@@ -1,6 +1,6 @@
 # 📝 Meeting Protokoll
 
-**Datum:** <!-- YYYY-MM-DD -->
+**Datum:** <!-- DD-MM-YYYY -->
 
 **Teilnehmer:**
 - Teilnehmer 1
@@ -12,7 +12,6 @@
 2. Punkt 2
 3. Punkt 3
 
----
 
 ## 1. Besprochene Themen
 
@@ -25,7 +24,6 @@
 ### Thema 2
 - Zusammenfassung des Themas.
 
----
 
 ## 2. Beschlüsse und Aufgaben
 
