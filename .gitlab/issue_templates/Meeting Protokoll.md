@@ -1,8 +1,13 @@
 # 📝 Meeting Protokoll
 
-**Datum:** <!-- DD-MM-YYYY -->
+**Datum:** <!-- DD-MM-YYYY --> **Beginn: <!-- hh:mm -->** **Ende: <!-- hh:mm-->**
 
 **Teilnehmer:**
+- Teilnehmer 1
+- Teilnehmer 2
+- ...
+
+**Abwesend:**
 - Teilnehmer 1
 - Teilnehmer 2
 - ...
