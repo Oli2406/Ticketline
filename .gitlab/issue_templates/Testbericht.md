@@ -1,8 +1,11 @@
 # 🧪 Testbericht
 
 **Version:** <!-- Version der Anwendung, die getestet wurde -->
+
 **Datum:** <!-- DD-MM-YYYY -->
+
 **Tester:** <!-- Name des Testers -->
+
 
 ---
 
@@ -18,11 +21,11 @@
 
 ## 2. Testfälle
 
-| Testfall-ID | Beschreibung              | Erwartetes Ergebnis             | Tatsächliches Ergebnis | Status      | Anmerkungen                     |
-|-------------|---------------------------|---------------------------------|-------------------------|-------------|----------------------------------|
-| TC-01       | Überprüfung des Logins    | Erfolgreiches Einloggen         | Erfolgreich             | ✅ Bestanden | -                                |
-| TC-02       | Passwort zurücksetzen     | E-Mail wird gesendet            | Fehlermeldung           | ❌ Fehlgeschlagen | SMTP-Server nicht erreichbar    |
-| TC-03       | Profil bearbeiten         | Daten werden aktualisiert       | Erfolgreich             | ✅ Bestanden | -                                |
+| Testfall-ID |Userstory-ID| Beschreibung              | Erwartetes Ergebnis             | Tatsächliches Ergebnis | Status      | Anmerkungen                     |
+|-------------|---------------|---------------------------|---------------------------------|-------------------------|-------------|----------------------------------|
+| TC-01       | US-1-2-3 | Überprüfung des Logins    | Erfolgreiches Einloggen         | Erfolgreich             | ✅ Bestanden | -                                |
+| TC-02       | US-1-2-3 | Passwort zurücksetzen     | E-Mail wird gesendet            | Fehlermeldung           | ❌ Fehlgeschlagen | SMTP-Server nicht erreichbar    |
+| TC-03       | US-1-2-3 | Profil bearbeiten         | Daten werden aktualisiert       | Erfolgreich             | ✅ Bestanden | -                                |
 
 ---
 
