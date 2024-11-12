@@ -7,7 +7,6 @@
 **Tester:** <!-- Name des Testers -->
 
 
----
 
 ## 1. Übersicht
 
@@ -17,7 +16,6 @@
 ### Testumgebung
 - **Browser / Version:** <!-- z. B. Chrome 94, Firefox 92 -->
 
----
 
 ## 2. Testfälle
 
@@ -27,7 +25,6 @@
 | TC-02       | US-1-2-3 | Passwort zurücksetzen     | E-Mail wird gesendet            | Fehlermeldung           | ❌ Fehlgeschlagen | SMTP-Server nicht erreichbar    |
 | TC-03       | US-1-2-3 | Profil bearbeiten         | Daten werden aktualisiert       | Erfolgreich             | ✅ Bestanden | -                                |
 
----
 
 ## 3. Zusammenfassung der Ergebnisse
 
@@ -36,13 +33,11 @@
 - **Fehlgeschlagen:** <!-- z. B. 2 -->
 - **Offene Punkte:** <!-- Punkte, die noch untersucht werden müssen -->
 
----
 
 ## 4. Empfehlungen
 
 <!-- Empfohlene Maßnahmen aufgrund der Testergebnisse, z. B. "Überprüfung der SMTP-Einstellungen für Passwort zurücksetzen erforderlich." -->
 
----
 
 ## 5. Anhang (optional)
 
