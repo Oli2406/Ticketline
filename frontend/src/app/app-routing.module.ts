@@ -6,8 +6,11 @@ import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
 
 const routes: Routes = [
-  {path: '', component: HomeComponent},
+  {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'merchandise', component: HomeComponent},
+  {path: 'events', component: HomeComponent},
+  {path: 'news', component: HomeComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent}
 ];
 

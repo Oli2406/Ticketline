@@ -1,19 +1,37 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark ">
-  <a class="navbar-brand ml-lg-5" href="">SE PR Group Phase</a>
-  <button class="navbar-toggler ml-5" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+<body>
+<!-- Header -->
+<div class="header-container">
+  <!-- Logo in the top left -->
+  <div class="logo"></div>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/message" routerLinkActive="active">Message</a>
-      </li>
-    </ul>
-    <ul class="navbar-nav mr-5">
-      <a class="nav-link" *ngIf="!authService.isLoggedIn()" routerLink="/login" routerLinkActive="active">Login</a>
-      <a class="nav-link" *ngIf="authService.isLoggedIn()" routerLink="/" (click)="authService.logoutUser()">Logout</a>
-    </ul>
+  <!-- Navigation Buttons -->
+  <div class="nav-buttons">
+    <button class="v76_370" [class.active]="currentPage === 'home'" (click)="setActivePage('home')">
+      Home
+    </button>
+    <button class="v76_371" [class.active]="currentPage === 'news'" (click)="setActivePage('news')">
+      News
+    </button>
+    <button class="v76_372" [class.active]="currentPage === 'merchandise'" (click)="setActivePage('merchandise')">
+      Merchandise
+    </button>
+    <button class="v76_373" [class.active]="currentPage === 'events'" (click)="setActivePage('events')">
+      Events
+    </button>
   </div>
-</nav>
+
+  <!-- Authentication Buttons -->
+  <div class="auth-buttons">
+    <div class="button-container">
+      <button class="login-button" [class.active]="currentPage === 'login'" (click)="setActivePage('login')">
+        Log in
+      </button>
+    </div>
+    <div class="button-container">
+      <button class="signup-button" [class.active]="currentPage === 'register'" (click)="setActivePage('register')">
+        Sign up
+      </button>
+    </div>
+  </div>
+</div>
+</body>
