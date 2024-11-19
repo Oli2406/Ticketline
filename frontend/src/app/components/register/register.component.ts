@@ -56,7 +56,7 @@ export class RegisterComponent {
     this.registerService.registerUser(payload).subscribe({
       next: () => {
         this.toastr.success('Registration successful!', 'Success');
-        this.router.navigate(['/home']);
+        this.router.navigate(['']);
 
       },
       error: (err) => {

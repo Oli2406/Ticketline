@@ -7,7 +7,7 @@ import {MessageComponent} from './components/message/message.component';
 import {RegisterComponent} from './components/register/register.component';
 
 const routes: Routes = [
-  {path: 'home', component: HomeComponent},
+  {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'merchandise', component: HomeComponent},
   {path: 'events', component: HomeComponent},
