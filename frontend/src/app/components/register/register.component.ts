@@ -46,24 +46,29 @@ export class RegisterComponent {
       firstName: this.registerData.firstName,
       lastName: this.registerData.lastName,
       email: this.registerData.email,
-      password: this.registerData.password
-    }
+      password: this.registerData.password,
+    };
     if (this.registerData.password !== this.registerData.confirmedPassword) {
       this.toastr.error('Passwords do not match!', 'Error');
       return;
     }
-    console.log(payload);
     this.registerService.registerUser(payload).subscribe({
       next: () => {
         this.toastr.success('Registration successful!', 'Success');
         this.router.navigate(['']);
-
       },
       error: (err) => {
-        console.error('Error during registration:', err);
-        this.toastr.error('Registration failed: ' + err.message, 'Error');
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating account', {
+          enableHtml: true,
+        });
       },
     });
   }
-
 }

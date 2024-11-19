@@ -4,7 +4,9 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
@@ -32,13 +34,17 @@ public class CustomUserDetailService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
     private final RegisterRepository registerRepository;
+    private final UserValidator userValidator;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, RegisterRepository registerRepository) {
+    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                                   JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
+                                   UserValidator userValidator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
         this.registerRepository = registerRepository;
+        this.userValidator = userValidator;
     }
 
     @Override
@@ -89,15 +95,19 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public String register(UserRegistrationDto userRegistrationDto) {
+    public String register(UserRegistrationDto userRegistrationDto) throws ValidationException, ConflictException {
+        LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
+
+        userValidator.validateRegister(userRegistrationDto);
+
         RegisterUser toRegister = new RegisterUser();
         toRegister.setFirstName(userRegistrationDto.getFirstName());
         toRegister.setLastName(userRegistrationDto.getLastName());
         toRegister.setEmail(userRegistrationDto.getEmail());
-
         String hashedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
         toRegister.setPassword(hashedPassword);
 
+        LOGGER.debug("saving user to database with details: {}", toRegister);
         registerRepository.save(toRegister);
 
         return jwtTokenizer.getAuthToken(toRegister.getEmail(), List.of("ROLE_USER"));
