@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -38,35 +39,33 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        LOGGER.debug("Load all user by email");
-        try {
-            ApplicationUser applicationUser = findApplicationUserByEmail(email);
+        LOGGER.debug("Loading user by email: {}", email);
+        ApplicationUser applicationUser = findApplicationUserByEmail(email);
 
-            List<GrantedAuthority> grantedAuthorities;
-            if (applicationUser.getAdmin()) {
-                grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER");
-            } else {
-                grantedAuthorities = AuthorityUtils.createAuthorityList("ROLE_USER");
-            }
+        List<GrantedAuthority> grantedAuthorities = applicationUser.getAdmin()
+            ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
+            : AuthorityUtils.createAuthorityList("ROLE_USER");
 
-            return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
-        } catch (NotFoundException e) {
-            throw new UsernameNotFoundException(e.getMessage(), e);
-        }
+        return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
     }
 
     @Override
     public ApplicationUser findApplicationUserByEmail(String email) {
-        LOGGER.debug("Find application user by email");
-        ApplicationUser applicationUser = userRepository.findUserByEmail(email);
-        if (applicationUser != null) {
-            return applicationUser;
-        }
-        throw new NotFoundException(String.format("Could not find the user with the email address %s", email));
+        LOGGER.debug("Finding application user by email: {}", email);
+        return userRepository.findUserByEmail(email)
+            .orElseThrow(() -> new NotFoundException(String.format("Could not find the user with the email address %s", email)));
     }
+
 
     @Override
     public String login(UserLoginDto userLoginDto) {
+
+        ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(() -> new NotFoundException(String.format("Could not find the user with the email address %s", userLoginDto.getEmail())));
+
+        if (user.isLocked()) {
+            throw new BadCredentialsException("Account is locked due to too many failed login attempts");
+        }
+
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (userDetails != null
             && userDetails.isAccountNonExpired()
@@ -74,12 +73,25 @@ public class CustomUserDetailService implements UserService {
             && userDetails.isCredentialsNonExpired()
             && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
         ) {
+            user.resetLoginAttempts();
+
             List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
             return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
         }
+
+
+            user.incrementLoginAttempts();
+            user.setLastFailedLogin(LocalDateTime.now());
+
+            if (user.getLoginAttempts() >= 5) {
+                user.setLocked(true);
+                throw new BadCredentialsException("User account has been locked because of too many incorrect attempts");
+            }
+            userRepository.save(user);
+
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
     }
 }
