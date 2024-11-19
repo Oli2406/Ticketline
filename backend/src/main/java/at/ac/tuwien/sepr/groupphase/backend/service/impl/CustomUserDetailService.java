@@ -1,8 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -28,12 +31,14 @@ public class CustomUserDetailService implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
+    private final RegisterRepository registerRepository;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
+    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, RegisterRepository registerRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
+        this.registerRepository = registerRepository;
     }
 
     @Override
@@ -81,5 +86,20 @@ public class CustomUserDetailService implements UserService {
             return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
         }
         throw new BadCredentialsException("Username or password is incorrect or account is locked");
+    }
+
+    @Override
+    public String register(UserRegistrationDto userRegistrationDto) {
+        RegisterUser toRegister = new RegisterUser();
+        toRegister.setFirstName(userRegistrationDto.getFirstName());
+        toRegister.setLastName(userRegistrationDto.getLastName());
+        toRegister.setEmail(userRegistrationDto.getEmail());
+
+        String hashedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
+        toRegister.setPassword(hashedPassword);
+
+        registerRepository.save(toRegister);
+
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), List.of("ROLE_USER"));
     }
 }
