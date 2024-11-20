@@ -10,12 +10,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Configuration
 public class LogConfiguration {
 
-    @Bean
-    public FilterRegistrationBean<OncePerRequestFilter> logFilter() {
-        var reg = new FilterRegistrationBean<OncePerRequestFilter>(new LogFilter());
-        reg.addUrlPatterns("/*");
-        reg.setName("logFilter");
-        reg.setOrder(Ordered.LOWEST_PRECEDENCE);
-        return reg;
-    }
+  @Bean
+  public FilterRegistrationBean<OncePerRequestFilter> logFilter() {
+    var reg = new FilterRegistrationBean<OncePerRequestFilter>(new LogFilter());
+    reg.addUrlPatterns("/*");
+    reg.setName("logFilter");
+    reg.setOrder(Ordered.LOWEST_PRECEDENCE);
+    return reg;
+  }
 }

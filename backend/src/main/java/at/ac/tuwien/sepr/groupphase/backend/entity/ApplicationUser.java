@@ -5,96 +5,99 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
 public class ApplicationUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(nullable = false, unique = true)
-    private String email;
-    @Column(nullable = false)
-    private String password;
-    @Column(nullable = false)
-    private Boolean admin;
-    @Column(nullable = false)
-    private int loginAttempts = 0;
-    @Column
-    private LocalDateTime lastFailedLogin;
-    @Column(nullable = false)
-    private boolean locked = false;
-    @Column(nullable = false)
-    private boolean isLoggedIn = false;
 
-    public ApplicationUser() {
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Column(nullable = false, unique = true)
+  private String email;
+  @Column(nullable = false)
+  private String password;
+  @Column(nullable = false)
+  private Boolean admin;
+  @Column(nullable = false)
+  private int loginAttempts = 0;
+  @Column
+  private LocalDateTime lastFailedLogin;
+  @Column(nullable = false)
+  private boolean locked = false;
+  @Column(nullable = false)
+  private boolean isLoggedIn = false;
 
-    public ApplicationUser(String email, String password, Boolean admin) {
-        this.email = email;
-        this.password = password;
-        this.admin = admin;
-    }
+  public ApplicationUser() {
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public ApplicationUser(String email, String password, Boolean admin) {
+    this.email = email;
+    this.password = password;
+    this.admin = admin;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public Boolean getAdmin() {
-        return admin;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public void setAdmin(Boolean admin) {
-        this.admin = admin;
-    }
+  public Boolean getAdmin() {
+    return admin;
+  }
 
-    public int getLoginAttempts() {
-        return loginAttempts;
-    }
+  public void setAdmin(Boolean admin) {
+    this.admin = admin;
+  }
 
-    public void setLoginAttempts(int loginAttempts) {
-        this.loginAttempts = loginAttempts;
-    }
+  public int getLoginAttempts() {
+    return loginAttempts;
+  }
 
-    public LocalDateTime getLastFailedLogin() {
-        return lastFailedLogin;
-    }
+  public void setLoginAttempts(int loginAttempts) {
+    this.loginAttempts = loginAttempts;
+  }
 
-    public void setLastFailedLogin(LocalDateTime lastFailedLogin) {
-        this.lastFailedLogin = lastFailedLogin;
-    }
+  public LocalDateTime getLastFailedLogin() {
+    return lastFailedLogin;
+  }
 
-    public boolean isLocked() {
-        return locked;
-    }
+  public void setLastFailedLogin(LocalDateTime lastFailedLogin) {
+    this.lastFailedLogin = lastFailedLogin;
+  }
 
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
+  public boolean isLocked() {
+    return locked;
+  }
 
-    public void incrementLoginAttempts() {
-        this.loginAttempts++;
-    }
+  public void setLocked(boolean locked) {
+    this.locked = locked;
+  }
 
-    public void resetLoginAttempts() {
-        this.loginAttempts = 0;
-    }
+  public void incrementLoginAttempts() {
+    this.loginAttempts++;
+  }
 
-    public void setLoggedIn(boolean loggedIn){
-        this.isLoggedIn = loggedIn;
-    }
-    public boolean isLoggedIn() { return isLoggedIn;}
+  public void resetLoginAttempts() {
+    this.loginAttempts = 0;
+  }
+
+  public void setLoggedIn(boolean loggedIn) {
+    this.isLoggedIn = loggedIn;
+  }
+
+  public boolean isLoggedIn() {
+    return isLoggedIn;
+  }
 }

@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/authentication")
 public class LogoutEndpoint {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    public LogoutEndpoint(UserService userService) {
-        this.userService = userService;
-    }
+  public LogoutEndpoint(UserService userService) {
+    this.userService = userService;
+  }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping
-    public void logout(@RequestBody UserLogoutDto userLogoutDto) { userService.logout(userLogoutDto); }
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping
+  public void logout(@RequestBody UserLogoutDto userLogoutDto) {
+    userService.logout(userLogoutDto);
+  }
 }

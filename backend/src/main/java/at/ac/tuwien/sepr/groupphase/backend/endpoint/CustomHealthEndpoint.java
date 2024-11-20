@@ -17,32 +17,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/health")
 public class CustomHealthEndpoint {
 
-    private final ApplicationContext applicationContext;
-    private boolean status = true;
+  private final ApplicationContext applicationContext;
+  private boolean status = true;
 
-    @Autowired
-    public CustomHealthEndpoint(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
+  @Autowired
+  public CustomHealthEndpoint(ApplicationContext applicationContext) {
+    this.applicationContext = applicationContext;
+  }
+
+
+  @PermitAll
+  @GetMapping
+  public ResponseEntity<String> getHealth() {
+    if (status) {
+      return ResponseEntity.ok("OK");
     }
+    return ResponseEntity.internalServerError().build();
+  }
 
-
-    @PermitAll
-    @GetMapping
-    public ResponseEntity<String> getHealth() {
-        if (status) {
-            return ResponseEntity.ok("OK");
-        }
-        return ResponseEntity.internalServerError().build();
-    }
-
-    /**
-     * Before the shutdown of a pod this url will be called. Afterwards the health probes fail. Therefore the pod
-     * is removed from the healthy pods which are exposed. This way a zero downtime upgrade is possible.
-     */
-    @PermitAll
-    @GetMapping("/prepareShutdown")
-    public void preShutdown() {
-        AvailabilityChangeEvent.publish(applicationContext, LivenessState.BROKEN);
-        status = false;
-    }
+  /**
+   * Before the shutdown of a pod this url will be called. Afterwards the health probes fail.
+   * Therefore the pod is removed from the healthy pods which are exposed. This way a zero downtime
+   * upgrade is possible.
+   */
+  @PermitAll
+  @GetMapping("/prepareShutdown")
+  public void preShutdown() {
+    AvailabilityChangeEvent.publish(applicationContext, LivenessState.BROKEN);
+    status = false;
+  }
 }
