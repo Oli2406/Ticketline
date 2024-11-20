@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/authentication")
 public class LoginEndpoint {
 
-  private final UserService userService;
+    private final UserService userService;
 
-  public LoginEndpoint(UserService userService) {
-    this.userService = userService;
-  }
+    public LoginEndpoint(UserService userService) {
+        this.userService = userService;
+    }
 
-  @PermitAll
-  @PostMapping
-  public String login(@RequestBody UserLoginDto userLoginDto) {
-    return userService.login(userLoginDto);
-  }
+    @PermitAll
+    @PostMapping
+    public String login(@RequestBody UserLoginDto userLoginDto) {
+        return userService.login(userLoginDto);
+    }
 }

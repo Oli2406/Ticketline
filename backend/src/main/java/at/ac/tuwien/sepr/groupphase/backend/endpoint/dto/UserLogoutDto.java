@@ -5,24 +5,24 @@ import jakarta.validation.constraints.NotNull;
 
 public class UserLogoutDto {
 
-  @NotNull(message = "Email must not be null")
-  @Email
-  private String email;
-  private String authToken;
+    @NotNull(message = "Email must not be null")
+    @Email
+    private String email;
+    private String authToken;
 
-  public String getEmail() {
-    return email;
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  public String getAuthToken() {
-    return authToken;
-  }
+    public String getAuthToken() {
+        return authToken;
+    }
 
-  public void setAuthToken(String authToken) {
-    this.authToken = authToken;
-  }
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
 }

@@ -26,119 +26,119 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailService implements UserService {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-      MethodHandles.lookup().lookupClass());
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtTokenizer jwtTokenizer;
-  private final SecurityPropertiesConfig.Jwt jwt;
-  private final SecurityPropertiesConfig.Auth auth;
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenizer jwtTokenizer;
+    private final SecurityPropertiesConfig.Jwt jwt;
+    private final SecurityPropertiesConfig.Auth auth;
 
-  @Autowired
-  public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-      JwtTokenizer jwtTokenizer, SecurityPropertiesConfig.Jwt jwt,
-      SecurityPropertiesConfig.Auth auth) {
-    this.userRepository = userRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.jwtTokenizer = jwtTokenizer;
-    this.jwt = jwt;
-    this.auth = auth;
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    LOGGER.debug("Loading user by email: {}", email);
-    ApplicationUser applicationUser = findApplicationUserByEmail(email);
-
-    List<GrantedAuthority> grantedAuthorities = applicationUser.getAdmin()
-        ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
-        : AuthorityUtils.createAuthorityList("ROLE_USER");
-
-    return User.builder()
-        .username(applicationUser.getEmail())
-        .password(applicationUser.getPassword())
-        .accountLocked(applicationUser.isLocked())
-        .authorities(grantedAuthorities)
-        .build();
-  }
-
-  @Override
-  public ApplicationUser findApplicationUserByEmail(String email) {
-    LOGGER.debug("Finding application user by email: {}", email);
-    return userRepository.findUserByEmail(email)
-        .orElseThrow(() -> new NotFoundException(
-            String.format("Could not find the user with the email address %s", email)));
-  }
-
-
-  @Override
-  public String login(UserLoginDto userLoginDto) {
-    LOGGER.debug("Login user: {}", userLoginDto);
-    ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(
-        () -> new NotFoundException(
-            String.format("Could not find the user with the email address %s",
-                userLoginDto.getEmail())));
-
-    UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
-    if (!userDetails.isAccountNonLocked()) {
-      throw new BadCredentialsException(
-          "Account is locked due to too many failed login attempts");
-    }
-    if (userDetails.isAccountNonExpired()
-        && userDetails.isCredentialsNonExpired()
-        && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
-    ) {
-      user.resetLoginAttempts();
-      user.setLoggedIn(true);
-      userRepository.save(user);
-
-      List<String> roles = userDetails.getAuthorities()
-          .stream()
-          .map(GrantedAuthority::getAuthority)
-          .toList();
-      return jwtTokenizer.getAuthToken(
-          userDetails.getUsername(),
-          roles);
+    @Autowired
+    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+        JwtTokenizer jwtTokenizer, SecurityPropertiesConfig.Jwt jwt,
+        SecurityPropertiesConfig.Auth auth) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenizer = jwtTokenizer;
+        this.jwt = jwt;
+        this.auth = auth;
     }
 
-    user.incrementLoginAttempts();
-    user.setLastFailedLogin(LocalDateTime.now());
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        LOGGER.debug("Loading user by email: {}", email);
+        ApplicationUser applicationUser = findApplicationUserByEmail(email);
 
-    if (user.getLoginAttempts() >= auth.getMaxLoginAttempts()) {
-      user.setLocked(true);
-      userRepository.save(user);
-      throw new BadCredentialsException(
-          "User account has been locked because of too many incorrect attempts");
-    }
-    userRepository.save(user);
-    throw new BadCredentialsException("Username or password is incorrect");
-  }
+        List<GrantedAuthority> grantedAuthorities = applicationUser.getAdmin()
+            ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
+            : AuthorityUtils.createAuthorityList("ROLE_USER");
 
-  @Override
-  public void logout(UserLogoutDto userLogoutDto) {
-    LOGGER.debug("Logout user: {}", userLogoutDto);
-    String authToken = userLogoutDto.getAuthToken();
-
-    ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail())
-        .orElseThrow(() -> new NotFoundException(
-            String.format("Could not find the user with the email address %s",
-                userLogoutDto.getEmail())));
-
-    if (!user.isLoggedIn()) {
-      throw new IllegalStateException(
-          String.format("The user with email %s is not currently logged in",
-              userLogoutDto.getEmail()));
+        return User.builder()
+            .username(applicationUser.getEmail())
+            .password(applicationUser.getPassword())
+            .accountLocked(applicationUser.isLocked())
+            .authorities(grantedAuthorities)
+            .build();
     }
 
-    if (!jwtTokenizer.validateToken(authToken)) {
-      throw new SecurityException("Invalid authentication token");
+    @Override
+    public ApplicationUser findApplicationUserByEmail(String email) {
+        LOGGER.debug("Finding application user by email: {}", email);
+        return userRepository.findUserByEmail(email)
+            .orElseThrow(() -> new NotFoundException(
+                String.format("Could not find the user with the email address %s", email)));
     }
 
-    jwtTokenizer.blockToken(authToken);
 
-    user.setLoggedIn(false);
-    userRepository.save(user);
+    @Override
+    public String login(UserLoginDto userLoginDto) {
+        LOGGER.debug("Login user: {}", userLoginDto);
+        ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    userLoginDto.getEmail())));
 
-    LOGGER.info("User with email {} has successfully logged out.", userLogoutDto.getEmail());
-  }
+        UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
+        if (!userDetails.isAccountNonLocked()) {
+            throw new BadCredentialsException(
+                "Account is locked due to too many failed login attempts");
+        }
+        if (userDetails.isAccountNonExpired()
+            && userDetails.isCredentialsNonExpired()
+            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
+        ) {
+            user.resetLoginAttempts();
+            user.setLoggedIn(true);
+            userRepository.save(user);
+
+            List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+            return jwtTokenizer.getAuthToken(
+                userDetails.getUsername(),
+                roles);
+        }
+
+        user.incrementLoginAttempts();
+        user.setLastFailedLogin(LocalDateTime.now());
+
+        if (user.getLoginAttempts() >= auth.getMaxLoginAttempts()) {
+            user.setLocked(true);
+            userRepository.save(user);
+            throw new BadCredentialsException(
+                "User account has been locked because of too many incorrect attempts");
+        }
+        userRepository.save(user);
+        throw new BadCredentialsException("Username or password is incorrect");
+    }
+
+    @Override
+    public void logout(UserLogoutDto userLogoutDto) {
+        LOGGER.debug("Logout user: {}", userLogoutDto);
+        String authToken = userLogoutDto.getAuthToken();
+
+        ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail())
+            .orElseThrow(() -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    userLogoutDto.getEmail())));
+
+        if (!user.isLoggedIn()) {
+            throw new IllegalStateException(
+                String.format("The user with email %s is not currently logged in",
+                    userLogoutDto.getEmail()));
+        }
+
+        if (!jwtTokenizer.validateToken(authToken)) {
+            throw new SecurityException("Invalid authentication token");
+        }
+
+        jwtTokenizer.blockToken(authToken);
+
+        user.setLoggedIn(false);
+        userRepository.save(user);
+
+        LOGGER.info("User with email {} has successfully logged out.", userLogoutDto.getEmail());
+    }
 }

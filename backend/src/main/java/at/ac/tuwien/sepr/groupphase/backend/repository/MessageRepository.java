@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-  /**
-   * Find all message entries ordered by published at date (descending).
-   *
-   * @return ordered list of al message entries
-   */
-  List<Message> findAllByOrderByPublishedAtDesc();
+    /**
+     * Find all message entries ordered by published at date (descending).
+     *
+     * @return ordered list of al message entries
+     */
+    List<Message> findAllByOrderByPublishedAtDesc();
 
 }
