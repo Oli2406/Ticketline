@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.Date;
 import java.util.List;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,48 +43,65 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (authToken != null) {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (IllegalArgumentException | JwtException e) {
-            LOGGER.debug("Invalid authorization attempt: {}", e.getMessage());
+        } catch (JwtException e) {
+            LOGGER.warn("JWT validation failed: {}", e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid authorization header or token");
+            response.getWriter().write("Invalid or expired token");
+            return;
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Invalid authorization attempt: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Malformed authorization header");
             return;
         }
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request)
-        throws JwtException, IllegalArgumentException {
+    private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request) throws JwtException {
         String token = request.getHeader(securityProperties.getAuthHeader());
         if (token == null || token.isEmpty()) {
             return null;
         }
 
         if (!token.startsWith(securityProperties.getAuthTokenPrefix())) {
-            throw new IllegalArgumentException("Authorization header is malformed or missing");
+            throw new IllegalArgumentException("Authorization header must start with the correct prefix");
         }
 
+        String strippedToken = token.replace(securityProperties.getAuthTokenPrefix(), "").trim();
         byte[] signingKey = securityProperties.getJwtSecret().getBytes();
 
         if (!token.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Token must start with 'Bearer'");
         }
-        Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(signingKey)).build()
-            .parseSignedClaims(token.replace(securityProperties.getAuthTokenPrefix(), ""))
+
+        Claims claims = Jwts.parser()
+            .verifyWith(Keys.hmacShaKeyFor(signingKey))
+            .build()
+            .parseSignedClaims(strippedToken)
             .getPayload();
 
+        validateTokenExpiration(claims);
+
         String username = claims.getSubject();
-
-        List<SimpleGrantedAuthority> authorities = ((List<?>) claims
-            .get("rol")).stream()
-            .map(authority -> new SimpleGrantedAuthority((String) authority))
-            .toList();
-
         if (username == null || username.isEmpty()) {
-            throw new IllegalArgumentException("Token contains no user");
+            throw new IllegalArgumentException("Token does not contain a valid user");
         }
+
+        @SuppressWarnings("unchecked")
+        List<String> roles = (List<String>) claims.get("rol");
+        List<SimpleGrantedAuthority> authorities = roles.stream()
+            .map(SimpleGrantedAuthority::new)
+            .toList();
 
         MDC.put("u", username);
 
         return new UsernamePasswordAuthenticationToken(username, null, authorities);
+    }
+
+    private void validateTokenExpiration(Claims claims) {
+        Date expiration = claims.getExpiration();
+        if (expiration == null || expiration.before(new Date())) {
+            throw new JwtException("Token is expired");
+        }
     }
 }

@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
@@ -29,12 +31,16 @@ public class CustomUserDetailService implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
+    private final SecurityPropertiesConfig.Jwt jwt;
+    private final SecurityPropertiesConfig.Auth auth;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer) {
+    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer, SecurityPropertiesConfig.Jwt jwt, SecurityPropertiesConfig.Auth auth) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
+        this.jwt = jwt;
+        this.auth = auth;
     }
 
     @Override
@@ -46,7 +52,12 @@ public class CustomUserDetailService implements UserService {
             ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
             : AuthorityUtils.createAuthorityList("ROLE_USER");
 
-        return new User(applicationUser.getEmail(), applicationUser.getPassword(), grantedAuthorities);
+        return User.builder()
+            .username(applicationUser.getEmail())
+            .password(applicationUser.getPassword())
+            .accountLocked(applicationUser.isLocked())
+            .authorities(grantedAuthorities)
+            .build();
     }
 
     @Override
@@ -59,39 +70,65 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public String login(UserLoginDto userLoginDto) {
-
+        LOGGER.debug("Login user: {}", userLoginDto);
         ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(() -> new NotFoundException(String.format("Could not find the user with the email address %s", userLoginDto.getEmail())));
 
-        if (user.isLocked()) {
+        UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
+        if(!userDetails.isAccountNonLocked()){
             throw new BadCredentialsException("Account is locked due to too many failed login attempts");
         }
-
-        UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
-        if (userDetails != null
-            && userDetails.isAccountNonExpired()
-            && userDetails.isAccountNonLocked()
+        if ( userDetails.isAccountNonExpired()
             && userDetails.isCredentialsNonExpired()
             && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
         ) {
             user.resetLoginAttempts();
+            user.setLoggedIn(true);
+            userRepository.save(user);
 
             List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            return jwtTokenizer.getAuthToken(
+                userDetails.getUsername(),
+                roles);
         }
-
 
             user.incrementLoginAttempts();
             user.setLastFailedLogin(LocalDateTime.now());
 
-            if (user.getLoginAttempts() >= 5) {
+            if (user.getLoginAttempts() >= auth.getMaxLoginAttempts()) {
                 user.setLocked(true);
+                userRepository.save(user);
                 throw new BadCredentialsException("User account has been locked because of too many incorrect attempts");
             }
             userRepository.save(user);
+            throw new BadCredentialsException("Username or password is incorrect");
+    }
 
-        throw new BadCredentialsException("Username or password is incorrect or account is locked");
+    @Override
+    public void logout(UserLogoutDto userLogoutDto) {
+        LOGGER.debug("Logout user: {}", userLogoutDto);
+        String authToken = userLogoutDto.getAuthToken();
+
+        ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail())
+            .orElseThrow(() -> new NotFoundException(
+                String.format("Could not find the user with the email address %s", userLogoutDto.getEmail())));
+
+        if (!user.isLoggedIn()) {
+            throw new IllegalStateException(
+                String.format("The user with email %s is not currently logged in", userLogoutDto.getEmail()));
+        }
+
+        if (!jwtTokenizer.validateToken(authToken)) {
+            throw new SecurityException("Invalid authentication token");
+        }
+
+        jwtTokenizer.blockToken(authToken);
+
+        user.setLoggedIn(false);
+        userRepository.save(user);
+
+        LOGGER.info("User with email {} has successfully logged out.", userLogoutDto.getEmail());
     }
 }

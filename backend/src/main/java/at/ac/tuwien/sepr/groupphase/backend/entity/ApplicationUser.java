@@ -25,6 +25,8 @@ public class ApplicationUser {
     private LocalDateTime lastFailedLogin;
     @Column(nullable = false)
     private boolean locked = false;
+    @Column(nullable = false)
+    private boolean isLoggedIn = false;
 
     public ApplicationUser() {
     }
@@ -90,4 +92,9 @@ public class ApplicationUser {
     public void resetLoginAttempts() {
         this.loginAttempts = 0;
     }
+
+    public void setLoggedIn(boolean loggedIn){
+        this.isLoggedIn = loggedIn;
+    }
+    public boolean isLoggedIn() { return isLoggedIn;}
 }
