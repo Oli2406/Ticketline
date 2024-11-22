@@ -46,5 +46,4 @@ public class SimpleMessageService implements MessageService {
         message.setPublishedAt(LocalDateTime.now());
         return messageRepository.save(message);
     }
-
 }
