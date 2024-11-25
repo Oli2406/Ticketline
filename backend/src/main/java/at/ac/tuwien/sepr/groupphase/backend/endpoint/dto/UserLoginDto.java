@@ -48,14 +48,11 @@ public class UserLoginDto {
 
     @Override
     public String toString() {
-        return "UserLoginDto{"
-            + "email='" + email + '\''
-            + ", password='" + password + '\''
-            + '}';
+        return "UserLoginDto{" + "email='" + email + '\'' + ", password='" + password + '\'' + '}';
     }
 
-
     public static final class UserLoginDtoBuilder {
+
         private String email;
         private String password;
 

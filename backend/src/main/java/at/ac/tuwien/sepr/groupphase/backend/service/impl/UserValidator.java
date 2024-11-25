@@ -15,14 +15,16 @@ import java.util.List;
 @Component
 public class UserValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final RegisterRepository registerRepository;
 
     public UserValidator(RegisterRepository registerRepository) {
         this.registerRepository = registerRepository;
     }
 
-    public void validateRegister(UserRegistrationDto registerDto) throws ValidationException, ConflictException {
+    public void validateRegister(UserRegistrationDto registerDto)
+        throws ValidationException, ConflictException {
         LOGGER.trace("validateRegister({})", registerDto);
         List<String> validationErrors = new ArrayList<>();
 
@@ -33,7 +35,8 @@ public class UserValidator {
         } else if (registerDto.getFirstName().length() > 255) {
             validationErrors.add("First name must be less than 255 characters");
         } else if (!registerDto.getFirstName().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
-            validationErrors.add("First name must contain only letters, apostrophes, hyphens, and spaces");
+            validationErrors.add(
+                "First name must contain only letters, apostrophes, hyphens, and spaces");
         }
 
         if (registerDto.getLastName() == null || registerDto.getLastName().trim().isEmpty()) {
@@ -41,12 +44,15 @@ public class UserValidator {
         } else if (registerDto.getLastName().length() > 255) {
             validationErrors.add("Last name must be less than 255 characters");
         } else if (!registerDto.getLastName().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
-            validationErrors.add("Last name must contain only letters, apostrophes, hyphens, and spaces");
+            validationErrors.add(
+                "Last name must contain only letters, apostrophes, hyphens, and spaces");
         }
 
         if (registerDto.getEmail() == null || registerDto.getEmail().trim().isEmpty()) {
             validationErrors.add("Email must not be empty");
-        } else if (!registerDto.getEmail().matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
+        } else if (!registerDto
+            .getEmail()
+            .matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
             validationErrors.add("Invalid email format");
         }
 
@@ -56,7 +62,8 @@ public class UserValidator {
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("User data validation failed");
-            throw new ValidationException("User data validation registration failed: ", validationErrors);
+            throw new ValidationException("User data validation registration failed: ",
+                validationErrors);
         }
     }
 

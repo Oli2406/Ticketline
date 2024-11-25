@@ -22,16 +22,24 @@
 
   <!-- Authentication Buttons -->
   <div class="auth-buttons">
-    <div class="button-container">
-      <button class="login-button" [class.active]="currentPage === 'login'" (click)="setActivePage('login')">
-        Log in
-      </button>
-    </div>
-    <div class="button-container">
-      <button class="signup-button" [class.active]="currentPage === 'register'" (click)="setActivePage('register')">
-        Sign up
-      </button>
-    </div>
+    @if (!authService.isLoggedIn()) {
+      <div class="button-container">
+        <button class="login-button" [class.active]="currentPage === 'login'" (click)="setActivePage('login')">
+          Login
+        </button>
+      </div>
+      <div class="button-container">
+        <button class="signup-button" [class.active]="currentPage === 'register'" (click)="setActivePage('register')">
+          Sign up
+        </button>
+      </div>
+    } @else {
+      <div class="button-container">
+        <button class="login-button" [class.active]="currentPage === 'logout'"  (click)="logoutUser()">
+          Logout
+        </button>
+      </div>
+    }
   </div>
 </div>
 </body>

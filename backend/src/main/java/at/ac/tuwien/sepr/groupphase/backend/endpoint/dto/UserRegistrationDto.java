@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public class UserRegistrationDto {
+
     private String firstName;
     private String lastName;
     private String email;

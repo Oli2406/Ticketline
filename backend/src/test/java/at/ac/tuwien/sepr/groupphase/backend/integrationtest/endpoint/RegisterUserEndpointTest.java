@@ -45,11 +45,13 @@ class RegisterUserEndpointTest {
 
         Mockito.when(userService.register(Mockito.any(UserRegistrationDto.class))).thenReturn(null);
 
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/v1/register")
-                .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\",\"password\":\"password123\"}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/v1/register")
+                    .content(
+                        "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\",\"password\":\"password123\"}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
     }
 
@@ -61,13 +63,17 @@ class RegisterUserEndpointTest {
         userRegistrationDto.setEmail("");
         userRegistrationDto.setPassword("");
 
-        doThrow(new ValidationException("Validation error", new ArrayList<>())).when(userService).register(any(UserRegistrationDto.class));
+        doThrow(new ValidationException("Validation error", new ArrayList<>()))
+            .when(userService)
+            .register(any(UserRegistrationDto.class));
 
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/v1/register")
-                .content("{\"firstName\":\"\",\"lastName\":\"\",\"email\":\"\",\"password\":\"\"}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/v1/register")
+                    .content(
+                        "{\"firstName\":\"\",\"lastName\":\"\",\"email\":\"\",\"password\":\"\"}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isUnprocessableEntity());
     }
 
@@ -79,13 +85,17 @@ class RegisterUserEndpointTest {
         userRegistrationDto.setEmail("john.doe@example.com");
         userRegistrationDto.setPassword("password123");
 
-        doThrow(new ConflictException("Conflict error", new ArrayList<>())).when(userService).register(any(UserRegistrationDto.class));
+        doThrow(new ConflictException("Conflict error", new ArrayList<>()))
+            .when(userService)
+            .register(any(UserRegistrationDto.class));
 
-        mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/v1/register")
-                .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\",\"password\":\"password123\"}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc
+            .perform(
+                MockMvcRequestBuilders.post("/api/v1/register")
+                    .content(
+                        "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\",\"password\":\"password123\"}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isConflict());
     }
 }

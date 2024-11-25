@@ -1,12 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Message {
@@ -90,16 +90,24 @@ public class Message {
     @Override
     public String toString() {
         return "Message{"
-            + "id=" + id
-            + ", publishedAt=" + publishedAt
-            + ", title='" + title + '\''
-            + ", summary='" + summary + '\''
-            + ", text='" + text + '\''
+            + "id="
+            + id
+            + ", publishedAt="
+            + publishedAt
+            + ", title='"
+            + title
+            + '\''
+            + ", summary='"
+            + summary
+            + '\''
+            + ", text='"
+            + text
+            + '\''
             + '}';
     }
 
-
     public static final class MessageBuilder {
+
         private Long id;
         private LocalDateTime publishedAt;
         private String title;
