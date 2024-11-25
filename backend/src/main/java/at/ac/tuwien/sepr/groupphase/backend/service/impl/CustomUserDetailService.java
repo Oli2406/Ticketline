@@ -3,8 +3,13 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -33,14 +38,19 @@ public class CustomUserDetailService implements UserService {
     private final JwtTokenizer jwtTokenizer;
     private final SecurityPropertiesConfig.Jwt jwt;
     private final SecurityPropertiesConfig.Auth auth;
+    private final RegisterRepository registerRepository;
+    private final UserValidator userValidator;
 
     @Autowired
     public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-        JwtTokenizer jwtTokenizer, SecurityPropertiesConfig.Jwt jwt,
-        SecurityPropertiesConfig.Auth auth) {
+                                   JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
+                                   UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
+                                   SecurityPropertiesConfig.Auth auth) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
+        this.registerRepository = registerRepository;
+        this.userValidator = userValidator;
         this.jwt = jwt;
         this.auth = auth;
     }
@@ -140,5 +150,24 @@ public class CustomUserDetailService implements UserService {
         userRepository.save(user);
 
         LOGGER.info("User with email {} has successfully logged out.", userLogoutDto.getEmail());
+    }
+
+    @Override
+    public String register(UserRegistrationDto userRegistrationDto) throws ValidationException, ConflictException {
+        LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
+
+        userValidator.validateRegister(userRegistrationDto);
+
+        RegisterUser toRegister = new RegisterUser();
+        toRegister.setFirstName(userRegistrationDto.getFirstName());
+        toRegister.setLastName(userRegistrationDto.getLastName());
+        toRegister.setEmail(userRegistrationDto.getEmail());
+        String hashedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
+        toRegister.setPassword(hashedPassword);
+
+        LOGGER.debug("saving user to database with details: {}", toRegister);
+        registerRepository.save(toRegister);
+
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), List.of("ROLE_USER"));
     }
 }

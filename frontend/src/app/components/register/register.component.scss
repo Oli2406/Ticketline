@@ -1,0 +1,156 @@
+// General Reset
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// Ensure no interference with ngx-toastr styles
+*:not(.toast),
+*:not(.toast *) {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #A7A3FF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+// Password Group Styling
+.password-group {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding-right: 50px;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #6c63ff;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #514dc7;
+    }
+  }
+}
+
+// Signup Container Styling
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  width: 100%;
+  max-width: 1200px;
+
+  // Left Section
+  .signup-left {
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #3e3e3e;
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Right Section
+  .signup-right {
+    width: 100%;
+    max-width: 400px;
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .form-group {
+        position: relative;
+
+        input {
+          width: 100%;
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+          outline: none;
+          background-color: #F0EFFF;
+          color: #333;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+          transition: border-color 0.3s, box-shadow 0.3s;
+
+          &::placeholder {
+            color: #A7A3FF;
+            font-size: 1rem;
+          }
+
+          &:focus {
+            border-color: #7d5efc;
+            box-shadow: 0px 4px 10px rgba(125, 94, 252, 0.3);
+          }
+        }
+      }
+
+      .btn-register {
+        width: 100%;
+        padding: 15px;
+        background-color: #4D47C3;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s, box-shadow 0.3s;
+
+        &:hover {
+          background-color: #514dc7;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+      }
+    }
+  }
+}
+
+// Custom Styling for ngx-toastr
+.toast {
+  font-family: 'Arial', sans-serif !important;
+  font-size: 1rem !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.toast-error {
+  background-color: #f44336 !important; // Red background for error toasts
+  color: #fff !important; // White text for better contrast
+}
+
+.toast-top-left {
+  top: 12px !important;
+  left: 12px !important;
+  position: fixed !important;
+  z-index: 1060 !important; // Ensure it appears above other elements
+}

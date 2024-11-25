@@ -1,0 +1,57 @@
+<div class="signup-container">
+  <div class="signup-left">
+    <h1>Sign Up to Ticketline</h1>
+  </div>
+  <div class="signup-right">
+    <h2>Sign Up</h2>
+    <form>
+      <div class="form-group">
+        <input
+          type="email"
+          placeholder="Email"
+          [(ngModel)]="registerData.email"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          placeholder="First name"
+          [(ngModel)]="registerData.firstName"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          placeholder="Last name"
+          [(ngModel)]="registerData.lastName"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group password-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="registerData.password"
+          [ngModelOptions]="{standalone: true}"
+        />
+        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+          {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+        </button>
+      </div>
+      <div class="form-group password-group">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm Password"
+          [(ngModel)]="registerData.confirmedPassword"
+          [ngModelOptions]="{standalone: true}"
+        />
+        <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+          {{ showConfirmPassword ? '👁️‍🗨️' : '👁️'}}
+        </button>
+      </div>
+      <button type="button" class="btn-register" (click)="onSubmit()">Register</button>
+    </form>
+  </div>
+</div>
