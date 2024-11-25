@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageDataGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int NUMBER_OF_MESSAGES_TO_GENERATE = 5;
     private static final String TEST_NEWS_TITLE = "Title";
     private static final String TEST_NEWS_SUMMARY = "Summary of the message";
@@ -34,16 +34,16 @@ public class MessageDataGenerator {
         } else {
             LOGGER.debug("generating {} message entries", NUMBER_OF_MESSAGES_TO_GENERATE);
             for (int i = 0; i < NUMBER_OF_MESSAGES_TO_GENERATE; i++) {
-                Message message = Message.MessageBuilder.aMessage()
-                    .withTitle(TEST_NEWS_TITLE + " " + i)
-                    .withSummary(TEST_NEWS_SUMMARY + " " + i)
-                    .withText(TEST_NEWS_TEXT + " " + i)
-                    .withPublishedAt(LocalDateTime.now().minusMonths(i))
-                    .build();
+                Message message =
+                    Message.MessageBuilder.aMessage()
+                        .withTitle(TEST_NEWS_TITLE + " " + i)
+                        .withSummary(TEST_NEWS_SUMMARY + " " + i)
+                        .withText(TEST_NEWS_TEXT + " " + i)
+                        .withPublishedAt(LocalDateTime.now().minusMonths(i))
+                        .build();
                 LOGGER.debug("saving message {}", message);
                 messageRepository.save(message);
             }
         }
     }
-
 }

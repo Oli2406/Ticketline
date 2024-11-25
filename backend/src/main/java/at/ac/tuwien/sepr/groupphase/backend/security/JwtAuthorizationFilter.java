@@ -28,8 +28,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final SecurityProperties securityProperties;
 
     public JwtAuthorizationFilter(SecurityProperties securityProperties) {
@@ -37,8 +37,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain chain)
+    protected void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
         List<String> excludedPaths = List.of("/api/v1/register", "/api/v1/public");
 
@@ -70,7 +70,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-
     private UsernamePasswordAuthenticationToken getAuthToken(HttpServletRequest request)
         throws JwtException {
         String token = request.getHeader(securityProperties.getAuthHeader());
@@ -90,11 +89,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throw new IllegalArgumentException("Token must start with 'Bearer'");
         }
 
-        Claims claims = Jwts.parser()
-            .verifyWith(Keys.hmacShaKeyFor(signingKey))
-            .build()
-            .parseSignedClaims(strippedToken)
-            .getPayload();
+        Claims claims =
+            Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(signingKey))
+                .build()
+                .parseSignedClaims(strippedToken)
+                .getPayload();
 
         validateTokenExpiration(claims);
 
@@ -105,9 +105,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         @SuppressWarnings("unchecked")
         List<String> roles = (List<String>) claims.get("rol");
-        List<SimpleGrantedAuthority> authorities = roles.stream()
-            .map(SimpleGrantedAuthority::new)
-            .toList();
+        List<SimpleGrantedAuthority> authorities =
+            roles.stream().map(SimpleGrantedAuthority::new).toList();
 
         MDC.put("u", username);
 

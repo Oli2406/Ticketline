@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SimpleMessageService implements MessageService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final MessageRepository messageRepository;
 
     public SimpleMessageService(MessageRepository messageRepository) {

@@ -14,5 +14,4 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * @return ordered list of al message entries
      */
     List<Message> findAllByOrderByPublishedAtDesc();
-
 }

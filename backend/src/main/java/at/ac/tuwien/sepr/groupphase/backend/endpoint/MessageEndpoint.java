@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/messages")
 public class MessageEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final MessageService messageService;
     private final MessageMapper messageMapper;
 
@@ -40,7 +40,9 @@ public class MessageEndpoint {
 
     @Secured("ROLE_USER")
     @GetMapping
-    @Operation(summary = "Get list of messages without details", security = @SecurityRequirement(name = "apiKey"))
+    @Operation(
+        summary = "Get list of messages without details",
+        security = @SecurityRequirement(name = "apiKey"))
     public List<SimpleMessageDto> findAll() {
         LOGGER.info("GET /api/v1/messages");
         return messageMapper.messageToSimpleMessageDto(messageService.findAll());
@@ -48,7 +50,9 @@ public class MessageEndpoint {
 
     @Secured("ROLE_USER")
     @GetMapping(value = "/{id}")
-    @Operation(summary = "Get detailed information about a specific message", security = @SecurityRequirement(name = "apiKey"))
+    @Operation(
+        summary = "Get detailed information about a specific message",
+        security = @SecurityRequirement(name = "apiKey"))
     public DetailedMessageDto find(@PathVariable(name = "id") Long id) {
         LOGGER.info("GET /api/v1/messages/{}", id);
         return messageMapper.messageToDetailedMessageDto(messageService.findOne(id));

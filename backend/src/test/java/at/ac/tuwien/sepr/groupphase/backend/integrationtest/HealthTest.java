@@ -32,8 +32,7 @@ public class HealthTest {
      */
     @Test
     public void getHealthReturns200() throws Exception {
-        MvcResult mvcResult = this.mockMvc.perform(get("/health"))
-            .andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/health")).andReturn();
 
         assertEquals(HttpStatus.OK.value(), mvcResult.getResponse().getStatus());
     }

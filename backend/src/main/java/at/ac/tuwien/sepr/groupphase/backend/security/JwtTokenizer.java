@@ -26,16 +26,22 @@ public class JwtTokenizer {
     }
 
     public String getAuthToken(String user, List<String> roles) {
-        String token = Jwts.builder()
-            .header().add("typ", securityProperties.getJwtType()).and()
-            .issuer(securityProperties.getJwtIssuer())
-            .audience().add(securityProperties.getJwtAudience()).and()
-            .subject(user)
-            .expiration(
-                new Date(System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
-            .claim("rol", roles)
-            .signWith(secretKey, SignatureAlgorithm.HS512)
-            .compact();
+        String token =
+            Jwts.builder()
+                .header()
+                .add("typ", securityProperties.getJwtType())
+                .and()
+                .issuer(securityProperties.getJwtIssuer())
+                .audience()
+                .add(securityProperties.getJwtAudience())
+                .and()
+                .subject(user)
+                .expiration(
+                    new Date(
+                        System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
+                .claim("rol", roles)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .compact();
 
         return securityProperties.getAuthTokenPrefix() + token;
     }
@@ -43,10 +49,7 @@ public class JwtTokenizer {
     public boolean validateToken(String token) {
         try {
             String strippedToken = stripTokenPrefix(token);
-            Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(strippedToken);
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(strippedToken);
 
             return !isTokenBlocked(strippedToken);
         } catch (JwtException | IllegalArgumentException e) {

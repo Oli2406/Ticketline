@@ -63,12 +63,17 @@ public class MessageInquiryDto {
     @Override
     public String toString() {
         return "MessageInquiryDto{"
-            + "title='" + title + '\''
-            + ", summary='" + summary + '\''
-            + ", text='" + text + '\''
+            + "title='"
+            + title
+            + '\''
+            + ", summary='"
+            + summary
+            + '\''
+            + ", text='"
+            + text
+            + '\''
             + '}';
     }
-
 
     public static final class MessageInquiryDtoBuilder {
 

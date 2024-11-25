@@ -49,5 +49,4 @@ public class SecurityProperties {
     public Long getJwtExpirationTime() {
         return jwt.getExpirationTime();
     }
-
 }

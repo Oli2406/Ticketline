@@ -18,7 +18,7 @@ public interface MessageMapper {
     /**
      * This is necessary since the SimpleMessageDto misses the text property and the collection
      * mapper can't handle missing fields.
-     **/
+     */
     @IterableMapping(qualifiedByName = "simpleMessage")
     List<SimpleMessageDto> messageToSimpleMessageDto(List<Message> message);
 
@@ -30,4 +30,3 @@ public interface MessageMapper {
 
     MessageInquiryDto messageToMessageInquiryDto(Message message);
 }
-

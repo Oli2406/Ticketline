@@ -5,7 +5,6 @@ import java.util.Objects;
 
 public class SimpleMessageDto {
 
-
     private Long id;
 
     private LocalDateTime publishedAt;
@@ -68,13 +67,18 @@ public class SimpleMessageDto {
     @Override
     public String toString() {
         return "SimpleMessageDto{"
-            + "id=" + id
-            + ", publishedAt=" + publishedAt
-            + ", title='" + title + '\''
-            + ", summary='" + summary + '\''
+            + "id="
+            + id
+            + ", publishedAt="
+            + publishedAt
+            + ", title='"
+            + title
+            + '\''
+            + ", summary='"
+            + summary
+            + '\''
             + '}';
     }
-
 
     public static final class SimpleMessageDtoBuilder {
 

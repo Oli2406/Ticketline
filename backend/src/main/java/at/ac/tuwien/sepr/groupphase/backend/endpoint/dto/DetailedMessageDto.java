@@ -36,11 +36,8 @@ public class DetailedMessageDto extends SimpleMessageDto {
 
     @Override
     public String toString() {
-        return "DetailedMessageDto{"
-            + "text='" + text + '\''
-            + '}';
+        return "DetailedMessageDto{" + "text='" + text + '\'' + '}';
     }
-
 
     public static final class DetailedMessageDtoBuilder {
 

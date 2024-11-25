@@ -12,7 +12,6 @@ public interface MessageService {
      */
     List<Message> findAll();
 
-
     /**
      * Find a single message entry by id.
      *
@@ -28,5 +27,4 @@ public interface MessageService {
      * @return published message entry
      */
     Message publishMessage(Message message);
-
 }

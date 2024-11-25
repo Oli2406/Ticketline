@@ -8,6 +8,7 @@ public class UserLogoutDto {
     @NotNull(message = "Email must not be null")
     @Email
     private String email;
+
     private String authToken;
 
     public String getEmail() {

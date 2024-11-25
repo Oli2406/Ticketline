@@ -13,18 +13,25 @@ public class ApplicationUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private Boolean admin;
+
     @Column(nullable = false)
     private int loginAttempts = 0;
+
     @Column
     private LocalDateTime lastFailedLogin;
+
     @Column(nullable = false)
     private boolean locked = false;
+
     @Column(nullable = false)
     private boolean isLoggedIn = false;
 

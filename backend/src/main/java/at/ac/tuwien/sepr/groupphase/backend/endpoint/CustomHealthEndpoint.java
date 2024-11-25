@@ -25,7 +25,6 @@ public class CustomHealthEndpoint {
         this.applicationContext = applicationContext;
     }
 
-
     @PermitAll
     @GetMapping
     public ResponseEntity<String> getHealth() {

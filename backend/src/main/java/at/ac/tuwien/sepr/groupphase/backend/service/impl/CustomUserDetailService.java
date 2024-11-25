@@ -31,8 +31,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailService implements UserService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-        MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
@@ -42,10 +42,14 @@ public class CustomUserDetailService implements UserService {
     private final UserValidator userValidator;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                                   JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
-                                   UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
-                                   SecurityPropertiesConfig.Auth auth) {
+    public CustomUserDetailService(
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder,
+        JwtTokenizer jwtTokenizer,
+        RegisterRepository registerRepository,
+        UserValidator userValidator,
+        SecurityPropertiesConfig.Jwt jwt,
+        SecurityPropertiesConfig.Auth auth) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -60,9 +64,10 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("Loading user by email: {}", email);
         ApplicationUser applicationUser = findApplicationUserByEmail(email);
 
-        List<GrantedAuthority> grantedAuthorities = applicationUser.getAdmin()
-            ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
-            : AuthorityUtils.createAuthorityList("ROLE_USER");
+        List<GrantedAuthority> grantedAuthorities =
+            applicationUser.getAdmin()
+                ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
+                : AuthorityUtils.createAuthorityList("ROLE_USER");
 
         return User.builder()
             .username(applicationUser.getEmail())
@@ -75,19 +80,26 @@ public class CustomUserDetailService implements UserService {
     @Override
     public ApplicationUser findApplicationUserByEmail(String email) {
         LOGGER.debug("Finding application user by email: {}", email);
-        return userRepository.findUserByEmail(email)
-            .orElseThrow(() -> new NotFoundException(
-                String.format("Could not find the user with the email address %s", email)));
+        return userRepository
+            .findUserByEmail(email)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(
+                        String.format("Could not find the user with the email address %s", email)));
     }
-
 
     @Override
     public String login(UserLoginDto userLoginDto) {
         LOGGER.debug("Login user: {}", userLoginDto);
-        ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(
-            () -> new NotFoundException(
-                String.format("Could not find the user with the email address %s",
-                    userLoginDto.getEmail())));
+        ApplicationUser user =
+            userRepository
+                .findUserByEmail(userLoginDto.getEmail())
+                .orElseThrow(
+                    () ->
+                        new NotFoundException(
+                            String.format(
+                                "Could not find the user with the email address %s",
+                                userLoginDto.getEmail())));
 
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (!userDetails.isAccountNonLocked()) {
@@ -96,19 +108,14 @@ public class CustomUserDetailService implements UserService {
         }
         if (userDetails.isAccountNonExpired()
             && userDetails.isCredentialsNonExpired()
-            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())
-        ) {
+            && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())) {
             user.resetLoginAttempts();
             user.setLoggedIn(true);
             userRepository.save(user);
 
-            List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-            return jwtTokenizer.getAuthToken(
-                userDetails.getUsername(),
-                roles);
+            List<String> roles =
+                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
+            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
         }
 
         user.incrementLoginAttempts();
@@ -129,15 +136,20 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("Logout user: {}", userLogoutDto);
         String authToken = userLogoutDto.getAuthToken();
 
-        ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail())
-            .orElseThrow(() -> new NotFoundException(
-                String.format("Could not find the user with the email address %s",
-                    userLogoutDto.getEmail())));
+        ApplicationUser user =
+            userRepository
+                .findUserByEmail(userLogoutDto.getEmail())
+                .orElseThrow(
+                    () ->
+                        new NotFoundException(
+                            String.format(
+                                "Could not find the user with the email address %s",
+                                userLogoutDto.getEmail())));
 
         if (!user.isLoggedIn()) {
             throw new IllegalStateException(
-                String.format("The user with email %s is not currently logged in",
-                    userLogoutDto.getEmail()));
+                String.format(
+                    "The user with email %s is not currently logged in", userLogoutDto.getEmail()));
         }
 
         if (!jwtTokenizer.validateToken(authToken)) {
@@ -153,7 +165,8 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public String register(UserRegistrationDto userRegistrationDto) throws ValidationException, ConflictException {
+    public String register(UserRegistrationDto userRegistrationDto)
+        throws ValidationException, ConflictException {
         LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
 
         userValidator.validateRegister(userRegistrationDto);

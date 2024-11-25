@@ -90,14 +90,21 @@ public class Message {
     @Override
     public String toString() {
         return "Message{"
-            + "id=" + id
-            + ", publishedAt=" + publishedAt
-            + ", title='" + title + '\''
-            + ", summary='" + summary + '\''
-            + ", text='" + text + '\''
+            + "id="
+            + id
+            + ", publishedAt="
+            + publishedAt
+            + ", title='"
+            + title
+            + '\''
+            + ", summary='"
+            + summary
+            + '\''
+            + ", text='"
+            + text
+            + '\''
             + '}';
     }
-
 
     public static final class MessageBuilder {
 
