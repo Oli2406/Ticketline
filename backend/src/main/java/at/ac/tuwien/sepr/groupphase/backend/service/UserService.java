@@ -33,7 +33,7 @@ public interface UserService extends UserDetailsService {
     ApplicationUser findApplicationUserByEmail(String email);
 
     /**
-     * Log in a user.
+     * Log in an user.
      *
      * @param userLoginDto login credentials
      * @return the JWT, if successful
@@ -43,7 +43,7 @@ public interface UserService extends UserDetailsService {
     String login(UserLoginDto userLoginDto);
 
     /**
-     * Log out a user.
+     * Log out an user.
      *
      * @param userLogoutDto logout credentials
      */
