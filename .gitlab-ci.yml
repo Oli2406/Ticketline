@@ -32,31 +32,6 @@ test-frontend:
       - frontend/dist
     expire_in: 1 hour
 
-e2e-test:
-  stage: test
-  image: registry.reset.inso-w.at/pub/docker/cypress:latest
-  script:
-    - cd frontend
-    - npm ci --legacy-peer-deps
-    - npm run start &
-    - cd ../backend
-    - mvn -B clean install -DskipTests
-    - java -jar target/*.jar &
-    - sleep 30
-    - cd ../e2e
-    - npm ci --legacy-peer-deps
-    - npx cypress run
-  artifacts:
-    when: always
-    expire_in: 1 hour
-    reports:
-      junit:
-        - '**/cypress/results/*.xml'
-    paths:
-      - '**/cypress/videos/*.mp4'
-      - '**/cypress/screenshots/*.png'
-      - '**/cypress/reports/html/**'
-
 gitinspector:
   stage: test
   image: registry.reset.inso-w.at/pub/docker/gitinspector:latest

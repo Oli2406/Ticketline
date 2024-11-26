@@ -21,4 +21,9 @@ export class HeaderComponent implements OnInit {
     this.currentPage = page;
     this.router.navigate([page]);
   }
+
+  logoutUser(): void {
+    this.authService.logoutUser();
+    this.setActivePage('home');
+  }
 }

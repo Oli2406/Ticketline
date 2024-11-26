@@ -1,6 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.exception;
 
-
 public class NotFoundException extends RuntimeException {
 
     public NotFoundException() {

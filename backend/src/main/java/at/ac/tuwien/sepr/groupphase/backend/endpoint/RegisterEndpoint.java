@@ -21,7 +21,8 @@ import java.util.Map;
 @RequestMapping("/api/v1")
 public class RegisterEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final String basePath = "/api/v1";
     private final UserService userService;
 
@@ -31,7 +32,9 @@ public class RegisterEndpoint {
 
     @PermitAll
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> registerUser(@RequestBody UserRegistrationDto registerDto) throws ValidationException, ConflictException {
+    public ResponseEntity<Map<String, String>> registerUser(
+        @RequestBody UserRegistrationDto registerDto)
+        throws ValidationException, ConflictException {
         LOGGER.trace("POST" + basePath + "/register");
         Map<String, String> response = new HashMap<>();
         userService.register(registerDto);

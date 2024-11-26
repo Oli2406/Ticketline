@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -38,16 +39,17 @@ class CustomUserDetailServiceTest {
     @Mock
     private UserValidator userValidator;
 
+    @Mock
+    private SecurityPropertiesConfig.Auth auth;
+    @Mock
+    private SecurityPropertiesConfig.Jwt jwt;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userService = new CustomUserDetailService(
-            null,
-            passwordEncoder,
-            jwtTokenizer,
-            registerRepository,
-            userValidator
-        );
+        userService =
+            new CustomUserDetailService(
+                null, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth);
     }
 
     @Test
@@ -64,7 +66,8 @@ class CustomUserDetailServiceTest {
 
         doNothing().when(userValidator).validateRegister(userRegistrationDto);
         when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-        when(jwtTokenizer.getAuthToken("john.doe@example.com", List.of("ROLE_USER"))).thenReturn(expectedToken);
+        when(jwtTokenizer.getAuthToken("john.doe@example.com", List.of("ROLE_USER")))
+            .thenReturn(expectedToken);
 
         String authToken = userService.register(userRegistrationDto);
 
@@ -85,7 +88,8 @@ class CustomUserDetailServiceTest {
     }
 
     @Test
-    void register_InvalidUser_ThrowsValidationException() throws ValidationException, ConflictException {
+    void register_InvalidUser_ThrowsValidationException()
+        throws ValidationException, ConflictException {
         // Arrange
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
         userRegistrationDto.setFirstName("John");
@@ -93,12 +97,13 @@ class CustomUserDetailServiceTest {
         userRegistrationDto.setEmail("invalidEmail");
         userRegistrationDto.setPassword("password123");
 
-        doThrow(new ValidationException("Invalid email", new ArrayList<>())).when(userValidator).validateRegister(userRegistrationDto);
+        doThrow(new ValidationException("Invalid email", new ArrayList<>()))
+            .when(userValidator)
+            .validateRegister(userRegistrationDto);
 
-        ValidationException exception = assertThrows(
-            ValidationException.class,
-            () -> userService.register(userRegistrationDto)
-        );
+        ValidationException exception =
+            assertThrows(ValidationException.class,
+                () -> userService.register(userRegistrationDto));
 
         assertEquals("Invalid email. Failed validations: .", exception.getMessage());
 
@@ -107,7 +112,8 @@ class CustomUserDetailServiceTest {
     }
 
     @Test
-    void register_ExistingEmail_ThrowsConflictException() throws ValidationException, ConflictException {
+    void register_ExistingEmail_ThrowsConflictException()
+        throws ValidationException, ConflictException {
         // Arrange
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
         userRegistrationDto.setFirstName("John");
@@ -116,12 +122,11 @@ class CustomUserDetailServiceTest {
         userRegistrationDto.setPassword("password123");
 
         doThrow(new ConflictException("Email is already registered", new ArrayList<>()))
-            .when(userValidator).validateRegister(userRegistrationDto);
+            .when(userValidator)
+            .validateRegister(userRegistrationDto);
 
-        ConflictException exception = assertThrows(
-            ConflictException.class,
-            () -> userService.register(userRegistrationDto)
-        );
+        ConflictException exception =
+            assertThrows(ConflictException.class, () -> userService.register(userRegistrationDto));
 
         assertEquals("Email is already registered. Conflicts: .", exception.getMessage());
 
