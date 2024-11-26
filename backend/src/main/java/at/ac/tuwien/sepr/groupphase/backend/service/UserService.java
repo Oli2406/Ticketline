@@ -52,8 +52,14 @@ public interface UserService extends UserDetailsService {
     /**
      * Registers a new user using the provided UserRegistrationDto.
      *
+<<<<<<< Updated upstream
      * @param userRegistrationDto the data transfer object containing user registration details such
      *                            as first name, last name, email, and password
+=======
+     * @param userRegistrationDto the data transfer object containing user
+     *                            registration details such as first name,
+     *                            last name, email, password and if the user is an admin
+>>>>>>> Stashed changes
      * @return the created JWT Token, if successful
      */
     String register(UserRegistrationDto userRegistrationDto)

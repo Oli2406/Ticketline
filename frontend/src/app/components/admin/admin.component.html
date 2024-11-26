@@ -1,0 +1,59 @@
+<div class="admin-container">
+  <!-- Show this only for /admin route -->
+  <div *ngIf="isAdminRoute">
+    <h1>Administrator Menu</h1>
+
+    <!-- Admin Actions -->
+    <div class="admin-actions">
+      <button class="create-btn" (click)="navigateToCreateShow()">
+        <span class="plus-sign">+</span> Create Show
+      </button>
+      <button class="create-btn" (click)="navigateToCreateNews()">
+        <span class="plus-sign">+</span> Create News
+      </button>
+      <button class="create-btn" (click)="navigateToCreateEvent()">
+        <span class="plus-sign">+</span> Create Event
+      </button>
+      <button class="create-btn" (click)="navigateToCreateUser()">
+        <span class="plus-sign">+</span> Create User
+      </button>
+    </div>
+
+    <!-- User Table -->
+    <div class="user-table">
+      <table>
+        <thead>
+        <tr>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Email</th>
+            <th class="actions-column">Actions</th>
+
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr *ngFor="let user of users">
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td class="button-cell">
+            <button class="btn toggle-locked">
+              <i class="bi bi-lock"></i>
+            </button>
+            <button class="btn delete-user">
+              <i class="bi bi-trash"></i>
+            </button>
+            <button class="btn reset-password">
+              Reset Password
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Render child components -->
+  <router-outlet></router-outlet>
+</div>
