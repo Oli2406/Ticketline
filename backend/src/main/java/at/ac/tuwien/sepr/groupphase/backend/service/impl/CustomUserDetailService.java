@@ -177,10 +177,12 @@ public class CustomUserDetailService implements UserService {
         toRegister.setEmail(userRegistrationDto.getEmail());
         String hashedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
         toRegister.setPassword(hashedPassword);
+        toRegister.setAdmin(Boolean.TRUE.equals(userRegistrationDto.getIsAdmin()));
 
         LOGGER.debug("saving user to database with details: {}", toRegister);
         registerRepository.save(toRegister);
 
-        return jwtTokenizer.getAuthToken(toRegister.getEmail(), List.of("ROLE_USER"));
+        List<String> roles = toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles);
     }
 }

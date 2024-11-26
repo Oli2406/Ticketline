@@ -5,6 +5,8 @@ import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
 import {RegisterComponent} from './components/register/register.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { CreateUserComponent } from './components/admin/createUser/create-user.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -13,7 +15,14 @@ const routes: Routes = [
   {path: 'events', component: HomeComponent},
   {path: 'news', component: HomeComponent},
   {path: 'register', component: RegisterComponent},
-  {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent}
+  {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
+  {
+    path: 'admin',
+    component: AdminComponent,
+    children: [
+      { path: 'createUser', component: CreateUserComponent }
+    ]
+  }
 ];
 
 @NgModule({

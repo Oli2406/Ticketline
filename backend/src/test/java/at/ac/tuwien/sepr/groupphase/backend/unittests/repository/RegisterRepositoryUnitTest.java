@@ -18,6 +18,7 @@ class RegisterRepositoryUnitTest {
     private RegisterRepository registerRepository;
 
     private RegisterUser testUser;
+    private RegisterUser testAdmin;
 
     @BeforeEach
     void setUp() {
@@ -29,6 +30,15 @@ class RegisterRepositoryUnitTest {
         testUser.setAdmin(false);
         testUser.setBanned(false);
         testUser.setLoyaltyPoints(100);
+
+        testAdmin = new RegisterUser();
+        testAdmin.setFirstName("Admin");
+        testAdmin.setLastName("Mustermann");
+        testAdmin.setEmail("admin.user@example.com");
+        testAdmin.setPassword("adminPassword123");
+        testAdmin.setAdmin(true);
+        testAdmin.setBanned(false);
+        testAdmin.setLoyaltyPoints(0);
     }
 
     @Test
@@ -79,5 +89,14 @@ class RegisterRepositoryUnitTest {
         userWithoutPoints.setPassword("securePassword123");
         RegisterUser savedUser = registerRepository.save(userWithoutPoints);
         assertEquals(0, savedUser.getLoyaltyPoints());
+    }
+
+    @Test
+    void saveAndRetrieveAdmin() {
+        RegisterUser savedUser = registerRepository.save(testAdmin);
+        Optional<RegisterUser> retrievedUser = registerRepository.findById(savedUser.getId());
+        assertTrue(retrievedUser.isPresent());
+        assertEquals(savedUser.getEmail(), retrievedUser.get().getEmail());
+        assertTrue(retrievedUser.get().isAdmin());
     }
 }

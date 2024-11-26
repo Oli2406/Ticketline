@@ -6,6 +6,7 @@ public class UserRegistrationDto {
     private String lastName;
     private String email;
     private String password;
+    private Boolean isAdmin = false;
 
     public String getFirstName() {
         return firstName;
@@ -38,4 +39,13 @@ public class UserRegistrationDto {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Boolean getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(Boolean admin) {
+        isAdmin = admin;
+    }
+
 }
