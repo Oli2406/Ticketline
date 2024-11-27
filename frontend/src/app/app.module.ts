@@ -10,7 +10,8 @@ import {FooterComponent} from './components/footer/footer.component';
 import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {MessageComponent} from './components/message/message.component';
-import {AdminComponent} from "./components/admin/admin.component";
+import { AdminComponent } from './components/admin/admin.component';
+import { CreateUserComponent } from './components/admin/createUser/create-user.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -23,7 +24,8 @@ import { ToastrModule } from 'ngx-toastr';
         HomeComponent,
         LoginComponent,
         MessageComponent,
-        AdminComponent
+        AdminComponent,
+        CreateUserComponent,
     ],
     bootstrap: [AppComponent],
     imports: [BrowserModule,

@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
+import { Router } from '@angular/router';
+import { RegisterUser } from '../../dtos/register-data';
+
 
 @Component({
   selector: 'app-admin',
@@ -16,7 +19,8 @@ export class AdminComponent implements OnInit {
   users: any[] = [];
 
   constructor(private authService: AuthService,
-              private userService: AdminService) {}
+              private userService: AdminService,
+              private router: Router) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -63,5 +67,22 @@ export class AdminComponent implements OnInit {
    */
   vanishError(): void {
     this.error = false;
+  }
+
+  navigateToCreateUser(): void {
+    this.router.navigate(['/admin/createUser']);
+    console.log('Navigating to Create User');
+  }
+
+  navigateToCreateNews(): void {
+    console.log('Create News functionality will be implemented.');
+  }
+
+  navigateToCreateShow(): void {
+    console.log('Create Show functionality will be implemented.');
+  }
+
+  navigateToCreateEvent(): void {
+    console.log('Create Event functionality will be implemented.');
   }
 }
