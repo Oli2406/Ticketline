@@ -12,8 +12,7 @@ public class SecurityProperties {
     private final SecurityPropertiesConfig.Auth auth;
     private final SecurityPropertiesConfig.Jwt jwt;
 
-    public SecurityProperties(SecurityPropertiesConfig.Auth auth,
-        SecurityPropertiesConfig.Jwt jwt) {
+    public SecurityProperties(SecurityPropertiesConfig.Auth auth, SecurityPropertiesConfig.Jwt jwt) {
         this.auth = auth;
         this.jwt = jwt;
     }
@@ -49,4 +48,5 @@ public class SecurityProperties {
     public Long getJwtExpirationTime() {
         return jwt.getExpirationTime();
     }
+
 }

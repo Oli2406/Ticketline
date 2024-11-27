@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Message;
+
 import java.util.List;
 
 public interface MessageService {
@@ -11,6 +12,7 @@ public interface MessageService {
      * @return ordered list of al message entries
      */
     List<Message> findAll();
+
 
     /**
      * Find a single message entry by id.
@@ -27,4 +29,5 @@ public interface MessageService {
      * @return published message entry
      */
     Message publishMessage(Message message);
+
 }

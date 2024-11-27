@@ -20,11 +20,9 @@ public class SecurityPropertiesConfig {
     }
 
     public static class Auth {
-
         private String header;
         private String prefix;
         private String loginUri;
-        private int maxLoginAttempts;
 
         public String getHeader() {
             return header;
@@ -49,18 +47,9 @@ public class SecurityPropertiesConfig {
         public void setLoginUri(String loginUri) {
             this.loginUri = loginUri;
         }
-
-        public int getMaxLoginAttempts() {
-            return maxLoginAttempts;
-        }
-
-        public void setMaxLoginAttempts(int maxLoginAttempts) {
-            this.maxLoginAttempts = maxLoginAttempts;
-        }
     }
 
     public static class Jwt {
-
         private String secret;
         private String type;
         private String issuer;

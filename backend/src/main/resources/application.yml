@@ -27,7 +27,6 @@ security:
     header: Authorization
     prefix: "Bearer "
     login-uri: /api/v1/authentication
-    max-login-attempts: 5
   jwt:
     secret: ?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9
     type: JWT

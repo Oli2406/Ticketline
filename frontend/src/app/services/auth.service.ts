@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AuthRequest} from '../dtos/auth-request';
-import {catchError, Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
@@ -32,48 +32,14 @@ export class AuthService {
   /**
    * Check if a valid JWT token is saved in the localStorage
    */
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token && this.getTokenExpirationDate(token) > new Date();
+  isLoggedIn() {
+    return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
   }
 
-  private getTokenExpirationDate(token: string): Date {
-    const decoded: any = jwtDecode(token);
-    if (decoded.exp === undefined) {
-      return null;
-    }
-    const date = new Date(0);
-    date.setUTCSeconds(decoded.exp);
-    return date;
+  logoutUser() {
+    console.log('Logout');
+    localStorage.removeItem('authToken');
   }
-
-  logoutUser(): void {
-    const token = this.getToken();
-    const email = this.getUserEmailFromToken();
-
-    if (token && email) {
-      const userLogoutDto = {
-        email: email,
-        authToken: token
-      };
-
-      this.httpClient.delete(this.authBaseUri, {
-        body: userLogoutDto
-      }).subscribe({
-        next: () => {
-          localStorage.removeItem('authToken');
-        },
-        error: (err) => {
-          //TODO fehlermeldung
-          console.error('Logout failed', err);
-        }
-      });
-    } else {
-      //TODO fehlermeldung
-      console.warn('No token or email found for logout');
-    }
-  }
-
 
   getToken() {
     return localStorage.getItem('authToken');
@@ -95,32 +61,20 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
-  isUserAdmin() {
-    return this.getUserRole() === 'ADMIN';
-  }
-
   private setToken(authResponse: string) {
     localStorage.setItem('authToken', authResponse);
   }
 
-  getUserEmailFromToken(): string | null {
-    const token = this.getToken();
-    if (token) {
-      const decoded: any = jwtDecode(token);
-      return decoded.sub;
-    }
-    return null;
-  }
+  private getTokenExpirationDate(token: string): Date {
 
-  validateToken(): Observable<boolean> {
-    const token = this.getToken();
-
-    if (!token) {
-      return of(false);
+    const decoded: any = jwtDecode(token);
+    if (decoded.exp === undefined) {
+      return null;
     }
 
-    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
-      catchError(() => of(false))
-    );
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.exp);
+    return date;
   }
+
 }
