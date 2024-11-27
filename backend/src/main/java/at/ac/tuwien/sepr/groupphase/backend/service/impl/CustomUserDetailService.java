@@ -104,7 +104,7 @@ public class CustomUserDetailService implements UserService {
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (!userDetails.isAccountNonLocked()) {
             throw new BadCredentialsException(
-                "Account is locked due to too many failed login attempts");
+                "Account is locked");
         }
         if (userDetails.isAccountNonExpired()
             && userDetails.isCredentialsNonExpired()
@@ -182,7 +182,8 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("saving user to database with details: {}", toRegister);
         registerRepository.save(toRegister);
 
-        List<String> roles = toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+        List<String> roles =
+            toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
         return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles);
     }
 }

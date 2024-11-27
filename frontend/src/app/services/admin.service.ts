@@ -22,6 +22,10 @@ export class AdminService {
     return this.http.post<void>(`${this.baseUrl}/unlock/${id}`, {});
   }
 
+  lockUser(id: number): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/lock/${id}`, {});
+  }
+
   /**
    * Handles API errors and formats error messages.
    * @param error - HttpErrorResponse from the backend

@@ -17,6 +17,7 @@ export class AdminComponent implements OnInit {
 
   // User data
   users: any[] = [];
+  currentUserEmail = '';
 
   constructor(private authService: AuthService,
               private userService: AdminService,
@@ -24,6 +25,7 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.currentUserEmail = this.authService.getUserEmailFromToken();
   }
 
   /**
@@ -45,14 +47,26 @@ export class AdminComponent implements OnInit {
    * Lock a user account
    */
   lockUser(userId: number): void {
-    //TODO implement
+    this.userService.lockUser(userId).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => {
+        this.error = true;
+        this.errorMessage = err.error.errorMessage;
+      }
+    });
   }
 
   /**
    * Unlock a user account
    */
   unlockUser(userId: number): void {
-    this.userService.unlockUser(userId).subscribe(() => this.loadUsers());
+    this.userService.unlockUser(userId).subscribe( {
+      next:() => this.loadUsers(),
+      error: err => {
+        this.error = true;
+        this.errorMessage = err.error.errorMessage;
+      }
+    });
   }
 
   /**
