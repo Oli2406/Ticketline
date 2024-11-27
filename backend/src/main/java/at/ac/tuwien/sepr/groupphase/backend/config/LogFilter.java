@@ -1,5 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.config;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.text.DecimalFormat;
@@ -8,10 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -21,18 +21,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * ServletFilter to log every request.
  */
 public class LogFilter extends OncePerRequestFilter {
+
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final DecimalFormat REQUEST_RUNTIME_FORMAT = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+    private static final DecimalFormat REQUEST_RUNTIME_FORMAT =
+        new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
     private static final Long NANOSECONDS_PER_MS = 1000_000L;
-    private static final List<String> MUTED_PATHS = Arrays.asList(
-        "/swagger-ui/",
-        "/swagger.yaml"
-    );
-
+    private static final List<String> MUTED_PATHS = Arrays.asList("/swagger-ui/", "/swagger.yaml");
 
     @Override
-    public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+    public void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         var runtime = -1L;
         var shouldLog = shouldLog(request);
         if (shouldLog) {
@@ -40,14 +39,14 @@ public class LogFilter extends OncePerRequestFilter {
             beforeRequest(request);
         }
         try {
-            //keep timestamp
+            // keep timestamp
             runtime = System.nanoTime();
-            //do the work
+            // do the work
             filterChain.doFilter(request, response);
         } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
         } finally {
-            //runtime = end - start
+            // runtime = end - start
             runtime = System.nanoTime() - runtime;
             if (shouldLog) {
                 afterRequest(request, response, runtime);
@@ -65,7 +64,8 @@ public class LogFilter extends OncePerRequestFilter {
         logWithRightCategory(200, b.toString());
     }
 
-    private void afterRequest(HttpServletRequest request, HttpServletResponse response, Long runtime) {
+    private void afterRequest(
+        HttpServletRequest request, HttpServletResponse response, Long runtime) {
         var b = getUrlString("<<< ", request);
         var logStatus = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         if (response != null) {
@@ -83,9 +83,9 @@ public class LogFilter extends OncePerRequestFilter {
 
     private void populateMdc(HttpServletRequest request) {
         var forwarded = request.getHeader("X-Forwarded-For");
-        //ip of client
+        // ip of client
         MDC.put("ip", forwarded != null ? forwarded : request.getRemoteAddr());
-        //correlation-id if none is set
+        // correlation-id if none is set
         if (MDC.get("r") == null) {
             MDC.put("r", generateRequestId());
         }
@@ -102,10 +102,11 @@ public class LogFilter extends OncePerRequestFilter {
     }
 
     private StringBuilder getUrlString(String prefix, HttpServletRequest request) {
-        var b = new StringBuilder(prefix)
-            .append(request.getMethod())
-            .append(" ")
-            .append(request.getRequestURI());
+        var b =
+            new StringBuilder(prefix)
+                .append(request.getMethod())
+                .append(" ")
+                .append(request.getRequestURI());
         var qs = request.getQueryString();
         if (qs != null) {
             b.append("?").append(qs);
@@ -114,12 +115,12 @@ public class LogFilter extends OncePerRequestFilter {
     }
 
     private boolean shouldLog(HttpServletRequest request) {
-        //Log everything in TRACE
+        // Log everything in TRACE
         if (LOG.isTraceEnabled()) {
             return true;
         }
 
-        //is the url muted?
+        // is the url muted?
         var url = request.getRequestURI();
         return MUTED_PATHS.stream().noneMatch(url::startsWith);
     }
@@ -132,5 +133,4 @@ public class LogFilter extends OncePerRequestFilter {
             default -> LOG.error(logMsg);
         }
     }
-
 }

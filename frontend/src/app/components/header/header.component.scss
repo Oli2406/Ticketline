@@ -1,0 +1,159 @@
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 14px;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Header Container */
+.header-container {
+  width: 100%;
+  background: #A7A3FF;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  color: white;
+  height: 100px;
+}
+
+/* Logo Styles */
+.logo {
+  width: 100px;
+  height: 250px;
+  background: url("src/assets/images/logo/logo.png") no-repeat center center;
+  background-size: contain;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+  display: flex;
+  gap: 16px;
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.nav-buttons button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: 500;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.nav-buttons button:hover {
+  color: #000000;
+}
+
+
+.nav-buttons button.active {
+  font-weight: bold;
+  color: white;
+}
+
+button.active {
+  font-weight: bold;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.button-container {
+  display: inline-block;
+}
+
+.login-button, .signup-button {
+  background: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #4D47C3;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 120px;
+  text-align: center;
+}
+
+.admin-button {
+  background: #FF4D4D;
+  border:none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 120px;
+  text-align: center;
+}
+
+.admin-button:hover {
+  background: #E57373;
+}
+
+button.active {
+  font-weight: bold;
+}
+
+
+.login-button:hover {
+  background: #f1f1f1;
+}
+
+.signup-button {
+  background: #3f51b5;
+  color: #fff;
+}
+
+.signup-button:hover {
+  background: #2e3d9a;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .logo {
+    width: 180px;
+    height: 60px;
+  }
+
+  .nav-buttons {
+    gap: 10px;
+  }
+
+  .nav-buttons button {
+    font-size: 16px;
+  }
+
+  .login-button, .signup-button, .admin-button {
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-buttons {
+    display: none;
+  }
+
+  .auth-buttons {
+    justify-content: flex-end;
+  }
+
+  .login-button, .signup-button, .admin-button {
+    width: auto;
+  }
+}
