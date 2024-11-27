@@ -86,6 +86,25 @@ button.active {
   text-align: center;
 }
 
+.admin-button {
+  background: #FF4D4D;
+  border:none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #000000;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 120px;
+  text-align: center;
+}
+
+.admin-button:hover {
+  background: #E57373;
+}
+
 button.active {
   font-weight: bold;
 }
@@ -119,7 +138,7 @@ button.active {
     font-size: 16px;
   }
 
-  .login-button, .signup-button {
+  .login-button, .signup-button, .admin-button {
     padding: 8px 16px;
     font-size: 16px;
   }
@@ -134,7 +153,7 @@ button.active {
     justify-content: flex-end;
   }
 
-  .login-button, .signup-button {
+  .login-button, .signup-button, .admin-button {
     width: auto;
   }
 }

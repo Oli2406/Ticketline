@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AuthRequest} from '../dtos/auth-request';
-import {Observable} from 'rxjs';
+import {catchError, Observable, of} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
@@ -32,8 +32,19 @@ export class AuthService {
   /**
    * Check if a valid JWT token is saved in the localStorage
    */
-  isLoggedIn() {
-    return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
+  isLoggedIn(): boolean {
+    const token = this.getToken();
+    return !!token && this.getTokenExpirationDate(token) > new Date();
+  }
+
+  private getTokenExpirationDate(token: string): Date {
+    const decoded: any = jwtDecode(token);
+    if (decoded.exp === undefined) {
+      return null;
+    }
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.exp);
+    return date;
   }
 
   logoutUser(): void {
@@ -50,14 +61,15 @@ export class AuthService {
         body: userLogoutDto
       }).subscribe({
         next: () => {
-          console.log('Logout successful');
           localStorage.removeItem('authToken');
         },
         error: (err) => {
+          //TODO fehlermeldung
           console.error('Logout failed', err);
         }
       });
     } else {
+      //TODO fehlermeldung
       console.warn('No token or email found for logout');
     }
   }
@@ -83,21 +95,14 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
+  isUserAdmin() {
+    return this.getUserRole() === 'ADMIN';
+  }
+
   private setToken(authResponse: string) {
     localStorage.setItem('authToken', authResponse);
   }
 
-  private getTokenExpirationDate(token: string): Date {
-
-    const decoded: any = jwtDecode(token);
-    if (decoded.exp === undefined) {
-      return null;
-    }
-
-    const date = new Date(0);
-    date.setUTCSeconds(decoded.exp);
-    return date;
-  }
   getUserEmailFromToken(): string | null {
     const token = this.getToken();
     if (token) {
@@ -105,5 +110,17 @@ export class AuthService {
       return decoded.sub;
     }
     return null;
+  }
+
+  validateToken(): Observable<boolean> {
+    const token = this.getToken();
+
+    if (!token) {
+      return of(false);
+    }
+
+    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
+      catchError(() => of(false))
+    );
   }
 }
