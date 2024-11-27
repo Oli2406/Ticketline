@@ -28,6 +28,7 @@ public class AdminEndpoint {
         return ResponseEntity.ok().build();
     }
 
+    @Secured("ROLE_ADMIN")
     @PostMapping("/lock/{id}")
     public ResponseEntity<Void> lockUser(@PathVariable(name = "id") Long id) {
         adminService.lockUser(id);
