@@ -2,14 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import io.jsonwebtoken.JwtException;
-import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@PermitAll
 @RestController
 @RequestMapping("/api/v1/authentication")
 public class AuthTokenEndpoint {
