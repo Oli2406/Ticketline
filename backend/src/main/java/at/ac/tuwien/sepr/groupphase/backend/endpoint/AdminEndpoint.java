@@ -5,11 +5,9 @@ import at.ac.tuwien.sepr.groupphase.backend.service.AdminService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +27,14 @@ public class AdminEndpoint {
         adminService.unlockUser(id);
         return ResponseEntity.ok().build();
     }
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/lock/{id}")
+    public ResponseEntity<Void> lockUser(@PathVariable(name = "id") Long id) {
+        adminService.lockUser(id);
+        return ResponseEntity.ok().build();
+    }
+
 
     @Secured("ROLE_ADMIN")
     @GetMapping
