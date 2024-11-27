@@ -12,10 +12,12 @@
     <button class="v76_371" [class.active]="currentPage === 'news'" (click)="setActivePage('news')">
       News
     </button>
-    <button class="v76_372" [class.active]="currentPage === 'merchandise'" (click)="setActivePage('merchandise')">
+    <button class="v76_372" [class.active]="currentPage === 'merchandise'"
+            (click)="setActivePage('merchandise')">
       Merchandise
     </button>
-    <button class="v76_373" [class.active]="currentPage === 'events'" (click)="setActivePage('events')">
+    <button class="v76_373" [class.active]="currentPage === 'events'"
+            (click)="setActivePage('events')">
       Events
     </button>
   </div>
@@ -24,18 +26,29 @@
   <div class="auth-buttons">
     @if (!authService.isLoggedIn()) {
       <div class="button-container">
-        <button class="login-button" [class.active]="currentPage === 'login'" (click)="setActivePage('login')">
+        <button class="login-button" [class.active]="currentPage === 'login'"
+                (click)="setActivePage('login')">
           Login
         </button>
       </div>
       <div class="button-container">
-        <button class="signup-button" [class.active]="currentPage === 'register'" (click)="setActivePage('register')">
+        <button class="signup-button" [class.active]="currentPage === 'register'"
+                (click)="setActivePage('register')">
           Sign up
         </button>
       </div>
     } @else {
+      @if (authService.isUserAdmin()) {
+        <div class="button-container">
+          <button class="admin-button" [class.active]="currentPage === 'admin'" (click)="setActivePage('admin')">
+            <i class="bi bi-file-text me-1"></i>
+            Admin
+          </button>
+        </div>
+      }
       <div class="button-container">
-        <button class="login-button" [class.active]="currentPage === 'logout'"  (click)="logoutUser()">
+        <button class="login-button" [class.active]="currentPage === 'logout'"
+                (click)="logoutUser()">
           Logout
         </button>
       </div>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="admin-container">
   <!-- Show this only for /admin route -->
   <div *ngIf="isAdminRoute">
@@ -22,21 +23,60 @@
     <!-- User Table -->
     <div class="user-table">
       <table>
+=======
+<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Error!</strong> {{ errorMessage }}
+  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h1 class="custom-heading">Administrator menu</h1>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="row justify-content-center my-3">
+    <div class="col-md-6 d-flex justify-content-between">
+      <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Create Show</button>
+      <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Create News</button>
+      <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Create Event</button>
+      <button class="btn btn-primary"><i class="bi bi-person-plus"></i> Create User</button>
+    </div>
+  </div>
+
+  <!-- User Table -->
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <table class="table table-striped table-hover text-center">
+>>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
         <thead>
         <tr>
           <th>First name</th>
           <th>Last name</th>
           <th>Email</th>
+<<<<<<< HEAD
             <th class="actions-column">Actions</th>
 
         </tr>
         </thead>
         <tbody>
 
+=======
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+>>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
         <tr *ngFor="let user of users">
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
+<<<<<<< HEAD
           <td class="button-cell">
             <button class="btn toggle-locked">
               <i class="bi bi-lock"></i>
@@ -47,13 +87,34 @@
             <button class="btn reset-password">
               Reset Password
             </button>
+=======
+          <td>
+            <div class="btn-group">
+            @if(user.locked) {
+              <button class="btn btn-success btn-sm" (click)="unlockUser(user.id)">
+                <i class="bi bi-unlock-fill"></i>
+              </button>
+            } @else {
+              <button class="btn btn-danger btn-sm" (click)="lockUser(user.id)">
+                <i class="bi bi-lock-fill"></i>
+              </button>
+            }
+            <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-secondary btn-sm" (click)="resetPassword(user.id)">
+              reset password
+            </button>
+            </div>
+>>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
           </td>
         </tr>
         </tbody>
       </table>
     </div>
   </div>
+<<<<<<< HEAD
 
   <!-- Render child components -->
   <router-outlet></router-outlet>
+=======
+>>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
 </div>

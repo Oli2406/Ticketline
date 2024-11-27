@@ -7,6 +7,7 @@ import {MessageComponent} from './components/message/message.component';
 import {RegisterComponent} from './components/register/register.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { CreateUserComponent } from './components/admin/createUser/create-user.component';
+import {AdminGuard} from "./guards/admin.guard";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -21,7 +22,7 @@ const routes: Routes = [
     component: AdminComponent,
     children: [
       { path: 'createUser', component: CreateUserComponent }
-    ]
+    ], canActivate: mapToCanActivate([AdminGuard])
   }
 ];
 

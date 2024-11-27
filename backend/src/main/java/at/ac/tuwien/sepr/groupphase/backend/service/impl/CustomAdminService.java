@@ -24,10 +24,12 @@ public class CustomAdminService implements AdminService {
 
     @Override
     public void unlockUser(Long userId) {
+
         ApplicationUser currentUser = getCurrentUser();
         if (currentUser.getId().equals(userId)) {
             throw new IllegalArgumentException("Admins cannot unlock themselves.");
         }
+
         ApplicationUser user = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
         user.setLocked(false);

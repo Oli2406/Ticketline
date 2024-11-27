@@ -25,16 +25,29 @@ public class UserDataGenerator {
     @PostConstruct
     public void loadInitialData() {
         LOGGER.debug("generating users");
-        if (userRepository.findUserByEmail("user@email.com").isEmpty()) {
-            ApplicationUser user =
-                new ApplicationUser("user@email.com", passwordEncoder.encode("password"), false);
-            userRepository.save(user);
-        }
 
-        if (userRepository.findUserByEmail("admin@email.com").isEmpty()) {
-            ApplicationUser admin =
-                new ApplicationUser("admin@email.com", passwordEncoder.encode("password"), true);
-            userRepository.save(admin);
+        // Users without admin rights
+        createUserIfNotExists("Max", "Mustermann", "max.mustermann@email.com", "password", false);
+        createUserIfNotExists("Lena", "Müller", "lena.mueller@email.com", "password", false);
+        createUserIfNotExists("Tom", "Schmidt", "tom.schmidt@email.com", "password", false);
+        createUserIfNotExists("Anna", "Meier", "anna.meier@email.com", "password", false);
+        createUserIfNotExists("Felix", "Berger", "felix.berger@email.com", "password", false);
+
+        // user with admin rights
+        createUserIfNotExists("Herta", "Musterfrau", "herta.musterfrau@email.com", "password",
+            true);
+        createUserIfNotExists("Karl", "Admin", "karl.admin@email.com", "password", true);
+    }
+
+    private void createUserIfNotExists(String firstName, String lastName, String email,
+        String password, boolean isAdmin) {
+        if (userRepository.findUserByEmail(email).isEmpty()) {
+            ApplicationUser user = new ApplicationUser(
+                firstName, lastName, email, passwordEncoder.encode(password), isAdmin
+            );
+            userRepository.save(user);
+            LOGGER.debug("User created: {}", email);
         }
     }
+
 }
