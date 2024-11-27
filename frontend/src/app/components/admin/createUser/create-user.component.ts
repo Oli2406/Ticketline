@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AdminRegisterData, AdminUserRegistrationDto } from '../../../dtos/register-data';
 import { AdminService } from '../../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
+import {RegisterService} from "../../../services/register.service";
 
 @Component({
   selector: 'app-create-user',
@@ -24,7 +25,8 @@ export class CreateUserComponent {
 
   constructor(
     private adminService: AdminService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private registerService: RegisterService
   ) {}
 
   togglePasswordVisibility(): void {
@@ -52,7 +54,7 @@ export class CreateUserComponent {
     };
 
     // Make the API call to create the user
-    this.adminService.createUser(payload).subscribe({
+    this.registerService.registerUser(payload).subscribe({
       next: () => {
         this.toastr.success('User created successfully!', 'Success');
         // Reset the form

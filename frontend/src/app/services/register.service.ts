@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {UserRegistrationDto} from 'src/app/dtos/register-data'
+import {AdminUserRegistrationDto, UserRegistrationDto} from 'src/app/dtos/register-data'
 
 
 @Injectable({

@@ -1,131 +1,190 @@
-
-.admin-container {
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-  font-weight: bold;
+/* Hintergrund */
+body {
+  background-color: #A7A3FF;
 }
 
-.admin-actions {
-  display: flex;
-  justify-content: space-evenly;
-  gap: 10px;
+/* Überschrift */
+.custom-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3e3e3e;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
 }
 
-.create-btn {
-  flex: 1;
+/* Action Buttons */
+.btn-primary {
   background-color: #4D47C3;
-  color: white;
   border: none;
-  padding: 12px 20px;
+  color: #fff;
+  padding: 10px 20px;
   font-size: 1rem;
   font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-align: center;
-  min-width: 120px;
+  border-radius: 8px;
 }
 
-.create-btn:hover {
-  background-color: #3f3a9b;
-}
-
-h1 {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
-}
-
-.user-table {
-  margin-top: 30px;
-  width: 100%;
-
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #ffffff;
-  color: #000000;
-  font-size: 1.1rem;
-}
-
-.actions-column {
-  text-align: left;
-  padding-left: 118px;
-}
-
-td {
-  font-size: 1rem;
-  color: #555;
-}
-
-tr:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-
-tr:nth-child(even) {
-  background-color: #ffffff;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.reset-password {
+.btn-primary:hover {
   background-color: #514dc7;
-  color: white;
-  border: none;
-  margin-right: 10px;
 }
 
-.reset-password:hover {
-  background-color: #3f3a9b;
+.table {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.delete-user {
-  background-color: #e74c3c;
-  color: black;
-  border: none;
+.table th, .table td {
+  vertical-align: middle;
+  text-align: center;
 }
 
-.delete-user:hover {
-  background-color: #c0392b;
+.table th {
+  background-color: #F0EFFF;
+  color: #333;
 }
 
-.toggle-locked {
-  //background-color: #28a745; green for the unlock
-  background-color: #e74c3c;
-  color: black;
-  border: none;
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #F9F9FF;
 }
 
-.toggle-locked:hover {
-  //background-color: #218838; green for the unlock
-  background-color: #c0392b;
-
+.table-striped tbody tr:nth-of-type(even) {
+  background-color: #F0EFFF;
 }
 
-.button-cell {
-  display: flex;
-  gap: 10px;
-  justify-content: right;
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+
+  .admin-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+  }
+
+  .admin-actions {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .create-btn {
+    flex: 1;
+    background-color: #4D47C3;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .create-btn:hover {
+    background-color: #3f3a9b;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .user-table {
+    margin-top: 30px;
+    width: 100%;
+
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 1.1rem;
+  }
+
+  .actions-column {
+    text-align: left;
+    padding-left: 118px;
+  }
+
+  td {
+    font-size: 1rem;
+    color: #555;
+  }
+
+  tr:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
+
+  tr:nth-child(even) {
+    background-color: #ffffff;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .reset-password {
+    background-color: #514dc7;
+    color: white;
+    border: none;
+    margin-right: 10px;
+  }
+
+  .reset-password:hover {
+    background-color: #3f3a9b;
+  }
+
+  .delete-user {
+    background-color: #e74c3c;
+    color: black;
+    border: none;
+  }
+
+  .delete-user:hover {
+    background-color: #c0392b;
+  }
+
+  .toggle-locked {
+    //background-color: #28a745; green for the unlock
+    background-color: #e74c3c;
+    color: black;
+    border: none;
+  }
+
+  .toggle-locked:hover {
+    //background-color: #218838; green for the unlock
+    background-color: #c0392b;
+
+  }
+
+  .button-cell {
+    display: flex;
+    gap: 10px;
+    justify-content: right;
+  }
 }
