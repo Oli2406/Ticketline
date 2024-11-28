@@ -1,0 +1,87 @@
+<!-- Header Section -->
+<div class="row">
+  <div class="col">
+    <h1> News Create Menu </h1>
+  </div>
+  <div class="col-auto">
+  </div>
+</div>
+
+<!-- News Form -->
+<form #newsForm="ngForm" (ngSubmit)="onSubmit(newsForm)">
+  <!-- Hidden submit element, to keep presses of enter key to trigger the cancel button -->
+  <input type="submit" hidden="hidden"/>
+
+
+  <!-- News Title -->
+  <div class="form-group">
+    <label class="form-label" for="title">News Title</label>
+    <input [(ngModel)]="news.title"
+           [ngModelOptions]="{standalone: true}"
+           class="form-control"
+           id="title"
+           name="title"
+           placeholder="Enter News Title"
+           required type="text"/>
+  </div>
+
+  <!-- News Summary -->
+  <div class="form-group">
+    <label class="form-label" for="summary">News Summary</label>
+    <textarea [(ngModel)]="news.summary"
+              [ngModelOptions]="{standalone: true}"
+              class="form-control"
+              id="summary"
+              name="summary"
+              placeholder="Enter News Summary"
+              required type="text"></textarea>
+  </div>
+
+  <!-- News Content -->
+  <div class="form-group">
+    <label class="form-label" for="content">News Content</label>
+    <textarea [(ngModel)]="news.content"
+              [ngModelOptions]="{standalone: true}"
+              class="form-control"
+              id="content"
+              name="content"
+              placeholder="Enter News Content"
+              required type="text"></textarea>
+  </div>
+
+  <!-- Image Input-->
+  <div class="form-group">
+    <label class="form-label" for="imageUrl">Image File</label>
+    <input [(ngModel)]="news.imageUrl"
+           [ngModelOptions]= "{standalone: true}"
+           class="form-control"
+           id="imageUrl"
+           name="imageUrl"
+           type="file"
+           accept=".png, .jpg"
+           (change)="readImage($event)"/>
+
+    @for (image of news.imageUrl; track image) {
+      @if (image !== null) {
+        <div class="col-md-6 mb-3">
+          <img [src]="image"
+               class="img-thumbnail"
+               alt=""
+               style="max-height: 100px;
+             max-width: 100px;">
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Submit Button -->
+  <div class="d-flex flex-row justify-content-end">
+    <span class="flex-grow-1"></span>
+    <button [disabled]="!newsForm.valid"
+            class="btn btn-primary"
+            type="submit">
+      <i class="bi bi-check-lg"> Submit </i>
+    </button>
+  </div>
+
+</form>

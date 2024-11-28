@@ -12,6 +12,7 @@ import {LoginComponent} from './components/login/login.component';
 import {MessageComponent} from './components/message/message.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
+import {NewsCreateComponent} from "./components/news-create/news-create.component";
 
 @NgModule({ declarations: [
         AppComponent,
@@ -21,10 +22,11 @@ import {httpInterceptorProviders} from './interceptors';
         LoginComponent,
         MessageComponent,
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        AppRoutingModule,
-        ReactiveFormsModule,
-        NgbModule,
-        FormsModule], providers: [httpInterceptorProviders, provideHttpClient(withInterceptorsFromDi())] })
+    bootstrap: [AppComponent],
+  imports: [BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    NgbModule,
+    FormsModule, NewsCreateComponent], providers: [httpInterceptorProviders, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {
 }
