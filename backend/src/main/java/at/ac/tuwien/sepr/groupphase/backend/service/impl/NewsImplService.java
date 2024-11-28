@@ -25,72 +25,81 @@ import java.util.List;
 @Service
 public class NewsImplService implements NewsService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-  private final NewsRepository newsRepository;
-  private final NewsValidator newsValidator;
-  private final NewsMapper newsMapper;
-  private final Path uploadDirectory = Path.of("");
-      //Paths.get(NewsImplService.class.getClassLoader().getResource("images").toURI());
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final NewsRepository newsRepository;
+    private final NewsValidator newsValidator;
+    private final NewsMapper newsMapper;
+    private final Path uploadDirectory = Path.of("");
 
-  public NewsImplService(NewsRepository newsRepository, NewsValidator newsValidator, NewsMapper newsMapper){
-    this.newsRepository = newsRepository;
-    this.newsValidator = newsValidator;
-    this.newsMapper = newsMapper;
-  }
+    // Paths.get(NewsImplService.class.getClassLoader().getResource("images").toURI());
 
-  @Override
-  public NewsCreateDto createNews(NewsCreateMPFDto newsCreateMPFDto)
-      throws ValidationException, IOException, URISyntaxException {
-    LOG.trace("createNews({})", newsCreateMPFDto);
-    newsValidator.validateNews(newsCreateMPFDto);
-
-      List<String> imageUrls = new ArrayList<String>();
-
-      for (MultipartFile imageFile : newsCreateMPFDto.getImages()) {
-          imageUrls.add(this.uploadImagePath(null, imageFile));
-      }
-
-      NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithIMGURL(newsCreateMPFDto, imageUrls);
-
-      News news = new News(newsCreate.getTitle(), newsCreate.getSummary(), newsCreate.getContent(), newsCreate.getDateOfNews(),newsCreate.getImageUrl());
-      var createdNews = newsRepository.save(news);
-
-      return newsMapper.entityToCreateDto(createdNews);
-  }
-
-  /*Private methods handling the image upload*/
-
-  private String uploadImagePath(Long id, MultipartFile image) throws IOException {
-    if (id == null && image != null) {
-      return uploadNewImage(image);
-    } else if (id == null) {
-      return null;
+    public NewsImplService(
+        NewsRepository newsRepository, NewsValidator newsValidator, NewsMapper newsMapper) {
+        this.newsRepository = newsRepository;
+        this.newsValidator = newsValidator;
+        this.newsMapper = newsMapper;
     }
 
-    if (image == null) {
-      //Todo get img url
-      String pictureURL = "";
-      if (pictureURL != null && !pictureURL.isEmpty()) {
-        return pictureURL;
-      }
-      return null;
+    @Override
+    public NewsCreateDto createNews(NewsCreateMPFDto newsCreateMPFDto)
+        throws ValidationException, IOException, URISyntaxException {
+        LOG.trace("createNews({})", newsCreateMPFDto);
+        newsValidator.validateNews(newsCreateMPFDto);
+
+        List<String> imageUrls = new ArrayList<String>();
+
+        for (MultipartFile imageFile : newsCreateMPFDto.getImages()) {
+            imageUrls.add(this.uploadImagePath(null, imageFile));
+        }
+
+        NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithIMGURL(newsCreateMPFDto,
+            imageUrls);
+
+        News news =
+            new News(
+                newsCreate.getTitle(),
+                newsCreate.getSummary(),
+                newsCreate.getContent(),
+                newsCreate.getDateOfNews(),
+                newsCreate.getImageUrl());
+        var createdNews = newsRepository.save(news);
+
+        return newsMapper.entityToCreateDto(createdNews);
     }
-    return uploadNewImage(image);
-  }
 
-  private String uploadNewImage(MultipartFile image) throws IOException {
+    /*Private methods handling the image upload*/
 
-    String relativePathVar =
-        uploadDirectory
-            .toString()
-            .substring(0, uploadDirectory.toString().lastIndexOf(File.separator));
-    Path relativePath = Paths.get(relativePathVar);
+    private String uploadImagePath(Long id, MultipartFile image) throws IOException {
+        if (id == null && image != null) {
+            return uploadNewImage(image);
+        } else if (id == null) {
+            return null;
+        }
 
-    String fileName = image.getOriginalFilename();
-    Path uploadPath = Paths.get(uploadDirectory + File.separator + fileName);
-    Files.createDirectories(uploadPath.getParent());
-    image.transferTo(new File(uploadPath.toString()));
+        if (image == null) {
+            // Todo get img url
+            String pictureURL = "";
+            if (pictureURL != null && !pictureURL.isEmpty()) {
+                return pictureURL;
+            }
+            return null;
+        }
+        return uploadNewImage(image);
+    }
 
-    return relativePath.relativize(uploadPath).toString().replace("\\", "/");
-  }
+    private String uploadNewImage(MultipartFile image) throws IOException {
+
+        String relativePathVar =
+            uploadDirectory
+                .toString()
+                .substring(0, uploadDirectory.toString().lastIndexOf(File.separator));
+        Path relativePath = Paths.get(relativePathVar);
+
+        String fileName = image.getOriginalFilename();
+        Path uploadPath = Paths.get(uploadDirectory + File.separator + fileName);
+        Files.createDirectories(uploadPath.getParent());
+        image.transferTo(new File(uploadPath.toString()));
+
+        return relativePath.relativize(uploadPath).toString().replace("\\", "/");
+    }
 }

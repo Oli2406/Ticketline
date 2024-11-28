@@ -15,30 +15,31 @@ public class NewsMapper {
      *
      * @param news entity for mapping
      * @ return the mapped create dto
-     * */
-  public NewsCreateDto entityToCreateDto(News news) {
-    return new NewsCreateDto(
-        news.getTitle(),
-        news.getSummary(),
-        news.getContent(),
-        news.getImageUrl(),
-        news.getDateOfNews());
-  }
+     */
+    public NewsCreateDto entityToCreateDto(News news) {
+        return new NewsCreateDto(
+            news.getTitle(),
+            news.getSummary(),
+            news.getContent(),
+            news.getImageUrl(),
+            news.getDateOfNews());
+    }
 
     /**
-     * Maps an and multipart-file-Dto to a dto which only contains the imag urls and not the pictures
+     * Maps an and multipart-file-Dto to a dto which only contains the imag urls and not the
+     * pictures
      *
      * @param newsCreateMPFDto dto to be mapped
-     * @param imgUrls the image urls from the pictures from the multipart-file
+     * @param imgUrls          the image urls from the pictures from the multipart-file
      * @ return the mapped dto
-     * */
-  public NewsCreateDto entityToCreateDtoWithIMGURL(
-      NewsCreateMPFDto newsCreateMPFDto, List<String> imgUrls) {
-    return new NewsCreateDto(
-        newsCreateMPFDto.getTitle(),
-        newsCreateMPFDto.getSummary(),
-        newsCreateMPFDto.getContent(),
-        imgUrls,
-        newsCreateMPFDto.getDateOfNews());
-  }
+     */
+    public NewsCreateDto entityToCreateDtoWithIMGURL(
+        NewsCreateMPFDto newsCreateMPFDto, List<String> imgUrls) {
+        return new NewsCreateDto(
+            newsCreateMPFDto.getTitle(),
+            newsCreateMPFDto.getSummary(),
+            newsCreateMPFDto.getContent(),
+            imgUrls,
+            newsCreateMPFDto.getDateOfNews());
+    }
 }

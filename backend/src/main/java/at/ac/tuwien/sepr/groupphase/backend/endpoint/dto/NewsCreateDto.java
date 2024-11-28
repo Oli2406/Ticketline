@@ -4,13 +4,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class NewsCreateDto {
+
     String title;
     String summary;
     String content;
     List<String> imageUrl;
     LocalDate dateOfNews;
 
-    public NewsCreateDto(String title, String summary, String content, List<String> imageUrl, LocalDate dateOfNews) {
+    public NewsCreateDto(String title, String summary, String content, List<String> imageUrl,
+        LocalDate dateOfNews) {
         this.title = title;
         this.summary = summary;
         this.content = content;
@@ -74,15 +76,19 @@ public class NewsCreateDto {
     }
 
     public static final class NewsCreateDtoBuilder {
+
         private String title;
         private String summary;
         private String content;
         private List<String> imageUrl;
         private LocalDate dateOfNews;
 
-        private NewsCreateDtoBuilder() {}
+        private NewsCreateDtoBuilder() {
+        }
 
-        public static NewsCreateDtoBuilder aNewsCreateDto() {return new NewsCreateDtoBuilder();}
+        public static NewsCreateDtoBuilder aNewsCreateDto() {
+            return new NewsCreateDtoBuilder();
+        }
 
         public NewsCreateDtoBuilder withTitle(String title) {
             this.title = title;

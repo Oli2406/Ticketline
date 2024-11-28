@@ -42,7 +42,8 @@ public class News {
     //needs event implementation
 
 
-    public News(String title, String summary, String content, LocalDate dateOfNews, List<String> imageUrl ) {
+    public News(String title, String summary, String content, LocalDate dateOfNews,
+        List<String> imageUrl) {
         this.title = title;
         this.summary = summary;
         this.content = content;
