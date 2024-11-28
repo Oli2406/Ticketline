@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { AdminService } from '../../services/admin.service';
-import { Router } from '@angular/router';
-import { RegisterUser } from '../../dtos/register-data';
-
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../../services/auth.service';
+import {AdminService} from '../../services/admin.service';
+import {Router} from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin',
@@ -20,8 +19,10 @@ export class AdminComponent implements OnInit {
   currentUserEmail = '';
 
   constructor(private authService: AuthService,
-              private userService: AdminService,
-              private router: Router) {}
+              private adminService: AdminService,
+              private router: Router,
+              private toastr: ToastrService) {
+  }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -32,7 +33,7 @@ export class AdminComponent implements OnInit {
    * Load users from the backend
    */
   loadUsers(): void {
-    this.userService.getUsers().subscribe({
+    this.adminService.getUsers().subscribe({
       next: (data) => {
         this.users = data;
       },
@@ -47,7 +48,7 @@ export class AdminComponent implements OnInit {
    * Lock a user account
    */
   lockUser(userId: number): void {
-    this.userService.lockUser(userId).subscribe({
+    this.adminService.lockUser(userId).subscribe({
       next: () => this.loadUsers(),
       error: (err) => {
         this.error = true;
@@ -60,8 +61,8 @@ export class AdminComponent implements OnInit {
    * Unlock a user account
    */
   unlockUser(userId: number): void {
-    this.userService.unlockUser(userId).subscribe( {
-      next:() => this.loadUsers(),
+    this.adminService.unlockUser(userId).subscribe({
+      next: () => this.loadUsers(),
       error: err => {
         this.error = true;
         this.errorMessage = err.error.errorMessage;
@@ -72,8 +73,16 @@ export class AdminComponent implements OnInit {
   /**
    * Reset a user's password
    */
-  resetPassword(userId: number): void {
-    //TODO implement
+  resetPassword(email: string): void {
+    this.adminService.resetPassword(email).subscribe({
+      next: () => {
+        this.toastr.success('Reset password e-Mail sent to ' + email, 'Success');
+      },
+      error: err => {
+        this.error = true;
+        this.errorMessage = err.error.errorMessage;
+      }
+    });
   }
 
   /**

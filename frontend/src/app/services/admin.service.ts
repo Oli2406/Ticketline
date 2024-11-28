@@ -3,7 +3,6 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
 import {UserDetailDto} from "../dtos/user-data";
-import {AdminUserRegistrationDto} from "../dtos/register-data";
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +24,11 @@ export class AdminService {
   lockUser(id: number): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/lock/${id}`, {});
   }
+
+  resetPassword(email:string): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/reset-password/${email}`, {});
+  }
+
 
   /**
    * Handles API errors and formats error messages.

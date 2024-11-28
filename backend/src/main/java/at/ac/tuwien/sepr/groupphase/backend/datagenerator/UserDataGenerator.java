@@ -27,10 +27,10 @@ public class UserDataGenerator {
         LOGGER.debug("generating users");
 
         // Users without admin rights
-        createUserIfNotExists("Max", "Mustermann", "max.mustermann@email.com", "password", false);
-        createUserIfNotExists("Lena", "Müller", "lena.mueller@email.com", "password", false);
+        createUserIfNotExists("Max", "Mustermann", "anna.simhofer@hotmail.com", "password", false);
+        createUserIfNotExists("Lena", "Müller", "lena.mueller@email.com", "password", true);
         createUserIfNotExists("Tom", "Schmidt", "tom.schmidt@email.com", "password", false);
-        createUserIfNotExists("Anna", "Meier", "anna.meier@email.com", "password", false);
+        createUserIfNotExists("Anna", "Meier", "anna.meier@email.com", "password", true);
         createUserIfNotExists("Felix", "Berger", "felix.berger@email.com", "password", false);
 
         // user with admin rights

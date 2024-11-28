@@ -37,8 +37,6 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       const authRequest: AuthRequest = new AuthRequest(this.loginForm.controls.username.value, this.loginForm.controls.password.value);
       this.authenticateUser(authRequest);
-    } else {
-      console.log('Invalid input');
     }
   }
 
@@ -75,5 +73,9 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  forgotPassword() {
+    this.router.navigate(['/send-email']);
   }
 }

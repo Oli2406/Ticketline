@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.AdminService;
+import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminEndpoint {
 
     private final AdminService adminService;
+    private final ResetPasswordService resetPasswordService;
 
-    public AdminEndpoint(AdminService adminService) {
+    public AdminEndpoint(AdminService adminService, ResetPasswordService resetPasswordService) {
         this.adminService = adminService;
+        this.resetPasswordService = resetPasswordService;
     }
 
     @Secured("ROLE_ADMIN")
@@ -35,6 +38,12 @@ public class AdminEndpoint {
         return ResponseEntity.ok().build();
     }
 
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/reset-password/{email}")
+    public ResponseEntity<Void> resetPassword(@PathVariable(name = "email") String email) {
+        resetPasswordService.resetPassword(email);
+        return ResponseEntity.ok().build();
+    }
 
     @Secured("ROLE_ADMIN")
     @GetMapping

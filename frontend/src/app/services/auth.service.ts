@@ -123,4 +123,12 @@ export class AuthService {
       catchError(() => of(false))
     );
   }
+
+  resetPassword(email:string): Observable<void> {
+    return this.httpClient.post<void>(`${this.authBaseUri}/reset-password/${email}`, {});
+  }
+
+  verifyResetCode(code: number) {
+    return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code/${code}`, {});
+  }
 }

@@ -8,6 +8,9 @@ import {RegisterComponent} from './components/register/register.component';
 import {AdminGuard} from "./guards/admin.guard";
 import {AdminComponent} from './components/admin/admin.component';
 import {CreateUserComponent} from './components/admin/createUser/create-user.component';
+import {ResetPasswordComponent} from "./components/password-reset/reset-password/reset-password.component";
+import {VerifyResetCodeComponent} from "./components/password-reset/verify-reset-code/verify-reset-code.component";
+import {SendEmailComponent} from "./components/password-reset/send-email/send-email.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -22,6 +25,9 @@ const routes: Routes = [
       {path: 'createUser', component: CreateUserComponent}
     ]
   },
+  {path: 'reset-password', component: ResetPasswordComponent},
+  {path: 'verify-reset-code', component: VerifyResetCodeComponent},
+  {path: 'send-email' , component: SendEmailComponent},
   {path: 'home', component: HomeComponent}
 ];
 

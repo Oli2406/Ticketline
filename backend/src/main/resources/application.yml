@@ -21,7 +21,17 @@ spring:
     # is disabled since it breaks the principle of least astonishment and leads to bad performance. To learn more,
     # follow this link: https://bit.ly/2LaX9ku
     open-in-view: false
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ticketline.inso8@gmail.com
+    password: hljt zyqi lvcs yowz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 security:
   auth:
     header: Authorization
