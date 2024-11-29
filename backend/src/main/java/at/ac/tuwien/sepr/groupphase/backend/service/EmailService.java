@@ -17,6 +17,6 @@ public interface EmailService {
      * @param to        Recipient's email address
      * @param resetCode Code to reset password
      */
-    void sendPasswordResetEmail(String to, String resetCode);
+    void sendPasswordResetEmail(String to, String resetCode, String resetLink);
 
 }

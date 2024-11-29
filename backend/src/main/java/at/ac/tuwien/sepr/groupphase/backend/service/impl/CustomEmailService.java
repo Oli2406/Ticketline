@@ -18,12 +18,17 @@ public class CustomEmailService implements EmailService {
     }
 
     @Override
-    public void sendPasswordResetEmail(String to, String resetCode) {
-        String subject = "Password Reset Code";
-        String message = "Your password reset code is: " + resetCode
-            + "\n Please enter the code here to reset your password: \n";
-        sendEmail(to, subject, message);
+    public void sendPasswordResetEmail(String email, String resetCode, String resetLink) {
+        String subject = "Password Reset Request";
+        String message = String.format(
+            "Hello,\n\nYou requested a password reset. Here is your reset code: %s\n\n"
+                + "Alternatively, click the link below to reset your password:\n%s\n\n"
+                + "If you did not request this, please ignore this email.\n\nRegards,\nYour Team",
+            resetCode, resetLink);
+
+        sendEmail(email, subject, message);
     }
+
 
     @Override
     public void sendHtmlEmail(String to, String subject, String html) {
