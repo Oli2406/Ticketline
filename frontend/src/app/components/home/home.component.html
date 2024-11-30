@@ -1,11 +1,21 @@
 <div class="jumbotron mt-5">
-  <h1 class="display-4">Welcome to the SE PR group phase!</h1>
-  <hr class="my-4">
   <a *ngIf="!authService.isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
   <div *ngIf="authService.isLoggedIn()">
-    <p>Check out the latest message from the SE PR group phase.</p>
-    <p class="lead">
-      <a class="btn btn-primary btn-lg" routerLink="/message" role="button">Message</a>
-    </p>
+    <h1>Upcoming Events</h1>
+
+    <div class="events-container mt-5">
+      <button class="btn btn-secondary" (click)="previousEvents()" [disabled]="currentIndex === 0">
+        < </button>
+
+      <div class="event" *ngFor="let event of displayedEvents">
+        <img [src]="event.imageUrl" alt="Event Image">
+        <h2 class="mt-2">{{ event.title }}</h2>
+        <p class="date">{{ event.date | date }}</p>
+        <p>{{ truncateSummary(event.summary, 200) }}</p>
+      </div>
+
+      <button class="btn btn-secondary" (click)="nextEvents()" [disabled]="currentIndex >= events.length - 3">
+        > </button>
+    </div>
   </div>
 </div>
