@@ -8,13 +8,15 @@ import {RegisterComponent} from './components/register/register.component';
 import {AdminGuard} from "./guards/admin.guard";
 import {AdminComponent} from './components/admin/admin.component';
 import {CreateUserComponent} from './components/admin/createUser/create-user.component';
+import {NewsDetailComponent} from "./components/news-detail/news-detail.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'merchandise', component: HomeComponent},
   {path: 'events', component: HomeComponent},
-  {path: 'news', component: HomeComponent},
+  {path: 'news', component: HomeComponent },
+  {path: 'news/details/:id', component: NewsDetailComponent },
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {

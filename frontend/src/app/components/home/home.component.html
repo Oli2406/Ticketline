@@ -1,21 +1,23 @@
 <div class="jumbotron mt-5">
-  <a *ngIf="!authService.isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
-  <div *ngIf="authService.isLoggedIn()">
+  <a *ngIf="!isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
+  <div *ngIf="isLoggedIn()">
     <h1>Upcoming Events</h1>
 
-    <div class="events-container mt-5">
-      <button class="btn btn-secondary" (click)="previousEvents()" [disabled]="currentIndex === 0">
+    <div class="news-container mt-5">
+      <button class="btn btn-secondary" (click)="previousNews()" [disabled]="currentIndex === 0">
         < </button>
 
-      <div class="event" *ngFor="let event of displayedEvents">
-        <img [src]="event.imageUrl" alt="Event Image">
-        <h2 class="mt-2">{{ event.title }}</h2>
-        <p class="date">{{ event.date | date }}</p>
-        <p>{{ truncateSummary(event.summary, 200) }}</p>
+      <div *ngFor="let n of displayedNews; trackBy: trackByNewsId" class="news" (click)="navigateToNewsDetails(n.id)">
+        <img [src]="" alt="News Image">
+        <h2 class="mt-2">{{ n.title }}</h2>
+        <p class="date">{{ n.date | date }}</p>
+        <p>{{ truncateSummary(n.summary, 200) }}</p>
       </div>
 
-      <button class="btn btn-secondary" (click)="nextEvents()" [disabled]="currentIndex >= events.length - 3">
+      <button class="btn btn-secondary" (click)="nextNews()" [disabled]="currentIndex >= news.length - 3">
         > </button>
     </div>
   </div>
 </div>
+
+

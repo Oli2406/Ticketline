@@ -1,5 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../services/auth.service';
+import {NewsService} from "../../services/news.service";
+import {NewsDetailDto} from "../../dtos/news-data";
+import {ToastrService} from "ngx-toastr";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-home',
@@ -8,53 +12,37 @@ import {AuthService} from '../../services/auth.service';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(public authService: AuthService) { }
+  constructor(private authService: AuthService,
+              private newsService: NewsService,
+              private notification: ToastrService,
+              private router: Router) {
+
+  }
 
   ngOnInit() {
-    this.updateDisplayedEvents()
+    if (this.isLoggedIn()) {
+      this.initNews()
+    }
+
   }
-  events = [
-    {
-      imageUrl: '/assets/images/pathToImage',
-      title: 'News 1 Title',
-      date: new Date('2025-01-01'),
-      summary: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores '
-    },
-    {
-      imageUrl: '/assets/images/pathToImage',
-      title: 'News 2 slightly longer Title',
-      date: new Date('2025-01-01'),
-      summary: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea tak'
-    },
-    {
-      imageUrl: '/assets/images/pathToImage',
-      title: 'News 3 much much longer Title to test behaviour',
-      date: new Date('2025-01-01'),
-      summary: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l.'
-    },
-    {
-      imageUrl: '/assets/images/pathToImage',
-      title: 'News 4 Title',
-      date: new Date('2025-01-01'),
-      summary: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam volu.'
-    },
-  ];
+
+  news: NewsDetailDto[] = [];
 
   currentIndex = 0;
-  displayedEvents: any[] = [];
+  displayedNews: NewsDetailDto[] = [];
 
-  updateDisplayedEvents() {
-    this.displayedEvents = this.events.slice(this.currentIndex, this.currentIndex + 3);
+  updateDisplayedNews() {
+    this.displayedNews = this.news.slice(this.currentIndex, this.currentIndex + 3);
   }
 
-  nextEvents() {
+  nextNews() {
     this.currentIndex += 3;
-    this.updateDisplayedEvents();
+    this.updateDisplayedNews();
   }
 
-  previousEvents() {
+  previousNews() {
     this.currentIndex -= 3;
-    this.updateDisplayedEvents();
+    this.updateDisplayedNews();
   }
 
   truncateSummary(summary: string, maxLength: number): string {
@@ -63,5 +51,31 @@ export class HomeComponent implements OnInit {
     } else {
       return summary;
     }
+  }
+
+  initNews() {
+    this.newsService.getUnreadNews(this.authService.getUserEmailFromToken())
+      .subscribe({
+        next: news => {
+          this.news = news;
+          this.updateDisplayedNews()
+        },
+        error: error => {
+          console.error('Error fetching news', error);
+          this.notification.error('Could not fetch news');
+        }
+      });
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  navigateToNewsDetails(id: number) {
+    this.router.navigate(['/news/details', id]);
+  }
+
+  trackByNewsId(index: number, news: NewsDetailDto): number {
+    return news.id;
   }
 }
