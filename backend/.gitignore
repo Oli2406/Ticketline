@@ -51,3 +51,6 @@ buildNumber.properties
 
 ### VS Code ###
 .vscode/
+
+### Uploaded images ###
+src/main/newsImages/

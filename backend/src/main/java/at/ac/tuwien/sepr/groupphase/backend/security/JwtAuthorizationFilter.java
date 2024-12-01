@@ -40,7 +40,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
         HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        List<String> excludedPaths = List.of("/api/v1/register", "/api/v1/public");
+        List<String> excludedPaths = List.of("/api/v1/register", "/api/v1/public", "/api/v1/create-news");
 
         String requestPath = request.getRequestURI();
 

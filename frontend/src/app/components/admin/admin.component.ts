@@ -89,7 +89,7 @@ export class AdminComponent implements OnInit {
   }
 
   navigateToCreateNews(): void {
-    console.log('Create News functionality will be implemented.');
+    this.router.navigate(['/admin/createNews']);
   }
 
   navigateToCreateShow(): void {
