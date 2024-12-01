@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
@@ -39,19 +38,21 @@ public class NewsImplService implements NewsService {
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMpfDto newsCreateMPFDto)
+    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto)
         throws ValidationException, IOException, URISyntaxException {
-        LOG.trace("createNews({})", newsCreateMPFDto);
-        newsValidator.validateNews(newsCreateMPFDto);
+        LOG.trace("createNews({})", mpfDto);
+        newsValidator.validateNews(mpfDto);
 
-        List<String> imageUrls = new ArrayList<String>();
+        List<String> imageUrls = new ArrayList<>();
 
-        for (MultipartFile imageFile : newsCreateMPFDto.getImages()) {
-            imageUrls.add(this.uploadImagePath(null, imageFile));
+        MultipartFile[] images = mpfDto.getImages();
+        if (images != null) {
+            for (MultipartFile imageFile : images) {
+                imageUrls.add(this.uploadImagePath(null, imageFile));
+            }
         }
 
-        NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithIMGURL(newsCreateMPFDto,
-            imageUrls);
+        NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithImgUrl(mpfDto, imageUrls);
 
         News news =
             new News(
@@ -65,6 +66,7 @@ public class NewsImplService implements NewsService {
         return newsMapper.entityToCreateDto(createdNews);
     }
 
+
     /*Private methods handling the image upload*/
 
     private String uploadImagePath(Long id, MultipartFile image) throws IOException {
@@ -76,9 +78,9 @@ public class NewsImplService implements NewsService {
 
         if (image == null) {
             // Todo get img url
-            String pictureURL = "";
-            if (pictureURL != null && !pictureURL.isEmpty()) {
-                return pictureURL;
+            String pictureUrl = "";
+            if (pictureUrl != null && !pictureUrl.isEmpty()) {
+                return pictureUrl;
             }
             return null;
         }
@@ -86,18 +88,36 @@ public class NewsImplService implements NewsService {
     }
 
     private String uploadNewImage(MultipartFile image) throws IOException {
-
-        String relativePathVar =
-            uploadDirectory
-                .toString()
-                .substring(0, uploadDirectory.toString().lastIndexOf(File.separator));
-        Path relativePath = Paths.get(relativePathVar);
-
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("Invalid image file: file is null or empty");
+        }
+        Path baseDirectory = Paths.get("src", "main", "newsImages");
+        Path uploadDirectory = baseDirectory.resolve("uploads").toAbsolutePath();
+        try {
+            if (!Files.exists(baseDirectory)) {
+                Files.createDirectories(baseDirectory);
+                LOG.info("Created base resources directory: {}", baseDirectory.toAbsolutePath());
+            }
+            Files.createDirectories(uploadDirectory);
+            LOG.info("Uploads directory verified/created: {}", uploadDirectory.toAbsolutePath());
+        } catch (IOException e) {
+            LOG.error("Failed to create upload directory: {}", uploadDirectory, e);
+            throw new IOException("Could not create upload directory", e);
+        }
         String fileName = image.getOriginalFilename();
-        Path uploadPath = Paths.get(uploadDirectory + File.separator + fileName);
-        Files.createDirectories(uploadPath.getParent());
-        image.transferTo(new File(uploadPath.toString()));
-
-        return relativePath.relativize(uploadPath).toString().replace("\\", "/");
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("Invalid image file: filename is null or empty");
+        }
+        Path uploadPath = uploadDirectory.resolve(fileName);
+        try {
+            image.transferTo(uploadPath.toFile());
+            LOG.info("File uploaded successfully to: {}", uploadPath.toAbsolutePath());
+        } catch (IOException e) {
+            LOG.error("Error while saving file: {}", fileName, e);
+            throw new IOException("Failed to save file: " + fileName, e);
+        }
+        return uploadDirectory.relativize(uploadPath).toString().replace("\\", "/");
     }
+
+
 }

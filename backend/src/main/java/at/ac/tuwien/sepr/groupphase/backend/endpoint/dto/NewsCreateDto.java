@@ -12,11 +12,11 @@ public class NewsCreateDto {
     LocalDate dateOfNews;
 
     public NewsCreateDto(String title, String summary, String content, List<String> imageUrl,
-        LocalDate dateOfNews) {
+                         LocalDate dateOfNews) {
         this.title = title;
         this.summary = summary;
         this.content = content;
-        this.imageUrl = List.of(String.valueOf(imageUrl));
+        this.imageUrl = imageUrl;
         this.dateOfNews = dateOfNews;
     }
 
@@ -66,13 +66,13 @@ public class NewsCreateDto {
 
     @Override
     public String toString() {
-        return "NewsCreateDto{" +
-            "content='" + content + '\'' +
-            ", title='" + title + '\'' +
-            ", summary='" + summary + '\'' +
-            ", imageUrl=" + List.of(imageUrl) +
-            ", dateOfNews=" + dateOfNews +
-            '}';
+        return "NewsCreateDto{"
+            + "content='" + content + '\''
+            + ", title='" + title + '\''
+            + ", summary='" + summary + '\''
+            + ", imageUrl=" + List.of(imageUrl)
+            + ", dateOfNews=" + dateOfNews
+            + '}';
     }
 
     public static final class NewsCreateDtoBuilder {

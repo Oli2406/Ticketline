@@ -11,10 +11,10 @@ import java.util.List;
 public class NewsMapper {
 
     /**
-     * Maps an entity to a
+     * Maps a {@link News} entity to a {@link NewsCreateDto}.
      *
-     * @param news entity for mapping
-     * @ return the mapped create dto
+     * @param news the {@link News} entity to be mapped
+     * @return the mapped {@link NewsCreateDto}
      */
     public NewsCreateDto entityToCreateDto(News news) {
         return new NewsCreateDto(
@@ -22,24 +22,27 @@ public class NewsMapper {
             news.getSummary(),
             news.getContent(),
             news.getImageUrl(),
-            news.getDateOfNews());
+            news.getDateOfNews()
+        );
     }
 
     /**
-     * Maps an and multipart-file-Dto to a dto which only contains the imag urls and not the
-     * pictures
+     * Maps a {@link NewsCreateMpfDto} and a list of image URLs to a {@link NewsCreateDto}.
+     * This method is used to map data from a multipart-file DTO to a DTO containing only
+     * image URLs without the actual pictures.
      *
-     * @param newsCreateMPFDto dto to be mapped
-     * @param imgUrls          the image urls from the pictures from the multipart-file
-     * @ return the mapped dto
+     * @param mpfDto the {@link NewsCreateMpfDto} to be mapped
+     * @param imgUrls          the list of image URLs extracted from the multipart files
+     * @return the mapped {@link NewsCreateDto}
      */
-    public NewsCreateDto entityToCreateDtoWithIMGURL(
-        NewsCreateMpfDto newsCreateMPFDto, List<String> imgUrls) {
+    public NewsCreateDto entityToCreateDtoWithImgUrl(
+        NewsCreateMpfDto mpfDto, List<String> imgUrls) {
         return new NewsCreateDto(
-            newsCreateMPFDto.getTitle(),
-            newsCreateMPFDto.getSummary(),
-            newsCreateMPFDto.getContent(),
+            mpfDto.getTitle(),
+            mpfDto.getSummary(),
+            mpfDto.getContent(),
             imgUrls,
-            newsCreateMPFDto.getDateOfNews());
+            mpfDto.getDateOfNews()
+        );
     }
 }

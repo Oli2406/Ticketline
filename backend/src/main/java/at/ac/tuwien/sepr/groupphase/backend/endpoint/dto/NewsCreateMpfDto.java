@@ -69,7 +69,7 @@ public class NewsCreateMpfDto {
             + '}';
     }
 
-    public static final class NewsCreateMPFDtoBuilder {
+    public static final class NewsCreateMpfDtoBuilder {
 
         private String title;
         private String summary;
@@ -77,42 +77,42 @@ public class NewsCreateMpfDto {
         private MultipartFile[] images;
         private LocalDate dateOfNews;
 
-        public NewsCreateMPFDtoBuilder() {
+        public NewsCreateMpfDtoBuilder() {
         }
 
-        public NewsCreateMPFDtoBuilder title(String title) {
+        public NewsCreateMpfDtoBuilder title(String title) {
             this.title = title;
             return this;
         }
 
-        public NewsCreateMPFDtoBuilder summary(String summary) {
+        public NewsCreateMpfDtoBuilder summary(String summary) {
             this.summary = summary;
             return this;
         }
 
-        public NewsCreateMPFDtoBuilder content(String content) {
+        public NewsCreateMpfDtoBuilder content(String content) {
             this.content = content;
             return this;
         }
 
-        public NewsCreateMPFDtoBuilder images(MultipartFile[] images) {
+        public NewsCreateMpfDtoBuilder images(MultipartFile[] images) {
             this.images = images;
             return this;
         }
 
-        public NewsCreateMPFDtoBuilder dateOfNews(LocalDate dateOfNews) {
+        public NewsCreateMpfDtoBuilder dateOfNews(LocalDate dateOfNews) {
             this.dateOfNews = dateOfNews;
             return this;
         }
 
         public NewsCreateMpfDto build() {
-            NewsCreateMpfDto newsCreateMPFDto = new NewsCreateMpfDto();
-            newsCreateMPFDto.setTitle(title);
-            newsCreateMPFDto.setSummary(summary);
-            newsCreateMPFDto.setContent(content);
-            newsCreateMPFDto.setImages(images);
-            newsCreateMPFDto.setDateOfNews(dateOfNews);
-            return newsCreateMPFDto;
+            NewsCreateMpfDto mpfDto = new NewsCreateMpfDto();
+            mpfDto.setTitle(title);
+            mpfDto.setSummary(summary);
+            mpfDto.setContent(content);
+            mpfDto.setImages(images);
+            mpfDto.setDateOfNews(dateOfNews);
+            return mpfDto;
         }
     }
 }

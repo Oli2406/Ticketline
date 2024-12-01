@@ -41,62 +41,46 @@ export class NewsCreateComponent implements OnInit {
 
   public onSubmit(form: NgForm): void {
     console.log("submitted");
-    if (form.valid) {
-      if (this.validateNews(this.news)) {
-        const newsFormData = this.createFormData(this.news);
-        //create a form date?
-        let observable: Observable<NewsData>;
-        observable = this.service.createNews(newsFormData);
-        observable.subscribe({
-          next: () => {
-            this.toastr.success('News successfully submitted');
-            this.router.navigate(['']);
-          }, error: (err) => {
-            console.error('Error during news creation:', err.message);
-            const errors = Array.isArray(err.message)
-              ? err.message
-              : err.message.split(/\n/);
-            const errorList = errors
+    if (form.valid) {const newsFormData = this.createFormData(this.news);
+      let observable: Observable<NewsData>;
+      observable = this.service.createNews(newsFormData);
+      observable.subscribe({
+        next: () => {
+          this.toastr.success('News successfully submitted');
+          this.router.navigate(['']);
+        }, error: (err) => {
+          console.error('Error during news creation:', err.message);
+          const errors = Array.isArray(err.message)
+            ? err.message
+            : err.message.split(/\n/);
+          const errorList = errors
             .map((error) => `<li>${error.trim()}</li>`)
             .join('');
-            this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating news', {
-              enableHtml: true,
-            });
-          },
-        });
-      }
+          this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating news', {
+            enableHtml: true,
+          });
+        },
+      });
     }
   }
 
   /*private methods for validation*/
 
   private createFormData(news: NewsData): FormData {
+    const formData = new FormData();
+    formData.append('title', news.title);
+    formData.append('summary', news.summary);
+    formData.append('content', news.content);
+    formData.append('dateOfNews', news.dateOfNews.toString()); // Ensure correct date format
 
-    const newsData = new FormData;
-
-    if (news.id != null) {
-      newsData.append('id', news.id.toString())
-    }
-
-    newsData.append('title', news.title);
-    newsData.append('summary', news.summary);
-    newsData.append('content', news.content);
-    newsData.append('dateOfNews', news.dateOfNews.toString());
-
-    if (news.imageUrl != null) {
-        if (this.selectedFiles) {
-          try {
-            for (let i=0; i < this.selectedFiles.length; i++)
-              newsData.append('images', new Blob([this.selectedFiles[i]], {type: "application/octet-stream"}), this.selectedFiles[i].name);
-          } catch (error) {
-            console.error('Error while file uploading or reading', error);
-          }
+    if (this.selectedFiles) {
+      for (const file of this.selectedFiles) {
+        formData.append('images', file, file.name); // Correct key for file
       }
-
-    } else newsData.append('images', null);
-
-    return newsData;
+    }
+    return formData;
   }
+
 
   private validateNews(news: NewsData) {
     console.log("validation start");

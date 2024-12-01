@@ -22,7 +22,7 @@ public class NewsValidator {
     }
 
     /**
-     * Method for validating a NewsCreateMpfDto
+     * Method for validating a NewsCreateMpfDto.
      *
      * @param news - dto for validation
      */

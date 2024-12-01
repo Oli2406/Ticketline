@@ -14,17 +14,16 @@ const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
-  {path: 'create-news', component: NewsCreateComponent},
   {path: 'merchandise', component: HomeComponent},
   {path: 'events', component: HomeComponent},
   {path: 'news', component: HomeComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
-  {
-    path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard], children: [
-      {path: 'createUser', component: CreateUserComponent}
-    ]
-  },
+  {path: '', children: [
+      {path: 'admin', canActivate: [AuthGuard, AdminGuard], component: AdminComponent},
+      {path: 'admin/createUser', canActivate: [AuthGuard, AdminGuard], component: CreateUserComponent},
+      {path: 'admin/createNews', canActivate: [AuthGuard, AdminGuard],component: NewsCreateComponent},
+  ]},
   {path: 'home', component: HomeComponent}
 ];
 
