@@ -3,10 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 
-public class NewsCreateMPFDto {
+public class NewsCreateMpfDto {
 
     String title;
     String summary;
@@ -56,7 +54,7 @@ public class NewsCreateMPFDto {
 
     @Override
     public String toString() {
-        return "NewsCreateMPFDto{"
+        return "NewsCreateMpfDto{"
             + "content='"
             + content
             + '\''
@@ -107,8 +105,8 @@ public class NewsCreateMPFDto {
             return this;
         }
 
-        public NewsCreateMPFDto build() {
-            NewsCreateMPFDto newsCreateMPFDto = new NewsCreateMPFDto();
+        public NewsCreateMpfDto build() {
+            NewsCreateMpfDto newsCreateMPFDto = new NewsCreateMpfDto();
             newsCreateMPFDto.setTitle(title);
             newsCreateMPFDto.setSummary(summary);
             newsCreateMPFDto.setContent(content);

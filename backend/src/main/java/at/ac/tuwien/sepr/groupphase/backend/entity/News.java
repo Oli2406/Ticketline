@@ -1,10 +1,14 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
@@ -28,9 +32,10 @@ public class News {
     @Column(name = "content", nullable = false, length = 4096)
     private String content;
 
+    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "images", joinColumns = @JoinColumn(name = "newsId"))
     @Column(name = "image_url")
-    //TODO WHY NOT WORKING???
-    private List<String> imageUrl = new ArrayList<String>();
+    private List<String> imageUrl;
 
     @Column(name = "date_of_news", nullable = false)
     private LocalDate dateOfNews = LocalDate.now();
@@ -50,6 +55,10 @@ public class News {
         this.dateOfNews = dateOfNews;
         this.imageUrl = imageUrl;
 
+
+    }
+
+    public News() {
 
     }
 

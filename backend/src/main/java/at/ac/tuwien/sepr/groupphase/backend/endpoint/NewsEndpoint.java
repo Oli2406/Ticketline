@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMPFDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import jakarta.xml.bind.ValidationException;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 
 @RestController
-@RequestMapping(value = "/api/v1/news")
+@RequestMapping(value = "/api/v1")
 public class NewsEndpoint {
 
     private final NewsService newsService;
@@ -33,15 +33,15 @@ public class NewsEndpoint {
      * @throws IOException         - when there is an error with the picture input
      * @throws URISyntaxException  - when there occurs an error with the image urls
      */
-    @PostMapping
-    public NewsCreateDto createNews(@RequestBody NewsCreateMPFDto news)
+    @PostMapping("/create-news")
+    public NewsCreateDto createNews(@RequestBody NewsCreateMpfDto news)
         throws ValidationException, IOException, URISyntaxException {
-        LOG.info("POST" + "/api/v1/news");
+        LOG.info("POST" + "/api/v1/create-news");
         LOG.debug("get request parameters: {}", news);
 
         try {
+            System.out.println("we have reached the endpoint");
             return this.newsService.createNews(news);
-
         } catch (ValidationException e) {
             throw new ValidationException("Validation for News failed");
         } catch (IOException e) {

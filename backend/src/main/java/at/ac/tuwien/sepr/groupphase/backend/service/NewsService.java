@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMPFDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import jakarta.xml.bind.ValidationException;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public interface NewsService {
      * @throws IOException         when there is an error with the image input
      * @throws URISyntaxException  when there is an error with the image urls
      */
-    NewsCreateDto createNews(NewsCreateMPFDto newsCreateMPFDto)
+    NewsCreateDto createNews(NewsCreateMpfDto newsCreateMPFDto)
         throws ValidationException, IOException, URISyntaxException;
 
 }

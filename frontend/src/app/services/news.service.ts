@@ -9,7 +9,7 @@ import {catchError, Observable, throwError} from "rxjs";
 })
 export class NewsService {
 
-  private baseURI: string = this.globals.backendUri + '/news'
+  private baseURI: string = this.globals.backendUri + '/create-news';
 
   constructor(private httpClient: HttpClient, private globals: Globals) { }
 
@@ -19,6 +19,8 @@ export class NewsService {
    * @return Observable of the created news
    * */
   createNews(data: FormData ): Observable<NewsData>{
+    console.log("service start");
+    console.log(data);
     return this.httpClient.post<NewsData>(this.baseURI, data).pipe(catchError(this.handleError));
   }
 

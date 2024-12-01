@@ -1,14 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMPFDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import jakarta.xml.bind.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +29,6 @@ public class NewsImplService implements NewsService {
     private final NewsValidator newsValidator;
     private final NewsMapper newsMapper;
     private final Path uploadDirectory = Path.of("");
-
     // Paths.get(NewsImplService.class.getClassLoader().getResource("images").toURI());
 
     public NewsImplService(
@@ -41,7 +39,7 @@ public class NewsImplService implements NewsService {
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMPFDto newsCreateMPFDto)
+    public NewsCreateDto createNews(NewsCreateMpfDto newsCreateMPFDto)
         throws ValidationException, IOException, URISyntaxException {
         LOG.trace("createNews({})", newsCreateMPFDto);
         newsValidator.validateNews(newsCreateMPFDto);

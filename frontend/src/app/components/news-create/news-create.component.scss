@@ -1,9 +1,62 @@
 //temporary CSS - should be replaced when we agreed on a style
 // General Reset
+
+body {
+  background-color: #A7A3FF;
+}
+
+.custom-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3e3e3e;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-label {
+  color: #333;
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.custom-input {
+  background-color: #FFFFFF;
+  color: #333;
+  border-radius: 8px;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.custom-button {
+  background-color: #4D47C3;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  border-color: #4D47C3;
+}
+.custom-button:hover {
+  background-color: #514dc7;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  border-color: #514dc7;
+}
+
+.custom-input::placeholder {
+  color: #D3D3D3;
+  font-size: 1rem;
+}
+
+.news-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  width: 100%;
+  max-width: 1200px;
 }
 
 // Ensure no interference with ngx-toastr styles
@@ -23,93 +76,22 @@ body {
   height: 100vh;
 }
 
-h1 {
-  font-size: 2.5em;
-  color: #343a40;
-  text-align: center;
+// Custom Styling for ngx-toastr
+.toast {
+  font-family: 'Arial', sans-serif !important;
+  font-size: 1rem !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+.toast-error {
+  background-color: #f44336 !important; // Red background for error toasts
+  color: #fff !important; // White text for better contrast
 }
 
-.col {
-  flex: 1;
+.toast-top-left {
+  top: 12px !important;
+  left: 12px !important;
+  position: fixed !important;
+  z-index: 1060 !important; // Ensure it appears above other elements
 }
 
-.col-auto {
-  flex: 0;
-}
-
-/* Form Styles */
-form {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #495057;
-}
-
-input[type="text"], textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  font-size: 1em;
-  color: #495057;
-}
-
-input[type="file"] {
-  display: block;
-  margin-top: 10px;
-}
-
-.img-thumbnail {
-  max-height: 100px;
-  max-width: 100px;
-  margin-top: 10px;
-}
-
-/* Button Styles */
-button[type="submit"] {
-  background-color: #007bff;
-  color: #ffffff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-button[type="submit"]:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-.d-flex {
-  display: flex;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.justify-content-end {
-  justify-content: flex-end;
-}
-
-.flex-grow-1 {
-  flex-grow: 1;
-}

@@ -1,7 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMPFDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class NewsMapper {
      * @ return the mapped dto
      */
     public NewsCreateDto entityToCreateDtoWithIMGURL(
-        NewsCreateMPFDto newsCreateMPFDto, List<String> imgUrls) {
+        NewsCreateMpfDto newsCreateMPFDto, List<String> imgUrls) {
         return new NewsCreateDto(
             newsCreateMPFDto.getTitle(),
             newsCreateMPFDto.getSummary(),

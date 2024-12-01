@@ -7,6 +7,7 @@ import {Observable} from "rxjs";
 import {formatDate} from "@angular/common";
 // @ts-ignore
 import {ToastrService} from "ngx-toastr";
+import {forEach} from "lodash";
 
 @Component({
   selector: 'app-news-create',
@@ -23,14 +24,14 @@ export class NewsCreateComponent implements OnInit {
     title: '',
     summary: '',
     content: '',
-    imageUrl: null,
+    imageUrl: [],
     dateOfNews: new Date()
   };
-  private selectedFile: File;
+  private selectedFiles: File[];
 
   constructor(private service: NewsService,
               private route: ActivatedRoute,
-              //private toastr: ToastrService,
+              private toastr: ToastrService,
               private router: Router) {
   }
 
@@ -39,6 +40,7 @@ export class NewsCreateComponent implements OnInit {
   }
 
   public onSubmit(form: NgForm): void {
+    console.log("submitted");
     if (form.valid) {
       if (this.validateNews(this.news)) {
         const newsFormData = this.createFormData(this.news);
@@ -47,10 +49,21 @@ export class NewsCreateComponent implements OnInit {
         observable = this.service.createNews(newsFormData);
         observable.subscribe({
           next: () => {
-            //this.toastr.success('News successfully submitted');
-            this.router.navigate([''])
-          }
-        })
+            this.toastr.success('News successfully submitted');
+            this.router.navigate(['']);
+          }, error: (err) => {
+            console.error('Error during news creation:', err.message);
+            const errors = Array.isArray(err.message)
+              ? err.message
+              : err.message.split(/\n/);
+            const errorList = errors
+            .map((error) => `<li>${error.trim()}</li>`)
+            .join('');
+            this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating news', {
+              enableHtml: true,
+            });
+          },
+        });
       }
     }
   }
@@ -70,19 +83,23 @@ export class NewsCreateComponent implements OnInit {
     newsData.append('content', news.content);
     newsData.append('dateOfNews', news.dateOfNews.toString());
 
-    for (var imgUrl of news.imageUrl) {
-      if (this.selectedFile) {
-        try {
-          newsData.append('images', new Blob([this.selectedFile], {type: "application/octet-stream"}), this.selectedFile.name);
-        } catch (error) {
-          console.error('Error while file uploading or reading', error);
-        }
+    if (news.imageUrl != null) {
+        if (this.selectedFiles) {
+          try {
+            for (let i=0; i < this.selectedFiles.length; i++)
+              newsData.append('images', new Blob([this.selectedFiles[i]], {type: "application/octet-stream"}), this.selectedFiles[i].name);
+          } catch (error) {
+            console.error('Error while file uploading or reading', error);
+          }
       }
-    }
+
+    } else newsData.append('images', null);
+
     return newsData;
   }
 
   private validateNews(news: NewsData) {
+    console.log("validation start");
     let errorMessage = '';
 
     if (this.empty(news.title) || (this.isEmpty(news.title))) {
@@ -150,22 +167,44 @@ export class NewsCreateComponent implements OnInit {
     }
   }
 
-  readImage(event: Event) {
 
+  readImage(event: Event) {
     const imageInput = event.target as HTMLInputElement;
     const reader = new FileReader();
+    this.selectedFiles = [];
+    let imgArr = [];
 
     if (imageInput.files != null && imageInput.files.length > 0) {
-      const file = imageInput.files.item(0);
-      if (file != null) {
-        this.selectedFile = file;
+      for (let i = 0; i < imageInput.files.length; i++) {
+        const file = imageInput.files.item(i);
+        if (file != null&& this.selectedFiles[i]==null) {
+          this.selectedFiles.push(file);
 
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          const result = e.target?.result as string;
-          this.news.imageUrl.push(result);
-        };
-        reader.readAsDataURL(file);
+          reader.onload = (e: ProgressEvent<FileReader>) => {
+            const result = e.target?.result as string;
+            //this.news.imageUrl.push(result);
+            this.displayImages(this.news.imageUrl);
+          };
+          reader.readAsDataURL(file);
+        }else {
+          i++;
+        }
       }
     }
   }
+
+  displayImages(images: string[]) {
+    const container = document.getElementById('imageContainer') as HTMLInputElement;
+    container.innerHTML = '';
+
+    for (let i = 0; i < images.length; i++) {
+      const imgElement = document.createElement('img');
+      imgElement.setAttribute('src', images[i]);
+      imgElement.setAttribute('alt', images[i].toString());
+      imgElement.style.maxHeight= '100px';
+      imgElement.style.maxWidth= '100px';
+      container.appendChild(imgElement);
+    }
+  }
 }
+

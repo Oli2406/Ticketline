@@ -1,6 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMPFDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,11 @@ public class NewsValidator {
     }
 
     /**
-     * Method for validating a NewsCreateMPFDto
+     * Method for validating a NewsCreateMpfDto
      *
      * @param news - dto for validation
      */
-    public void validateNews(NewsCreateMPFDto news) {
+    public void validateNews(NewsCreateMpfDto news) {
         LOG.info("validateNews({})", news);
         List<String> validationErrors = new ArrayList<>();
 
