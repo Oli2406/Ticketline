@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,44 +15,44 @@ public class Performance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long performanceId;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "artist_id", nullable = false)
+    @Column(nullable = false)
     private Long artistId;
 
-    @Column(name = "location_id", nullable = false)
+    @Column(nullable = false)
     private Long locationId;
 
-    @Column
-    private LocalDateTime date;
+    @Column(nullable = false)
+    private LocalDate date;
 
     @Column(nullable = false)
-    private Double price;
-
-    @Column(nullable = false)
-    private String hall;
+    private BigDecimal price;
 
     @Column(nullable = false)
     private Long ticketNumber;
 
+    @Column(nullable = false)
+    private String hall;
+
     public Performance() {
     }
 
-    public Performance(String name, Long artistId, Long locationId, LocalDateTime date, Double price, String hall, Long ticketNumber) {
+    public Performance(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall) {
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
         this.date = date;
         this.price = price;
-        this.hall = hall;
         this.ticketNumber = ticketNumber;
+        this.hall = hall;
     }
 
-    public Long getId() {
-        return id;
+    public Long getPerformanceId() {
+        return performanceId;
     }
 
     public String getName() {
@@ -76,19 +79,19 @@ public class Performance {
         this.locationId = locationId;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

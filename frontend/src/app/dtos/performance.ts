@@ -2,7 +2,7 @@ export interface Performance {
   performanceId?: number; // Primary Key
   name: string;
   locationId: number; // Foreign Key
-  date: Date;
+  date: string;
   price: number;
   artistId: number; // Foreign Key
   ticketNumber: number;
@@ -13,7 +13,7 @@ export interface PerformanceListDto {
   performanceId: number;
   name: string;
   locationId: number; // Populated from Location
-  date: Date;
+  date: string;
   price: number;
   artistId: number; // Populated from Artist
   ticketNumber: number;

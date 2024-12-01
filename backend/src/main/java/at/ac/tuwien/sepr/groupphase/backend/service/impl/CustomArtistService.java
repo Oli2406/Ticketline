@@ -42,7 +42,7 @@ public class CustomArtistService implements ArtistService {
         logger.info("Saved Artist to database: {}", artist);
 
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
-            artist.getId(),
+            artist.getArtistId(),
             artist.getFirstName(),
             artist.getSurname(),
             artist.getArtistName()
@@ -58,7 +58,7 @@ public class CustomArtistService implements ArtistService {
 
         List<ArtistDetailDto> artistList = artistRepository.findAll().stream()
             .map(artist -> new ArtistDetailDto(
-                artist.getId(),
+                artist.getArtistId(),
                 artist.getFirstName(),
                 artist.getSurname(),
                 artist.getArtistName()
@@ -72,19 +72,19 @@ public class CustomArtistService implements ArtistService {
     }
 
     @Override
-    public ArtistDetailDto getArtistById(Long id) {
-        logger.info("Fetching Artist by ID: {}", id);
+    public ArtistDetailDto getArtistById(Long artistId) {
+        logger.info("Fetching Artist by ID: {}", artistId);
 
-        Artist artist = artistRepository.findById(id)
+        Artist artist = artistRepository.findById(artistId)
             .orElseThrow(() -> {
-                logger.error("Artist not found with ID: {}", id);
-                return new IllegalArgumentException("Artist not found with ID: " + id);
+                logger.error("Artist not found with ID: {}", artistId);
+                return new IllegalArgumentException("Artist not found with ID: " + artistId);
             });
 
         logger.debug("Fetched Artist entity: {}", artist);
 
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
-            artist.getId(),
+            artist.getArtistId(),
             artist.getFirstName(),
             artist.getSurname(),
             artist.getArtistName()
@@ -95,17 +95,17 @@ public class CustomArtistService implements ArtistService {
     }
 
     @Override
-    public void deleteArtist(Long id) {
-        logger.info("Deleting Artist by ID: {}", id);
+    public void deleteArtist(Long artistId) {
+        logger.info("Deleting Artist by ID: {}", artistId);
 
-        if (!artistRepository.existsById(id)) {
-            logger.error("Attempted to delete non-existent Artist with ID: {}", id);
-            throw new IllegalArgumentException("Artist not found with ID: " + id);
+        if (!artistRepository.existsById(artistId)) {
+            logger.error("Attempted to delete non-existent Artist with ID: {}", artistId);
+            throw new IllegalArgumentException("Artist not found with ID: " + artistId);
         }
 
-        artistRepository.deleteById(id);
+        artistRepository.deleteById(artistId);
 
-        logger.info("Successfully deleted Artist with ID: {}", id);
+        logger.info("Successfully deleted Artist with ID: {}", artistId);
     }
 }
 

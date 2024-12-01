@@ -1,5 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PerformanceCreateDto {
@@ -7,12 +9,12 @@ public class PerformanceCreateDto {
     private String name;
     private Long artistId;
     private Long locationId;
-    private LocalDateTime date;
-    private double price;
+    private LocalDate date;
+    private BigDecimal price;
     private Long ticketNumber;
     private String hall;
 
-    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDateTime date, double price, Long ticketNumber, String hall) {
+    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall) {
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
@@ -48,19 +50,19 @@ public class PerformanceCreateDto {
         this.locationId = locationId;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

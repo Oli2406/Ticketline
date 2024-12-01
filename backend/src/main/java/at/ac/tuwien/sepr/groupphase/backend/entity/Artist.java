@@ -11,7 +11,7 @@ public class Artist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long artistId;
 
     @Column(nullable = false)
     private String firstName;
@@ -31,8 +31,8 @@ public class Artist {
         this.artistName = artistName;
     }
 
-    public Long getId() {
-        return id;
+    public Long getArtistId() {
+        return artistId;
     }
 
     public String getFirstName() {

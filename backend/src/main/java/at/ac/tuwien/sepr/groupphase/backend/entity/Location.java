@@ -13,7 +13,7 @@ public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long locationId;
 
     @Column(nullable = false)
     private String name;
@@ -41,8 +41,8 @@ public class Location {
         this.country = country;
     }
 
-    public Long getId() {
-        return id;
+    public Long getLocationId() {
+        return locationId;
     }
 
     public String getName() {

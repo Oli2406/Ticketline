@@ -1,20 +1,22 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PerformanceDetailDto {
 
-    private Long id;
+    private Long performanceId;
     private String name;
     private Long artistId;
     private Long locationId;
-    private LocalDateTime date;
-    private double price;
+    private LocalDate date;
+    private BigDecimal price;
     private Long ticketNumber;
     private String hall;
 
-    public PerformanceDetailDto(Long id, String name, Long artistId, Long locationId, LocalDateTime date, double price, Long ticketNumber, String hall) {
-        this.id = id;
+    public PerformanceDetailDto(Long performanceId, String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall) {
+        this.performanceId = performanceId;
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
@@ -24,12 +26,12 @@ public class PerformanceDetailDto {
         this.hall = hall;
     }
 
-    public Long getId() {
-        return id;
+    public Long getPerformanceId() {
+        return performanceId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setPerformaanceId(Long id) {
+        this.performanceId = id;
     }
 
     public String getName() {
@@ -56,19 +58,19 @@ public class PerformanceDetailDto {
         this.locationId = locationId;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

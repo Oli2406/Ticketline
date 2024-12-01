@@ -53,6 +53,7 @@
             <label>Artist</label>
             <div class="select-container">
               <select [(ngModel)]="newPerformance.artistId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Artist</option>
                 <option *ngFor="let artist of artists" [value]="artist.artistId">{{ artist.artistName }}</option>
               </select>
               <button type="button" class="btn-add-inline" (click)="toggleArtistForm()">+</button>
@@ -80,6 +81,7 @@
             <label>Location</label>
             <div class="select-container">
               <select [(ngModel)]="newPerformance.locationId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Location</option>
                 <option *ngFor="let location of locations" [value]="location.locationId">{{ location.name }}</option>
               </select>
               <button type="button" class="btn-add-inline" (click)="toggleLocationForm()">+</button>

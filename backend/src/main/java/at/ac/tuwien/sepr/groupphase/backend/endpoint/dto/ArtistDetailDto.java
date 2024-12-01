@@ -2,24 +2,24 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public class ArtistDetailDto {
 
-    private Long id;
+    private Long artistId;
     private String firstName;
     private String surname;
     private String artistName;
 
-    public ArtistDetailDto(Long id, String firstName, String surname, String artistName) {
-        this.id = id;
+    public ArtistDetailDto(Long artistId, String firstName, String surname, String artistName) {
+        this.artistId = artistId;
         this.firstName = firstName;
         this.surname = surname;
         this.artistName = artistName;
     }
 
-    public Long getId() {
-        return id;
+    public Long getArtistId() {
+        return artistId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
     }
 
     public String getFirstName() {

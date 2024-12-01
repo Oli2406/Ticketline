@@ -1,20 +1,21 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventDetailDto {
 
-    private Long id;
+    private Long eventId;
     private String title;
     private String description;
     private String category;
-    private LocalDateTime dateOfEvent;
+    private LocalDate dateOfEvent;
     private int duration;
     private List<Long> performanceIds; // List of associated Performance IDs
 
-    public EventDetailDto(Long id, String title, String description, String category, LocalDateTime dateOfEvent, int duration, List<Long> performanceIds) {
-        this.id = id;
+    public EventDetailDto(Long eventId, String title, String description, String category, LocalDate dateOfEvent, int duration, List<Long> performanceIds) {
+        this.eventId = eventId;
         this.title = title;
         this.description = description;
         this.category = category;
@@ -23,12 +24,12 @@ public class EventDetailDto {
         this.performanceIds = performanceIds;
     }
 
-    public Long getId() {
-        return id;
+    public Long getEventId() {
+        return eventId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 
     public String getTitle() {
@@ -55,11 +56,11 @@ public class EventDetailDto {
         this.category = category;
     }
 
-    public LocalDateTime getDateOfEvent() {
+    public LocalDate getDateOfEvent() {
         return dateOfEvent;
     }
 
-    public void setDateOfEvent(LocalDateTime dateOfEvent) {
+    public void setDateOfEvent(LocalDate dateOfEvent) {
         this.dateOfEvent = dateOfEvent;
     }
 

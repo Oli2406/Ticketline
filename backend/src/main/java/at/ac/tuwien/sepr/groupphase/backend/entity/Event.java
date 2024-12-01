@@ -8,6 +8,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.JoinColumn;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long eventId;
 
     @Column(nullable = false)
     private String title;
@@ -25,7 +27,7 @@ public class Event {
     private String description;
 
     @Column
-    private LocalDateTime dateOfEvent;
+    private LocalDate dateOfEvent;
 
     @Column(nullable = false)
     private String category;
@@ -41,7 +43,7 @@ public class Event {
     public Event() {
     }
 
-    public Event(String title, String description, LocalDateTime dateOfEvent, String category, Integer duration, List<Long> performanceIds) {
+    public Event(String title, String description, LocalDate dateOfEvent, String category, Integer duration, List<Long> performanceIds) {
         this.title = title;
         this.description = description;
         this.dateOfEvent = dateOfEvent;
@@ -50,8 +52,8 @@ public class Event {
         this.performanceIds = performanceIds;
     }
 
-    public Long getId() {
-        return id;
+    public Long getEventId() {
+        return eventId;
     }
 
     public String getTitle() {
@@ -70,11 +72,11 @@ public class Event {
         this.description = description;
     }
 
-    public LocalDateTime getDateOfEvent() {
+    public LocalDate getDateOfEvent() {
         return dateOfEvent;
     }
 
-    public void setDateOfEvent(LocalDateTime dateOfEvent) {
+    public void setDateOfEvent(LocalDate dateOfEvent) {
         this.dateOfEvent = dateOfEvent;
     }
 

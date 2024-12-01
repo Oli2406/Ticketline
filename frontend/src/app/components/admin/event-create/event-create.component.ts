@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NgForOf, NgIf } from '@angular/common';
+import {DatePipe, NgForOf, NgIf} from '@angular/common';
 import { ArtistService } from 'src/app/services/artist.service';
 import { LocationService } from 'src/app/services/location.service';
 import { PerformanceService } from 'src/app/services/performance.service';
@@ -19,7 +19,8 @@ import { Event } from 'src/app/dtos/event';
     NgForOf
   ],
   templateUrl: './event-create.component.html',
-  styleUrls: ['./event-create.component.scss']
+  styleUrls: ['./event-create.component.scss'],
+  providers: [DatePipe]
 })
 export class EventCreateComponent implements OnInit {
   // Event and Performance Data
@@ -40,7 +41,12 @@ export class EventCreateComponent implements OnInit {
   locations: LocationListDto[] = [];
   performances: PerformanceListDto[] = [];
 
+  // Selected Artist and Location Variables
+  selectedArtist = null;
+  selectedLocation = null;
+
   constructor(
+    private datePipe: DatePipe,
     private artistService: ArtistService,
     private locationService: LocationService,
     private performanceService: PerformanceService,
@@ -89,33 +95,69 @@ export class EventCreateComponent implements OnInit {
 
   // Load all Performances
   loadPerformances() {
-    this.performanceService.getPerformances().subscribe(
-      (performances: PerformanceListDto[]) => {
-        console.log('Fetched performances:', performances);
-        this.performances = performances;
+    console.log('Current performances:', this.performances);
+  }
+
+  onArtistSelect(artistName: string): void {
+    this.artistService.getArtists().subscribe(artists => {
+      const selectedArtist: ArtistListDto = artists.find(artist => artist.artistName === artistName);
+      if (selectedArtist) {
+        console.log('Selected artist details:', selectedArtist);
+        console.log('Selected artist id:', selectedArtist.artistId);
+        this.newPerformance.artistId = selectedArtist.artistId; // Artist ID wird gesetzt
+        console.log('Updated newPerformance with artistId:', this.newPerformance);
+      } else {
+        console.log('Artist not found for name:', artistName);
+      }
+    }, error => {
+      console.error('Error fetching artist details:', error);
+    });
+  }
+
+// Log selected location
+  onLocationSelect(locationName: string): void {
+    this.locationService.getLocations().subscribe(locations => {
+      const selectedLocation = locations.find(location => location.name === locationName);
+      if (selectedLocation) {
+        console.log('Selected location details:', selectedLocation);
+        console.log('Selected artist id:', selectedLocation.locationId);
+        this.newPerformance.locationId = selectedLocation.locationId; // Location ID wird gesetzt
+        console.log('Updated newPerformance with locationId:', this.newPerformance);
+      } else {
+        console.log('Location not found for name:', locationName);
+      }
+    }, error => {
+      console.error('Error fetching location details:', error);
+    });
+  }
+
+
+  // Create new Performance
+  createPerformance() {
+    // Log the performance data being sent to the backend
+    console.log('Sending performance data to backend:', this.newPerformance);
+    console.log('Selected Artist:', this.selectedArtist);
+    console.log('Selected Location:', this.selectedLocation);
+    this.performanceService.createPerformance(this.newPerformance).subscribe(
+      (performance: PerformanceListDto) => {
+        // Log the response from the backend
+        console.log('Created performance:', performance);
+        // Add new performance to the list
+        this.performances.push(performance);
+        if (performance.performanceId) {
+          this.eventData.performanceIds?.push(performance.performanceId); // Add ID to event's performance list
+        }
+        // Reset form
+        this.newPerformance = { name: '', date: null, price: 0, hall: '', artistId: null, locationId: null, ticketNumber: null };
+        this.showPerformanceForm = false; // Hide form
       },
       (error) => {
-        console.error('Error fetching performances:', error);
+        // Log the error response
+        console.error('Error creating performance:', error);
       }
     );
   }
 
-  // Create new Performance
-  createPerformance() {
-    this.performanceService.createPerformance(this.newPerformance).subscribe((performance: PerformanceListDto) => {
-      console.log('Created performance:', performance); // Logge die Antwort
-      this.performances.push(performance); // Add new performance to list
-      if (performance.performanceId) {
-        this.eventData.performanceIds?.push(performance.performanceId); // Add ID to event's performance list
-      }
-      // Reset form
-      this.newPerformance = { name: '', date: null, price: 0, hall: '', artistId: null, locationId: null, ticketNumber: null };
-      this.showPerformanceForm = false; // Hide form
-    },
-      (error) => {
-        console.error('Error creating performance:', error);
-      });
-  }
 
   // Create new Event
   onSubmit() {
@@ -123,6 +165,8 @@ export class EventCreateComponent implements OnInit {
       console.log('Event created:', event);
       // Reset event data
       this.eventData = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
+      this.performances = [];
+      console.log('Cleared performances list after event creation:', this.performances);
     });
   }
 

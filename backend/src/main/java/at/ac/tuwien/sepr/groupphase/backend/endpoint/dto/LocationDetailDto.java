@@ -2,15 +2,15 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public class LocationDetailDto {
 
-    private Long id;
+    private Long locationId;
     private String name;
     private String street;
     private String city;
     private String postalCode;
     private String country;
 
-    public LocationDetailDto(Long id, String name, String street, String city, String postalCode, String country) {
-        this.id = id;
+    public LocationDetailDto(Long locationId, String name, String street, String city, String postalCode, String country) {
+        this.locationId = locationId;
         this.name = name;
         this.street = street;
         this.city = city;
@@ -18,12 +18,12 @@ public class LocationDetailDto {
         this.country = country;
     }
 
-    public Long getId() {
-        return id;
+    public Long getLocationId() {
+        return locationId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
     }
 
     public String getName() {
