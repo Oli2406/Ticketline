@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
 
@@ -15,8 +17,10 @@ public interface LocationService {
      *
      * @param locationCreateDto the data for creating or updating the location
      * @return the detailed representation of the created or updated location
+     * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
+     * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto);
+    LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all locations.

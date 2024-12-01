@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
 import org.springframework.stereotype.Service;
@@ -20,14 +22,18 @@ public class CustomArtistService implements ArtistService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ArtistRepository artistRepository;
+    private final ArtistValidator artistValidator;
 
-    public CustomArtistService(ArtistRepository artistRepository) {
+    public CustomArtistService(ArtistRepository artistRepository, ArtistValidator artistValidator) {
         this.artistRepository = artistRepository;
+        this.artistValidator = artistValidator;
     }
 
     @Override
-    public ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) {
+    public ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating/Updating Artist with data: {}", artistCreateDto);
+
+        artistValidator.validateArtist(artistCreateDto);
 
         Artist artist = new Artist(
             artistCreateDto.getSurname(),

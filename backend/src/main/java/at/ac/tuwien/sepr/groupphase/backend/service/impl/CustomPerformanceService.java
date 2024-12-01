@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 
@@ -20,14 +22,17 @@ public class CustomPerformanceService implements PerformanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PerformanceRepository performanceRepository;
+    private final PerformanceValidator performanceValidator;
 
-    public CustomPerformanceService(PerformanceRepository performanceRepository) {
+    public CustomPerformanceService(PerformanceRepository performanceRepository, PerformanceValidator performanceValidator) {
         this.performanceRepository = performanceRepository;
+        this.performanceValidator = performanceValidator;
     }
 
     @Override
-    public PerformanceDetailDto createOrUpdatePerformance(PerformanceCreateDto performanceCreateDto) {
+    public PerformanceDetailDto createOrUpdatePerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating performance: {}", performanceCreateDto);
+        performanceValidator.validatePerformance(performanceCreateDto);
         Performance performance = new Performance(
             performanceCreateDto.getName(),
             performanceCreateDto.getArtistId(),

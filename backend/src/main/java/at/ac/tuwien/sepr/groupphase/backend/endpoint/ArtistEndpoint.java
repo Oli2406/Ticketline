@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -34,7 +36,7 @@ public class ArtistEndpoint {
 
     @Secured("ROLE_ADMIN")
     @PutMapping
-    public ResponseEntity<ArtistDetailDto> createOrUpdateArtist(@RequestBody ArtistCreateDto artistCreateDto) {
+    public ResponseEntity<ArtistDetailDto> createOrUpdateArtist(@RequestBody ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update Artist: {}", artistCreateDto);
         ArtistDetailDto createdArtist = artistService.createOrUpdateArtist(artistCreateDto);
         logger.info("Successfully created/updated Artist: {}", createdArtist);

@@ -9,6 +9,7 @@ import { Artist, ArtistListDto } from 'src/app/dtos/artist';
 import { Location, LocationListDto } from 'src/app/dtos/location';
 import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
 import { Event } from 'src/app/dtos/event';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-event-create',
@@ -50,7 +51,8 @@ export class EventCreateComponent implements OnInit {
     private artistService: ArtistService,
     private locationService: LocationService,
     private performanceService: PerformanceService,
-    private eventService: EventService
+    private eventService: EventService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -62,34 +64,59 @@ export class EventCreateComponent implements OnInit {
 
   // Load all Artists
   loadArtists() {
-    this.artistService.getArtists().subscribe((artists: ArtistListDto[]) => {
-      this.artists = artists;
+    this.artistService.getArtists().subscribe({
+      next: (artists: ArtistListDto[]) => {
+        this.artists = artists;
+      },
+      error: (err) => {
+        console.error('Error fetching artists:', err.message);
+        this.toastr.error('Failed to load artists. Please try again.', 'Error');
+      },
     });
   }
 
   // Create new Artist
   createArtist() {
-    console.log('Sending Artist Data:', this.newArtist); // Log the artist data
-    this.artistService.createArtist(this.newArtist).subscribe(() => {
-      this.newArtist = { firstName: '', surname: '', artistName: '' }; // Reset form
-      this.showArtistForm = false; // Hide form
-      this.loadArtists(); // Reload artist list
+    this.artistService.createArtist(this.newArtist).subscribe({
+      next: () => {
+        this.toastr.success('Artist created successfully!', 'Success');
+        this.newArtist = { firstName: '', surname: '', artistName: '' }; // Reset form
+        this.showArtistForm = false; // Hide form
+        this.loadArtists(); // Reload artist list
+      },
+      error: (err) => {
+        console.error('Error creating artist:', err.message);
+        this.toastr.error('Failed to create artist. Please try again.', 'Error');
+      },
     });
   }
 
   // Load all Locations
   loadLocations() {
-    this.locationService.getLocations().subscribe((locations: LocationListDto[]) => {
-      this.locations = locations;
+    this.locationService.getLocations().subscribe({
+      next: (locations: LocationListDto[]) => {
+        this.locations = locations;
+      },
+      error: (err) => {
+        console.error('Error fetching locations:', err.message);
+        this.toastr.error('Failed to load locations. Please try again.', 'Error');
+      },
     });
   }
 
   // Create new Location
   createLocation() {
-    this.locationService.createLocation(this.newLocation).subscribe(() => {
-      this.newLocation = { name: '', street: '', city: '', postalCode: '', country: '' }; // Reset form
-      this.showLocationForm = false; // Hide form
-      this.loadLocations(); // Reload location list
+    this.locationService.createLocation(this.newLocation).subscribe({
+      next: () => {
+        this.toastr.success('Location created successfully!', 'Success');
+        this.newLocation = { name: '', street: '', city: '', postalCode: '', country: '' }; // Reset form
+        this.showLocationForm = false; // Hide form
+        this.loadLocations(); // Reload location list
+      },
+      error: (err) => {
+        console.error('Error creating location:', err.message);
+        this.toastr.error('Failed to create location. Please try again.', 'Error');
+      },
     });
   }
 
@@ -134,39 +161,45 @@ export class EventCreateComponent implements OnInit {
 
   // Create new Performance
   createPerformance() {
-    // Log the performance data being sent to the backend
     console.log('Sending performance data to backend:', this.newPerformance);
-    console.log('Selected Artist:', this.selectedArtist);
-    console.log('Selected Location:', this.selectedLocation);
-    this.performanceService.createPerformance(this.newPerformance).subscribe(
-      (performance: PerformanceListDto) => {
-        // Log the response from the backend
+    this.performanceService.createPerformance(this.newPerformance).subscribe({
+      next: (performance: PerformanceListDto) => {
         console.log('Created performance:', performance);
-        // Add new performance to the list
-        this.performances.push(performance);
+        this.performances.push(performance); // Add new performance to the list
         if (performance.performanceId) {
           this.eventData.performanceIds?.push(performance.performanceId); // Add ID to event's performance list
         }
+        this.toastr.success('Performance created successfully!', 'Success');
         // Reset form
         this.newPerformance = { name: '', date: null, price: 0, hall: '', artistId: null, locationId: null, ticketNumber: null };
         this.showPerformanceForm = false; // Hide form
       },
-      (error) => {
-        // Log the error response
-        console.error('Error creating performance:', error);
-      }
-    );
+      error: (err) => {
+        console.error('Error creating performance:', err.message);
+        const errors = Array.isArray(err.message) ? err.message : err.message.split(/\n/);
+        const errorList = errors.map((error) => `<li>${error.trim()}</li>`).join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating performance', { enableHtml: true });
+      },
+    });
   }
 
 
   // Create new Event
   onSubmit() {
-    this.eventService.createEvent(this.eventData).subscribe((event: Event) => {
-      console.log('Event created:', event);
-      // Reset event data
-      this.eventData = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
-      this.performances = [];
-      console.log('Cleared performances list after event creation:', this.performances);
+    this.eventService.createEvent(this.eventData).subscribe({
+      next: (event: Event) => {
+        console.log('Event created:', event);
+        this.toastr.success('Event created successfully!', 'Success');
+        this.eventData = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
+        this.performances = [];
+        console.log('Cleared performances list after event creation:', this.performances);
+      },
+      error: (err) => {
+        console.error('Error creating event:', err.message);
+        const errors = Array.isArray(err.message) ? err.message : err.message.split(/\n/);
+        const errorList = errors.map((error) => `<li>${error.trim()}</li>`).join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', { enableHtml: true });
+      },
     });
   }
 

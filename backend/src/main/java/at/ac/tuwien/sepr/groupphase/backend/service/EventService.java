@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
 
@@ -15,8 +17,10 @@ public interface EventService {
      *
      * @param eventCreateDto the data for creating or updating the event
      * @return the detailed representation of the created or updated event
+     * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
+     * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto);
+    EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all events.

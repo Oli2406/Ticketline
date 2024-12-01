@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
 
@@ -20,14 +22,18 @@ public class CustomLocationService implements LocationService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final LocationRepository locationRepository;
+    private final LocationValidator locationValidator;
 
-    public CustomLocationService(LocationRepository locationRepository) {
+
+    public CustomLocationService(LocationRepository locationRepository, LocationValidator locationValidator) {
         this.locationRepository = locationRepository;
+        this.locationValidator = locationValidator;
     }
 
     @Override
-    public LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) {
+    public LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating location: {}", locationCreateDto);
+        locationValidator.validateLocation(locationCreateDto);
         Location location = new Location(
             locationCreateDto.getName(),
             locationCreateDto.getStreet(),

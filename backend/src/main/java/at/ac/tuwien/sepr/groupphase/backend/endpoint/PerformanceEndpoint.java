@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ public class PerformanceEndpoint {
     }
 
     @PutMapping
-    public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) {
+    public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update performance: {}", performanceCreateDto);
         PerformanceDetailDto createdPerformance = performanceService.createOrUpdatePerformance(performanceCreateDto);
         logger.debug("Performance created/updated successfully: {}", createdPerformance);

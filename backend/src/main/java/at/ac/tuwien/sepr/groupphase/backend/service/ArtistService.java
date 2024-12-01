@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
 
@@ -15,8 +17,10 @@ public interface ArtistService {
      *
      * @param artistCreateDto the data for creating or updating the artist
      * @return the detailed representation of the created or updated artist
+     * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
+     * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto);
+    ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all artists.

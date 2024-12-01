@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ public class EventEndpoint {
     }
 
     @PutMapping
-    public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) {
+    public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update event: {}", eventCreateDto);
         EventDetailDto createdEvent = eventService.createOrUpdateEvent(eventCreateDto);
         logger.debug("Event created/updated successfully: {}", createdEvent);

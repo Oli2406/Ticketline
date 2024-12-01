@@ -3,6 +3,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 
@@ -20,14 +22,17 @@ public class CustomEventService implements EventService {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
+    private final EventValidator eventValidator;
 
-    public CustomEventService(EventRepository eventRepository) {
+    public CustomEventService(EventRepository eventRepository, EventValidator eventValidator) {
         this.eventRepository = eventRepository;
+        this.eventValidator = eventValidator;
     }
 
     @Override
-    public EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) {
+    public EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating event: {}", eventCreateDto);
+        eventValidator.validateEvent(eventCreateDto);
         Event event = new Event(
             eventCreateDto.getTitle(),
             eventCreateDto.getDescription(),

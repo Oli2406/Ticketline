@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface LocationRepository extends JpaRepository<Location, Long> {
     // Beispiel: Benutzerdefinierte Methode, um Orte nach Namen zu suchen
     boolean existsByName(String name);
+
+    boolean existsByNameAndCity(String name, String city);
 }
