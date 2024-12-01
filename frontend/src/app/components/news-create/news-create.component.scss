@@ -1,0 +1,97 @@
+//temporary CSS - should be replaced when we agreed on a style
+// General Reset
+
+body {
+  background-color: #A7A3FF;
+}
+
+.custom-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #3e3e3e;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-label {
+  color: #333;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.custom-input {
+  background-color: #FFFFFF;
+  color: #333;
+  border-radius: 8px;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.custom-button {
+  background-color: #4D47C3;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  border-color: #4D47C3;
+}
+.custom-button:hover {
+  background-color: #514dc7;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  border-color: #514dc7;
+}
+
+.custom-input::placeholder {
+  color: #D3D3D3;
+  font-size: 1rem;
+}
+
+.news-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+// Ensure no interference with ngx-toastr styles
+*:not(.toast),
+*:not(.toast *) {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #A7A3FF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+// Custom Styling for ngx-toastr
+.toast {
+  font-family: 'Arial', sans-serif !important;
+  font-size: 1rem !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.toast-error {
+  background-color: #f44336 !important; // Red background for error toasts
+  color: #fff !important; // White text for better contrast
+}
+
+.toast-top-left {
+  top: 12px !important;
+  left: 12px !important;
+  position: fixed !important;
+  z-index: 1060 !important; // Ensure it appears above other elements
+}
+

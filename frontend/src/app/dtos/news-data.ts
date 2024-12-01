@@ -3,5 +3,6 @@ export interface NewsDetailDto {
   title: string;
   summary: string;
   content: string;
+  imageUrl: string[] | null;
   date: Date;
 }
