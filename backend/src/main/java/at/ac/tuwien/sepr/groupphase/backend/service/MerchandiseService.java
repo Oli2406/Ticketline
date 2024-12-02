@@ -1,6 +1,9 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
+
+import java.util.List;
 
 public interface MerchandiseService {
 
@@ -11,6 +14,13 @@ public interface MerchandiseService {
      *                             name, category, stock, and image URL
      * @return the DTO containing the details of the saved merchandise
      */
-    public MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto);
+    MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto);
+
+    /**
+     * Retrieves a list of all available merchandises.
+     *
+     * @return a list of Merchandise objects representing all the merchandises
+     */
+    List<Merchandise> getAllMerchandise();
 
 }

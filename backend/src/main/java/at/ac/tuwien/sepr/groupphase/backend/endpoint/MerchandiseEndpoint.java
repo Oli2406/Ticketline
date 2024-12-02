@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -46,9 +48,7 @@ public class MerchandiseEndpoint {
         try {
             LOGGER.info("POST " + "api/v1/merchandise/create");
             String imagePathStr = image != null ? saveImageToFileSystem(image) : null;
-            if (image != null) {
-                imagePathStr = LOCALHOST_IMAGE_PATH + imagePathStr;
-            } else {
+            if (image == null) {
                 imagePathStr = "No image provided";
             }
             MerchandiseCreateDto merchandiseCreateDtoWithImage = new MerchandiseCreateDto();
@@ -68,8 +68,8 @@ public class MerchandiseEndpoint {
 
     @PermitAll
     @GetMapping
-    public String getRoot() {
-        return "works";
+    public List<Merchandise> getAllMerchandise() {
+        return merchandiseService.getAllMerchandise();
     }
 
     private String saveImageToFileSystem(MultipartFile imageFile) throws IOException {
@@ -79,7 +79,4 @@ public class MerchandiseEndpoint {
         Files.write(imagePath, imageFile.getBytes());
         return imageFileName;
     }
-
-
-
 }

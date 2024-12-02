@@ -12,12 +12,13 @@ import {CreateUserComponent} from './components/admin/createUser/create-user.com
 import {EventCreateComponent} from "./components/admin/event-create/event-create.component";
 import {NewsDetailComponent} from "./components/news-detail/news-detail.component";
 import {MerchandiseCreateComponent} from "./components/admin/merchandise-create/merchandise-create.component";
+import {MerchandiseComponent} from "./components/merchandise/merchandise.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
-  {path: 'merchandise', component: HomeComponent},
+  {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
   {path: 'events', component: HomeComponent},
   {path: 'news', component: HomeComponent},
   {path: 'register', component: RegisterComponent},

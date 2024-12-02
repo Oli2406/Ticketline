@@ -1,0 +1,33 @@
+<div class="merchandise-container">
+  <!-- Points Header -->
+  <div class="points-header">
+    <h3>Available points: 1234</h3>
+  </div>
+
+  <!-- Merchandise Grid -->
+  <div class="merchandise-grid">
+    <div class="merchandise-card" *ngFor="let item of displayedMerchandise">
+      <div class="image-container">
+        <img *ngIf="item.imageUrl" [src]="'http://localhost:8080/merchandise/' + item.imageUrl" alt="{{item.name}}">
+      </div>
+      <h5>{{ item.name }}</h5>
+      <p class="description">{{ item.category }}</p>
+      <div class="price-points">
+        <p class="price">{{ item.price | number: '1.2-2' }} €</p>
+        <p class="stock">Stock: {{ item.stock }}</p>
+      </div>
+      <p class="points">{{ '69' }} Points</p>
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination">
+    <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">&larr;</button>
+
+    <span *ngFor="let page of [].constructor(totalPages); let i = index">
+      <button (click)="goToPage(i + 1)" [class.active]="currentPage === i + 1">{{ i + 1 }}</button>
+    </span>
+
+    <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">&rarr;</button>
+  </div>
+</div>

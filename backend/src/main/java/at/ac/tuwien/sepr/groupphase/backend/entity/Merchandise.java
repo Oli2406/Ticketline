@@ -1,7 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,24 +12,30 @@ import java.math.BigDecimal;
 @Entity
 public class Merchandise {
 
+    @Column(nullable = false)
+    BigDecimal price;
+    @Column(nullable = false)
+    String name;
+    @Column(nullable = false)
+    String category;
+    @Column(nullable = false)
+    int stock;
+    @Column(nullable = false)
+    String imageUrl;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long merchandiseId;
 
-    @Column(nullable = false)
-    BigDecimal price;
+    public Merchandise(String name, String category, BigDecimal price, int stock, String imagePath) {
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.stock = stock;
+        this.imageUrl = imagePath;
+    }
 
-    @Column(nullable = false)
-    String name;
-
-    @Column(nullable = false)
-    String category;
-
-    @Column(nullable = false)
-    int stock;
-
-    @Column(nullable = false)
-    String imageUrl;
+    public Merchandise() {
+    }
 
     public Long getMerchandiseId() {
         return merchandiseId;

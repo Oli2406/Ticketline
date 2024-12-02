@@ -4,6 +4,7 @@ import { CommonModule } from "@angular/common";
 import { MerchandiseService } from "../../../services/merchandise.service";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
+import { RegisterService } from "../../../services/register.service";
 
 @Component({
   selector: 'app-merchandise-create',
@@ -28,7 +29,8 @@ export class MerchandiseCreateComponent {
   constructor(
     private merchandiseService: MerchandiseService,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private registerService: RegisterService
   ) {}
 
   onImageSelected(event: Event): void {

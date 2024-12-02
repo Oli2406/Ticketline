@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 @Service
 public class CustomMerchandiseService implements MerchandiseService {
@@ -33,5 +34,10 @@ public class CustomMerchandiseService implements MerchandiseService {
         merchandiseRepository.save(toAdd);
 
         return merchandiseCreateDto;
+    }
+
+    @Override
+    public List<Merchandise> getAllMerchandise() {
+        return merchandiseRepository.findAll();
     }
 }
