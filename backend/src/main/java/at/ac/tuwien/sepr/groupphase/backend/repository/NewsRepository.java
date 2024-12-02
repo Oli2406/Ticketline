@@ -11,6 +11,12 @@ import java.util.List;
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
 
-    @Query("SELECT n FROM News n WHERE n.id NOT IN :readNewsIds")
+    /**
+     * Finds all news items that have not been read.
+     *
+     * @param readNewsIds A list of IDs of news items that have already been read.
+     * @return A list of news items that have not been read.
+     */
+    @Query("SELECT n FROM News n WHERE n.newsId NOT IN :readNewsIds")
     List<News> findUnreadNews(@Param("readNewsIds") List<Long> readNewsIds);
 }

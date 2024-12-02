@@ -51,15 +51,11 @@ public class CustomNewsService implements NewsService {
         LOG.trace("getUnreadNews({})", email);
         ApplicationUser user = userService.findApplicationUserByEmail(email);
 
-        return newsRepository.findUnreadNews(user.getReadNewsIds())
-            .stream()
-            .map(newsMapper::entityToDetailDto)
-            .collect(Collectors.toList());
+        return newsRepository.findUnreadNews(user.getReadNewsIds()).stream().map(newsMapper::entityToDetailDto).collect(Collectors.toList());
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto)
-        throws ValidationException, IOException, URISyntaxException {
+    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException, URISyntaxException {
         LOG.trace("createNews({})", mpfDto);
         newsValidator.validateNews(mpfDto);
 
@@ -73,13 +69,7 @@ public class CustomNewsService implements NewsService {
         }
 
         NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithImgUrl(mpfDto, imageUrls);
-        News news =
-            new News(
-                newsCreate.getTitle(),
-                newsCreate.getSummary(),
-                newsCreate.getContent(),
-                newsCreate.getDate(),
-                newsCreate.getImages());
+        News news = new News(newsCreate.getTitle(), newsCreate.getSummary(), newsCreate.getContent(), newsCreate.getDate(), newsCreate.getImages());
 
         System.out.println("NEWS BEING SAVED: " + news.getImageUrl().size());
         var createdNews = newsRepository.save(news);

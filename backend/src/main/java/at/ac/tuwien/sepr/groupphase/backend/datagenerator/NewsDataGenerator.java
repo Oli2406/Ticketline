@@ -22,9 +22,9 @@ import java.util.List;
 @Profile("datagen")
 public class NewsDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final NewsRepository newsRepository;
     private static final Path SOURCE_DIR = Paths.get("./src/test/resources/testImages/").toAbsolutePath().normalize();
     private static final Path TARGET_DIR = Paths.get("./newsImages").toAbsolutePath().normalize();
+    private final NewsRepository newsRepository;
 
     public NewsDataGenerator(NewsRepository newsRepository) {
         this.newsRepository = newsRepository;
@@ -42,8 +42,8 @@ public class NewsDataGenerator {
 
         createNewsIfNotExists("Interactive Art Exhibit Opens at [Museum Name]",
             "Experience art in a whole new way.",
-            "The [Museum Name] is excited to announce the opening of its new interactive art exhibit, [Exhibit Name], on [Date]. This immersive exhibit invites visitors to engage with art through technology and explore their creativity. Don't miss this unique experience!",
-            LocalDate.of(2025, 2, 5), new ArrayList<>(List.of("art.png")));
+            "The [Museum Name] is excited to announce the opening of its new interactive art exhibit, [Exhibit Name], on [Date]. This immersive exhibit invites visitors to engage with art through technology and explore "
+                + "their creativity. Don't miss this unique experience!", LocalDate.of(2025, 2, 5), new ArrayList<>(List.of("art.png")));
 
         createNewsIfNotExists("Local Band [Band Name] Live in Concert",
             "[Band Name] is playing a special show in their hometown!",
