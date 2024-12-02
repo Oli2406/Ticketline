@@ -19,6 +19,9 @@ export class LoginComponent implements OnInit {
   error = false;
   errorMessage = '';
 
+  showPassword: boolean = false;
+
+
   constructor(private formBuilder: UntypedFormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.formBuilder.group({
       username: ['', [Validators.required]],
@@ -45,15 +48,11 @@ export class LoginComponent implements OnInit {
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: AuthRequest) {
-    console.log('Try to authenticate user: ' + authRequest.email);
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
-        console.log('Successfully logged in user: ' + authRequest.email);
         this.router.navigate(['/message']);
       },
       error: error => {
-        console.log('Could not log in due to:');
-        console.log(error);
         this.error = true;
         if (typeof error.error === 'object') {
           this.errorMessage = error.error.error;
@@ -74,4 +73,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 }
