@@ -39,22 +39,13 @@ public class News {
     @Column(name = "date_of_news", nullable = false)
     private LocalDate dateOfNews = LocalDate.now();
 
-    //TODO look at foreign key implementation
-    /*@ManyToOne //one event can have multiple news
-    @JoinColumn(name = "event_id")
-    private Event event;*/
-    //needs event implementation
-
-
     public News(String title, String summary, String content, LocalDate dateOfNews,
-        List<String> imageUrl) {
+                List<String> imageUrl) {
         this.title = title;
         this.summary = summary;
         this.content = content;
         this.dateOfNews = dateOfNews;
         this.imageUrl = imageUrl;
-
-
     }
 
     public News() {
@@ -109,3 +100,4 @@ public class News {
         this.title = title;
     }
 }
+

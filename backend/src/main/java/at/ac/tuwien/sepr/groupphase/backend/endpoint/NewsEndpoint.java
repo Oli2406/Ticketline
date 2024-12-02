@@ -63,7 +63,7 @@ public class NewsEndpoint {
     }
 
     @PermitAll
-    @GetMapping("create-news")
+    @GetMapping("/create")
     public String getRoot() {
         return "Get stub";
     }

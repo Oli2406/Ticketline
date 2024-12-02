@@ -54,9 +54,9 @@ public class NewsValidator {
             validationErrors.add("Content contains invalid characters");
         }
 
-        if (news.getDateOfNews() == null) {
+        if (news.getDate() == null) {
             validationErrors.add("Date of news is required");
-        } else if (news.getDateOfNews().isAfter(LocalDate.now())) {
+        } else if (news.getDate().isAfter(LocalDate.now())) {
             validationErrors.add("Date of news cannot be in the future");
         }
 

@@ -8,7 +8,7 @@
         < </button>
 
       <div *ngFor="let n of displayedNews; trackBy: trackByNewsId" class="news" (click)="navigateToNewsDetails(n.id)">
-        <img [src]="" alt="News Image">
+        <img [src]="n.images[0]" alt="News Image">
         <h2 class="mt-2">{{ n.title }}</h2>
         <p class="date">{{ n.date | date }}</p>
         <p>{{ truncateSummary(n.summary, 200) }}</p>

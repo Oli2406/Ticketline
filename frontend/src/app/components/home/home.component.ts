@@ -4,6 +4,7 @@ import {NewsService} from "../../services/news.service";
 import {NewsDetailDto} from "../../dtos/news-data";
 import {ToastrService} from "ngx-toastr";
 import {Router} from "@angular/router";
+import {Globals} from "../../global/globals";
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private newsService: NewsService,
+              private globals: Globals,
               private notification: ToastrService,
               private router: Router) {
 
@@ -58,7 +60,20 @@ export class HomeComponent implements OnInit {
       .subscribe({
         next: news => {
           this.news = news;
-          this.updateDisplayedNews()
+
+          for (const n of this.news) {
+            if (n.images && n.images[0]) {
+              n.images[0] = this.globals.backendRessourceUri + "/newsImages/" + n.images[0];
+              console.log(n.images[0]);
+            }
+            else {
+              n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
+            }
+          }
+
+          this.updateDisplayedNews();
+          console.log(news.length);
+          console.log(news);
         },
         error: error => {
           console.error('Error fetching news', error);

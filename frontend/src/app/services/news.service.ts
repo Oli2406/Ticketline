@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
-import {NewsData} from "../dtos/news-data";
 import {catchError, Observable, throwError} from "rxjs";
-import {NewsDetailDto} from "../dtos/news-data";
+import {NewsDetailDto, NewsDto} from "../dtos/news-data";
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +18,10 @@ export class NewsService {
    * @param data NewsData containing title, summary, content, imageURls and date of creation
    * @return Observable of the created news
    * */
-  createNews(data: FormData ): Observable<NewsData>{
+  createNews(data: FormData): Observable<NewsDto>{
     console.log("service start");
     console.log(data);
-    return this.httpClient.post<NewsData>(`${this.baseUri}/create`, data).pipe(catchError(this.handleError));
+    return this.httpClient.post<NewsDto>(`${this.baseUri}/create`, data).pipe(catchError(this.handleError));
   }
 
   getUnreadNews(email: string): Observable<NewsDetailDto[]> {

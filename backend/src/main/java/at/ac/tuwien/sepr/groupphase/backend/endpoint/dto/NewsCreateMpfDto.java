@@ -5,12 +5,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 
 public class NewsCreateMpfDto {
-
     String title;
     String summary;
     String content;
     MultipartFile[] images;
-    LocalDate dateOfNews;
+    LocalDate date;
 
     public String getContent() {
         return content;
@@ -20,12 +19,12 @@ public class NewsCreateMpfDto {
         this.content = content;
     }
 
-    public LocalDate getDateOfNews() {
-        return dateOfNews;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateOfNews(LocalDate dateOfNews) {
-        this.dateOfNews = dateOfNews;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public MultipartFile[] getImages() {
@@ -58,8 +57,8 @@ public class NewsCreateMpfDto {
             + "content='"
             + content
             + '\''
-            + ", dateOfNews="
-            + dateOfNews
+            + ", dates="
+            + date
             + ", summary='"
             + summary
             + '\''
@@ -75,7 +74,7 @@ public class NewsCreateMpfDto {
         private String summary;
         private String content;
         private MultipartFile[] images;
-        private LocalDate dateOfNews;
+        private LocalDate date;
 
         public NewsCreateMpfDtoBuilder() {
         }
@@ -100,8 +99,8 @@ public class NewsCreateMpfDto {
             return this;
         }
 
-        public NewsCreateMpfDtoBuilder dateOfNews(LocalDate dateOfNews) {
-            this.dateOfNews = dateOfNews;
+        public NewsCreateMpfDtoBuilder date(LocalDate date) {
+            this.date = date;
             return this;
         }
 
@@ -111,7 +110,7 @@ public class NewsCreateMpfDto {
             mpfDto.setSummary(summary);
             mpfDto.setContent(content);
             mpfDto.setImages(images);
-            mpfDto.setDateOfNews(dateOfNews);
+            mpfDto.setDate(date);
             return mpfDto;
         }
     }

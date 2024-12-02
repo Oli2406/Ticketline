@@ -8,16 +8,16 @@ public class NewsCreateDto {
     String title;
     String summary;
     String content;
-    List<String> imageUrl;
-    LocalDate dateOfNews;
+    List<String> images;
+    LocalDate date;
 
-    public NewsCreateDto(String title, String summary, String content, List<String> imageUrl,
-                         LocalDate dateOfNews) {
+    public NewsCreateDto(String title, String summary, String content, List<String> images,
+                         LocalDate date) {
         this.title = title;
         this.summary = summary;
         this.content = content;
-        this.imageUrl = imageUrl;
-        this.dateOfNews = dateOfNews;
+        this.images = images;
+        this.date = date;
     }
 
     public NewsCreateDto() {
@@ -32,20 +32,20 @@ public class NewsCreateDto {
         this.content = content;
     }
 
-    public LocalDate getDateOfNews() {
-        return dateOfNews;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setDateOfNews(LocalDate dateOfNews) {
-        this.dateOfNews = dateOfNews;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
-    public List<String> getImageUrl() {
-        return imageUrl;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setImageUrl(List<String> imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getSummary() {
@@ -70,8 +70,8 @@ public class NewsCreateDto {
             + "content='" + content + '\''
             + ", title='" + title + '\''
             + ", summary='" + summary + '\''
-            + ", imageUrl=" + List.of(imageUrl)
-            + ", dateOfNews=" + dateOfNews
+            + ", images=" + List.of(images)
+            + ", date=" + date
             + '}';
     }
 
@@ -80,8 +80,8 @@ public class NewsCreateDto {
         private String title;
         private String summary;
         private String content;
-        private List<String> imageUrl;
-        private LocalDate dateOfNews;
+        private List<String> images;
+        private LocalDate date;
 
         private NewsCreateDtoBuilder() {
         }
@@ -105,13 +105,13 @@ public class NewsCreateDto {
             return this;
         }
 
-        public NewsCreateDtoBuilder withImageUrl(List<String> imageUrl) {
-            this.imageUrl = imageUrl;
+        public NewsCreateDtoBuilder withImages(List<String> images) {
+            this.images = images;
             return this;
         }
 
-        public NewsCreateDtoBuilder withDateOfNews(LocalDate dateOfNews) {
-            this.dateOfNews = dateOfNews;
+        public NewsCreateDtoBuilder withDate(LocalDate date) {
+            this.date = date;
             return this;
         }
 
@@ -120,8 +120,8 @@ public class NewsCreateDto {
             newsCreateDto.setTitle(title);
             newsCreateDto.setSummary(summary);
             newsCreateDto.setContent(content);
-            newsCreateDto.setImageUrl(imageUrl);
-            newsCreateDto.setDateOfNews(dateOfNews);
+            newsCreateDto.setImages(images);
+            newsCreateDto.setDate(date);
             return newsCreateDto;
         }
     }
