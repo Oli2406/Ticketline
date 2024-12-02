@@ -15,5 +15,8 @@ public class WebConfig implements WebMvcConfigurer {
         Path uploadDir = Paths.get("./newsImages").toAbsolutePath().normalize();
         registry.addResourceHandler("/newsImages/**")
             .addResourceLocations("file:" + uploadDir + "/");
+        Path uploadDir2 = Paths.get("./merchandise").toAbsolutePath().normalize();
+        registry.addResourceHandler("./merchandise/**")
+            .addResourceLocations("file:" + uploadDir2 + "/");
     }
 }

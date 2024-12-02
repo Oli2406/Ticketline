@@ -92,8 +92,8 @@ export class AdminComponent implements OnInit {
     this.router.navigate(['/admin/createNews']);
   }
 
-  navigateToCreateShow(): void {
-    console.log('Create Show functionality will be implemented.');
+  navigateToCreateMerchandise(): void {
+    this.router.navigate(['admin/createMerchandise']);
   }
 
   navigateToCreateEvent(): void {

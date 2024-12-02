@@ -43,7 +43,6 @@ public class NewsEndpoint {
         LOG.debug("Request parameters: {}", news);
         System.out.println("We have reached the endpoint");
         return this.newsService.createNews(news);
-
     }
 
     @PermitAll
