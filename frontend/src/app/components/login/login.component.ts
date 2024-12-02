@@ -43,14 +43,14 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * Send authentication data to the authService. If the authentication was successfully, the user will be forwarded to the message page
+   * Send authentication data to the authService. If the authentication was successfully, the user will be forwarded to the home page
    *
    * @param authRequest authentication data from the user login form
    */
   authenticateUser(authRequest: AuthRequest) {
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
-        this.router.navigate(['/message']);
+        this.router.navigate(['/home']);
       },
       error: error => {
         this.error = true;

@@ -1,14 +1,28 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
 import org.springframework.stereotype.Component;
+
 
 import java.util.List;
 
 @Component
 public class NewsMapper {
+
+    public NewsDetailDto entityToDetailDto(News news) {
+        System.out.println("entityToDetailDto: " + news.getDateOfNews());
+        return new NewsDetailDto(
+            news.getNewsId(),
+            news.getTitle(),
+            news.getSummary(),
+            news.getContent(),
+            news.getImageUrl(),
+            news.getDateOfNews()
+        );
+    }
 
     /**
      * Maps a {@link News} entity to a {@link NewsCreateDto}.
@@ -17,6 +31,7 @@ public class NewsMapper {
      * @return the mapped {@link NewsCreateDto}
      */
     public NewsCreateDto entityToCreateDto(News news) {
+        System.out.println("entityToCreateDto: " + news.getDateOfNews());
         return new NewsCreateDto(
             news.getTitle(),
             news.getSummary(),
@@ -31,18 +46,19 @@ public class NewsMapper {
      * This method is used to map data from a multipart-file DTO to a DTO containing only
      * image URLs without the actual pictures.
      *
-     * @param mpfDto the {@link NewsCreateMpfDto} to be mapped
-     * @param imgUrls          the list of image URLs extracted from the multipart files
+     * @param mpfDto  the {@link NewsCreateMpfDto} to be mapped
+     * @param imgUrls the list of image URLs extracted from the multipart files
      * @return the mapped {@link NewsCreateDto}
      */
     public NewsCreateDto entityToCreateDtoWithImgUrl(
         NewsCreateMpfDto mpfDto, List<String> imgUrls) {
+        System.out.println("entityToCreateDtoWithImgUrl: " + mpfDto.getDate());
         return new NewsCreateDto(
             mpfDto.getTitle(),
             mpfDto.getSummary(),
             mpfDto.getContent(),
             imgUrls,
-            mpfDto.getDateOfNews()
+            mpfDto.getDate()
         );
     }
 }

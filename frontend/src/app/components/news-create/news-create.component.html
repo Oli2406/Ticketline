@@ -1,5 +1,3 @@
-
-
 <!-- News Form -->
 <form class="news-container" #newsForm="ngForm" (ngSubmit)="onSubmit(newsForm)">
   <!-- Hidden submit element, to keep presses of enter key to trigger the cancel button -->
@@ -53,7 +51,7 @@
 
     <div class="col-md-6 mb-3">
       <label class="custom-label fw-bold" for="dateOfNews">Publication Date</label>
-      <input [(ngModel)]="news.dateOfNews"
+      <input [(ngModel)]="news.date"
              class="form-control custom-input"
              id="dateOfNews"
              name="dateOfNews"
@@ -64,7 +62,7 @@
     <!-- Image Input-->
     <div class="form-group">
       <label class="custom-label fw-bold" for="imageUrl">Image File</label>
-      <input [(ngModel)]="news.imageUrl"
+      <input [(ngModel)]="news.images"
              [ngModelOptions]="{standalone: true}"
              class="form-control custom-input"
              id="imageUrl"
@@ -77,20 +75,8 @@
       <div class="image-container" id="imageContainer">
 
       </div>
-
-      <!---@for(image of news.imageUrl; track image){
-        <p>here could be an image</p>
-      }
-        @if (news.imageUrl !== null) {
-          <div class="col-md-6 mb-3">
-            <img [src]="news.imageUrl"
-                 class="img-thumbnail"
-                 alt=""
-                 style="max-height: 100px;
-             max-width: 100px;">
-          </div>
-        }-->
     </div>
+
 
     <!-- Submit Button -->
     <div class="d-flex flex-row justify-content-end">
@@ -103,6 +89,3 @@
     </div>
   </div>
 </form>
-
-
-

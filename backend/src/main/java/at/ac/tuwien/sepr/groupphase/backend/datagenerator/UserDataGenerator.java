@@ -40,7 +40,7 @@ public class UserDataGenerator {
     }
 
     private void createUserIfNotExists(String firstName, String lastName, String email,
-        String password, boolean isAdmin) {
+                                       String password, boolean isAdmin) {
         if (userRepository.findUserByEmail(email).isEmpty()) {
             ApplicationUser user = new ApplicationUser(
                 firstName, lastName, email, passwordEncoder.encode(password), isAdmin
