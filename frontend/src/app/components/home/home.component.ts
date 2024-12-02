@@ -64,7 +64,6 @@ export class HomeComponent implements OnInit {
           for (const n of this.news) {
             if (n.images && n.images[0]) {
               n.images[0] = this.globals.backendRessourceUri + "/newsImages/" + n.images[0];
-              console.log(n.images[0]);
             } else {
               n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
             }
