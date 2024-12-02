@@ -41,4 +41,5 @@ public class RegisterEndpoint {
         response.put("message", "User registered successfully");
         return ResponseEntity.ok(response);
     }
+
 }

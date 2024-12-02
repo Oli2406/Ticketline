@@ -2,14 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -62,6 +60,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("status", "CONFLICT_ERROR", "errors", ex.getErrors()));
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    protected ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex) {
+        LOGGER.warn(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(Map.of("status", "ILLEGAL_ARGUMENT_ERROR", "errorMessage", ex.getMessage()));
+    }
+
 
     /**
      * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a

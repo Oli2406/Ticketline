@@ -1,29 +1,27 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
-import {Globals} from '../global/globals';
-import {UserDetailDto} from "../dtos/user-data";
-import {AdminUserRegistrationDto} from "../dtos/register-data";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
+import {Globals} from "../global/globals";
+import {NewsData} from "../dtos/news-data";
+import {catchError, Observable, throwError} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
-export class AdminService {
-  private baseUrl: string = this.globals.backendUri + '/admin';
+export class NewsService {
 
-  constructor(private http: HttpClient, private globals: Globals) {
-  }
+  private baseURI: string = this.globals.backendUri + '/create-news';
 
-  getUsers(): Observable<UserDetailDto[]> {
-    return this.http.get<UserDetailDto[]>(`${this.baseUrl}`);
-  }
+  constructor(private httpClient: HttpClient, private globals: Globals) { }
 
-  unlockUser(id: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/unlock/${id}`, {});
-  }
-
-  lockUser(id: number): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/lock/${id}`, {});
+  /**
+   * Creates new news in the system
+   * @param data NewsData containing title, summary, content, imageURls and date of creation
+   * @return Observable of the created news
+   * */
+  createNews(data: FormData ): Observable<NewsData>{
+    console.log("service start");
+    console.log(data);
+    return this.httpClient.post<NewsData>(this.baseURI, data).pipe(catchError(this.handleError));
   }
 
   /**
@@ -54,4 +52,5 @@ export class AdminService {
     }
     return throwError(() => new Error(cleanedError));
   }
+
 }

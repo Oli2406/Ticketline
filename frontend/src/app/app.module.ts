@@ -14,6 +14,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { CreateUserComponent } from './components/admin/createUser/create-user.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
+import {NewsCreateComponent} from "./components/news-create/news-create.component";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
