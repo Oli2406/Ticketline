@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class EventEndpoint {
         this.eventService = eventService;
     }
 
+    @PermitAll
     @PutMapping
     public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update event: {}", eventCreateDto);
@@ -40,6 +42,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(createdEvent);
     }
 
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<EventDetailDto>> getAllEvents() {
         logger.info("Fetching all events");
@@ -48,6 +51,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(events);
     }
 
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<EventDetailDto> getEventById(@PathVariable Long id) {
         logger.info("Fetching event with ID: {}", id);
@@ -56,6 +60,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(event);
     }
 
+    @PermitAll
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         logger.info("Deleting event with ID: {}", id);

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class LocationEndpoint {
         this.locationService = locationService;
     }
 
+    @PermitAll
     @PutMapping
     public ResponseEntity<LocationDetailDto> createOrUpdateLocation(@RequestBody LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update location: {}", locationCreateDto);
@@ -41,6 +43,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(createdLocation);
     }
 
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<LocationDetailDto>> getAllLocations() {
         logger.info("Fetching all locations");
@@ -49,6 +52,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(locations);
     }
 
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<LocationDetailDto> getLocationById(@PathVariable Long id) {
         logger.info("Fetching location with ID: {}", id);
@@ -57,6 +61,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(location);
     }
 
+    @PermitAll
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
         logger.info("Deleting location with ID: {}", id);

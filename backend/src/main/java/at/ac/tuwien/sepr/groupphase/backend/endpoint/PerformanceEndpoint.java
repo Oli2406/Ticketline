@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
+import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ public class PerformanceEndpoint {
         this.performanceService = performanceService;
     }
 
+    @PermitAll
     @PutMapping
     public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update performance: {}", performanceCreateDto);
@@ -40,6 +42,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(createdPerformance);
     }
 
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<PerformanceDetailDto>> getAllPerformances() {
         logger.info("Fetching all performances");
@@ -48,6 +51,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(performances);
     }
 
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<PerformanceDetailDto> getPerformanceById(@PathVariable Long id) {
         logger.info("Fetching performance with ID: {}", id);
@@ -56,6 +60,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(performance);
     }
 
+    @PermitAll
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable Long id) {
         logger.info("Deleting performance with ID: {}", id);
