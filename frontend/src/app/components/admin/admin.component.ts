@@ -97,6 +97,7 @@ export class AdminComponent implements OnInit {
   }
 
   navigateToCreateEvent(): void {
-    console.log('Create Event functionality will be implemented.');
+    this.router.navigate(['/admin/createEvent']);
+    console.log('Navigating to Create Event');
   }
 }

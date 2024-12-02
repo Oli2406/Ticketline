@@ -1,0 +1,132 @@
+<div class="event-container">
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>Create a New Event</h1>
+  </div>
+
+  <div class="form-sections">
+    <!-- Event Details -->
+    <div class="section event-details">
+      <h2>Event Details</h2>
+      <form>
+        <div class="form-group">
+          <input type="text" placeholder="Event Title" [(ngModel)]="eventData.title" name="title" />
+        </div>
+        <div class="form-group">
+          <textarea placeholder="Description" [(ngModel)]="eventData.description" name="description"></textarea>
+        </div>
+        <div class="form-group">
+          <input type="date" placeholder="Date of Event" [(ngModel)]="eventData.dateOfEvent" name="dateOfEvent" />
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="Category" [(ngModel)]="eventData.category" name="category" />
+        </div>
+        <div class="form-group">
+          <input type="number" placeholder="Duration (minutes)" [(ngModel)]="eventData.duration" name="duration" />
+        </div>
+      </form>
+    </div>
+
+    <!-- Performances -->
+    <div class="section performances">
+      <h2>Performances</h2>
+
+      <!-- List of Created Performances -->
+      <ul class="performance-list">
+        <li *ngFor="let performance of performances">
+          <span>{{ performance.name }}</span>
+        </li>
+      </ul>
+
+
+      <!-- Button to Create Performance -->
+      <button type="button" class="btn-create-performance" (click)="togglePerformanceForm()">Create Performance</button>
+
+      <!-- Performance Form -->
+      <div *ngIf="showPerformanceForm" class="performance-form">
+        <form>
+          <div class="form-group">
+            <input type="text" placeholder="Performance Name" [(ngModel)]="newPerformance.name" name="performanceName" />
+          </div>
+          <!-- Select Artist -->
+          <div class="form-group artist-select">
+            <label>Artist</label>
+            <div class="select-container">
+              <select [(ngModel)]="newPerformance.artistId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Artist</option>
+                <option *ngFor="let artist of artists" [value]="artist.artistId">{{ artist.artistName }}</option>
+              </select>
+              <button type="button" class="btn-add-inline" (click)="toggleArtistForm()">+</button>
+            </div>
+          </div>
+          <!-- Artist Form -->
+          <div *ngIf="showArtistForm" class="artist-form">
+            <h3>Create New Artist</h3>
+            <form>
+              <div class="form-group">
+                <input type="text" placeholder="First Name" [(ngModel)]="newArtist.firstName" name="firstName" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Surname" [(ngModel)]="newArtist.surname" name="surname" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Artist Name/Band" [(ngModel)]="newArtist.artistName" name="artistName" />
+              </div>
+              <button type="button" class="btn-save" (click)="createArtist()">Create Artist</button>
+            </form>
+          </div>
+
+          <!-- Select Location -->
+          <div class="form-group location-select">
+            <label>Location</label>
+            <div class="select-container">
+              <select [(ngModel)]="newPerformance.locationId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Location</option>
+                <option *ngFor="let location of locations" [value]="location.locationId">{{ location.name }}</option>
+              </select>
+              <button type="button" class="btn-add-inline" (click)="toggleLocationForm()">+</button>
+            </div>
+          </div>
+          <!-- Location Form -->
+          <div *ngIf="showLocationForm" class="location-form">
+            <h3>Create New Location</h3>
+            <form>
+              <div class="form-group">
+                <input type="text" placeholder="Location Name" [(ngModel)]="newLocation.name" name="locationName" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Street" [(ngModel)]="newLocation.street" name="street" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="City" [(ngModel)]="newLocation.city" name="city" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Postal Code" [(ngModel)]="newLocation.postalCode" name="postalCode" />
+              </div>
+              <div class="form-group">
+                <input type="text" placeholder="Country" [(ngModel)]="newLocation.country" name="country" />
+              </div>
+              <button type="button" class="btn-save" (click)="createLocation()">Create Location</button>
+            </form>
+          </div>
+          <div class="form-group">
+            <input type="date" placeholder="Performance Date" [(ngModel)]="newPerformance.date" name="performanceDate" />
+          </div>
+          <div class="form-group">
+            <input type="number" placeholder="Price per Ticket" [(ngModel)]="newPerformance.price" name="pricePerTicket" />
+          </div>
+          <div class="form-group">
+            <input type="number" placeholder="Number of Tickets" [(ngModel)]="newPerformance.ticketNumber" name="ticketNumber" />
+          </div>
+          <div class="form-group">
+            <input type="text" placeholder="Hall" [(ngModel)]="newPerformance.hall" name="hall" />
+          </div>
+          <button type="button" class="btn-save-performance" (click)="createPerformance()">Save Performance</button>
+        </form>
+      </div>
+    </div>
+    <div class="submit-container">
+      <button type="button" class="btn-create" (click)="onSubmit()">Create Event</button>
+    </div>
+  </div>
+</div>
