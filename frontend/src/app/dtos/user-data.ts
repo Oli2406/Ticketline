@@ -6,3 +6,8 @@ export interface UserDetailDto {
   isLocked: boolean;
   isLoggedIn: boolean;
 }
+
+export interface UserUpdateReadNewsDto {
+  newsId: number;
+  email: string;
+}

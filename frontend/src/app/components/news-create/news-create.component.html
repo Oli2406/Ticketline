@@ -1,0 +1,91 @@
+<!-- News Form -->
+<form class="news-container" #newsForm="ngForm" (ngSubmit)="onSubmit(newsForm)">
+  <!-- Hidden submit element, to keep presses of enter key to trigger the cancel button -->
+  <input type="submit" hidden="hidden"/>
+
+  <!-- Header Section -->
+  <div class="news-heading">
+    <h1 class="custom-heading align-content-center"> News Create Menu </h1>
+  </div>
+
+
+  <!-- News Title -->
+  <div class="col-md-4 p-4">
+    <div class="form-group">
+      <label class="custom-label fw-bold" for="title">News Title</label>
+      <input [(ngModel)]="news.title"
+             [ngModelOptions]="{standalone: true}"
+             class="form-control custom-input"
+             id="title"
+             name="title"
+             placeholder="Enter News Title"
+             required
+             type="text"/>
+    </div>
+
+    <!-- News Summary -->
+    <div class="form-group">
+      <label class="custom-label fw-bold" for="summary">News Summary</label>
+      <textarea [(ngModel)]="news.summary"
+                [ngModelOptions]="{standalone: true}"
+                class="form-control custom-input"
+                id="summary"
+                name="summary"
+                placeholder="Enter News Summary"
+                required
+                type="text"></textarea>
+    </div>
+
+    <!-- News Content -->
+    <div class="form-group">
+      <label class="custom-label fw-bold" for="content">News Content</label>
+      <textarea [(ngModel)]="news.content"
+                [ngModelOptions]="{standalone: true}"
+                class="form-control custom-input"
+                id="content"
+                name="content"
+                placeholder="Enter News Content"
+                required
+                type="text"></textarea>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label class="custom-label fw-bold" for="dateOfNews">Publication Date</label>
+      <input [(ngModel)]="news.date"
+             class="form-control custom-input"
+             id="dateOfNews"
+             name="dateOfNews"
+             required
+             type="date"/>
+    </div>
+
+    <!-- Image Input-->
+    <div class="form-group">
+      <label class="custom-label fw-bold" for="imageUrl">Image File</label>
+      <input [(ngModel)]="news.images"
+             [ngModelOptions]="{standalone: true}"
+             class="form-control custom-input"
+             id="imageUrl"
+             name="imageUrl"
+             type="file"
+             multiple
+             accept=".png, .jpg, .jpeg"
+             (change)="readImage($event)"/>
+
+      <div class="image-container" id="imageContainer">
+
+      </div>
+    </div>
+
+
+    <!-- Submit Button -->
+    <div class="d-flex flex-row justify-content-end">
+      <span class="flex-grow-1"></span>
+      <button [disabled]="!newsForm.valid"
+              class="btn btn-primary w-100 custom-button"
+              type="submit">
+        <i class="bi bi-check-lg"> Submit News</i>
+      </button>
+    </div>
+  </div>
+</form>

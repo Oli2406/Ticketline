@@ -2,10 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
-import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import jakarta.xml.bind.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsDetailDto;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public interface NewsService {
 
@@ -20,4 +22,12 @@ public interface NewsService {
      */
     NewsCreateDto createNews(NewsCreateMpfDto mpfDto)
         throws ValidationException, IOException, URISyntaxException;
+
+    /**
+     * Retrieves a list of unread news articles for a given user.
+     *
+     * @param email The email address of the user.
+     * @return A list of {@link NewsDetailDto} objects representing the unread news articles.
+     */
+    List<NewsDetailDto> getUnreadNews(String email);
 }

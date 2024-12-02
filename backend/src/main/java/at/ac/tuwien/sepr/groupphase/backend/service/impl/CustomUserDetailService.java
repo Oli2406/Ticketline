@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -13,9 +14,11 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomUserDetailService implements UserService {
@@ -185,5 +189,14 @@ public class CustomUserDetailService implements UserService {
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
         return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles);
+    }
+
+    @Override
+    @Transactional
+    public void updateReadNews(UserUpdateReadNewsDto userUpdateReadNewsDto) {
+        LOGGER.trace("updateReadNews({})", userUpdateReadNewsDto);
+        ApplicationUser user = findApplicationUserByEmail(userUpdateReadNewsDto.getEmail());
+        user.getReadNewsIds().add(userUpdateReadNewsDto.getNewsId());
+        userRepository.save(user);
     }
 }

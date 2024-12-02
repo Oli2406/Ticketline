@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {NewsData} from "../../../dtos/news-data";
+import {NewsDto} from "../../../dtos/news-data";
 import {NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormsModule, NgForm} from "@angular/forms";
@@ -21,12 +21,12 @@ import {CommonModule} from "@angular/common";
 })
 export class NewsCreateComponent implements OnInit {
 
-  news: NewsData = {
+  news: NewsDto = {
     title: '',
     summary: '',
     content: '',
-    imageUrl: [],
-    dateOfNews: new Date()
+    images: [],
+    date: new Date()
   };
   private selectedFiles: File[];
 
@@ -44,7 +44,7 @@ export class NewsCreateComponent implements OnInit {
     console.log("submitted");
     if (form.valid) {
       const newsFormData = this.createFormData(this.news);
-      let observable: Observable<NewsData>;
+      let observable: Observable<NewsDto>;
       observable = this.service.createNews(newsFormData);
       observable.subscribe({
         next: () => {
@@ -68,12 +68,12 @@ export class NewsCreateComponent implements OnInit {
 
   /*private methods for validation*/
 
-  private createFormData(news: NewsData): FormData {
+  private createFormData(news: NewsDto): FormData {
     const formData = new FormData();
     formData.append('title', news.title);
     formData.append('summary', news.summary);
     formData.append('content', news.content);
-    formData.append('dateOfNews', news.dateOfNews.toString()); // Ensure correct date format
+    formData.append('dateOfNews', news.date.toString()); // Ensure correct date format
 
     if (this.selectedFiles) {
       for (const file of this.selectedFiles) {
@@ -84,7 +84,7 @@ export class NewsCreateComponent implements OnInit {
   }
 
 
-  private validateNews(news: NewsData) {
+  private validateNews(news: NewsDto) {
     console.log("validation start");
     let errorMessage = '';
 
@@ -112,11 +112,11 @@ export class NewsCreateComponent implements OnInit {
       errorMessage += 'The content cannot exceed the limit of 4096 characters\n';
     }
 
-    if (formatDate(news.dateOfNews, 'yyyy-MM-dd', 'en_US') === formatDate(new Date(0), 'yyyy-MM-dd', 'en_US')) {
+    if (formatDate(news.date, 'yyyy-MM-dd', 'en_US') === formatDate(new Date(0), 'yyyy-MM-dd', 'en_US')) {
       errorMessage += 'No date of news f was given\n';
     }
-    if (news.dateOfNews !== undefined &&
-      formatDate(this.news.dateOfNews, 'yyyy-MM-dd', 'en_US') > formatDate(new Date(), 'yyyy-MM-dd', 'en_US')) {
+    if (news.date !== undefined &&
+      formatDate(this.news.date, 'yyyy-MM-dd', 'en_US') > formatDate(new Date(), 'yyyy-MM-dd', 'en_US')) {
       errorMessage += 'The given date of news lies in the future\n';
     }
     return this.empty(errorMessage);
@@ -156,7 +156,7 @@ export class NewsCreateComponent implements OnInit {
   readImage(event: Event): void {
     const imageInput = event.target as HTMLInputElement;
     this.selectedFiles = [];
-    this.news.imageUrl = []; // Reset the image URL array
+    this.news.images = []; // Reset the image URL array
 
     if (imageInput.files && imageInput.files.length > 0) {
       for (let i = 0; i < imageInput.files.length; i++) {
@@ -168,8 +168,8 @@ export class NewsCreateComponent implements OnInit {
           reader.onload = (e: ProgressEvent<FileReader>) => {
             const result = e.target?.result as string;
             if (result) {
-              this.news.imageUrl.push(result);
-              this.displayImages(this.news.imageUrl);
+              this.news.images.push(result);
+              this.displayImages(this.news.images);
             }
           };
           reader.readAsDataURL(file);
