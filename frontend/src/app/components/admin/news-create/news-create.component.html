@@ -1,0 +1,65 @@
+<div class="news-container">
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>Create a News Article</h1>
+  </div>
+
+  <div class="form-sections">
+    <!-- News Details -->
+    <div class="section news-details">
+      <h2 style="font-weight: bold; font-size: 1.8rem; color: #333;">News Details</h2>
+      <form #newsForm="ngForm" (ngSubmit)="onSubmit(newsForm)">
+        <label class="custom-label fw-bold">Title</label>
+        <div class="form-group">
+          <input
+            type="text"
+            placeholder="News Title"
+            [(ngModel)]="news.title"
+            name="title" />
+        </div>
+
+        <label class="custom-label fw-bold">Summary</label>
+        <div class="form-group">
+          <textarea
+            placeholder="Summary"
+            [(ngModel)]="news.summary"
+            name="summary"></textarea>
+        </div>
+
+        <label class="custom-label fw-bold">Content</label>
+        <div class="form-group">
+          <textarea
+            placeholder="Content"
+            [(ngModel)]="news.content"
+            name="content"></textarea>
+        </div>
+
+        <label class="custom-label fw-bold">Publication Date</label>
+        <div class="form-group">
+          <input
+            type="date"
+            [(ngModel)]="news.dateOfNews"
+            name="dateOfNews" />
+        </div>
+
+        <label class="custom-label fw-bold">Image Upload</label>
+        <div class="form-group">
+          <input
+            type="file"
+            [(ngModel)]="news.imageUrl"
+            name="imageUrl"
+            (change)="readImage($event)"
+            multiple
+            accept=".png, .jpg, .jpeg" />
+        </div>
+
+        <div id="imageContainer" class="image-container"></div>
+
+        <!-- Submit Section -->
+        <div class="submit-container">
+          <button type="submit" class="btn-create">Create News</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

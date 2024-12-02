@@ -47,6 +47,8 @@ public class EventValidator {
 
         if (eventCreateDto.getDateOfEvent() == null) {
             validationErrors.add("Event date is required");
+        } else if(eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
+            validationErrors.add("Event date cannot be in the past");
         }
 
         if (eventCreateDto.getDuration() <= 0) {
@@ -54,7 +56,7 @@ public class EventValidator {
         }
 
         if (eventCreateDto.getPerformanceIds() == null || eventCreateDto.getPerformanceIds().isEmpty()) {
-            validationErrors.add("At least one performance ID must be provided");
+            validationErrors.add("At least one performance id must be provided");
         }
 
         if (!validationErrors.isEmpty()) {

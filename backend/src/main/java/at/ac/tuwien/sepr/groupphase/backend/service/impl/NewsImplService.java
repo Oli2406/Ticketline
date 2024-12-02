@@ -5,7 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
-import jakarta.xml.bind.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,7 @@ public class NewsImplService implements NewsService {
     private final NewsRepository newsRepository;
     private final NewsValidator newsValidator;
     private final NewsMapper newsMapper;
-    private final Path uploadDirectory = Path.of("");
-    // Paths.get(NewsImplService.class.getClassLoader().getResource("images").toURI());
+
 
     public NewsImplService(
         NewsRepository newsRepository, NewsValidator newsValidator, NewsMapper newsMapper) {

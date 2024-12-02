@@ -136,4 +136,8 @@ public class ApplicationUser {
     public boolean isLoggedIn() {
         return isLoggedIn;
     }
+
+    public boolean isAdmin() {
+        return this.admin;
+    }
 }

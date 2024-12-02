@@ -1,19 +1,20 @@
 import {Component, OnInit} from '@angular/core';
-import {NewsData} from "../../dtos/news-data";
-import {NewsService} from "../../services/news.service";
+import {NewsData} from "../../../dtos/news-data";
+import {NewsService} from "../../../services/news.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {FormsModule, NgForm} from "@angular/forms";
 import {Observable} from "rxjs";
-import {formatDate} from "@angular/common";
-// @ts-ignore
+import {formatDate, NgClass} from "@angular/common";
 import {ToastrService} from "ngx-toastr";
-import {forEach} from "lodash";
+import {CommonModule} from "@angular/common";
 
 @Component({
   selector: 'app-news-create',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    NgClass,
+    CommonModule
   ],
   templateUrl: './news-create.component.html',
   styleUrl: './news-create.component.scss'
@@ -118,7 +119,6 @@ export class NewsCreateComponent implements OnInit {
       formatDate(this.news.dateOfNews, 'yyyy-MM-dd', 'en_US') > formatDate(new Date(), 'yyyy-MM-dd', 'en_US')) {
       errorMessage += 'The given date of news lies in the future\n';
     }
-
     return this.empty(errorMessage);
   }
 
@@ -153,43 +153,48 @@ export class NewsCreateComponent implements OnInit {
   }
 
 
-  readImage(event: Event) {
+  readImage(event: Event): void {
     const imageInput = event.target as HTMLInputElement;
-    const reader = new FileReader();
     this.selectedFiles = [];
-    let imgArr = [];
+    this.news.imageUrl = []; // Reset the image URL array
 
-    if (imageInput.files != null && imageInput.files.length > 0) {
+    if (imageInput.files && imageInput.files.length > 0) {
       for (let i = 0; i < imageInput.files.length; i++) {
         const file = imageInput.files.item(i);
-        if (file != null&& this.selectedFiles[i]==null) {
+        if (file) {
           this.selectedFiles.push(file);
 
+          const reader = new FileReader();
           reader.onload = (e: ProgressEvent<FileReader>) => {
             const result = e.target?.result as string;
-            //this.news.imageUrl.push(result);
-            this.displayImages(this.news.imageUrl);
+            if (result) {
+              this.news.imageUrl.push(result);
+              this.displayImages(this.news.imageUrl);
+            }
           };
           reader.readAsDataURL(file);
-        }else {
-          i++;
         }
       }
     }
   }
 
-  displayImages(images: string[]) {
-    const container = document.getElementById('imageContainer') as HTMLInputElement;
-    container.innerHTML = '';
 
-    for (let i = 0; i < images.length; i++) {
-      const imgElement = document.createElement('img');
-      imgElement.setAttribute('src', images[i]);
-      imgElement.setAttribute('alt', images[i].toString());
-      imgElement.style.maxHeight= '100px';
-      imgElement.style.maxWidth= '100px';
-      container.appendChild(imgElement);
+  displayImages(images: string[]): void {
+    const container = document.getElementById('imageContainer');
+    if (container) {
+      container.innerHTML = ''; // Clear the container before displaying new images
+
+      images.forEach((image) => {
+        const imgElement = document.createElement('img');
+        imgElement.setAttribute('src', image);
+        imgElement.setAttribute('alt', 'Preview Image');
+        imgElement.style.maxHeight = '100px';
+        imgElement.style.maxWidth = '100px';
+        imgElement.style.margin = '5px'; // Add some spacing between images
+        container.appendChild(imgElement);
+      });
     }
   }
+
 }
 

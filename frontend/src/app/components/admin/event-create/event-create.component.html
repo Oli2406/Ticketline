@@ -9,18 +9,23 @@
     <div class="section event-details">
       <h2>Event Details</h2>
       <form>
+        <label class="custom-label fw-bold">Title</label>
         <div class="form-group">
           <input type="text" placeholder="Event Title" [(ngModel)]="eventData.title" name="title" />
         </div>
+        <label class="custom-label fw-bold">Description</label>
         <div class="form-group">
           <textarea placeholder="Description" [(ngModel)]="eventData.description" name="description"></textarea>
         </div>
+        <label class="custom-label fw-bold">Date</label>
         <div class="form-group">
           <input type="date" placeholder="Date of Event" [(ngModel)]="eventData.dateOfEvent" name="dateOfEvent" />
         </div>
+        <label class="custom-label fw-bold">Category</label>
         <div class="form-group">
           <input type="text" placeholder="Category" [(ngModel)]="eventData.category" name="category" />
         </div>
+        <label class="custom-label fw-bold">Duration (minutes)</label>
         <div class="form-group">
           <input type="number" placeholder="Duration (minutes)" [(ngModel)]="eventData.duration" name="duration" />
         </div>
@@ -46,11 +51,12 @@
       <div *ngIf="showPerformanceForm" class="performance-form">
         <form>
           <div class="form-group">
-            <input type="text" placeholder="Performance Name" [(ngModel)]="newPerformance.name" name="performanceName" />
+            <label class="custom-label fw-bold">Performance name</label>
+            <input type="text" placeholder="Performance name" [(ngModel)]="newPerformance.name" name="performanceName" />
           </div>
           <!-- Select Artist -->
           <div class="form-group artist-select">
-            <label>Artist</label>
+            <label class="custom-label fw-bold">Artist</label>
             <div class="select-container">
               <select [(ngModel)]="newPerformance.artistId" [ngModelOptions]="{ standalone: true }">
                 <option value="" disabled selected>Select Artist</option>
@@ -62,15 +68,19 @@
           <!-- Artist Form -->
           <div *ngIf="showArtistForm" class="artist-form">
             <h3>Create New Artist</h3>
+
             <form>
+              <label class="custom-label fw-bold">First name</label>
               <div class="form-group">
                 <input type="text" placeholder="First Name" [(ngModel)]="newArtist.firstName" name="firstName" />
               </div>
+              <label class="custom-label fw-bold">Surname</label>
               <div class="form-group">
                 <input type="text" placeholder="Surname" [(ngModel)]="newArtist.surname" name="surname" />
               </div>
+              <label class="custom-label fw-bold">Artist/ Band name</label>
               <div class="form-group">
-                <input type="text" placeholder="Artist Name/Band" [(ngModel)]="newArtist.artistName" name="artistName" />
+                <input type="text" placeholder="Artist/ Band name" [(ngModel)]="newArtist.artistName" name="artistName" />
               </div>
               <button type="button" class="btn-save" (click)="createArtist()">Create Artist</button>
             </form>
@@ -78,7 +88,7 @@
 
           <!-- Select Location -->
           <div class="form-group location-select">
-            <label>Location</label>
+            <label class="custom-label fw-bold">Location</label>
             <div class="select-container">
               <select [(ngModel)]="newPerformance.locationId" [ngModelOptions]="{ standalone: true }">
                 <option value="" disabled selected>Select Location</option>
@@ -91,35 +101,46 @@
           <div *ngIf="showLocationForm" class="location-form">
             <h3>Create New Location</h3>
             <form>
+              <label class="custom-label fw-bold">Location name</label>
               <div class="form-group">
-                <input type="text" placeholder="Location Name" [(ngModel)]="newLocation.name" name="locationName" />
+                <input type="text" placeholder="Location name" [(ngModel)]="newLocation.name" name="locationName" />
               </div>
+              <label class="custom-label fw-bold">Street</label>
               <div class="form-group">
                 <input type="text" placeholder="Street" [(ngModel)]="newLocation.street" name="street" />
               </div>
+              <label class="custom-label fw-bold">City</label>
               <div class="form-group">
                 <input type="text" placeholder="City" [(ngModel)]="newLocation.city" name="city" />
               </div>
+              <label class="custom-label fw-bold">Postal code</label>
               <div class="form-group">
                 <input type="text" placeholder="Postal Code" [(ngModel)]="newLocation.postalCode" name="postalCode" />
               </div>
+              <label class="custom-label fw-bold">Country</label>
               <div class="form-group">
                 <input type="text" placeholder="Country" [(ngModel)]="newLocation.country" name="country" />
               </div>
               <button type="button" class="btn-save" (click)="createLocation()">Create Location</button>
             </form>
           </div>
+          <label class="custom-label fw-bold">Date</label>
           <div class="form-group">
             <input type="date" placeholder="Performance Date" [(ngModel)]="newPerformance.date" name="performanceDate" />
           </div>
+          <label class="custom-label fw-bold">Price per ticket</label>
+
           <div class="form-group">
-            <input type="number" placeholder="Price per Ticket" [(ngModel)]="newPerformance.price" name="pricePerTicket" />
+            <input type="number" placeholder="Price per ticket" [(ngModel)]="newPerformance.price" name="pricePerTicket" />
           </div>
+          <label class="custom-label fw-bold">Number of tickets</label>
+
           <div class="form-group">
-            <input type="number" placeholder="Number of Tickets" [(ngModel)]="newPerformance.ticketNumber" name="ticketNumber" />
+            <input type="number" placeholder="Number of tickets" [(ngModel)]="newPerformance.ticketNumber" name="ticketNumber" />
           </div>
+          <label class="custom-label fw-bold">Hall</label>
           <div class="form-group">
-            <input type="text" placeholder="Hall" [(ngModel)]="newPerformance.hall" name="hall" />
+            <input type="text" placeholder="Hall" [(ngModel)]="newPerformance.hall" name="Hall" />
           </div>
           <button type="button" class="btn-save-performance" (click)="createPerformance()">Save Performance</button>
         </form>

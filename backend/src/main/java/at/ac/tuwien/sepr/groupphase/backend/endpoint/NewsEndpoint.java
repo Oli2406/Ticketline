@@ -4,7 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import jakarta.annotation.security.PermitAll;
-import jakarta.xml.bind.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -37,17 +37,9 @@ public class NewsEndpoint {
         throws ValidationException, IOException, URISyntaxException {
         LOG.info("POST /api/v1/createNews");
         LOG.debug("Request parameters: {}", news);
+        System.out.println("We have reached the endpoint");
+        return this.newsService.createNews(news);
 
-        try {
-            System.out.println("We have reached the endpoint");
-            return this.newsService.createNews(news);
-        } catch (ValidationException e) {
-            throw new ValidationException("Validation for News failed");
-        } catch (IOException e) {
-            throw new IOException("There was an error with the image input");
-        } catch (URISyntaxException e) {
-            throw new URISyntaxException("An error occurred with the image URLs", "URL Error");
-        }
     }
 
     @PermitAll

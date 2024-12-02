@@ -2,7 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
-import jakarta.xml.bind.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,5 +20,4 @@ public interface NewsService {
      */
     NewsCreateDto createNews(NewsCreateMpfDto mpfDto)
         throws ValidationException, IOException, URISyntaxException;
-
 }

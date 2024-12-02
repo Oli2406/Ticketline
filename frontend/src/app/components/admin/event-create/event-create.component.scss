@@ -21,7 +21,6 @@
     }
   }
 
-
   .form-sections {
     flex: 2; /* Mehr Platz für den rechten Bereich */
     display: flex;
@@ -30,8 +29,7 @@
     margin-top: 80px;
     margin-left: 200px; /* Schiebt die gesamte Sektion nach rechts */
 
-
-  .section {
+    .section {
       display: flex;
       flex-direction: column;
       gap: 15px;
@@ -65,6 +63,13 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+
+            &:focus {
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+              border-color: #7d5efc; /* Highlight border color on focus */
+            }
           }
 
           .select-container {
@@ -78,6 +83,7 @@
               border: 1px solid #ddd;
               border-radius: 6px;
               font-size: 1rem;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Drop shadow */
             }
 
             .btn-add-inline {
@@ -87,6 +93,7 @@
               border: none;
               border-radius: 6px;
               cursor: pointer;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
               &:hover {
                 background-color: #514dc7;
@@ -112,7 +119,6 @@
         margin: 10px 0;
 
         li {
-          //background-color: #f9f9f9;
           padding: 10px;
           border: 1px solid #ddd;
           border-radius: 6px;
@@ -129,6 +135,7 @@
         border-radius: 6px;
         font-size: 1rem;
         cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
         &:hover {
           background-color: #514dc7;
@@ -136,9 +143,7 @@
       }
 
       .performance-form {
-        //background-color: #f9f9f9;
         padding: 15px;
-        //border: 1px solid #ddd;
         border-radius: 8px;
         margin-top: 15px;
 
@@ -157,6 +162,7 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Drop shadow */
           }
         }
 
@@ -168,6 +174,7 @@
           border-radius: 6px;
           font-size: 1rem;
           cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
           &:hover {
             background-color: #514dc7;
@@ -181,9 +188,9 @@
     margin-top: 20px;
     margin-bottom: 40px;
     display: flex;
-    justify-content: flex-start; /* Button linksbündig oder anpassen nach Bedarf */
-    flex-direction: column; /* Falls mehr Inhalte später dazukommen */
-    width: 70%; /* Button auf die volle Breite der Performances ausrichten */
+    justify-content: flex-start;
+    flex-direction: column;
+    width: 70%;
 
     .btn-create {
       padding: 10px 20px;
@@ -193,7 +200,8 @@
       border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
-      align-self: center; /* Zentriert den Button innerhalb des Containers */
+      align-self: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
       &:hover {
         background-color: #514dc7;
@@ -215,10 +223,15 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
       &:hover {
         background-color: #514dc7;
       }
     }
   }
+}
+
+.custom-label {
+  color: #333;
 }

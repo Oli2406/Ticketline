@@ -4,7 +4,7 @@ import {HomeComponent} from './components/home/home.component';
 import {LoginComponent} from './components/login/login.component';
 import {AuthGuard} from './guards/auth.guard';
 import {MessageComponent} from './components/message/message.component';
-import {NewsCreateComponent} from "./components/news-create/news-create.component";
+import {NewsCreateComponent} from "./components/admin/news-create/news-create.component";
 import {RegisterComponent} from './components/register/register.component';
 import {AdminGuard} from "./guards/admin.guard";
 import {AdminComponent} from './components/admin/admin.component';
@@ -24,6 +24,7 @@ const routes: Routes = [
       {path: 'admin', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: AdminComponent},
       {path: 'admin/createUser', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: CreateUserComponent},
       {path: 'admin/createEvent', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: EventCreateComponent},
+      {path: 'admin/createNews', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: NewsCreateComponent}
     ]
   },
   {path: 'home', component: HomeComponent}
