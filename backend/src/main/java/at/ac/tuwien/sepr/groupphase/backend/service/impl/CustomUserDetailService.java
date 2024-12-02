@@ -175,7 +175,7 @@ public class CustomUserDetailService implements UserService {
 
         userValidator.validateRegister(userRegistrationDto);
 
-        RegisterUser toRegister = new RegisterUser();
+        ApplicationUser toRegister = new ApplicationUser();
         toRegister.setFirstName(userRegistrationDto.getFirstName());
         toRegister.setLastName(userRegistrationDto.getLastName());
         toRegister.setEmail(userRegistrationDto.getEmail());
@@ -184,7 +184,7 @@ public class CustomUserDetailService implements UserService {
         toRegister.setAdmin(Boolean.TRUE.equals(userRegistrationDto.getIsAdmin()));
 
         LOGGER.debug("saving user to database with details: {}", toRegister);
-        registerRepository.save(toRegister);
+        userRepository.save(toRegister);
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");

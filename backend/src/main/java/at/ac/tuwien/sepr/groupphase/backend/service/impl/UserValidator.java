@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,18 +34,18 @@ public class UserValidator {
             validationErrors.add("First name is required");
         } else if (registerDto.getFirstName().length() > 255) {
             validationErrors.add("First name must be less than 255 characters");
-        } else if (!registerDto.getFirstName().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
+        } else if (!registerDto.getFirstName().matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
             validationErrors.add(
-                "First name must contain only letters, apostrophes, hyphens, and spaces");
+                "First name contains illegal characters");
         }
 
         if (registerDto.getLastName() == null || registerDto.getLastName().trim().isEmpty()) {
             validationErrors.add("Last name is required");
         } else if (registerDto.getLastName().length() > 255) {
             validationErrors.add("Last name must be less than 255 characters");
-        } else if (!registerDto.getLastName().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
+        } else if (!registerDto.getLastName().matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
             validationErrors.add(
-                "Last name must contain only letters, apostrophes, hyphens, and spaces");
+                "Last name contains illegal characters");
         }
 
         if (registerDto.getEmail() == null || registerDto.getEmail().trim().isEmpty()) {
@@ -58,6 +58,8 @@ public class UserValidator {
 
         if (registerDto.getPassword() == null || registerDto.getPassword().trim().isEmpty()) {
             validationErrors.add("Password must not be empty");
+        } else if (registerDto.getPassword().length() < 8) {
+            validationErrors.add("Password must be at least 8 characters long");
         }
 
         if (!validationErrors.isEmpty()) {

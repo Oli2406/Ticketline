@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class NewsValidator {
      *
      * @param news - dto for validation
      */
-    public void validateNews(NewsCreateMpfDto news) {
+    public void validateNews(NewsCreateMpfDto news) throws ValidationException {
         LOG.info("validateNews({})", news);
         List<String> validationErrors = new ArrayList<>();
 
@@ -56,11 +57,15 @@ public class NewsValidator {
 
         if (news.getDate() == null) {
             validationErrors.add("Date of news is required");
-        } else if (news.getDate().isAfter(LocalDate.now())) {
+        } else if (news.getDate().isBefore(LocalDate.now())) {
             validationErrors.add("Date of news cannot be in the future");
         }
 
-        // TODO setze ich das standard datum einfach auf localdate now???
+        if (!validationErrors.isEmpty()) {
+            LOG.warn("News validation failed with errors: {}", validationErrors);
+            throw new ValidationException("Validation Exception: ", validationErrors);
+        }
+
 
     }
 }

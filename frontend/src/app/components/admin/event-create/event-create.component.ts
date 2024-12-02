@@ -10,6 +10,7 @@ import { Location, LocationListDto } from 'src/app/dtos/location';
 import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
 import { Event } from 'src/app/dtos/event';
 import { ToastrService } from 'ngx-toastr';
+import {catchError} from "rxjs";
 
 @Component({
   selector: 'app-event-create',
@@ -24,25 +25,20 @@ import { ToastrService } from 'ngx-toastr';
   providers: [DatePipe]
 })
 export class EventCreateComponent implements OnInit {
-  // Event and Performance Data
   eventData: Event = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
   newPerformance: Performance = { name: '', date: null, price: 0, hall: '', artistId: null, locationId: null, ticketNumber: null };
 
-  // New Artist and Location
   newArtist: Artist = { firstName: '', surname: '', artistName: '' };
   newLocation: Location = { name: '', street: '', city: '', postalCode: '', country: '' };
 
-  // Show/Hide Form Controls
   showPerformanceForm = false;
   showArtistForm = false;
   showLocationForm = false;
 
-  // Lists for Artists, Locations, and Performances
   artists: ArtistListDto[] = [];
   locations: LocationListDto[] = [];
   performances: PerformanceListDto[] = [];
 
-  // Selected Artist and Location Variables
   selectedArtist = null;
   selectedLocation = null;
 
@@ -56,71 +52,97 @@ export class EventCreateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Load initial data
     this.loadArtists();
     this.loadLocations();
     this.loadPerformances();
   }
 
-  // Load all Artists
   loadArtists() {
     this.artistService.getArtists().subscribe({
       next: (artists: ArtistListDto[]) => {
         this.artists = artists;
       },
       error: (err) => {
-        console.error('Error fetching artists:', err.message);
-        this.toastr.error('Failed to load artists. Please try again.', 'Error');
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error loading artists', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-  // Create new Artist
   createArtist() {
     this.artistService.createArtist(this.newArtist).subscribe({
       next: () => {
         this.toastr.success('Artist created successfully!', 'Success');
-        this.newArtist = { firstName: '', surname: '', artistName: '' }; // Reset form
-        this.showArtistForm = false; // Hide form
-        this.loadArtists(); // Reload artist list
+        this.newArtist = { firstName: '', surname: '', artistName: '' };
+        this.showArtistForm = false;
+        this.loadArtists();
       },
       error: (err) => {
-        console.error('Error creating artist:', err.message);
-        this.toastr.error('Failed to create artist. Please try again.', 'Error');
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating artist', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-  // Load all Locations
   loadLocations() {
     this.locationService.getLocations().subscribe({
       next: (locations: LocationListDto[]) => {
         this.locations = locations;
       },
       error: (err) => {
-        console.error('Error fetching locations:', err.message);
-        this.toastr.error('Failed to load locations. Please try again.', 'Error');
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error loading locations', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-  // Create new Location
   createLocation() {
     this.locationService.createLocation(this.newLocation).subscribe({
       next: () => {
         this.toastr.success('Location created successfully!', 'Success');
-        this.newLocation = { name: '', street: '', city: '', postalCode: '', country: '' }; // Reset form
-        this.showLocationForm = false; // Hide form
-        this.loadLocations(); // Reload location list
+        this.newLocation = { name: '', street: '', city: '', postalCode: '', country: '' };
+        this.showLocationForm = false;
+        this.loadLocations();
       },
       error: (err) => {
-        console.error('Error creating location:', err.message);
-        this.toastr.error('Failed to create location. Please try again.', 'Error');
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating location', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-  // Load all Performances
   loadPerformances() {
     console.log('Current performances:', this.performances);
   }
@@ -131,7 +153,7 @@ export class EventCreateComponent implements OnInit {
       if (selectedArtist) {
         console.log('Selected artist details:', selectedArtist);
         console.log('Selected artist id:', selectedArtist.artistId);
-        this.newPerformance.artistId = selectedArtist.artistId; // Artist ID wird gesetzt
+        this.newPerformance.artistId = selectedArtist.artistId;
         console.log('Updated newPerformance with artistId:', this.newPerformance);
       } else {
         console.log('Artist not found for name:', artistName);
@@ -141,14 +163,13 @@ export class EventCreateComponent implements OnInit {
     });
   }
 
-// Log selected location
   onLocationSelect(locationName: string): void {
     this.locationService.getLocations().subscribe(locations => {
       const selectedLocation = locations.find(location => location.name === locationName);
       if (selectedLocation) {
         console.log('Selected location details:', selectedLocation);
         console.log('Selected artist id:', selectedLocation.locationId);
-        this.newPerformance.locationId = selectedLocation.locationId; // Location ID wird gesetzt
+        this.newPerformance.locationId = selectedLocation.locationId;
         console.log('Updated newPerformance with locationId:', this.newPerformance);
       } else {
         console.log('Location not found for name:', locationName);
@@ -158,33 +179,35 @@ export class EventCreateComponent implements OnInit {
     });
   }
 
-
-  // Create new Performance
   createPerformance() {
     console.log('Sending performance data to backend:', this.newPerformance);
     this.performanceService.createPerformance(this.newPerformance).subscribe({
       next: (performance: PerformanceListDto) => {
         console.log('Created performance:', performance);
-        this.performances.push(performance); // Add new performance to the list
+        this.performances.push(performance);
         if (performance.performanceId) {
-          this.eventData.performanceIds?.push(performance.performanceId); // Add ID to event's performance list
+          this.eventData.performanceIds?.push(performance.performanceId);
         }
         this.toastr.success('Performance created successfully!', 'Success');
-        // Reset form
         this.newPerformance = { name: '', date: null, price: 0, hall: '', artistId: null, locationId: null, ticketNumber: null };
-        this.showPerformanceForm = false; // Hide form
+        this.showPerformanceForm = false;
       },
       error: (err) => {
-        console.error('Error creating performance:', err.message);
-        const errors = Array.isArray(err.message) ? err.message : err.message.split(/\n/);
-        const errorList = errors.map((error) => `<li>${error.trim()}</li>`).join('');
-        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating performance', { enableHtml: true });
+        //err = this.eventService.handleErrorAndRethrow(err);
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${err.message}</ul>`, 'Error creating performance', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-
-  // Create new Event
   onSubmit() {
     this.eventService.createEvent(this.eventData).subscribe({
       next: (event: Event) => {
@@ -195,15 +218,20 @@ export class EventCreateComponent implements OnInit {
         console.log('Cleared performances list after event creation:', this.performances);
       },
       error: (err) => {
-        console.error('Error creating event:', err.message);
-        const errors = Array.isArray(err.message) ? err.message : err.message.split(/\n/);
-        const errorList = errors.map((error) => `<li>${error.trim()}</li>`).join('');
-        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', { enableHtml: true });
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
+          enableHtml: true,
+        });
       },
     });
   }
 
-  // Toggle forms
   toggleArtistForm() {
     this.showArtistForm = !this.showArtistForm;
   }
