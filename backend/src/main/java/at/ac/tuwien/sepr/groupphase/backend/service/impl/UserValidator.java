@@ -1,8 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class UserValidator {
 
         if (registerDto.getPassword() == null || registerDto.getPassword().trim().isEmpty()) {
             validationErrors.add("Password must not be empty");
-        } else if(registerDto.getPassword().length() < 8) {
+        } else if (registerDto.getPassword().length() < 8) {
             validationErrors.add("Password must be at least 8 characters long");
         }
 

@@ -4,11 +4,9 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
-import org.springframework.stereotype.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -47,7 +45,7 @@ public class EventValidator {
 
         if (eventCreateDto.getDateOfEvent() == null) {
             validationErrors.add("Event date is required");
-        } else if(eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
+        } else if (eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
             validationErrors.add("Event date cannot be in the past");
         }
 

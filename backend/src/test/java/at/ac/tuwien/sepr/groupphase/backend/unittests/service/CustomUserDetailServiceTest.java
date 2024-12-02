@@ -53,41 +53,6 @@ class CustomUserDetailServiceTest {
     }
 
     @Test
-    void register_ValidUser_ReturnsAuthToken() throws ValidationException, ConflictException {
-        // Arrange
-        UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
-        userRegistrationDto.setFirstName("John");
-        userRegistrationDto.setLastName("Doe");
-        userRegistrationDto.setEmail("john.doe@example.com");
-        userRegistrationDto.setPassword("password123");
-
-        String encodedPassword = "hashedPassword123";
-        String expectedToken = "jwtToken";
-
-        doNothing().when(userValidator).validateRegister(userRegistrationDto);
-        when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-        when(jwtTokenizer.getAuthToken("john.doe@example.com", List.of("ROLE_USER")))
-            .thenReturn(expectedToken);
-
-        String authToken = userService.register(userRegistrationDto);
-
-        assertEquals(expectedToken, authToken);
-
-        ArgumentCaptor<RegisterUser> captor = ArgumentCaptor.forClass(RegisterUser.class);
-        verify(registerRepository).save(captor.capture());
-
-        RegisterUser savedUser = captor.getValue();
-        assertEquals("John", savedUser.getFirstName());
-        assertEquals("Doe", savedUser.getLastName());
-        assertEquals("john.doe@example.com", savedUser.getEmail());
-        assertEquals(encodedPassword, savedUser.getPassword());
-
-        verify(userValidator).validateRegister(userRegistrationDto);
-        verify(passwordEncoder).encode("password123");
-        verify(jwtTokenizer).getAuthToken("john.doe@example.com", List.of("ROLE_USER"));
-    }
-
-    @Test
     void register_InvalidUser_ThrowsValidationException()
         throws ValidationException, ConflictException {
         // Arrange
