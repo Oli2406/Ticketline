@@ -9,6 +9,7 @@ import {RegisterComponent} from './components/register/register.component';
 import {AdminGuard} from "./guards/admin.guard";
 import {AdminComponent} from './components/admin/admin.component';
 import {CreateUserComponent} from './components/admin/createUser/create-user.component';
+import {EventCreateComponent} from "./components/admin/event-create/event-create.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -20,10 +21,11 @@ const routes: Routes = [
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: '', children: [
-      {path: 'admin', canActivate: [AuthGuard, AdminGuard], component: AdminComponent},
-      {path: 'admin/createUser', canActivate: [AuthGuard, AdminGuard], component: CreateUserComponent},
-      {path: 'admin/createNews', canActivate: [AuthGuard, AdminGuard],component: NewsCreateComponent},
-  ]},
+      {path: 'admin', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: AdminComponent},
+      {path: 'admin/createUser', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: CreateUserComponent},
+      {path: 'admin/createEvent', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: EventCreateComponent},
+    ]
+  },
   {path: 'home', component: HomeComponent}
 ];
 
