@@ -38,7 +38,7 @@
         <div class="form-group">
           <input
             type="date"
-            [(ngModel)]="news.dateOfNews"
+            [(ngModel)]="news.date"
             name="dateOfNews" />
         </div>
 
@@ -46,7 +46,7 @@
         <div class="form-group">
           <input
             type="file"
-            [(ngModel)]="news.imageUrl"
+            [(ngModel)]="news.images"
             name="imageUrl"
             (change)="readImage($event)"
             multiple

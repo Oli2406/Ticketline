@@ -73,7 +73,7 @@ export class NewsCreateComponent implements OnInit {
     formData.append('title', news.title);
     formData.append('summary', news.summary);
     formData.append('content', news.content);
-    formData.append('dateOfNews', news.date.toString()); // Ensure correct date format
+    formData.append('date', news.date.toString()); // Ensure correct date format
 
     if (this.selectedFiles) {
       for (const file of this.selectedFiles) {

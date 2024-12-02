@@ -156,4 +156,8 @@ public class ApplicationUser {
     public void setReadNewsIds(List<Long> readNewsIds) {
         this.readNewsIds = readNewsIds;
     }
+
+    public boolean isAdmin() {
+        return admin;
+    }
 }
