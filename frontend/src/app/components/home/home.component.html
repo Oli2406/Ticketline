@@ -2,20 +2,21 @@
   <a *ngIf="!isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
   <div *ngIf="isLoggedIn()">
     <h1>Upcoming Events</h1>
-
-    <div class="news-container mt-5">
-      <button class="btn btn-secondary" (click)="previousNews()" [disabled]="currentIndex === 0">
-        < </button>
-
-      <div *ngFor="let n of displayedNews; trackBy: trackByNewsId" class="news" (click)="navigateToNewsDetails(n.id)">
-        <img [src]="n.images[0]" alt="News Image">
-        <h2 class="mt-2">{{ n.title }}</h2>
-        <p class="date">{{ n.date | date }}</p>
-        <p>{{ truncateSummary(n.summary, 200) }}</p>
+    <div class="news-buttons-container mt-5">
+      <button class="btn btn-secondary" (click)="previousNews()" [hidden]="currentIndex === 0">
+        <
+      </button>
+      <div class="news-container">
+        <div *ngFor="let n of displayedNews; trackBy: trackByNewsId" class="news" (click)="navigateToNewsDetails(n.id)">
+          <img [src]="n.images[0]" alt="News Image">
+          <h2 class="mt-2">{{ n.title }}</h2>
+          <p class="date">{{ n.date | date }}</p>
+          <p>{{ truncateSummary(n.summary, 200) }}</p>
+        </div>
       </div>
-
-      <button class="btn btn-secondary" (click)="nextNews()" [disabled]="currentIndex >= news.length - 3">
-        > </button>
+      <button class="btn btn-secondary" (click)="nextNews()" [hidden]="currentIndex >= news.length - 3">
+        >
+      </button>
     </div>
   </div>
 </div>

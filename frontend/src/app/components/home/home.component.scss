@@ -5,32 +5,34 @@
 h1 {
   text-align: center;
 }
+
+.news-buttons-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
 .news-container {
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  gap: 30px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .news {
   width: 30%;
-  border: 1px solid #ccc;
-  padding: 10px;
+  padding: 0.5rem;
   background-color: #A7A3FF;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
 }
 
 .news img {
   width: 100%;
-  height: 300px;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
 }
 
-button {
-  font-size: 24px;
+.news-buttons-container button, .news-buttons-container h2 {
+  font-size: 1.25rem;
 }
-
-h2 {
-  font-size: 24px;
-}
-
