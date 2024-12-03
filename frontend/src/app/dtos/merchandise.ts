@@ -5,4 +5,5 @@ export interface Merchandise {
     price: number;
     category: string;
     stock: number;
+    points: number;
 }

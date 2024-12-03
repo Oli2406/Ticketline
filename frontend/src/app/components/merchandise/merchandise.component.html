@@ -1,7 +1,7 @@
 <div class="merchandise-container">
   <!-- Points Header -->
   <div class="points-header">
-    <h3>Available points: 1234</h3>
+    <h3>Available points: {{ accountPoints }}</h3>
   </div>
 
   <!-- Merchandise Grid -->
@@ -16,7 +16,7 @@
         <p class="price">{{ item.price | number: '1.2-2' }} €</p>
         <p class="stock">Stock: {{ item.stock }}</p>
       </div>
-      <p class="points">{{ '69' }} Points</p>
+      <p class="points">{{ item.points }} Points</p>
     </div>
   </div>
 

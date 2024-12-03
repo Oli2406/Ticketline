@@ -123,4 +123,8 @@ export class AuthService {
       catchError(() => of(false))
     );
   }
+
+  getUserPoints(email: string): Observable<number> {
+    return this.httpClient.get<number>(`${this.authBaseUri}/user-points?email=${email}`);
+  }
 }

@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface MerchandiseService {
      *                             name, category, stock, and image URL
      * @return the DTO containing the details of the saved merchandise
      */
-    MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto);
+    MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves a list of all available merchandises.

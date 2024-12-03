@@ -5,6 +5,7 @@ import { MerchandiseService } from "../../../services/merchandise.service";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
 import { RegisterService } from "../../../services/register.service";
+import {AdminService} from "../../../services/admin.service";
 
 @Component({
   selector: 'app-merchandise-create',
@@ -22,6 +23,7 @@ export class MerchandiseCreateComponent {
     category: '',
     stock: 0,
     price: null,
+    points: 0,
   };
   imageFile: File | null = null;
   imagePreview: string | null = null;
@@ -30,7 +32,7 @@ export class MerchandiseCreateComponent {
     private merchandiseService: MerchandiseService,
     private toastr: ToastrService,
     private router: Router,
-    private registerService: RegisterService
+    private adminService: AdminService
   ) {}
 
   onImageSelected(event: Event): void {
@@ -49,24 +51,29 @@ export class MerchandiseCreateComponent {
     }
   }
 
-  onSubmit(): void {
-    if (!this.merchandiseData.name || !this.merchandiseData.category || this.merchandiseData.stock <= 0) {
-      this.toastr.error("Please fill all required fields.", "Validation Error");
-      return;
-    }
 
-    this.merchandiseService.createMerchandise(this.merchandiseData, this.imageFile).subscribe(
-      (response) => {
+  onSubmit(): void {
+    this.merchandiseService.createMerchandise(this.merchandiseData, this.imageFile).subscribe({
+      next: () => {
         this.toastr.success("Merchandise created successfully!", "Success");
         this.resetForm();
         this.router.navigate(['/admin']);
       },
-      (error) => {
-        console.error('Error occurred:', error);
-        this.toastr.error("Failed to create merchandise. Please try again.", "Error");
-      }
-    );
+      error: (err) => {
+        console.error('Error occurred:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, "Failed to create merchandise", {
+          enableHtml: true,
+        });
+      },
+    });
   }
+
 
   resetForm(): void {
     this.merchandiseData = {
@@ -74,6 +81,7 @@ export class MerchandiseCreateComponent {
       category: '',
       stock: 0,
       price: null,
+      points: 0
     };
     this.imageFile = null;
     this.imagePreview = null;

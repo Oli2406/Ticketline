@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 
 import java.math.BigDecimal;
 
@@ -22,16 +23,22 @@ public class Merchandise {
     int stock;
     @Column(nullable = false)
     String imageUrl;
+    @Column(nullable = false)
+    int points;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long merchandiseId;
 
-    public Merchandise(String name, String category, BigDecimal price, int stock, String imagePath) {
+
+
+
+    public Merchandise(String name, String category, BigDecimal price, int stock, String imagePath, int points) {
         this.name = name;
         this.category = category;
         this.price = price;
         this.stock = stock;
         this.imageUrl = imagePath;
+        this.points = points;
     }
 
     public Merchandise() {
@@ -83,5 +90,13 @@ public class Merchandise {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 }
