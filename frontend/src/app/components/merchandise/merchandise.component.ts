@@ -40,17 +40,17 @@ export class MerchandiseComponent implements OnInit {
     if (email) {
       this.authService.getUserPoints(email).subscribe({
         next: (points) => {
-          this.accountPoints = points; // Store points in the component
+          this.accountPoints = points;
           console.log(`Logged-in user's points: ${this.accountPoints}`);
         },
         error: (err) => {
           console.error('Failed to fetch user points:', err);
-          this.accountPoints = 0; // Default to 0 on error
+          this.accountPoints = 0;
         }
       });
     } else {
       console.warn('No email found in token');
-      this.accountPoints = 0; // Default to 0 if email is missing
+      this.accountPoints = 0;
     }
   }
 
