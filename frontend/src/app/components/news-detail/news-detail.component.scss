@@ -1,0 +1,17 @@
+.container {
+  width: 80%;
+  height: 100%;
+}
+
+.container img {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+}
+
+.image-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
