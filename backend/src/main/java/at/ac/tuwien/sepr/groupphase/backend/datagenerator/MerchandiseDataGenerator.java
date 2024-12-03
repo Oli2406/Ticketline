@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 
 @Component
 public class MerchandiseDataGenerator {
-
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final MerchandiseRepository merchandiseRepository;
