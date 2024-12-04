@@ -53,7 +53,7 @@
         gap: 5px;
 
         input,
-        textarea {
+        textarea, span {
           width: 70%;
           padding: 10px;
           border: 1px solid #ddd;
@@ -100,6 +100,7 @@
 .custom-label {
   color: #333;
 }
+
 .is-invalid {
   border-color: red;
   box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);

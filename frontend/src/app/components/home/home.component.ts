@@ -68,10 +68,7 @@ export class HomeComponent implements OnInit {
               n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
             }
           }
-
           this.updateDisplayedNews();
-          console.log(news.length);
-          console.log(news);
         },
         error: error => {
           console.error('Error fetching news', error);

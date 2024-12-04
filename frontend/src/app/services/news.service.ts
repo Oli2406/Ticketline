@@ -19,8 +19,6 @@ export class NewsService {
    * @return Observable of the created news
    * */
   createNews(data: FormData): Observable<NewsDto>{
-    console.log("service start");
-    console.log(data);
     return this.httpClient.post<NewsDto>(`${this.baseUri}/create`, data).pipe(catchError(this.handleError));
   }
 
@@ -35,7 +33,6 @@ export class NewsService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors);
     if (error.error) {
       if (error.error.errors) {
         try {

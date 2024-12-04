@@ -56,7 +56,7 @@ public class CustomNewsService implements NewsService {
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException, URISyntaxException {
+    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException {
         LOG.trace("createNews({})", mpfDto);
         newsValidator.validateNews(mpfDto);
 
@@ -72,7 +72,7 @@ public class CustomNewsService implements NewsService {
         NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithImgUrl(mpfDto, imageUrls);
         News news = new News(newsCreate.getTitle(), newsCreate.getSummary(), newsCreate.getContent(), newsCreate.getDate(), newsCreate.getImages());
 
-        System.out.println("NEWS BEING SAVED: " + news.getImageUrl().size());
+
         var createdNews = newsRepository.save(news);
 
         return newsMapper.entityToCreateDto(createdNews);
