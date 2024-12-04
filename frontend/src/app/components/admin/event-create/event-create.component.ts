@@ -54,7 +54,6 @@ export class EventCreateComponent implements OnInit {
   ngOnInit() {
     this.loadArtists();
     this.loadLocations();
-    this.loadPerformances();
   }
 
   loadArtists() {
@@ -143,20 +142,12 @@ export class EventCreateComponent implements OnInit {
     });
   }
 
-  loadPerformances() {
-    console.log('Current performances:', this.performances);
-  }
-
   onArtistSelect(artistName: string): void {
     this.artistService.getArtists().subscribe(artists => {
       const selectedArtist: ArtistListDto = artists.find(artist => artist.artistName === artistName);
       if (selectedArtist) {
-        console.log('Selected artist details:', selectedArtist);
-        console.log('Selected artist id:', selectedArtist.artistId);
         this.newPerformance.artistId = selectedArtist.artistId;
-        console.log('Updated newPerformance with artistId:', this.newPerformance);
-      } else {
-        console.log('Artist not found for name:', artistName);
+
       }
     }, error => {
       console.error('Error fetching artist details:', error);
@@ -167,12 +158,7 @@ export class EventCreateComponent implements OnInit {
     this.locationService.getLocations().subscribe(locations => {
       const selectedLocation = locations.find(location => location.name === locationName);
       if (selectedLocation) {
-        console.log('Selected location details:', selectedLocation);
-        console.log('Selected artist id:', selectedLocation.locationId);
         this.newPerformance.locationId = selectedLocation.locationId;
-        console.log('Updated newPerformance with locationId:', this.newPerformance);
-      } else {
-        console.log('Location not found for name:', locationName);
       }
     }, error => {
       console.error('Error fetching location details:', error);
@@ -180,10 +166,8 @@ export class EventCreateComponent implements OnInit {
   }
 
   createPerformance() {
-    console.log('Sending performance data to backend:', this.newPerformance);
     this.performanceService.createPerformance(this.newPerformance).subscribe({
       next: (performance: PerformanceListDto) => {
-        console.log('Created performance:', performance);
         this.performances.push(performance);
         if (performance.performanceId) {
           this.eventData.performanceIds?.push(performance.performanceId);
@@ -194,16 +178,17 @@ export class EventCreateComponent implements OnInit {
       },
       error: (err) => {
         //err = this.eventService.handleErrorAndRethrow(err);
-        console.error('Error during registration:', err.message);
         const errors = Array.isArray(err.message)
           ? err.message
           : err.message.split(/\n/);
         const errorList = errors
           .map((error) => `<li>${error.trim()}</li>`)
           .join('');
-        this.toastr.error(`<ul>${err.message}</ul>`, 'Error creating performance', {
-          enableHtml: true,
-        });
+        this.toastr.error(
+          `<ul>${errorList}</ul>`,
+          'Error creating performance',
+          { enableHtml: true }
+        );
       },
     });
   }
@@ -211,11 +196,9 @@ export class EventCreateComponent implements OnInit {
   onSubmit() {
     this.eventService.createEvent(this.eventData).subscribe({
       next: (event: Event) => {
-        console.log('Event created:', event);
         this.toastr.success('Event created successfully!', 'Success');
         this.eventData = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
         this.performances = [];
-        console.log('Cleared performances list after event creation:', this.performances);
       },
       error: (err) => {
         console.error('Error during registration:', err.message);

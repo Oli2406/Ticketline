@@ -32,7 +32,9 @@ public class LocationValidator {
 
         if (locationCreateDto.getName() == null || locationCreateDto.getName().trim().isEmpty()) {
             validationErrors.add("Location name is required");
-        } else if (locationCreateDto.getName().length() > 255) {
+        }
+
+        if (locationCreateDto.getName().length() > 255) {
             validationErrors.add("Location name must be less than 255 characters");
         }
 
@@ -40,16 +42,36 @@ public class LocationValidator {
             validationErrors.add("Street is required");
         }
 
+        if (locationCreateDto.getStreet().length() > 50) {
+            validationErrors.add("Location street must be less than 255 characters");
+        }
+
         if (locationCreateDto.getCity() == null || locationCreateDto.getCity().trim().isEmpty()) {
             validationErrors.add("City is required");
+        }
+
+        if (locationCreateDto.getCity().length() > 50) {
+            validationErrors.add("Location city must be less than 50 characters");
         }
 
         if (locationCreateDto.getPostalCode() == null || locationCreateDto.getPostalCode().trim().isEmpty()) {
             validationErrors.add("Postal code is required");
         }
 
+        if (locationCreateDto.getPostalCode().length() > 50) {
+            validationErrors.add("Location postal code must be less than 50 characters");
+        }
+
+        if (!locationCreateDto.getPostalCode().matches("\\d+")) {
+            validationErrors.add("Postal code must contain only numbers.");
+        }
+
         if (locationCreateDto.getCountry() == null || locationCreateDto.getCountry().trim().isEmpty()) {
             validationErrors.add("Country is required");
+        }
+
+        if (locationCreateDto.getCountry().length() > 50) {
+            validationErrors.add("Location name must be less than 255 characters");
         }
 
         if (!validationErrors.isEmpty()) {

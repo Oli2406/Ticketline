@@ -34,20 +34,24 @@ public class PerformanceValidator {
 
         if (performanceCreateDto.getName() == null || performanceCreateDto.getName().trim().isEmpty()) {
             validationErrors.add("Performance name is required");
-        } else if (performanceCreateDto.getName().length() > 255) {
+        }
+
+        if (performanceCreateDto.getName().length() > 255) {
             validationErrors.add("Performance name must be less than 255 characters");
         }
 
         if (performanceCreateDto.getArtistId() == null) {
-            validationErrors.add("Artist ID is required");
+            validationErrors.add("Artist id is required");
         }
 
         if (performanceCreateDto.getLocationId() == null) {
-            validationErrors.add("Location ID is required");
+            validationErrors.add("Location id is required");
         }
 
         if (performanceCreateDto.getDate() == null) {
             validationErrors.add("Performance date is required");
+        } else if (performanceCreateDto.getDate().isBefore(LocalDate.now())) {
+            validationErrors.add("Performance date cannot be in the past");
         }
 
         if (performanceCreateDto.getPrice() == null || performanceCreateDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
@@ -60,6 +64,10 @@ public class PerformanceValidator {
 
         if (performanceCreateDto.getHall() == null || performanceCreateDto.getHall().trim().isEmpty()) {
             validationErrors.add("Hall is required");
+        }
+
+        if (performanceCreateDto.getHall().length() > 50) {
+            validationErrors.add("Performance hall must be less than 50 characters");
         }
 
         if (!validationErrors.isEmpty()) {

@@ -40,7 +40,6 @@ export class NewsCreateComponent implements OnInit {
   }
 
   public onSubmit(form: NgForm): void {
-    console.log("submitted");
     if (form.valid) {
 
       const newsFormData = this.createFormData(this.news);

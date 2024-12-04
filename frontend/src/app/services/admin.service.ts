@@ -34,7 +34,6 @@ export class AdminService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors);
     if (error.error) {
       if (error.error.errors) {
         try {
