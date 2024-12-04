@@ -36,8 +36,8 @@ public class CustomArtistService implements ArtistService {
         artistValidator.validateArtist(artistCreateDto);
 
         Artist artist = new Artist(
-            artistCreateDto.getSurname(),
             artistCreateDto.getFirstName(),
+            artistCreateDto.getSurname(),
             artistCreateDto.getArtistName()
         );
 

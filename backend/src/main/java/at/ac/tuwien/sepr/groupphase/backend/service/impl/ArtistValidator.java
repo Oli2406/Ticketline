@@ -30,21 +30,27 @@ public class ArtistValidator {
         // Check if first name is valid
         if (artistCreateDto.getFirstName() == null || artistCreateDto.getFirstName().trim().isEmpty()) {
             validationErrors.add("First name is required");
-        } else if (artistCreateDto.getFirstName().length() > 255) {
+        }
+
+        if (artistCreateDto.getFirstName().length() > 255) {
             validationErrors.add("First name must be less than 255 characters");
         }
 
         // Check if surname is valid
         if (artistCreateDto.getSurname() == null || artistCreateDto.getSurname().trim().isEmpty()) {
             validationErrors.add("Surname is required");
-        } else if (artistCreateDto.getSurname().length() > 255) {
+        }
+
+        if (artistCreateDto.getSurname().length() > 255) {
             validationErrors.add("Surname must be less than 255 characters");
         }
 
         // Check if artistName is valid
         if (artistCreateDto.getArtistName() == null || artistCreateDto.getArtistName().trim().isEmpty()) {
             validationErrors.add("Artist name is required");
-        } else if (artistCreateDto.getArtistName().length() > 255) {
+        }
+
+        if (artistCreateDto.getArtistName().length() > 255) {
             validationErrors.add("Artist name must be less than 255 characters");
         }
 

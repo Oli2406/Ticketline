@@ -184,9 +184,11 @@ export class EventCreateComponent implements OnInit {
         const errorList = errors
           .map((error) => `<li>${error.trim()}</li>`)
           .join('');
-        this.toastr.error(`<ul>${err.message}</ul>`, 'Error creating performance', {
-          enableHtml: true,
-        });
+        this.toastr.error(
+          `<ul>${errorList}</ul>`,
+          'Error creating performance',
+          { enableHtml: true }
+        );
       },
     });
   }

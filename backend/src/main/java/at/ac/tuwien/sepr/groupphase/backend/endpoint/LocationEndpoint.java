@@ -34,7 +34,7 @@ public class LocationEndpoint {
         this.locationService = locationService;
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @PutMapping
     public ResponseEntity<LocationDetailDto> createOrUpdateLocation(@RequestBody LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update location: {}", locationCreateDto);
@@ -43,7 +43,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(createdLocation);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @GetMapping
     public ResponseEntity<List<LocationDetailDto>> getAllLocations() {
         logger.info("Fetching all locations");
@@ -52,7 +52,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(locations);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<LocationDetailDto> getLocationById(@PathVariable Long id) {
         logger.info("Fetching location with ID: {}", id);
@@ -61,7 +61,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(location);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
         logger.info("Deleting location with ID: {}", id);

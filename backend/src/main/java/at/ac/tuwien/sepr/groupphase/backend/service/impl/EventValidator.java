@@ -29,23 +29,33 @@ public class EventValidator {
 
         if (eventCreateDto.getTitle() == null || eventCreateDto.getTitle().trim().isEmpty()) {
             validationErrors.add("Event title is required");
-        } else if (eventCreateDto.getTitle().length() > 255) {
-            validationErrors.add("Event title must be less than 255 characters");
+        }
+
+        if (eventCreateDto.getTitle().length() > 50) {
+            validationErrors.add("Event title must be less than 50 characters");
         }
 
         if (eventCreateDto.getDescription() == null || eventCreateDto.getDescription().trim().isEmpty()) {
             validationErrors.add("Event description is required");
         }
 
+        if (eventCreateDto.getDescription().length() > 255) {
+            validationErrors.add("Event description must be less than 255 characters");
+        }
+
         if (eventCreateDto.getCategory() == null || eventCreateDto.getCategory().trim().isEmpty()) {
             validationErrors.add("Event category is required");
-        } else if (eventCreateDto.getCategory().length() > 255) {
+        }
+
+        if (eventCreateDto.getCategory().length() > 255) {
             validationErrors.add("Event category must be less than 255 characters");
         }
 
         if (eventCreateDto.getDateOfEvent() == null) {
             validationErrors.add("Event date is required");
-        } else if (eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
+        }
+
+        if (eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
             validationErrors.add("Event date cannot be in the past");
         }
 
