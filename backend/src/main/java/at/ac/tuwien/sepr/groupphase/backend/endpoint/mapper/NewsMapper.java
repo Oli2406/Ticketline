@@ -24,6 +24,7 @@ public class NewsMapper {
         );
     }
 
+
     /**
      * Maps a {@link News} entity to a {@link NewsCreateDto}.
      *
