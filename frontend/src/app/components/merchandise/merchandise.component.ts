@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Merchandise } from "../../dtos/merchandise";
 import { MerchandiseService } from "../../services/merchandise.service";
-import { AdminService } from "../../services/admin.service";
 import { AuthService } from "../../services/auth.service";
+import { CartService } from "../../services/cart.service";
 import { CommonModule } from "@angular/common";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
   selector: 'app-merchandise',
@@ -22,8 +23,9 @@ export class MerchandiseComponent implements OnInit {
 
   constructor(
     private merchandiseService: MerchandiseService,
-    private adminService: AdminService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cartService: CartService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -41,20 +43,13 @@ export class MerchandiseComponent implements OnInit {
       this.authService.getUserPoints(email).subscribe({
         next: (points) => {
           this.accountPoints = points;
-          console.log(`Logged-in user's points: ${this.accountPoints}`);
         },
-        error: (err) => {
-          console.error('Failed to fetch user points:', err);
+        error: () => {
           this.accountPoints = 0;
         }
       });
-    } else {
-      console.warn('No email found in token');
-      this.accountPoints = 0;
     }
   }
-
-
 
   updateDisplayedMerchandise(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
@@ -67,5 +62,10 @@ export class MerchandiseComponent implements OnInit {
       this.currentPage = page;
       this.updateDisplayedMerchandise();
     }
+  }
+
+  addToCart(item: Merchandise): void {
+    this.toastr.success(item.name + " was successfully added to the cart.")
+    this.cartService.addToCart(item);
   }
 }

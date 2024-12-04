@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
+import {CartService} from "./cart.service";
 
 @Injectable({
   providedIn: 'root'
@@ -99,12 +100,10 @@ export class AuthService {
     const token = this.getToken();
     if (token) {
       const decoded: any = jwtDecode(token);
-      console.log(decoded)
       return decoded.id || null;
     }
     return null;
   }
-
 
   isUserAdmin() {
     return this.getUserRole() === 'ADMIN';

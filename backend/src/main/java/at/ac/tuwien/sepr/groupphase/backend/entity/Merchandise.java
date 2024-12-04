@@ -99,4 +99,8 @@ public class Merchandise {
     public void setPoints(int points) {
         this.points = points;
     }
+
+    public Long getId() {
+        return merchandiseId;
+    }
 }

@@ -1,6 +1,6 @@
 export interface Merchandise {
     imageUrl: String;
-    id: number;
+    merchandiseId: number;
     name: string;
     price: number;
     category: string;

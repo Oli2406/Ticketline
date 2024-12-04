@@ -186,7 +186,7 @@ public class SecurityTest implements TestData {
                     get(MESSAGE_BASE_URI)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES, "-1L")))
+                            jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES, "-1L", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -218,7 +218,7 @@ public class SecurityTest implements TestData {
                         .content(body)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "")))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -257,7 +257,7 @@ public class SecurityTest implements TestData {
                         .content(body)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES, "")))
+                            jwtTokenizer.getAuthToken(DEFAULT_USER, USER_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();

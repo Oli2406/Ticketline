@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomMerchandiseService implements MerchandiseService {
@@ -44,7 +46,18 @@ public class CustomMerchandiseService implements MerchandiseService {
     }
 
     @Override
-    public List<Merchandise> getAllMerchandise() {
-        return merchandiseRepository.findAll();
+    public List<MerchandiseDetailDto> getAllMerchandise() {
+        List<Merchandise> merchandises = merchandiseRepository.findAll();
+        return merchandises.stream()
+            .map(merchandise -> new MerchandiseDetailDto(
+                merchandise.getId(),
+                merchandise.getName(),
+                merchandise.getPrice(),
+                merchandise.getCategory(),
+                merchandise.getStock(),
+                merchandise.getPoints(),
+                merchandise.getImageUrl()
+            ))
+            .collect(Collectors.toList());
     }
 }

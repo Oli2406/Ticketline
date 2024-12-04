@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -23,6 +24,6 @@ public interface MerchandiseService {
      *
      * @return a list of Merchandise objects representing all the merchandises
      */
-    List<Merchandise> getAllMerchandise();
+    List<MerchandiseDetailDto> getAllMerchandise();
 
 }
