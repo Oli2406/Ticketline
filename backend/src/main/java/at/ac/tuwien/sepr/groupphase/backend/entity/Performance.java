@@ -55,6 +55,10 @@ public class Performance {
         return performanceId;
     }
 
+    public void setPerformanceId(Long performanceId) {
+        this.performanceId = performanceId;
+    }
+
     public String getName() {
         return name;
     }

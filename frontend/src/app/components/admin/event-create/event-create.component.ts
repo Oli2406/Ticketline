@@ -193,17 +193,18 @@ export class EventCreateComponent implements OnInit {
         this.showPerformanceForm = false;
       },
       error: (err) => {
-        //err = this.eventService.handleErrorAndRethrow(err);
-        console.error('Error during registration:', err.message);
+        console.error('Error during performance creation:', err.message);
         const errors = Array.isArray(err.message)
           ? err.message
           : err.message.split(/\n/);
         const errorList = errors
           .map((error) => `<li>${error.trim()}</li>`)
           .join('');
-        this.toastr.error(`<ul>${err.message}</ul>`, 'Error creating performance', {
-          enableHtml: true,
-        });
+        this.toastr.error(
+          `<ul>${errorList}</ul>`,
+          'Error creating performance',
+          { enableHtml: true }
+        );
       },
     });
   }
