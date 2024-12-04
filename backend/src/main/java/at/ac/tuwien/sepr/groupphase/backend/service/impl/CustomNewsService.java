@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 @Service
 public class CustomNewsService implements NewsService {
 
-    private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private final UserService userService;
     private final NewsRepository newsRepository;
     private final NewsValidator newsValidator;
@@ -84,8 +84,10 @@ public class CustomNewsService implements NewsService {
     @Override
     @Transactional(readOnly = true)
     public NewsDetailDto getById(long id) throws NotFoundException {
-        LOG.info("getById({})", id);
-        return newsMapper.entityToDetailDto(newsRepository.getById(id));
+        LOG.trace("getById({})", id);
+        News news = newsRepository.findById(id).orElseThrow(() -> new NotFoundException("News not found with id: " + id));
+
+        return newsMapper.entityToDetailDto(news);
     }
 
 
