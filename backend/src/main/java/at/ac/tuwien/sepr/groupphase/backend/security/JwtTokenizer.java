@@ -76,6 +76,25 @@ public class JwtTokenizer {
             .getPayload();
     }
 
+    public String getResetToken(String email) {
+        return Jwts.builder()
+            .subject(email)
+            .claim("purpose", "reset_password")
+            .expiration(
+                new Date(System.currentTimeMillis() + 2 * 60 * 1000))
+            .signWith(secretKey, SignatureAlgorithm.HS512)
+            .compact();
+    }
+
+    public boolean validateResetToken(String token) {
+        try {
+            Claims claims = getClaims(token);
+            return claims.get("purpose").equals("reset_password");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private String stripTokenPrefix(String token) {
         if (token.startsWith(securityProperties.getAuthTokenPrefix())) {
             return token.substring(securityProperties.getAuthTokenPrefix().length()).trim();

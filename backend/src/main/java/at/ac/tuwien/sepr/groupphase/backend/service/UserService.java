@@ -62,5 +62,5 @@ public interface UserService extends UserDetailsService {
      */
     String register(UserRegistrationDto userRegistrationDto)
         throws ValidationException, ConflictException;
-    
+
 }

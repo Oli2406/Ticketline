@@ -25,14 +25,14 @@ const routes: Routes = [
       {path: 'createUser', component: CreateUserComponent}
     ]
   },
-  {path: 'reset-password', component: ResetPasswordComponent},
-  {path: 'verify-reset-code', component: VerifyResetCodeComponent},
+  {path: 'reset-password', canActivate: [AuthGuard] ,component: ResetPasswordComponent},
+  {path: 'verify-reset-code',  canActivate: [AuthGuard] , component: VerifyResetCodeComponent},
   {path: 'send-email' , component: SendEmailComponent},
   {path: 'home', component: HomeComponent}
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: true})],
+  imports: [RouterModule.forRoot(routes, {useHash: false})],
   exports: [RouterModule]
 })
 export class AppRoutingModule {

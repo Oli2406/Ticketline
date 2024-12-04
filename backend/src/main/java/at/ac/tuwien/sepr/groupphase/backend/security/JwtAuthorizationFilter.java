@@ -44,7 +44,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/api/v1/register",
             "/api/v1/public",
             "/api/v1/authentication/send-email",
-            "/api/v1/authentication/reset-password.*"
+            "/api/v1/authentication/reset-password.*",
+            "/api/v1/authentication/verify-reset-code"
         );
 
         String requestPath = request.getRequestURI();
@@ -108,6 +109,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String username = claims.getSubject();
         if (username == null || username.isEmpty()) {
             throw new IllegalArgumentException("Token does not contain a valid user");
+        }
+
+        if (!"reset_password".equals(claims.get("purpose")) && claims.get("rol") == null) {
+            throw new IllegalArgumentException("Token purpose or roles are invalid");
+        } else if ("reset_password".equals(claims.get("purpose"))) {
+            return new UsernamePasswordAuthenticationToken(username, null, null);
         }
 
         @SuppressWarnings("unchecked")

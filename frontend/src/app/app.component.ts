@@ -15,7 +15,7 @@ export class AppComponent {
     this.authService.validateToken().subscribe((isValid) => {
       if (!isValid) {
         this.authService.logoutUser();
-        this.router.navigate(['/home']);
+        //this.router.navigate(['/home']);
       }
     });
   }

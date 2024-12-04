@@ -4,3 +4,8 @@ export class AuthRequest {
     public password: string
   ) {}
 }
+
+export interface ResetPasswordTokenDto {
+  email: string;
+  code: string;
+}

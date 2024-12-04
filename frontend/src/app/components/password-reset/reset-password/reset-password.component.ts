@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-reset-password',
@@ -19,10 +20,22 @@ export class ResetPasswordComponent implements OnInit {
   constructor(
       private fb: FormBuilder,
       private authService: AuthService,
-      private router: Router
+      private router: Router,
+      private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+
+    this.route.queryParams.subscribe(params => {
+      const token = params['token'];
+      if (token) {
+        this.verifyToken(token);
+      } else {
+        console.error('No token found in the URL');
+      }
+    });
+
+
     this.resetPasswordForm = this.fb.group(
         {
           newPassword: ['', [Validators.required, Validators.minLength(8)]],
@@ -32,6 +45,21 @@ export class ResetPasswordComponent implements OnInit {
           validators: this.passwordsMatchValidator
         }
     );
+  }
+
+  verifyToken(token: string): void {
+    this.authService.validateResetTokenInBackend(token).subscribe({
+      next: (isValid) => {
+        if (!isValid) {
+          console.warn('Token is invalid or expired');
+          this.router.navigate(['/login']);
+        }
+      },
+      error: (err) => {
+        console.error('Error validating token:', err);
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   private passwordsMatchValidator(group: FormGroup): { [key: string]: boolean } | null {

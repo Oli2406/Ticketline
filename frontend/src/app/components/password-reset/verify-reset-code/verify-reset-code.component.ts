@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import {ResetPasswordTokenDto} from "../../../dtos/auth-request";
 
 @Component({
   selector: 'app-verify-reset-code',
@@ -32,10 +33,13 @@ export class VerifyResetCodeComponent implements OnInit {
     }
 
     const code = this.verifyCodeForm.value.code;
+    const token: ResetPasswordTokenDto = {
+      email: "anna.simhofer@hotmail.com",
+      code: code
+    }
 
-    this.authService.verifyResetCode(code).subscribe({
+    this.authService.verifyResetCode(token).subscribe({
       next: () => {
-        console.log('Code verified successfully');
         this.router.navigate(['/reset-password']);
       },
       error: (error) => {

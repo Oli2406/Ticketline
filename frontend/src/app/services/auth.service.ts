@@ -1,10 +1,12 @@
 import {Injectable} from '@angular/core';
-import {AuthRequest} from '../dtos/auth-request';
+import {AuthRequest, ResetPasswordTokenDto} from '../dtos/auth-request';
 import {catchError, Observable, of} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
+import {UserRegistrationDto} from "../dtos/register-data";
+import {UserResetPasswordDto} from "../dtos/user-data";
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +14,7 @@ import {Globals} from '../global/globals';
 export class AuthService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
+  private resetTokenKey = 'resetPasswordToken';
 
   constructor(private httpClient: HttpClient, private globals: Globals) {
   }
@@ -33,6 +36,11 @@ export class AuthService {
    * Check if a valid JWT token is saved in the localStorage
    */
   isLoggedIn(): boolean {
+    if(this.getResetTokenFromStorage()) {
+      console.log("token for reset: " + this.getResetTokenFromStorage());
+      return false;
+    }
+
     const token = this.getToken();
     return !!token && this.getTokenExpirationDate(token) > new Date();
   }
@@ -76,7 +84,7 @@ export class AuthService {
 
 
   getToken() {
-    return localStorage.getItem('authToken');
+      return localStorage.getItem('authToken') || this.getResetTokenFromStorage();
   }
 
   /**
@@ -112,23 +120,65 @@ export class AuthService {
     return null;
   }
 
-  validateToken(): Observable<boolean> {
+  validateTokenInBackend(token: string): Observable<boolean> {
+    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
+      catchError(() => of(false))
+    );
+  }
+
+  validateResetTokenInBackend(token: string): Observable<boolean> {
+    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-reset-token`)
+    .pipe(
+      catchError((err) => {
+        console.error('Failed to validate reset token:', err);
+        return of(false);
+      })
+    );
+  }
+
+  validateToken() {
     const token = this.getToken();
 
     if (!token) {
       return of(false);
     }
 
-    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
-      catchError(() => of(false))
+    this.validateTokenInBackend(token);
+    this.validateResetTokenInBackend(token);
+  }
+
+  storeResetToken(token: string): void {
+    localStorage.setItem(this.resetTokenKey, token);
+  }
+
+  getResetTokenFromStorage(): string | null {
+    return localStorage.getItem(this.resetTokenKey);
+  }
+
+  clearResetToken(): void {
+    localStorage.removeItem(this.resetTokenKey);
+  }
+
+  sendEmailToResetPassword(email:string): Observable<string> {
+    return this.httpClient.post(`${this.authBaseUri}/send-email`, email, {responseType: 'text'})
+    .pipe(
+      tap((authResponse: string) => {
+        this.storeResetToken(authResponse);
+        console.log(authResponse)
+      })
     );
   }
 
-  resetPassword(email:string): Observable<void> {
-    return this.httpClient.post<void>(`${this.authBaseUri}/reset-password/${email}`, {});
+  resetPassword(data: UserResetPasswordDto): Observable<boolean> {
+    return this.httpClient.post<boolean>(`${this.authBaseUri}/reset-password`, data).pipe(
+      catchError((err) => {
+        console.error('Failed to validate reset token:', err);
+        return of(false);
+      })
+    );
   }
 
-  verifyResetCode(code: number) {
-    return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code/${code}`, {});
+  verifyResetCode(token: ResetPasswordTokenDto) {
+    return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code`, token);
   }
 }

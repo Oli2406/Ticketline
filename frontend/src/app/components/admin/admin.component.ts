@@ -74,7 +74,7 @@ export class AdminComponent implements OnInit {
    * Reset a user's password
    */
   resetPassword(email: string): void {
-    this.adminService.resetPassword(email).subscribe({
+    this.adminService.sendEmailToResetPassword(email).subscribe({
       next: () => {
         this.toastr.success('Reset password e-Mail sent to ' + email, 'Success');
       },

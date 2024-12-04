@@ -3,6 +3,8 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
 import {UserDetailDto} from "../dtos/user-data";
+import {tap} from "rxjs/operators";
+import {AuthService} from "./auth.service";
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,7 @@ import {UserDetailDto} from "../dtos/user-data";
 export class AdminService {
   private baseUrl: string = this.globals.backendUri + '/admin';
 
-  constructor(private http: HttpClient, private globals: Globals) {
+  constructor(private http: HttpClient, private globals: Globals, private authService: AuthService) {
   }
 
   getUsers(): Observable<UserDetailDto[]> {
@@ -27,6 +29,15 @@ export class AdminService {
 
   resetPassword(email:string): Observable<void> {
     return this.http.post<void>(`${this.baseUrl}/reset-password/${email}`, {});
+  }
+  sendEmailToResetPassword(email:string): Observable<string> {
+    return this.http.post(`${this.baseUrl}/send-email`, email, {responseType: 'text'})
+    .pipe(
+      tap((authResponse: string) => {
+        this.authService.storeResetToken(authResponse);
+        console.log(authResponse)
+      })
+    );
   }
 
 

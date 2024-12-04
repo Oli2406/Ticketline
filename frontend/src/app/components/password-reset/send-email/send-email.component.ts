@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-verify-reset-code',
@@ -15,7 +16,8 @@ export class SendEmailComponent implements OnInit {
 
   constructor(
       private fb: FormBuilder,
-      private authService: AuthService
+      private authService: AuthService,
+      private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -29,8 +31,10 @@ export class SendEmailComponent implements OnInit {
 
     if (this.emailForm.valid) {
       const email = this.emailForm.controls.username.value;
-      this.authService.resetPassword(email).subscribe({
-        next: () =>{},
+      this.authService.sendEmailToResetPassword(email).subscribe({
+        next: () =>{
+          this.router.navigate(['/verify-reset-code']);
+        },
         error: err => {
           console.log(err.message);
           this.error = true;

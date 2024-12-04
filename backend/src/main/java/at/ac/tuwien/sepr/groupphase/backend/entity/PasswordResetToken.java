@@ -19,7 +19,7 @@ public class PasswordResetToken {
 
     @Column(nullable = false)
     private LocalDateTime expirationTime;
-    
+
     public PasswordResetToken(String email, String code, String token,
         LocalDateTime expirationTime) {
         this.email = email;

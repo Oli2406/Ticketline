@@ -6,3 +6,9 @@ export interface UserDetailDto {
   isLocked: boolean;
   isLoggedIn: boolean;
 }
+
+export interface UserResetPasswordDto {
+  email: string;
+  newPassword: string;
+  newConfirmedPassword: string;
+}
