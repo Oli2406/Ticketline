@@ -20,7 +20,6 @@ export class EventService {
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors)
     if (error.error) {
       if (error.error.errors) {
         try {
@@ -42,7 +41,6 @@ export class EventService {
 
   public handleErrorAndRethrow(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors)
     if (error.error) {
       if (error.error.errors) {
           const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');

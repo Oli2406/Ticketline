@@ -13,7 +13,6 @@ import java.util.List;
 public class NewsMapper {
 
     public NewsDetailDto entityToDetailDto(News news) {
-        System.out.println("entityToDetailDto: " + news.getDateOfNews());
         return new NewsDetailDto(
             news.getNewsId(),
             news.getTitle(),
@@ -31,7 +30,6 @@ public class NewsMapper {
      * @return the mapped {@link NewsCreateDto}
      */
     public NewsCreateDto entityToCreateDto(News news) {
-        System.out.println("entityToCreateDto: " + news.getDateOfNews());
         return new NewsCreateDto(
             news.getTitle(),
             news.getSummary(),
@@ -52,7 +50,6 @@ public class NewsMapper {
      */
     public NewsCreateDto entityToCreateDtoWithImgUrl(
         NewsCreateMpfDto mpfDto, List<String> imgUrls) {
-        System.out.println("entityToCreateDtoWithImgUrl: " + mpfDto.getDate());
         return new NewsCreateDto(
             mpfDto.getTitle(),
             mpfDto.getSummary(),
