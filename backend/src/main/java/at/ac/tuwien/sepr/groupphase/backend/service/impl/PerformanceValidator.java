@@ -50,6 +50,8 @@ public class PerformanceValidator {
 
         if (performanceCreateDto.getDate() == null) {
             validationErrors.add("Performance date is required");
+        } else if (performanceCreateDto.getDate().isBefore(LocalDate.now())) {
+            validationErrors.add("Performance date cannot be in the past");
         }
 
         if (performanceCreateDto.getPrice() == null || performanceCreateDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {

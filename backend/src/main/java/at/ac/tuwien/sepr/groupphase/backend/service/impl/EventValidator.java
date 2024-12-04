@@ -31,8 +31,8 @@ public class EventValidator {
             validationErrors.add("Event title is required");
         }
 
-        if (eventCreateDto.getTitle().length() > 50) {
-            validationErrors.add("Event title must be less than 50 characters");
+        if (eventCreateDto.getTitle().length() > 255) {
+            validationErrors.add("Event title must be less than 255 characters");
         }
 
         if (eventCreateDto.getDescription() == null || eventCreateDto.getDescription().trim().isEmpty()) {
@@ -53,9 +53,7 @@ public class EventValidator {
 
         if (eventCreateDto.getDateOfEvent() == null) {
             validationErrors.add("Event date is required");
-        }
-
-        if (eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
+        } else if (eventCreateDto.getDateOfEvent().isBefore(LocalDate.now())) {
             validationErrors.add("Event date cannot be in the past");
         }
 
@@ -86,4 +84,3 @@ public class EventValidator {
     }
 
 }
-

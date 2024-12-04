@@ -19,7 +19,9 @@ export class ArtistService {
   }
 
   createArtist(artist: Artist): Observable<Artist> {
-    return this.http.put<Artist>(this.apiUrl, artist);
+    return this.http.put<Artist>(this.apiUrl, artist).pipe(
+      catchError(this.handleError)
+    );
   }
 
   public handleError(error: HttpErrorResponse): Observable<never> {
