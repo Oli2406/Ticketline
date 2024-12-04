@@ -13,10 +13,12 @@ import {EventCreateComponent} from "./components/admin/event-create/event-create
 import {NewsDetailComponent} from "./components/news-detail/news-detail.component";
 import {MerchandiseCreateComponent} from "./components/admin/merchandise-create/merchandise-create.component";
 import {MerchandiseComponent} from "./components/merchandise/merchandise.component";
+import {CartComponent} from "./components/cart/cart.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
   {path: 'events', component: HomeComponent},

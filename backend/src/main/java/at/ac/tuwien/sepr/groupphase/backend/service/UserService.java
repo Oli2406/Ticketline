@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.security.NoSuchAlgorithmException;
+
 public interface UserService extends UserDetailsService {
 
     /**
@@ -41,7 +43,7 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials
      *                                                                             are bad
      */
-    String login(UserLoginDto userLoginDto);
+    String login(UserLoginDto userLoginDto) throws NoSuchAlgorithmException;
 
     /**
      * Log out an user.
@@ -62,7 +64,7 @@ public interface UserService extends UserDetailsService {
      * @return the created JWT Token, if successful
      */
     String register(UserRegistrationDto userRegistrationDto)
-        throws ValidationException, ConflictException;
+        throws ValidationException, ConflictException, NoSuchAlgorithmException;
 
 
     /**

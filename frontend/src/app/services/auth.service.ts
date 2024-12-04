@@ -95,6 +95,17 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
+  getUserIdFromToken(): string | null {
+    const token = this.getToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      console.log(decoded)
+      return decoded.id || null;
+    }
+    return null;
+  }
+
+
   isUserAdmin() {
     return this.getUserRole() === 'ADMIN';
   }
