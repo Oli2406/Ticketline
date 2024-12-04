@@ -15,7 +15,7 @@
             type="text"
             placeholder="News Title"
             [(ngModel)]="news.title"
-            name="title" />
+            name="title"/>
         </div>
 
         <label class="custom-label fw-bold">Summary</label>
@@ -36,10 +36,7 @@
 
         <label class="custom-label fw-bold">Publication Date</label>
         <div class="form-group">
-          <input
-            type="date"
-            [(ngModel)]="news.date"
-            name="dateOfNews" />
+          <span>{{ news.date | date: 'dd.MM.yyyy' }}</span>
         </div>
 
         <label class="custom-label fw-bold">Image Upload</label>
@@ -50,7 +47,7 @@
             name="imageUrl"
             (change)="readImage($event)"
             multiple
-            accept=".png, .jpg, .jpeg" />
+            accept=".png, .jpg, .jpeg"/>
         </div>
 
         <div id="imageContainer" class="image-container"></div>
