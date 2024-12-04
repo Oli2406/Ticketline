@@ -32,40 +32,26 @@ public class NewsValidator {
         List<String> validationErrors = new ArrayList<>();
 
         if (news.getTitle() == null || news.getTitle().isEmpty()) {
-            validationErrors.add("Title is required");
-        } else if (news.getTitle().length() > 255) {
-            validationErrors.add("Title length cannot exceed 255 characters");
-        } else if (!news.getTitle().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
-            validationErrors.add("Title contains invalid characters");
+            validationErrors.add("News title is required");
+        } else if (news.getTitle().length() > 64) {
+            validationErrors.add("News title cannot exceed 64 characters");
         }
 
         if (news.getSummary() == null || news.getSummary().isEmpty()) {
-            validationErrors.add("Summary is required");
+            validationErrors.add("News summary is required");
         } else if (news.getSummary().length() > 1024) {
-            validationErrors.add("Summary length cannot exceed 1024 characters");
-        } else if (!news.getSummary().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
-            validationErrors.add("Summary contains invalid characters");
+            validationErrors.add("News summary cannot exceed 1024 characters");
         }
 
         if (news.getContent() == null || news.getContent().isEmpty()) {
-            validationErrors.add("Content for news is required");
+            validationErrors.add("News content is required");
         } else if (news.getContent().length() > 4096) {
-            validationErrors.add("Content length cannot exceed 255 characters");
-        } else if (!news.getContent().matches("^[a-zA-Z]+(?:[' -][a-zA-Z]+)*$")) {
-            validationErrors.add("Content contains invalid characters");
-        }
-
-        if (news.getDate() == null) {
-            validationErrors.add("Date of news is required");
-        } else if (news.getDate().isBefore(LocalDate.now())) {
-            validationErrors.add("Date of news cannot be in the future");
+            validationErrors.add("News content length cannot exceed 255 characters");
         }
 
         if (!validationErrors.isEmpty()) {
             LOG.warn("News validation failed with errors: {}", validationErrors);
             throw new ValidationException("Validation Exception: ", validationErrors);
         }
-
-
     }
 }
