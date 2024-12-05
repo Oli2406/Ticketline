@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class CustomNewsServiceTest {
@@ -61,6 +61,25 @@ public class CustomNewsServiceTest {
         news2.setSummary("Summary 2");
         news2.setContent("Content 2");
         news2.setDateOfNews(LocalDate.of(2024, 1, 1));
+    }
+
+    @Test
+    void testGetNews() {
+        List<News> newsList = List.of(news1, news2);
+        when(newsRepository.findAll()).thenReturn(newsList);
+        when(newsMapper.entityToDetailDto(news1)).thenReturn(newsDto1);
+        when(newsMapper.entityToDetailDto(news2)).thenReturn(newsDto2);
+
+        List<NewsDetailDto> result = customNewsService.getNews();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(newsDto1, result.get(0));
+        assertEquals(newsDto2, result.get(1));
+
+        verify(newsRepository, times(1)).findAll();
+        verify(newsMapper, times(1)).entityToDetailDto(news1);
+        verify(newsMapper, times(1)).entityToDetailDto(news2);
     }
 
     @Test
