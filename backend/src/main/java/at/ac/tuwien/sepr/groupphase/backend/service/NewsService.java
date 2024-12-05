@@ -24,10 +24,19 @@ public interface NewsService {
         throws ValidationException, IOException, URISyntaxException;
 
     /**
+     * Retrieves a list of all news articles.
+     *
+     * @return A list of {@link NewsDetailDto} objects representing the news articles.
+     */
+    List<NewsDetailDto> getNews();
+
+    /**
      * Retrieves a list of unread news articles for a given user.
      *
      * @param email The email address of the user.
      * @return A list of {@link NewsDetailDto} objects representing the unread news articles.
      */
     List<NewsDetailDto> getUnreadNews(String email);
+
+
 }

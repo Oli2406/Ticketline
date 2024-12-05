@@ -46,8 +46,17 @@ public class NewsEndpoint {
 
     @PermitAll
     @GetMapping
-    public ResponseEntity<List<NewsDetailDto>> getUnreadNews(@RequestParam String email) {
+    public ResponseEntity<List<NewsDetailDto>> getNews() {
         LOG.info("GET " + BASE_PATH);
+
+        List<NewsDetailDto> news = newsService.getNews();
+        return ResponseEntity.ok(news);
+    }
+
+    @PermitAll
+    @GetMapping(value = "/unread")
+    public ResponseEntity<List<NewsDetailDto>> getUnreadNews(@RequestParam String email) {
+        LOG.info("GET " + BASE_PATH + "/unread?email=" + email);
         List<NewsDetailDto> news = newsService.getUnreadNews(email);
         return ResponseEntity.ok(news);
     }

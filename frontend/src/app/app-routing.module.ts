@@ -11,6 +11,7 @@ import {AdminComponent} from './components/admin/admin.component';
 import {CreateUserComponent} from './components/admin/createUser/create-user.component';
 import {EventCreateComponent} from "./components/admin/event-create/event-create.component";
 import {NewsDetailComponent} from "./components/news-detail/news-detail.component";
+import {NewsComponent} from "./components/news/news.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -18,7 +19,7 @@ const routes: Routes = [
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', component: HomeComponent},
   {path: 'events', component: HomeComponent},
-  {path: 'news', component: HomeComponent},
+  {path: 'news', component: NewsComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'news/details/:id', component: NewsDetailComponent },

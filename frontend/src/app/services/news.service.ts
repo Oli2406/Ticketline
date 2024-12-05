@@ -22,8 +22,12 @@ export class NewsService {
     return this.httpClient.post<NewsDto>(`${this.baseUri}/create`, data).pipe(catchError(this.handleError));
   }
 
+  getNews(): Observable<NewsDetailDto[]> {
+    return this.httpClient.get<NewsDetailDto[]>(`${this.baseUri}`)
+  }
+
   getUnreadNews(email: string): Observable<NewsDetailDto[]> {
-    return this.httpClient.get<NewsDetailDto[]>(`${this.baseUri}?email=${email}`);
+    return this.httpClient.get<NewsDetailDto[]>(`${this.baseUri}/unread?email=${email}`);
   }
 
   /**
