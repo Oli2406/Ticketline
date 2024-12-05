@@ -25,7 +25,7 @@ public class UserValidator {
 
     public void validateRegister(UserRegistrationDto registerDto)
         throws ValidationException, ConflictException {
-        LOGGER.trace("validateRegister({})", registerDto);
+        LOGGER.trace("validateCreate({})", registerDto);
         List<String> validationErrors = new ArrayList<>();
 
         isEmailUnique(registerDto.getEmail());

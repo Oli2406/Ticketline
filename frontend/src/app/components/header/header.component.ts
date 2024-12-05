@@ -22,6 +22,12 @@ export class HeaderComponent implements OnInit {
     this.router.navigate([page]);
   }
 
+  routeToUserCart(page: string): void {
+    this.currentPage = page;
+    const userId = this.authService.getUserIdFromToken();
+    this.router.navigate([`/cart/${userId}`]);
+  }
+
   logoutUser(): void {
     this.authService.logoutUser();
     this.setActivePage('home');

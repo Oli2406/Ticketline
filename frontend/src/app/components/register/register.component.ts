@@ -5,7 +5,7 @@ import { RegisterService } from '../../services/register.service';
 import { ToastrService } from 'ngx-toastr';
 import { UserRegistrationDto } from "../../dtos/register-data";
 import { Router } from '@angular/router';
-import {NgClass} from "@angular/common";
+import { NgClass } from "@angular/common";
 
 @Component({
   selector: 'app-register',

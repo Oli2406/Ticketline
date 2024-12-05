@@ -1,0 +1,43 @@
+<div class="merchandise-container">
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>Create Merchandise</h1>
+  </div>
+
+  <div class="form-sections">
+    <!-- Merchandise Details -->
+    <div class="section merchandise-details">
+      <h2>Merchandise Details</h2>
+      <form>
+        <label class="custom-label fw-bold">Name</label>
+        <div class="form-group">
+          <input type="text" placeholder="Merchandise Name" [(ngModel)]="merchandiseData.name" name="name" />
+        </div>
+        <label class="custom-label fw-bold">Category</label>
+        <div class="form-group">
+          <input type="text" placeholder="Category" [(ngModel)]="merchandiseData.category" name="category" />
+        </div>
+        <label class="custom-label fw-bold">Stock</label>
+        <div class="form-group">
+          <input type="number" placeholder="Stock" [(ngModel)]="merchandiseData.stock" name="stock" />
+        </div>
+        <label class="custom-label fw-bold">Price</label>
+        <div class="form-group">
+          <input type="number" step="0.01" placeholder="Price" [(ngModel)]="merchandiseData.price" name="price" />
+        </div>
+        <label class="custom-label fw-bold">Image</label>
+        <div class="form-group">
+          <input type="file" (change)="onImageSelected($event)" />
+        </div>
+        <div *ngIf="imagePreview" class="image-preview">
+          <h3>Image Preview:</h3>
+          <img [src]="imagePreview" alt="Selected Image" />
+        </div>
+      </form>
+    </div>
+
+    <div class="submit-container">
+      <button type="button" class="btn-create" (click)="onSubmit()">Create Merchandise</button>
+    </div>
+  </div>
+</div>

@@ -6,16 +6,17 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 
 import java.lang.invoke.MethodHandles;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class CustomUserDetailService implements UserService {
     private final SecurityPropertiesConfig.Auth auth;
     private final RegisterRepository registerRepository;
     private final UserValidator userValidator;
+    private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
     public CustomUserDetailService(
@@ -53,7 +55,8 @@ public class CustomUserDetailService implements UserService {
         RegisterRepository registerRepository,
         UserValidator userValidator,
         SecurityPropertiesConfig.Jwt jwt,
-        SecurityPropertiesConfig.Auth auth) {
+        SecurityPropertiesConfig.Auth auth,
+        RandomStringGenerator randomStringGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -61,6 +64,7 @@ public class CustomUserDetailService implements UserService {
         this.userValidator = userValidator;
         this.jwt = jwt;
         this.auth = auth;
+        this.randomStringGenerator = randomStringGenerator;
     }
 
     @Override
@@ -93,7 +97,7 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public String login(UserLoginDto userLoginDto) {
+    public String login(UserLoginDto userLoginDto) throws NoSuchAlgorithmException {
         LOGGER.debug("Login user: {}", userLoginDto);
         ApplicationUser user =
             userRepository
@@ -119,7 +123,7 @@ public class CustomUserDetailService implements UserService {
 
             List<String> roles =
                 userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles);
+            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, randomStringGenerator.generateRandomString(user.getId()), user.getPoints());
         }
 
         user.incrementLoginAttempts();
@@ -170,7 +174,7 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public String register(UserRegistrationDto userRegistrationDto)
-        throws ValidationException, ConflictException {
+        throws ValidationException, ConflictException, NoSuchAlgorithmException {
         LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
 
         userValidator.validateRegister(userRegistrationDto);
@@ -188,7 +192,7 @@ public class CustomUserDetailService implements UserService {
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
-        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles);
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints());
     }
 
     @Override
@@ -197,6 +201,38 @@ public class CustomUserDetailService implements UserService {
         LOGGER.trace("updateReadNews({})", userUpdateReadNewsDto);
         ApplicationUser user = findApplicationUserByEmail(userUpdateReadNewsDto.getEmail());
         user.getReadNewsIds().add(userUpdateReadNewsDto.getNewsId());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public String updateUserPoints(String encryptedId, int pointsToDeduct) throws Exception {
+        Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser user = userRepository.findById(originalId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given ID"));
+
+        if (user.getPoints() >= pointsToDeduct) {
+            user.setPoints(user.getPoints() - pointsToDeduct);
+            userRepository.save(user);
+            return "Points updated successfully!";
+        } else {
+            throw new RuntimeException("Insufficient points!");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void addUserPoints(String encryptedId, int pointsToAdd) throws Exception {
+        Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser user = userRepository.findById(originalId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given ID"));
+
+        user.setPoints(user.getPoints() + pointsToAdd);
+        System.out.println("new point amount: " + user.getPoints() + pointsToAdd);
         userRepository.save(user);
     }
 }

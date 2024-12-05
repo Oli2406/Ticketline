@@ -94,4 +94,8 @@ export class AdminComponent implements OnInit {
   navigateToCreateEvent(): void {
     this.router.navigate(['/admin/createEvent']);
   }
+
+  navigateToCreateMerchandise() {
+    this.router.navigate(['/admin/createMerchandise']);
+  }
 }
