@@ -6,6 +6,7 @@ import {CommonModule, DecimalPipe} from "@angular/common";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
 import {Router} from "@angular/router";
+import {Globals} from "../../global/globals";
 
 @Component({
   selector: 'app-cart',
@@ -24,14 +25,18 @@ export class CartComponent implements OnInit {
   selectedPaymentOption: string = 'creditCard'
   protected accountPoints: number;
 
+  imageLocation: string = "";
+
   constructor(private cartService: CartService,
               private authService: AuthService,
               private toastr: ToastrService,
-              private router: Router) {}
+              private router: Router,
+              private global: Globals) {}
 
   ngOnInit(): void {
     this.cartItems = this.cartService.getCart();
     this.fetchAccountPoints()
+    this.imageLocation = this.global.backendRessourceUri + '/merchandise/'
   }
 
   fetchAccountPoints(): void {

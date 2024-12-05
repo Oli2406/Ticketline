@@ -13,7 +13,7 @@
         <div class="image-container">
           <img
             *ngIf="item.imageUrl"
-            [src]="'http://localhost:8080/merchandise/' + item.imageUrl"
+            [src]="imageLocation + item.imageUrl"
             alt="{{ item.name }}"
             class="card-img-top"
           />

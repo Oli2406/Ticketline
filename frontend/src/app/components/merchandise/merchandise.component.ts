@@ -5,6 +5,7 @@ import { AuthService } from "../../services/auth.service";
 import { CartService } from "../../services/cart.service";
 import { CommonModule } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
+import {Globals} from "../../global/globals";
 
 @Component({
   selector: 'app-merchandise',
@@ -20,12 +21,14 @@ export class MerchandiseComponent implements OnInit {
   itemsPerPage: number = 8;
   totalPages: number = 0;
   accountPoints: number = 0;
+  imageLocation: string = "";
 
   constructor(
     private merchandiseService: MerchandiseService,
     private authService: AuthService,
     private cartService: CartService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private global: Globals
   ) {}
 
   ngOnInit(): void {
@@ -34,6 +37,7 @@ export class MerchandiseComponent implements OnInit {
       this.merchandiseList = data;
       this.totalPages = Math.ceil(this.merchandiseList.length / this.itemsPerPage);
       this.updateDisplayedMerchandise();
+      this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
     });
   }
 
