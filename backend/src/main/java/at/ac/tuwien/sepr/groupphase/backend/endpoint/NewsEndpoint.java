@@ -43,11 +43,9 @@ public class NewsEndpoint {
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public NewsCreateDto createNews(@ModelAttribute NewsCreateMpfDto news)
         throws ValidationException, IOException, URISyntaxException {
-        LOG.info("POST /api/v1/createNews");
+        LOG.info("POST /api/v1/create");
         LOG.debug("Request parameters: {}", news);
-        System.out.println("We have reached the endpoint");
         return this.newsService.createNews(news);
-
     }
 
     @PermitAll

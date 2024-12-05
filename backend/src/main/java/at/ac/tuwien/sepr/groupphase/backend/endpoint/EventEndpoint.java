@@ -33,7 +33,7 @@ public class EventEndpoint {
         this.eventService = eventService;
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @PutMapping
     public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update event: {}", eventCreateDto);
@@ -42,7 +42,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(createdEvent);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @GetMapping
     public ResponseEntity<List<EventDetailDto>> getAllEvents() {
         logger.info("Fetching all events");
@@ -51,7 +51,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(events);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<EventDetailDto> getEventById(@PathVariable Long id) {
         logger.info("Fetching event with ID: {}", id);
@@ -60,7 +60,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(event);
     }
 
-    @PermitAll
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
         logger.info("Deleting event with ID: {}", id);

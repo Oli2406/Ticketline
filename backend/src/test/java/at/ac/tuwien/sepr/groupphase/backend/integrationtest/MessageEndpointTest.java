@@ -87,7 +87,7 @@ public class MessageEndpointTest implements TestData {
                     get(MESSAGE_BASE_URI)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -114,7 +114,7 @@ public class MessageEndpointTest implements TestData {
                     get(MESSAGE_BASE_URI)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -145,7 +145,7 @@ public class MessageEndpointTest implements TestData {
                     get(MESSAGE_BASE_URI + "/{id}", message.getId())
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -170,7 +170,7 @@ public class MessageEndpointTest implements TestData {
                     get(MESSAGE_BASE_URI + "/{id}", -1)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -192,7 +192,7 @@ public class MessageEndpointTest implements TestData {
                         .content(body)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -228,7 +228,7 @@ public class MessageEndpointTest implements TestData {
                         .content(body)
                         .header(
                             securityProperties.getAuthHeader(),
-                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES)))
+                            jwtTokenizer.getAuthToken(ADMIN_USER, ADMIN_ROLES, "", 0)))
                 .andDo(print())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();

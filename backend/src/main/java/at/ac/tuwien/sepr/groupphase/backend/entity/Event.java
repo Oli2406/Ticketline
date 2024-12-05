@@ -56,6 +56,10 @@ public class Event {
         return eventId;
     }
 
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
     public String getTitle() {
         return title;
     }

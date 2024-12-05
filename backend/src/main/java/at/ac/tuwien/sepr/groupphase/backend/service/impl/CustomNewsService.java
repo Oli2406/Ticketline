@@ -60,7 +60,7 @@ public class CustomNewsService implements NewsService {
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException, URISyntaxException {
+    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException {
         LOG.trace("createNews({})", mpfDto);
         newsValidator.validateNews(mpfDto);
 

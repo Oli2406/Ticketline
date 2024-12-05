@@ -67,7 +67,6 @@ export class HomeComponent implements OnInit {
               n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
             }
           }
-
           this.updateDisplayedNews();
         },
         error: error => {

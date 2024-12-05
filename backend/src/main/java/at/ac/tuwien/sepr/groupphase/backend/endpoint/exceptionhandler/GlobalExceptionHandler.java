@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.exceptionhandler;
 
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import java.lang.invoke.MethodHandles;
@@ -68,6 +69,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .body(Map.of("status", "ILLEGAL_ARGUMENT_ERROR", "errorMessage", ex.getMessage()));
     }
 
+    @ExceptionHandler(InsufficientStockException.class)
+    protected ResponseEntity<Object> handleInsufficientStock(InsufficientStockException ex) {
+        LOGGER.warn(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(Map.of("status", "INSUFFICIENT_STOCK_ERROR", "errorMessage", ex.getMessage()));
+    }
 
     /**
      * Override methods from ResponseEntityExceptionHandler to send a customized HTTP response for a

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
 import {Globals} from '../global/globals';
+import {CartService} from "./cart.service";
 
 @Injectable({
   providedIn: 'root'
@@ -95,6 +96,15 @@ export class AuthService {
     return 'UNDEFINED';
   }
 
+  getUserIdFromToken(): string | null {
+    const token = this.getToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.id || null;
+    }
+    return null;
+  }
+
   isUserAdmin() {
     return this.getUserRole() === 'ADMIN';
   }
@@ -122,5 +132,9 @@ export class AuthService {
     return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
       catchError(() => of(false))
     );
+  }
+
+  getUserPoints(email: string): Observable<number> {
+    return this.httpClient.get<number>(`${this.authBaseUri}/user-points?email=${email}`);
   }
 }

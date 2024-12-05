@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
+
 @RestController
 @RequestMapping(value = "/api/v1/authentication")
 public class LoginEndpoint {
@@ -20,7 +22,7 @@ public class LoginEndpoint {
 
     @PermitAll
     @PostMapping
-    public String login(@RequestBody UserLoginDto userLoginDto) {
+    public String login(@RequestBody UserLoginDto userLoginDto) throws NoSuchAlgorithmException {
         return userService.login(userLoginDto);
     }
 }

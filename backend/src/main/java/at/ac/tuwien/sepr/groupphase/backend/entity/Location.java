@@ -45,6 +45,10 @@ public class Location {
         return locationId;
     }
 
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
+    }
+
     public String getName() {
         return name;
     }

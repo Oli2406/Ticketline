@@ -26,6 +26,7 @@ export class AdminService {
     return this.http.post<void>(`${this.baseUrl}/lock/${id}`, {});
   }
 
+
   /**
    * Handles API errors and formats error messages.
    * @param error - HttpErrorResponse from the backend
@@ -33,7 +34,6 @@ export class AdminService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors);
     if (error.error) {
       if (error.error.errors) {
         try {

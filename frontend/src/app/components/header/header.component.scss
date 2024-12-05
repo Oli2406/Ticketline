@@ -51,7 +51,6 @@ body {
   color: #000000;
 }
 
-
 .nav-buttons button.active {
   font-weight: bold;
   color: white;
@@ -61,14 +60,17 @@ button.active {
   font-weight: bold;
 }
 
-/* Auth Buttons */
 .auth-buttons {
   display: flex;
-  gap: 16px;
+  flex-wrap: nowrap;
+  gap: 20px;
+  align-items: center;
 }
 
 .button-container {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
 }
 
 .login-button, .signup-button {
@@ -88,7 +90,7 @@ button.active {
 
 .admin-button {
   background: #FF4D4D;
-  border:none;
+  border: none;
   padding: 10px 20px;
   font-size: 16px;
   font-weight: 500;
@@ -99,6 +101,7 @@ button.active {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 120px;
   text-align: center;
+  margin-right: 8px; /* Ensure spacing from Logout */
 }
 
 .admin-button:hover {
@@ -108,7 +111,6 @@ button.active {
 button.active {
   font-weight: bold;
 }
-
 
 .login-button:hover {
   background: #f1f1f1;
@@ -121,6 +123,32 @@ button.active {
 
 .signup-button:hover {
   background: #2e3d9a;
+}
+
+.cart-button {
+  background: #FFC107;
+  color: #000000;
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+}
+
+.cart-button i {
+  font-size: 18px;
+}
+
+.cart-button:hover {
+  background: #FFD54F;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Media Queries for Responsiveness */
@@ -138,9 +166,9 @@ button.active {
     font-size: 16px;
   }
 
-  .login-button, .signup-button, .admin-button {
+  .login-button, .signup-button, .admin-button, .cart-button {
     padding: 8px 16px;
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -153,7 +181,8 @@ button.active {
     justify-content: flex-end;
   }
 
-  .login-button, .signup-button, .admin-button {
-    width: auto;
+  .login-button, .signup-button, .admin-button, .cart-button {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 }

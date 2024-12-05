@@ -29,7 +29,9 @@ public class EventValidator {
 
         if (eventCreateDto.getTitle() == null || eventCreateDto.getTitle().trim().isEmpty()) {
             validationErrors.add("Event title is required");
-        } else if (eventCreateDto.getTitle().length() > 255) {
+        }
+
+        if (eventCreateDto.getTitle().length() > 255) {
             validationErrors.add("Event title must be less than 255 characters");
         }
 
@@ -37,9 +39,15 @@ public class EventValidator {
             validationErrors.add("Event description is required");
         }
 
+        if (eventCreateDto.getDescription().length() > 255) {
+            validationErrors.add("Event description must be less than 255 characters");
+        }
+
         if (eventCreateDto.getCategory() == null || eventCreateDto.getCategory().trim().isEmpty()) {
             validationErrors.add("Event category is required");
-        } else if (eventCreateDto.getCategory().length() > 255) {
+        }
+
+        if (eventCreateDto.getCategory().length() > 255) {
             validationErrors.add("Event category must be less than 255 characters");
         }
 
@@ -76,4 +84,3 @@ public class EventValidator {
     }
 
 }
-
