@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomNewsService;
@@ -15,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -135,5 +137,32 @@ public class CustomNewsServiceTest {
         verify(newsRepository, times(1)).findUnreadNews(user.getReadNewsIds());
         verify(newsMapper, times(1)).entityToDetailDto(news1);
         verify(newsMapper, times(1)).entityToDetailDto(news2);
+    }
+
+    @Test
+    void testGetByIdSuccessful() {
+        when(newsRepository.findById(1L)).thenReturn(Optional.ofNullable(news1));
+        when(newsMapper.entityToDetailDto(news1)).thenReturn(newsDto1);
+
+        NewsDetailDto retrievedNews = customNewsService.getById(1L);
+
+        assertEquals(newsDto1, retrievedNews);
+        verify(newsRepository, times(1)).findById(1L);
+        verify(newsMapper, times(1)).entityToDetailDto(news1);
+    }
+
+
+    @Test
+    void testGetByIdNotFound() {
+        long nonExistentId = Long.MAX_VALUE;
+        when(newsRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        assertThrows(
+            NotFoundException.class,
+            () -> customNewsService.getById(nonExistentId)
+        );
+
+        verify(newsRepository, times(1)).findById(nonExistentId);
+        verifyNoInteractions(newsMapper);
     }
 }

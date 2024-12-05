@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomUserDetailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
@@ -51,12 +52,15 @@ class CustomUserDetailServiceTest {
     @Mock
     private SecurityPropertiesConfig.Jwt jwt;
 
+    @Mock
+    private RandomStringGenerator randomStringGenerator;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userService =
             new CustomUserDetailService(
-                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth);
+                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth, randomStringGenerator);
     }
 
     @Test

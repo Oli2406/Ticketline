@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {Globals} from "../global/globals";
 import {catchError, Observable, throwError} from "rxjs";
 import {NewsDetailDto, NewsDto} from "../dtos/news-data";
+import {NewsDetailComponent} from "../components/news-detail/news-detail.component";
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,10 @@ export class NewsService {
 
   getNews(): Observable<NewsDetailDto[]> {
     return this.httpClient.get<NewsDetailDto[]>(`${this.baseUri}`)
+  }
+
+  getById(id: number): Observable<NewsDetailDto> {
+    return this.httpClient.get<NewsDetailDto>(`${(this.baseUri)}/${id}`);
   }
 
   getUnreadNews(email: string): Observable<NewsDetailDto[]> {

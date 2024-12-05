@@ -47,6 +47,9 @@ public class ApplicationUser {
     @Column(nullable = false)
     private boolean isLoggedIn = false;
 
+    @Column(nullable = false)
+    private int points = 0;
+
     @ElementCollection
     @CollectionTable(name = "user_read_news", joinColumns = @JoinColumn(name = "user_id"))
     @Column
@@ -57,12 +60,13 @@ public class ApplicationUser {
 
     public ApplicationUser(String firstName, String lastName, String email,
                            String password,
-                           Boolean admin) {
+                           Boolean admin, int points) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.admin = admin;
+        this.points = points;
     }
 
     public Long getId() {
@@ -159,5 +163,17 @@ public class ApplicationUser {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public void incrementPoints(int points) {
+        points += this.points;
     }
 }

@@ -10,6 +10,9 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.NoSuchAlgorithmException;
 
 public interface UserService extends UserDetailsService {
 
@@ -29,7 +32,7 @@ public interface UserService extends UserDetailsService {
      * Find an application user based on the email address.
      *
      * @param email the email address
-     * @return a application user
+     * @return an application user
      */
     ApplicationUser findApplicationUserByEmail(String email);
 
@@ -41,7 +44,7 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials
      *                                                                             are bad
      */
-    String login(UserLoginDto userLoginDto);
+    String login(UserLoginDto userLoginDto) throws NoSuchAlgorithmException;
 
     /**
      * Log out an user.
@@ -62,7 +65,7 @@ public interface UserService extends UserDetailsService {
      * @return the created JWT Token, if successful
      */
     String register(UserRegistrationDto userRegistrationDto)
-        throws ValidationException, ConflictException;
+        throws ValidationException, ConflictException, NoSuchAlgorithmException;
 
 
     /**
@@ -72,4 +75,10 @@ public interface UserService extends UserDetailsService {
      *                              and the email address of the user who read the article.
      */
     void updateReadNews(UserUpdateReadNewsDto userUpdateReadNewsDto);
+
+    @Transactional
+    String updateUserPoints(String encryptedId, int pointsToDeduct) throws Exception;
+
+    @Transactional
+    void addUserPoints(String encryptedId, int pointsToAdd) throws Exception;
 }
