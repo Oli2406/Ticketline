@@ -25,7 +25,6 @@ export class HomeComponent implements OnInit {
     if (this.isLoggedIn()) {
       this.initNews()
     }
-
   }
 
   news: NewsDetailDto[] = [];
@@ -47,7 +46,7 @@ export class HomeComponent implements OnInit {
     this.updateDisplayedNews();
   }
 
-  truncateSummary(summary: string, maxLength: number): string {
+  truncate(summary: string, maxLength: number): string {
     if (summary.length > maxLength) {
       return summary.substring(0, maxLength) + '...';
     } else {
@@ -84,9 +83,5 @@ export class HomeComponent implements OnInit {
 
   navigateToNewsDetails(id: number) {
     this.router.navigate(['/news/details', id]);
-  }
-
-  trackByNewsId(index: number, news: NewsDetailDto): number {
-    return news.id;
   }
 }

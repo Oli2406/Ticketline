@@ -1,24 +1,25 @@
-<div class="jumbotron mt-5">
+<div class="mt-5">
   <a *ngIf="!isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
   <div *ngIf="isLoggedIn()">
-    <h1>Upcoming Events</h1>
-    <div class="news-buttons-container mt-5">
-      <button class="btn btn-secondary" (click)="previousNews()" [hidden]="currentIndex === 0">
-        <
+    <h1 class="text-center">Upcoming Events</h1>
+    <div class="d-flex align-items-center mt-5">
+      <button class="btn btn-light me-3" (click)="previousNews()" [disabled]="currentIndex === 0">
+        &lt;
       </button>
-      <div class="news-container">
-        <div *ngFor="let n of displayedNews; trackBy: trackByNewsId" class="news" (click)="navigateToNewsDetails(n.id)">
-          <img [src]="n.images[0]" alt="News Image">
-          <h2 class="mt-2">{{ n.title }}</h2>
-          <p class="date">{{ n.date | date }}</p>
-          <p>{{ truncateSummary(n.summary, 200) }}</p>
+      <div class="d-flex justify-content-between flex-wrap w-100">
+        <div *ngFor="let n of displayedNews" class="card w-30 cursor-pointer"
+             (click)="navigateToNewsDetails(n.id)">
+          <img [src]="n.images[0]" class="card-img-top" alt="News Image">
+          <div class="card-body">
+            <h2 class="card-title">{{ n.title }}</h2>
+            <p class="card-text text-muted">{{ n.date | date }}</p>
+            <p>{{ truncate(n.summary, 200) }}</p>
+          </div>
         </div>
       </div>
-      <button class="btn btn-secondary" (click)="nextNews()" [hidden]="currentIndex >= news.length - 3">
-        >
+      <button class="btn btn-light ms-3" (click)="nextNews()" [disabled]="currentIndex >= news.length - 3">
+        &gt;
       </button>
     </div>
   </div>
 </div>
-
-
