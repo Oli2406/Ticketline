@@ -80,42 +80,33 @@ export class CartComponent implements OnInit {
       this.toastr.error('Please select a payment option.');
       return;
     }
-
     if (this.cartItems.length === 0) {
       this.toastr.error('Your cart is empty.');
       return;
     }
-
-    if (this.selectedPaymentOption === 'points') {
-      try {
-        await this.fetchAccountPoints();
+    try {
+      const purchasePayload = this.cartItems.map(cartItem => ({
+        itemId: cartItem.item.merchandiseId,
+        quantity: cartItem.quantity,
+      }));
+      await this.cartService.purchaseItems(purchasePayload);
+      if (this.selectedPaymentOption === 'points') {
+        this.fetchAccountPoints();
         if (this.getTotalPoints() > this.accountPoints) {
           this.toastr.error('You do not have enough points to buy this item.');
           return;
         }
         await this.cartService.deductPoints(this.getTotalPoints());
-        this.toastr.success('Thank you for your purchase.');
-        this.cartService.clearCart();
-        this.router.navigate(['merchandise']);
-      } catch (error) {
-        console.error('Error during purchase:', error);
-        this.toastr.error('An error occurred while processing your purchase. Please try again.');
-      }
-    } else if (this.selectedPaymentOption !== 'points') {
-      try {
+      } else {
         const pointsToAdd = this.getPointsForMoney();
         await this.cartService.addPoints(pointsToAdd);
-        this.toastr.success('Thank you for your purchase. Points have been added to your account.');
-        this.cartService.clearCart();
-        this.router.navigate(['merchandise']);
-      } catch (error) {
-        console.error('Error during purchase:', error);
-        this.toastr.error('An error occurred while processing your purchase. Please try again.');
       }
-    } else {
       this.toastr.success('Thank you for your purchase.');
       this.cartService.clearCart();
-      this.router.navigate(['merchandise']);
+      await this.router.navigate(['merchandise']);
+    } catch (error) {
+      console.log(error);
+      this.toastr.error('Not enough stock left');
     }
   }
 }

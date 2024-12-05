@@ -2,8 +2,10 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -26,4 +28,11 @@ public interface MerchandiseService {
      */
     List<MerchandiseDetailDto> getAllMerchandise();
 
+    /**
+     * Processes a list of purchase items and updates the stock accordingly.
+     *
+     * @param purchaseItems the list of purchase items to be processed, each containing an item ID and the quantity to be purchased
+     * @throws InsufficientStockException if there is insufficient stock for any of the purchase items
+     */
+    void processPurchase(List<PurchaseItemDto> purchaseItems);
 }

@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
+import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(UserEndpoint.BASE_PATH)
@@ -25,10 +30,12 @@ public class UserEndpoint {
     public static final String BASE_PATH = "/api/v1/users";
     private final UserService userService;
     private final RandomStringGenerator randomStringGenerator;
+    private final MerchandiseService merchandiseService;
 
-    public UserEndpoint(UserService userService, RandomStringGenerator randomStringGenerator) {
+    public UserEndpoint(UserService userService, RandomStringGenerator randomStringGenerator, MerchandiseService merchandiseService) {
         this.userService = userService;
         this.randomStringGenerator = randomStringGenerator;
+        this.merchandiseService = merchandiseService;
     }
 
     @PermitAll
@@ -60,6 +67,24 @@ public class UserEndpoint {
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("unexpected error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PermitAll
+    @PostMapping("/purchase")
+    public ResponseEntity<?> purchaseItems(@RequestBody List<PurchaseItemDto> purchaseItems) {
+        if (purchaseItems == null || purchaseItems.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Purchase items cannot be empty"));
+        }
+        try {
+            merchandiseService.processPurchase(purchaseItems);
+            return ResponseEntity.ok(Map.of("message", "Purchase successful, stock updated"));
+        } catch (InsufficientStockException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "An unexpected error occurred"));
         }
     }
 }

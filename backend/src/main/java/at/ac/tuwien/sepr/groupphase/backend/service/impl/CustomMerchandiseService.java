@@ -2,11 +2,14 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.MerchandiseDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,5 +62,18 @@ public class CustomMerchandiseService implements MerchandiseService {
                 merchandise.getImageUrl()
             ))
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void processPurchase(List<PurchaseItemDto> purchaseItems) throws InsufficientStockException {
+        for (PurchaseItemDto item : purchaseItems) {
+            Merchandise merchandise = merchandiseRepository.findById(item.getItemId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid item ID: " + item.getItemId()));
+            if (merchandise.getStock() < item.getQuantity()) {
+                throw new InsufficientStockException("Not enough stock for item: " + merchandise.getName());
+            }
+            merchandise.setStock(merchandise.getStock() - item.getQuantity());
+            merchandiseRepository.save(merchandise);
+        }
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Merchandise } from '../dtos/merchandise';
 import { AuthService } from "./auth.service";
 import { HttpClient } from "@angular/common/http";
+import {Globals} from "../global/globals";
 
 @Injectable({
   providedIn: 'root',
@@ -9,10 +10,11 @@ import { HttpClient } from "@angular/common/http";
 export class CartService {
   private currentUserId: string = '';
   private readonly CART_STORAGE_KEY_PREFIX = 'cart_';
-  private readonly API_URL = 'http://localhost:8080/api/v1/users';
+  private API_URL = '';
 
   constructor(private authService: AuthService,
-              private http: HttpClient) {}
+              private http: HttpClient,
+              private globals: Globals) {}
 
 
 
@@ -64,19 +66,31 @@ export class CartService {
   }
 
   deductPoints(points: number): Promise<void> {
+    this.API_URL = this.globals.backendUri + '/users/deduct-points'
+    console.log(this.API_URL)
     const encryptedId = this.authService.getUserIdFromToken();
     return this.http
-      .post<void>(`${this.API_URL}/deduct-points`, null, {
+      .post<void>(`${this.API_URL}`, null, {
         params: { encryptedId, points: points.toString() },
       })
       .toPromise();
   }
 
   addPoints(points: number): Promise<void> {
+    this.API_URL = this.globals.backendUri + '/users/add-points';
     const encryptedId = this.authService.getUserIdFromToken();
     return this.http
-      .post<void>(`${this.API_URL}/add-points`, null, {
+      .post<void>(`${this.API_URL}`, null, {
         params: { encryptedId, points: points.toString() },
+      })
+      .toPromise();
+  }
+
+  purchaseItems(purchasePayload: { itemId: number; quantity: number }[]): Promise<void> {
+    this.API_URL = this.globals.backendUri + '/users/purchase'
+    return this.http
+      .post<void>(`${this.API_URL}`, purchasePayload, {
+        headers: { 'Content-Type': 'application/json' }
       })
       .toPromise();
   }
