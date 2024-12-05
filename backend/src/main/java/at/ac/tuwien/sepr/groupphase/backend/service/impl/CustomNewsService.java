@@ -6,7 +6,9 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.entity.News;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -31,19 +33,21 @@ import java.util.stream.Collectors;
 @Service
 public class CustomNewsService implements NewsService {
 
-    private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private final UserService userService;
     private final NewsRepository newsRepository;
     private final NewsValidator newsValidator;
     private final NewsMapper newsMapper;
+    private final UserRepository userRepository;
 
     @Autowired
-    public CustomNewsService(NewsRepository newsRepository, UserService userService, NewsValidator newsValidator, NewsMapper newsMapper) {
+    public CustomNewsService(NewsRepository newsRepository, UserService userService, NewsValidator newsValidator, NewsMapper newsMapper, UserRepository userRepository) {
         this.newsRepository = newsRepository;
         this.userService = userService;
         this.newsValidator = newsValidator;
         this.newsMapper = newsMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -72,14 +76,20 @@ public class CustomNewsService implements NewsService {
         NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithImgUrl(mpfDto, imageUrls);
         News news = new News(newsCreate.getTitle(), newsCreate.getSummary(), newsCreate.getContent(), newsCreate.getDate(), newsCreate.getImages());
 
-
         var createdNews = newsRepository.save(news);
 
         return newsMapper.entityToCreateDto(createdNews);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public NewsDetailDto getById(long id) throws NotFoundException {
+        LOG.trace("getById({})", id);
+        News news = newsRepository.findById(id).orElseThrow(() -> new NotFoundException("News not found with id: " + id));
 
-    /*Private methods handling the image upload*/
+        return newsMapper.entityToDetailDto(news);
+    }
+
 
     private String uploadImagePath(Long id, MultipartFile image) throws IOException {
         if (id == null && image != null) {
