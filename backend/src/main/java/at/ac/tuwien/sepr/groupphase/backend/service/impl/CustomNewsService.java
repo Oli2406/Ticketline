@@ -52,11 +52,19 @@ public class CustomNewsService implements NewsService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<NewsDetailDto> getNews() {
+        LOG.trace("getNews()");
+
+        return newsRepository.findAll().stream().map(newsMapper::entityToDetailDto).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<NewsDetailDto> getUnreadNews(String email) {
         LOG.trace("getUnreadNews({})", email);
         ApplicationUser user = userService.findApplicationUserByEmail(email);
 
-        return newsRepository.findUnreadNews(user.getReadNewsIds()).stream().map(newsMapper::entityToDetailDto).collect(Collectors.toList());
+        return newsRepository.findUnreadNews(user.getReadNewsIds()).stream().map(newsMapper::entityToDetailDto).toList();
     }
 
     @Override

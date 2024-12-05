@@ -152,8 +152,9 @@ public class NewsDataGenerator {
 
     private void createNewsIfNotExists(String title, String summary, String content,
                                        LocalDate date, List<String> images) {
-        News news = new News(title, summary, content, date, images);
-        newsRepository.save(news);
+        if (newsRepository.findByTitle(title).isEmpty()) {
+            newsRepository.save(new News(title, summary, content, date, images));
+        }
     }
 
     private void copyTestImages() {

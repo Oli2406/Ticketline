@@ -30,6 +30,24 @@ public class NewsEndpointTest {
     }
 
     @Test
+    void testGetNewsSuccessful() {
+        List<NewsDetailDto> mockNewsList = Arrays.asList(
+            new NewsDetailDto(11L, "Title1", "Summary1", "Content1", null, LocalDate.now()),
+            new NewsDetailDto(22L, "Title2", "Summary2", "Content2", null, LocalDate.now())
+        );
+
+        when(newsService.getNews()).thenReturn(mockNewsList);
+
+        ResponseEntity<List<NewsDetailDto>> response = newsEndpoint.getNews();
+
+        assertNotNull(response);
+        assertNotNull(response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(mockNewsList.size(), response.getBody().size());
+
+        verify(newsService, times(1)).getNews();
+    }
+    @Test
     void testGetByIdSuccessful() {
         long id = 321L;
         NewsDetailDto mockNews = new NewsDetailDto(id, "Title", "Summary", "Content", null, LocalDate.now());
@@ -83,5 +101,4 @@ public class NewsEndpointTest {
         assertTrue(response.getBody().isEmpty());
         verify(newsService, times(1)).getUnreadNews(email);
     }
-
 }

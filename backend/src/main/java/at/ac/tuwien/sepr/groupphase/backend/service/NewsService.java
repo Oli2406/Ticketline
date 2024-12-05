@@ -35,6 +35,13 @@ public interface NewsService {
     NewsDetailDto getById(long id) throws NotFoundException;
 
     /**
+     * Retrieves a list of all news articles.
+     *
+     * @return A list of {@link NewsDetailDto} objects representing the news articles.
+     */
+    List<NewsDetailDto> getNews();
+
+    /**
      * Retrieves a list of unread news articles for a given user.
      *
      * @param email The email address of the user.
