@@ -1,57 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-<<<<<<< HEAD
-import { Router } from '@angular/router';
-import { AdminService } from '../../services/admin.service';
-import { RegisterUser } from '../../dtos/register-data';
-=======
 import { AuthService } from '../../services/auth.service';
 import { AdminService } from '../../services/admin.service';
->>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
+import { Router } from '@angular/router';
+import { RegisterUser } from '../../dtos/register-data';
+
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-<<<<<<< HEAD
-  styleUrls: ['./admin.component.scss'],
-})
-export class AdminComponent implements OnInit {
-  isAdminRoute: boolean = true;
-  users: RegisterUser[] = [];
-
-  constructor(private router: Router, private adminService: AdminService) {}
-
-  ngOnInit(): void {
-    this.router.events.subscribe(() => {
-      this.isAdminRoute = this.router.url === '/admin';
-    });
-
-    this.fetchUsers();
-  }
-
-  fetchUsers(): void {
-    this.adminService.getUsers().subscribe((users: RegisterUser[]) => {
-      this.users = users;
-    });
-  }
-
-  navigateToCreateUser(): void {
-    this.router.navigate(['/admin/createUser']);
-    console.log('Navigating to Create User');
-  }
-
-  navigateToCreateNews(): void {
-    console.log('Create News functionality will be implemented.');
-  }
-
-  navigateToCreateShow(): void {
-    console.log('Create Show functionality will be implemented.');
-  }
-
-  navigateToCreateEvent(): void {
-    console.log('Create Event functionality will be implemented.');
-  }
-  //TODO: toggle locked/unlocked user accounts
-=======
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
@@ -61,12 +17,15 @@ export class AdminComponent implements OnInit {
 
   // User data
   users: any[] = [];
+  currentUserEmail = '';
 
   constructor(private authService: AuthService,
-              private userService: AdminService) {}
+              private userService: AdminService,
+              private router: Router) {}
 
   ngOnInit(): void {
     this.loadUsers();
+    this.currentUserEmail = this.authService.getUserEmailFromToken();
   }
 
   /**
@@ -88,14 +47,26 @@ export class AdminComponent implements OnInit {
    * Lock a user account
    */
   lockUser(userId: number): void {
-    //TODO implement
+    this.userService.lockUser(userId).subscribe({
+      next: () => this.loadUsers(),
+      error: (err) => {
+        this.error = true;
+        this.errorMessage = err.error.errorMessage;
+      }
+    });
   }
 
   /**
    * Unlock a user account
    */
   unlockUser(userId: number): void {
-    this.userService.unlockUser(userId).subscribe(() => this.loadUsers());
+    this.userService.unlockUser(userId).subscribe( {
+      next:() => this.loadUsers(),
+      error: err => {
+        this.error = true;
+        this.errorMessage = err.error.errorMessage;
+      }
+    });
   }
 
   /**
@@ -111,5 +82,16 @@ export class AdminComponent implements OnInit {
   vanishError(): void {
     this.error = false;
   }
->>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
+
+  navigateToCreateUser(): void {
+    this.router.navigate(['/admin/createUser']);
+  }
+
+  navigateToCreateNews(): void {
+    this.router.navigate(['/admin/createNews']);
+  }
+
+  navigateToCreateEvent(): void {
+    this.router.navigate(['/admin/createEvent']);
+  }
 }

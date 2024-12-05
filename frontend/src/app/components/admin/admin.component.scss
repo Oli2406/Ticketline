@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 .admin-container {
   width: 100%;
   max-width: 1000px;
@@ -129,64 +127,4 @@ tr:nth-child(even) {
   display: flex;
   gap: 10px;
   justify-content: right;
-=======
-/* Hintergrund */
-body {
-  background-color: #A7A3FF;
-}
-
-/* Überschrift */
-.custom-heading {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #3e3e3e;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-/* Action Buttons */
-.btn-primary {
-  background-color: #4D47C3;
-  border: none;
-  color: #fff;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 8px;
-}
-
-.btn-primary:hover {
-  background-color: #514dc7;
-}
-
-.table {
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.table th, .table td {
-  vertical-align: middle;
-  text-align: center;
-}
-
-.table th {
-  background-color: #F0EFFF;
-  color: #333;
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #F9F9FF;
-}
-
-.table-striped tbody tr:nth-of-type(even) {
-  background-color: #F0EFFF;
-}
-
-.btn-sm {
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  border-radius: 5px;
->>>>>>> 6ba5871 (#16 Adminmenu mit Ansicht über Users, entsperren von gesperrten Accounts möglich)
 }

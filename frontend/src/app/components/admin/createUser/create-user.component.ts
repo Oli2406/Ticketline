@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { AdminRegisterData, AdminUserRegistrationDto } from '../../../dtos/register-data';
 import { AdminService } from '../../../services/admin.service';
 import { ToastrService } from 'ngx-toastr';
+import {RegisterService} from "../../../services/register.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-create-user',
@@ -24,7 +26,9 @@ export class CreateUserComponent {
 
   constructor(
     private adminService: AdminService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private registerService: RegisterService,
+    private router: Router,
   ) {}
 
   togglePasswordVisibility(): void {
@@ -52,10 +56,10 @@ export class CreateUserComponent {
     };
 
     // Make the API call to create the user
-    this.adminService.createUser(payload).subscribe({
+    this.registerService.registerUser(payload).subscribe({
       next: () => {
         this.toastr.success('User created successfully!', 'Success');
-        // Reset the form
+        this.router.navigate(['/admin']);
         this.createUserData = {
           firstName: '',
           lastName: '',
@@ -71,8 +75,8 @@ export class CreateUserComponent {
           ? err.message
           : err.message.split(/\n/);
         const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
+        .map((error) => `<li>${error.trim()}</li>`)
+        .join('');
         this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating user', {
           enableHtml: true,
         });

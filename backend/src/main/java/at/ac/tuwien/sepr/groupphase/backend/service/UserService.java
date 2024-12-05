@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -53,15 +54,22 @@ public interface UserService extends UserDetailsService {
      * Registers a new user using the provided UserRegistrationDto.
      *
      * <p>
-     * This method accepts a {@code UserRegistrationDto} containing the user's
-     * registration details, such as first name, last name, email, password,
-     * and whether the user is an admin.
+     * This method accepts a {@code UserRegistrationDto} containing the user's registration details,
+     * such as first name, last name, email, password, and whether the user is an admin.
      *
-     * @param userRegistrationDto the data transfer object containing user
-     *                            registration details such as first name,
-     *                            last name, email, password, and admin status
+     * @param userRegistrationDto the data transfer object containing user registration details such
+     *                            as first name, last name, email, password, and admin status
      * @return the created JWT Token, if successful
      */
     String register(UserRegistrationDto userRegistrationDto)
         throws ValidationException, ConflictException;
+
+
+    /**
+     * Marks a news article as read for the specified user.
+     *
+     * @param userUpdateReadNewsDto A DTO containing the ID of the news article to be marked as read
+     *                              and the email address of the user who read the article.
+     */
+    void updateReadNews(UserUpdateReadNewsDto userUpdateReadNewsDto);
 }
