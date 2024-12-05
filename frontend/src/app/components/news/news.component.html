@@ -1,52 +1,52 @@
 <h1 class="mt-3">All news</h1>
 
 <div class="news-container mt-3">
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-    <div class="col" *ngFor="let n of displayedNews">
-      <div (click)="navigateToNewsDetails(n.id)" class="news-card card">
-        <div class="image-container">
-          <img
-            [src]="n.images[0]"
-            alt="{{ n.title }}"
-            class="card-img-top"
-          />
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        <div class="col" *ngFor="let n of displayedNews">
+            <div (click)="navigateToNewsDetails(n.id)" class="news-card card">
+                <div class="image-container">
+                    <img
+                            [src]="n.images[0]"
+                            alt="{{ n.title }}"
+                            class="card-img-top"
+                    />
+                </div>
+                <div class="card-body">
+                    <h5 class="">{{ n.title }}</h5>
+                    <p class="date">{{ n.date }}</p>
+                    <p class="summary">{{ this.truncate(n.summary, 160) }}</p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <h5 class="">{{ n.title }}</h5>
-          <p class="date">{{ n.date }}</p>
-          <p class="summary">{{ this.truncate(n.summary, 160) }}</p>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- Pagination Controls -->
-  <div class="pagination mt-4 d-flex justify-content-center">
-    <button
-      class="btn btn-light me-2"
-      (click)="goToPage(currentPage - 1)"
-      [disabled]="currentPage === 1"
-    >
-      &larr;
-    </button>
+    <!-- Pagination Controls -->
+    <div class="pagination mt-4 d-flex justify-content-center">
+        <button
+                class="btn btn-light me-2"
+                (click)="goToPage(currentPage - 1)"
+                [disabled]="currentPage === 1"
+        >
+            &larr;
+        </button>
 
-    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
-      <button
-        class="btn me-2"
-        (click)="goToPage(i + 1)"
-        [class.active]="currentPage === i + 1"
-        [ngClass]="{ 'btn-primary': currentPage === i + 1, 'btn-light': currentPage !== i + 1 }"
-      >
-        {{ i + 1 }}
-      </button>
-    </ng-container>
+        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+            <button
+                    class="btn me-2"
+                    (click)="goToPage(i + 1)"
+                    [class.active]="currentPage === i + 1"
+                    [ngClass]="{ 'btn-primary': currentPage === i + 1, 'btn-light': currentPage !== i + 1 }"
+            >
+                {{ i + 1 }}
+            </button>
+        </ng-container>
 
-    <button
-      class="btn btn-light ms-2"
-      (click)="goToPage(currentPage + 1)"
-      [disabled]="currentPage === totalPages"
-    >
-      &rarr;
-    </button>
-  </div>
+        <button
+                class="btn btn-light"
+                (click)="goToPage(currentPage + 1)"
+                [disabled]="currentPage === totalPages"
+        >
+            &rarr;
+        </button>
+    </div>
 </div>
