@@ -27,6 +27,7 @@ security:
     header: Authorization
     prefix: "Bearer "
     login-uri: /api/v1/authentication
+    max-login-attempts: 5
   jwt:
     secret: ?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9
     type: JWT
@@ -69,9 +70,5 @@ spring:
       on-cloud-platform: kubernetes
   lifecycle:
     timeout-per-shutdown-phase: 30s
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB
 server:
   shutdown: graceful

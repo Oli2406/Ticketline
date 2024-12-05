@@ -1,97 +1,48 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-import { AdminService } from '../../services/admin.service';
 import { Router } from '@angular/router';
+import { AdminService } from '../../services/admin.service';
 import { RegisterUser } from '../../dtos/register-data';
-
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+  styleUrls: ['./admin.component.scss'],
 })
 export class AdminComponent implements OnInit {
-  // Error flag
-  error = false;
-  errorMessage = '';
+  isAdminRoute: boolean = true;
+  users: RegisterUser[] = [];
 
-  // User data
-  users: any[] = [];
-  currentUserEmail = '';
-
-  constructor(private authService: AuthService,
-              private userService: AdminService,
-              private router: Router) {}
+  constructor(private router: Router, private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.loadUsers();
-    this.currentUserEmail = this.authService.getUserEmailFromToken();
-  }
-
-  /**
-   * Load users from the backend
-   */
-  loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-      },
-      error: (err) => {
-        this.error = true;
-        this.errorMessage = 'Failed to load users.';
-      }
+    this.router.events.subscribe(() => {
+      this.isAdminRoute = this.router.url === '/admin';
     });
+
+    this.fetchUsers();
   }
 
-  /**
-   * Lock a user account
-   */
-  lockUser(userId: number): void {
-    this.userService.lockUser(userId).subscribe({
-      next: () => this.loadUsers(),
-      error: (err) => {
-        this.error = true;
-        this.errorMessage = err.error.errorMessage;
-      }
+  fetchUsers(): void {
+    this.adminService.getUsers().subscribe((users: RegisterUser[]) => {
+      this.users = users;
     });
-  }
-
-  /**
-   * Unlock a user account
-   */
-  unlockUser(userId: number): void {
-    this.userService.unlockUser(userId).subscribe( {
-      next:() => this.loadUsers(),
-      error: err => {
-        this.error = true;
-        this.errorMessage = err.error.errorMessage;
-      }
-    });
-  }
-
-  /**
-   * Reset a user's password
-   */
-  resetPassword(userId: number): void {
-    //TODO implement
-  }
-
-  /**
-   * Clear error messages
-   */
-  vanishError(): void {
-    this.error = false;
   }
 
   navigateToCreateUser(): void {
     this.router.navigate(['/admin/createUser']);
+    console.log('Navigating to Create User');
   }
 
   navigateToCreateNews(): void {
-    this.router.navigate(['/admin/createNews']);
+    console.log('Create News functionality will be implemented.');
+  }
+
+  navigateToCreateShow(): void {
+    console.log('Create Show functionality will be implemented.');
   }
 
   navigateToCreateEvent(): void {
-    this.router.navigate(['/admin/createEvent']);
+    console.log('Create Event functionality will be implemented.');
   }
+  //TODO: toggle locked/unlocked user accounts
 }

@@ -1,24 +1,31 @@
+<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Authentication problems!</strong> {{ errorMessage }}
+  <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
 <div class="container-fluid d-flex flex-column">
   <div class="row flex-grow-1 align-items-center justify-content-center">
     <!-- Login Section -->
-    <div class="col-md-6 text-center signup-left">
-      <h1>Log in to Ticketline</h1>
+    <div class="col-md-6 text-center">
+      <h1 class="custom-heading">Log in to Ticketline</h1>
     </div>
 
     <!-- Login Form Section -->
-    <div class="col-md-4 p-4 signup-right">
-      <h2>Log in</h2>
+    <div class="col-md-4 p-4">
+      <h2 class="mb-4">Log in</h2>
       <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
         <!-- Email/Username Field -->
         <div class="form-group">
           <label for="inputEmail" class="custom-label fw-bold">Email</label>
-
           <input
-            type="text"
-            id="inputEmail"
-            name="username"
-            placeholder="Email"
-            formControlName="username"
+              type="text"
+              id="inputEmail"
+              name="username"
+              class="form-control custom-input"
+              placeholder="Email"
+              formControlName="username"
           />
           <div *ngIf="submitted && loginForm.controls.username.errors" class="text-danger mt-1">
             <small *ngIf="loginForm.controls.username.errors.required">
@@ -28,23 +35,24 @@
         </div>
 
         <!-- Password Field -->
-        <div class="form-group password-group">
+        <div class="form-group position-relative">
           <label for="inputPassword" class="custom-label fw-bold">Password</label>
-
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            id="inputPassword"
-            placeholder="Password"
-            name="password"
-            formControlName="password"
-          />
-          <i
-            class="bi"
-            [class.bi-eye-slash]="showPassword"
-            [class.bi-eye]="!showPassword"
-            (click)="togglePasswordVisibility()"
-            style="position: absolute; top: 35%; right: 15px; transform: translateY(20%); cursor: pointer;"
-          ></i>
+          <div class="password-input-wrapper">
+            <input
+                [type]="showPassword ? 'text' : 'password'"
+                id="inputPassword"
+                class="form-control custom-input"
+                placeholder="Password"
+                name="password"
+                formControlName="password"
+            />
+            <i
+                class="bi bi-eye"
+                [class.bi-eye-slash]="showPassword"
+                [class.bi-eye]="!showPassword"
+                (click)="togglePasswordVisibility()"
+            ></i>
+          </div>
           <div *ngIf="submitted && loginForm.controls.password.errors" class="text-danger mt-1">
             <small *ngIf="loginForm.controls.password.errors.required">
               Your password is required!
@@ -58,9 +66,10 @@
           </div>
         </div>
 
+
         <!-- Form Footer -->
         <div class="d-flex flex-column align-items-center mt-4">
-          <button type="submit" class="btn btn-primary custom-button">Login</button>
+          <button type="submit" class="btn btn-primary w-100 custom-button">Login</button>
         </div>
       </form>
     </div>

@@ -6,7 +6,6 @@
     <h2>Sign Up</h2>
     <form>
       <div class="form-group">
-        <label class="custom-label fw-bold">Email</label>
         <input
           type="email"
           placeholder="Email"
@@ -15,7 +14,6 @@
         />
       </div>
       <div class="form-group">
-        <label class="custom-label fw-bold">First name</label>
         <input
           type="text"
           placeholder="First name"
@@ -24,7 +22,6 @@
         />
       </div>
       <div class="form-group">
-        <label class="custom-label fw-bold">Last name</label>
         <input
           type="text"
           placeholder="Last name"
@@ -33,7 +30,6 @@
         />
       </div>
       <div class="form-group password-group">
-        <label class="custom-label fw-bold">Password</label>
         <input
           [type]="showPassword ? 'text' : 'password'"
           placeholder="Password"
@@ -41,12 +37,10 @@
           [ngModelOptions]="{standalone: true}"
         />
         <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
-          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
-             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+          {{ showPassword ? '👁️‍🗨️' : '👁️' }}
         </button>
       </div>
       <div class="form-group password-group">
-        <label class="custom-label fw-bold">Confirm password</label>
         <input
           [type]="showConfirmPassword ? 'text' : 'password'"
           placeholder="Confirm Password"
@@ -54,8 +48,7 @@
           [ngModelOptions]="{standalone: true}"
         />
         <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
-          <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
-             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+          {{ showConfirmPassword ? '👁️‍🗨️' : '👁️'}}
         </button>
       </div>
       <button type="button" class="btn-register" (click)="onSubmit()">Register</button>

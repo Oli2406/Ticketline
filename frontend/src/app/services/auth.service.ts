@@ -36,10 +36,32 @@ export class AuthService {
     return !!this.getToken() && (this.getTokenExpirationDate(this.getToken()).valueOf() > new Date().valueOf());
   }
 
-  logoutUser() {
-    console.log('Logout');
-    localStorage.removeItem('authToken');
+  logoutUser(): void {
+    const token = this.getToken();
+    const email = this.getUserEmailFromToken();
+
+    if (token && email) {
+      const userLogoutDto = {
+        email: email,
+        authToken: token
+      };
+
+      this.httpClient.delete(this.authBaseUri, {
+        body: userLogoutDto
+      }).subscribe({
+        next: () => {
+          console.log('Logout successful');
+          localStorage.removeItem('authToken');
+        },
+        error: (err) => {
+          console.error('Logout failed', err);
+        }
+      });
+    } else {
+      console.warn('No token or email found for logout');
+    }
   }
+
 
   getToken() {
     return localStorage.getItem('authToken');
@@ -76,5 +98,12 @@ export class AuthService {
     date.setUTCSeconds(decoded.exp);
     return date;
   }
-
+  getUserEmailFromToken(): string | null {
+    const token = this.getToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.sub;
+    }
+    return null;
+  }
 }

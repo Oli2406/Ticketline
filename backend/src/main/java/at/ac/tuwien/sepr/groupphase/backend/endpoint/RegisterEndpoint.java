@@ -1,5 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -38,5 +41,4 @@ public class RegisterEndpoint {
         response.put("message", "User registered successfully");
         return ResponseEntity.ok(response);
     }
-
 }

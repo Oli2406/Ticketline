@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {AdminUserRegistrationDto, UserRegistrationDto} from 'src/app/dtos/register-data'
+import {UserRegistrationDto} from 'src/app/dtos/register-data'
 
 
 @Injectable({
@@ -23,6 +23,7 @@ export class RegisterService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
+    console.log(error.error.errors)
     if (error.error) {
       if (error.error.errors) {
         try {

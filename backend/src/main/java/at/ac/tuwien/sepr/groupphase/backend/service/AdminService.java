@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
-import java.util.List;
 
 public interface AdminService {
 

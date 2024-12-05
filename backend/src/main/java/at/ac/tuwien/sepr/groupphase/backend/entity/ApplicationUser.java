@@ -1,17 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class ApplicationUser {
@@ -20,17 +14,13 @@ public class ApplicationUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
     @Column(nullable = false, unique = true)
     private String email;
-    @Column
+
+    @Column(nullable = false)
     private String password;
-    @Column
+
+    @Column(nullable = false)
     private Boolean admin;
 
     @Column(nullable = false)
@@ -45,19 +35,10 @@ public class ApplicationUser {
     @Column(nullable = false)
     private boolean isLoggedIn = false;
 
-    @ElementCollection
-    @CollectionTable(name = "user_read_news", joinColumns = @JoinColumn(name = "user_id"))
-    @Column
-    private List<Long> readNewsIds = new ArrayList<>();
-
     public ApplicationUser() {
     }
 
-    public ApplicationUser(String firstName, String lastName, String email,
-        String password,
-        Boolean admin) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public ApplicationUser(String email, String password, Boolean admin) {
         this.email = email;
         this.password = password;
         this.admin = admin;
@@ -125,17 +106,5 @@ public class ApplicationUser {
 
     public boolean isLoggedIn() {
         return isLoggedIn;
-    }
-
-    public List<Long> getReadNewsIds() {
-        return readNewsIds;
-    }
-
-    public void setReadNewsIds(List<Long> readNewsIds) {
-        this.readNewsIds = readNewsIds;
-    }
-
-    public boolean isAdmin() {
-        return admin;
     }
 }

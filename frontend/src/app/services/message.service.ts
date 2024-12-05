@@ -27,6 +27,7 @@ export class MessageService {
    * @param id of message to load
    */
   getMessageById(id: number): Observable<Message> {
+    console.log('Load message details for ' + id);
     return this.httpClient.get<Message>(this.messageBaseUri + '/' + id);
   }
 
@@ -36,6 +37,7 @@ export class MessageService {
    * @param message to persist
    */
   createMessage(message: Message): Observable<Message> {
+    console.log('Create message with title ' + message.title);
     return this.httpClient.post<Message>(this.messageBaseUri, message);
   }
 }
