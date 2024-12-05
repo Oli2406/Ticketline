@@ -1,0 +1,30 @@
+.container {
+  width: 80%;
+}
+
+.container img {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+}
+
+.image-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-light {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.btn-light:hover {
+  background-color: #d6caff;
+}
+
+.btn-light:disabled {
+  background-color: #ececec;
+  cursor: not-allowed;
+}
