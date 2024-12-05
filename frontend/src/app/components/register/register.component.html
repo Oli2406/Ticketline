@@ -1,0 +1,64 @@
+<div class="signup-container">
+  <div class="signup-left">
+    <h1>Sign Up to Ticketline</h1>
+  </div>
+  <div class="signup-right">
+    <h2>Sign Up</h2>
+    <form>
+      <div class="form-group">
+        <label class="custom-label fw-bold">Email</label>
+        <input
+          type="email"
+          placeholder="Email"
+          [(ngModel)]="registerData.email"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group">
+        <label class="custom-label fw-bold">First name</label>
+        <input
+          type="text"
+          placeholder="First name"
+          [(ngModel)]="registerData.firstName"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group">
+        <label class="custom-label fw-bold">Last name</label>
+        <input
+          type="text"
+          placeholder="Last name"
+          [(ngModel)]="registerData.lastName"
+          [ngModelOptions]="{standalone: true}"
+        />
+      </div>
+      <div class="form-group password-group">
+        <label class="custom-label fw-bold">Password</label>
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="registerData.password"
+          [ngModelOptions]="{standalone: true}"
+        />
+        <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+        </button>
+      </div>
+      <div class="form-group password-group">
+        <label class="custom-label fw-bold">Confirm password</label>
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm Password"
+          [(ngModel)]="registerData.confirmedPassword"
+          [ngModelOptions]="{standalone: true}"
+        />
+        <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+          <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
+             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+        </button>
+      </div>
+      <button type="button" class="btn-register" (click)="onSubmit()">Register</button>
+    </form>
+  </div>
+</div>
