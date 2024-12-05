@@ -37,7 +37,6 @@ export class AuthService {
    */
   isLoggedIn(): boolean {
     if(this.getResetTokenFromStorage()) {
-      console.log("token for reset: " + this.getResetTokenFromStorage());
       return false;
     }
 
