@@ -6,7 +6,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -46,7 +45,7 @@ public class CustomUserDetailService implements UserService {
     private final SecurityPropertiesConfig.Auth auth;
     private final RegisterRepository registerRepository;
     private final UserValidator userValidator;
-    private final RandomStringGenerator randomStringGenerator = new RandomStringGenerator();
+    private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
     public CustomUserDetailService(
@@ -56,7 +55,8 @@ public class CustomUserDetailService implements UserService {
         RegisterRepository registerRepository,
         UserValidator userValidator,
         SecurityPropertiesConfig.Jwt jwt,
-        SecurityPropertiesConfig.Auth auth) {
+        SecurityPropertiesConfig.Auth auth,
+        RandomStringGenerator randomStringGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -64,6 +64,7 @@ public class CustomUserDetailService implements UserService {
         this.userValidator = userValidator;
         this.jwt = jwt;
         this.auth = auth;
+        this.randomStringGenerator = randomStringGenerator;
     }
 
     @Override
@@ -200,6 +201,38 @@ public class CustomUserDetailService implements UserService {
         LOGGER.trace("updateReadNews({})", userUpdateReadNewsDto);
         ApplicationUser user = findApplicationUserByEmail(userUpdateReadNewsDto.getEmail());
         user.getReadNewsIds().add(userUpdateReadNewsDto.getNewsId());
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public String updateUserPoints(String encryptedId, int pointsToDeduct) throws Exception {
+        Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser user = userRepository.findById(originalId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given ID"));
+
+        if (user.getPoints() >= pointsToDeduct) {
+            user.setPoints(user.getPoints() - pointsToDeduct);
+            userRepository.save(user);
+            return "Points updated successfully!";
+        } else {
+            throw new RuntimeException("Insufficient points!");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void addUserPoints(String encryptedId, int pointsToAdd) throws Exception {
+        Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser user = userRepository.findById(originalId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given ID"));
+
+        user.setPoints(user.getPoints() + pointsToAdd);
+        System.out.println("new point amount: " + user.getPoints() + pointsToAdd);
         userRepository.save(user);
     }
 }

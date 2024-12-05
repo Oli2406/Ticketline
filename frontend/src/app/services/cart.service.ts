@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Merchandise } from '../dtos/merchandise';
 import { AuthService } from "./auth.service";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({
   providedIn: 'root',
@@ -8,8 +9,10 @@ import { AuthService } from "./auth.service";
 export class CartService {
   private currentUserId: string = '';
   private readonly CART_STORAGE_KEY_PREFIX = 'cart_';
+  private readonly API_URL = 'http://localhost:8080/api/v1/users';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+              private http: HttpClient) {}
 
 
 
@@ -59,4 +62,23 @@ export class CartService {
   clearCart(): void {
     localStorage.removeItem(this.getCartKey());
   }
+
+  deductPoints(points: number): Promise<void> {
+    const encryptedId = this.authService.getUserIdFromToken();
+    return this.http
+      .post<void>(`${this.API_URL}/deduct-points`, null, {
+        params: { encryptedId, points: points.toString() },
+      })
+      .toPromise();
+  }
+
+  addPoints(points: number): Promise<void> {
+    const encryptedId = this.authService.getUserIdFromToken();
+    return this.http
+      .post<void>(`${this.API_URL}/add-points`, null, {
+        params: { encryptedId, points: points.toString() },
+      })
+      .toPromise();
+  }
+
 }
