@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@PermitAll
 @RestController
 @RequestMapping("/api/v1/authentication")
 public class AuthTokenEndpoint {
@@ -20,6 +19,7 @@ public class AuthTokenEndpoint {
         this.jwtTokenizer = jwtTokenizer;
     }
 
+    @PermitAll
     @GetMapping("/validate-token")
     public ResponseEntity<Boolean> validateToken(@RequestHeader("Authorization") String token) {
         try {

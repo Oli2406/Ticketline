@@ -9,10 +9,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -40,7 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
         HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        List<String> excludedPaths = List.of("/api/v1/register", "/api/v1/public");
+        List<String> excludedPaths = List.of("/api/v1/register", "/api/v1/public", "/api/v1/news");
 
         String requestPath = request.getRequestURI();
 

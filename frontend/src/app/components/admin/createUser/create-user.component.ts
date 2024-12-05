@@ -75,8 +75,8 @@ export class CreateUserComponent {
           ? err.message
           : err.message.split(/\n/);
         const errorList = errors
-        .map((error) => `<li>${error.trim()}</li>`)
-        .join('');
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
         this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating user', {
           enableHtml: true,
         });

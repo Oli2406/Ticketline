@@ -56,8 +56,8 @@ public class ApplicationUser {
     }
 
     public ApplicationUser(String firstName, String lastName, String email,
-        String password,
-        Boolean admin) {
+                           String password,
+                           Boolean admin) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

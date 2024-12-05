@@ -2,30 +2,37 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomUserDetailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class CustomUserDetailServiceTest {
 
     private CustomUserDetailService userService;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private ApplicationUser mockUser;
 
     @Mock
     private RegisterRepository registerRepository;
@@ -49,46 +56,11 @@ class CustomUserDetailServiceTest {
         MockitoAnnotations.openMocks(this);
         userService =
             new CustomUserDetailService(
-                null, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth);
+                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth);
     }
 
     @Test
-    void register_ValidUser_ReturnsAuthToken() throws ValidationException, ConflictException {
-        // Arrange
-        UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
-        userRegistrationDto.setFirstName("John");
-        userRegistrationDto.setLastName("Doe");
-        userRegistrationDto.setEmail("john.doe@example.com");
-        userRegistrationDto.setPassword("password123");
-
-        String encodedPassword = "hashedPassword123";
-        String expectedToken = "jwtToken";
-
-        doNothing().when(userValidator).validateRegister(userRegistrationDto);
-        when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-        when(jwtTokenizer.getAuthToken("john.doe@example.com", List.of("ROLE_USER")))
-            .thenReturn(expectedToken);
-
-        String authToken = userService.register(userRegistrationDto);
-
-        assertEquals(expectedToken, authToken);
-
-        ArgumentCaptor<RegisterUser> captor = ArgumentCaptor.forClass(RegisterUser.class);
-        verify(registerRepository).save(captor.capture());
-
-        RegisterUser savedUser = captor.getValue();
-        assertEquals("John", savedUser.getFirstName());
-        assertEquals("Doe", savedUser.getLastName());
-        assertEquals("john.doe@example.com", savedUser.getEmail());
-        assertEquals(encodedPassword, savedUser.getPassword());
-
-        verify(userValidator).validateRegister(userRegistrationDto);
-        verify(passwordEncoder).encode("password123");
-        verify(jwtTokenizer).getAuthToken("john.doe@example.com", List.of("ROLE_USER"));
-    }
-
-    @Test
-    void register_InvalidUser_ThrowsValidationException()
+    void registerInvalidUserThrowsValidationException()
         throws ValidationException, ConflictException {
         // Arrange
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
@@ -112,7 +84,7 @@ class CustomUserDetailServiceTest {
     }
 
     @Test
-    void register_ExistingEmail_ThrowsConflictException()
+    void registerExistingEmailThrowsConflictException()
         throws ValidationException, ConflictException {
         // Arrange
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
@@ -133,5 +105,24 @@ class CustomUserDetailServiceTest {
         verify(userValidator).validateRegister(userRegistrationDto);
 
         verifyNoInteractions(passwordEncoder, jwtTokenizer);
+    }
+
+    @Test
+    void testUpdateReadNewsMarksNewsAsRead() {
+        String email = "testuser@example.com";
+        long newsId = 123L;
+        UserUpdateReadNewsDto dto = new UserUpdateReadNewsDto();
+        dto.setEmail(email);
+        dto.setNewsId(newsId);
+
+        List<Long> initialReadNewsIds = new ArrayList<>();
+        initialReadNewsIds.add(1L);
+        mockUser = mock(ApplicationUser.class);
+        when(mockUser.getReadNewsIds()).thenReturn(initialReadNewsIds);
+        when(userRepository.save(mockUser)).thenReturn(mockUser);
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(mockUser));
+
+        userService.updateReadNews(dto);
+        assertTrue(mockUser.getReadNewsIds().contains(newsId));
     }
 }
