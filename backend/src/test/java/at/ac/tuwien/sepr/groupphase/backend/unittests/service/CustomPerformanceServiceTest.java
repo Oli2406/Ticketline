@@ -36,7 +36,7 @@ public class CustomPerformanceServiceTest {
 
     @Test
     void createOrUpdatePerformance_ShouldSavePerformance_WhenValidInput() throws ValidationException, ConflictException {
-        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDate.now(), new BigDecimal("50.00"), 100L, "Main Hall");
+        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDate.now(), 100L, "Main Hall");
 
         when(performanceRepository.save(any(Performance.class))).thenAnswer(invocation -> {
             Performance p = invocation.getArgument(0);
@@ -49,8 +49,7 @@ public class CustomPerformanceServiceTest {
         assertNotNull(created, "Created performance DTO should not be null");
         assertAll(
             () -> assertNotNull(created.getPerformanceId(), "Performance ID should not be null"),
-            () -> assertEquals(dto.getName(), created.getName(), "Performance name should match"),
-            () -> assertEquals(dto.getPrice(), created.getPrice(), "Price should match")
+            () -> assertEquals(dto.getName(), created.getName(), "Performance name should match")
         );
 
         verify(performanceValidator, times(1)).validatePerformance(dto);

@@ -28,7 +28,6 @@ class PerformanceRepositoryUnitTest {
         testPerformance.setArtistId(1L);
         testPerformance.setLocationId(1L);
         testPerformance.setDate(LocalDate.now());
-        testPerformance.setPrice(new BigDecimal("50.00"));
         testPerformance.setTicketNumber(100L);
         testPerformance.setHall("Main Hall");
     }

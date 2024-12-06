@@ -11,17 +11,15 @@ public class PerformanceDetailDto {
     private Long artistId;
     private Long locationId;
     private LocalDate date;
-    private BigDecimal price;
     private Long ticketNumber;
     private String hall;
 
-    public PerformanceDetailDto(Long performanceId, String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall) {
+    public PerformanceDetailDto(Long performanceId, String name, Long artistId, Long locationId, LocalDate date, Long ticketNumber, String hall) {
         this.performanceId = performanceId;
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
         this.date = date;
-        this.price = price;
         this.ticketNumber = ticketNumber;
         this.hall = hall;
     }
@@ -64,14 +62,6 @@ public class PerformanceDetailDto {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public Long getTicketNumber() {

@@ -38,14 +38,13 @@ public class CustomPerformanceService implements PerformanceService {
             performanceCreateDto.getArtistId(),
             performanceCreateDto.getLocationId(),
             performanceCreateDto.getDate(),
-            performanceCreateDto.getPrice(),
             performanceCreateDto.getTicketNumber(),
             performanceCreateDto.getHall()
         );
         performance = performanceRepository.save(performance);
         logger.debug("Saved performance to database: {}", performance);
         return new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
-            performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall());
+            performance.getLocationId(), performance.getDate(), performance.getTicketNumber(), performance.getHall());
     }
 
     @Override
@@ -53,7 +52,7 @@ public class CustomPerformanceService implements PerformanceService {
         logger.info("Fetching all performances");
         List<PerformanceDetailDto> performances = performanceRepository.findAll().stream()
             .map(performance -> new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
-                performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall()))
+                performance.getLocationId(), performance.getDate(), performance.getTicketNumber(), performance.getHall()))
             .collect(Collectors.toList());
         logger.debug("Fetched {} performances: {}", performances.size(), performances);
         return performances;
@@ -65,7 +64,7 @@ public class CustomPerformanceService implements PerformanceService {
         Performance performance = performanceRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Performance not found"));
         logger.debug("Fetched performance: {}", performance);
         return new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
-            performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall());
+            performance.getLocationId(), performance.getDate(), performance.getTicketNumber(), performance.getHall());
     }
 
     @Override

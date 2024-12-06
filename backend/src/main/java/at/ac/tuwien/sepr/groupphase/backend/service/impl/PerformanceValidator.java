@@ -54,10 +54,6 @@ public class PerformanceValidator {
             validationErrors.add("Performance date cannot be in the past");
         }
 
-        if (performanceCreateDto.getPrice() == null || performanceCreateDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            validationErrors.add("Performance price must be greater than 0");
-        }
-
         if (performanceCreateDto.getTicketNumber() == null || performanceCreateDto.getTicketNumber() <= 0) {
             validationErrors.add("Number of tickets must be greater than 0");
         }

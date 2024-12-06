@@ -5,10 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Performance {
@@ -30,23 +33,24 @@ public class Performance {
     private LocalDate date;
 
     @Column(nullable = false)
-    private BigDecimal price;
-
-    @Column(nullable = false)
     private Long ticketNumber;
 
     @Column(nullable = false)
     private String hall;
 
+    /*
+     * @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
+     * private List<Ticket> tickets; // Wird nicht als Spalte in der Tabelle gespeichert
+     */
+
     public Performance() {
     }
 
-    public Performance(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall) {
+    public Performance(String name, Long artistId, Long locationId, LocalDate date, Long ticketNumber, String hall) {
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
         this.date = date;
-        this.price = price;
         this.ticketNumber = ticketNumber;
         this.hall = hall;
     }
@@ -89,14 +93,6 @@ public class Performance {
 
     public void setDate(LocalDate date) {
         this.date = date;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public String getHall() {
