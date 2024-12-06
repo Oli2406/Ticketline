@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordTokenDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 public interface ResetPasswordService {
 
@@ -20,4 +22,11 @@ public interface ResetPasswordService {
      * @param token as given Dto with email and code
      */
     void verifyResetCode(ResetPasswordTokenDto token);
+
+    /**
+     * Resets the password of a user
+     *
+     * @param token contains new passwords which need to be validated and token
+     */
+    void resetPassword(ResetPasswordDto token) throws ValidationException;
 }

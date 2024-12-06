@@ -12,7 +12,7 @@ export class AppComponent {
 
   constructor(private authService: AuthService, public router: Router) {}
   ngOnInit(): void {
-    this.authService.validateToken().subscribe((isValid) => {
+    this.authService.validateTokenInBackend(this.authService.getAuthToken()).subscribe((isValid) => {
       if (!isValid) {
         this.authService.logoutUser();
         //this.router.navigate(['/home']);

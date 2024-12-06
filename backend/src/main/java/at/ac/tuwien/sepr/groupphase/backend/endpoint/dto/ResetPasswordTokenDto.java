@@ -2,15 +2,15 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 public class ResetPasswordTokenDto {
 
-    private String email;
+    private String tokenFromStorage;
     private String code;
 
-    public String getEmail() {
-        return email;
+    public String getTokenFromStorage() {
+        return tokenFromStorage;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setTokenFromStorage(String tokenFromStorage) {
+        this.tokenFromStorage = tokenFromStorage;
     }
 
     public String getCode() {
@@ -21,8 +21,8 @@ public class ResetPasswordTokenDto {
         this.code = code;
     }
 
-    public ResetPasswordTokenDto(String email, String code) {
-        this.email = email;
+    public ResetPasswordTokenDto(String tokenFromStorage, String code) {
+        this.tokenFromStorage = tokenFromStorage;
         this.code = code;
     }
 

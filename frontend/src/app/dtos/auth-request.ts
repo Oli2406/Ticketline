@@ -6,6 +6,6 @@ export class AuthRequest {
 }
 
 export interface ResetPasswordTokenDto {
-  email: string;
+  tokenFromStorage: string;
   code: string;
 }

@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import {ResetPasswordTokenDto} from "../../../dtos/auth-request";
+import { ToastrService } from 'ngx-toastr';
+import { ResetPasswordTokenDto } from "../../../dtos/auth-request";
 
 @Component({
   selector: 'app-verify-reset-code',
@@ -12,12 +13,12 @@ import {ResetPasswordTokenDto} from "../../../dtos/auth-request";
 export class VerifyResetCodeComponent implements OnInit {
   verifyCodeForm!: FormGroup;
   submitted = false;
-  errorMessage: string | null = null;
 
   constructor(
-      private fb: FormBuilder,
-      private authService: AuthService,
-      private router: Router
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -28,23 +29,25 @@ export class VerifyResetCodeComponent implements OnInit {
 
   verifyCode(): void {
     this.submitted = true;
+
     if (this.verifyCodeForm.invalid) {
+      this.toastr.warning('Please enter the reset code to proceed.', 'Invalid Input');
       return;
     }
 
     const code = this.verifyCodeForm.value.code;
     const token: ResetPasswordTokenDto = {
-      email: "anna.simhofer@hotmail.com",
+      tokenFromStorage: this.authService.getResetToken(),
       code: code
-    }
+    };
 
     this.authService.verifyResetCode(token).subscribe({
       next: () => {
+        this.toastr.success('Reset code verified successfully. Redirecting to reset password page.', 'Success');
         this.router.navigate(['/reset-password']);
       },
-      error: (error) => {
-        console.error('Verification failed:', error);
-        this.errorMessage = 'The reset code is invalid or expired.';
+      error: () => {
+        this.toastr.error('The reset code is invalid or expired. Please try again.', 'Verification Failed');
       }
     });
   }

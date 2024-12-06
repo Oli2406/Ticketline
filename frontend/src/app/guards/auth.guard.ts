@@ -24,7 +24,7 @@ export class AuthGuard {
 
     if (state.url.startsWith('/reset-password') || state.url.startsWith('/verify-reset-code')) {
       const tokenFromUrl = this.extractTokenFromUrl(state.url);
-      const tokenFromStorage = this.authService.getResetTokenFromStorage();
+      const tokenFromStorage = this.authService.getResetToken();
 
       if (tokenFromUrl) {
         this.token = tokenFromUrl;
@@ -60,7 +60,8 @@ export class AuthGuard {
       return true;
     } else {
       this.toastr.warning('User is not logged in. Redirecting to login.', 'Access Denied');
-      return this.router.createUrlTree(['/login']);
+      this.router.navigate(['/login']);
+      return false;
     }
   }
 

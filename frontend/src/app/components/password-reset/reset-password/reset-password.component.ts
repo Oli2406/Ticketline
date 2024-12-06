@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { UserResetPasswordDto } from "../../../dtos/user-data";
 
 @Component({
   selector: 'app-reset-password',
@@ -18,46 +19,52 @@ export class ResetPasswordComponent implements OnInit {
   showConfirmPassword: boolean = false;
 
   constructor(
-      private fb: FormBuilder,
-      private authService: AuthService,
-      private router: Router,
-      private route: ActivatedRoute
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.resetPasswordForm = this.fb.group(
-        {
-          newPassword: ['', [Validators.required, Validators.minLength(8)]],
-          confirmPassword: ['', Validators.required]
-        },
-        {
-          validators: this.passwordsMatchValidator
-        }
+      {
+        newPassword: ['', [Validators.required, Validators.minLength(8)]],
+        confirmPassword: ['', Validators.required]
+      },
+      {
+        validators: this.passwordsMatchValidator
+      }
     );
   }
 
   private passwordsMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
     return group.get('newPassword')?.value === group.get('confirmPassword')?.value
-        ? null
-        : { passwordMismatch: true };
+      ? null
+      : { passwordMismatch: true };
   }
 
   resetPassword(): void {
     this.submitted = true;
+
     if (this.resetPasswordForm.invalid) {
+      this.toastr.warning('Please fill out all required fields and ensure passwords match.', 'Form Invalid');
       return;
     }
 
-    const newPassword = this.resetPasswordForm.value.newPassword;
+    const userToResetPassword: UserResetPasswordDto = {
+      tokenToResetPassword: this.authService.getResetToken(),
+      newPassword: this.resetPasswordForm.value.newPassword,
+      newConfirmedPassword: this.resetPasswordForm.value.confirmPassword
+    };
 
-    this.authService.resetPassword(newPassword).subscribe({
+    this.authService.resetPassword(userToResetPassword).subscribe({
       next: () => {
-        console.log('Password reset successful');
-        this.router.navigate(['/login']); // Redirect to login after successful reset
+        this.toastr.success('Password reset successful! You can now log in with your new password.', 'Success');
+        this.authService.clearResetToken();
+        this.router.navigate(['/login']);
       },
       error: (error) => {
-        console.error('Password reset failed:', error);
-        this.errorMessage = 'Failed to reset password. Please try again.';
+        this.toastr.error('Failed to reset password. Please try again.', 'Error');
       }
     });
   }

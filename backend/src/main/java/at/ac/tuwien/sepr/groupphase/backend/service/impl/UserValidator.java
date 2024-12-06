@@ -56,9 +56,8 @@ public class UserValidator {
             validationErrors.add("Invalid email format");
         }
 
-        if (registerDto.getPassword() == null || registerDto.getPassword().trim().isEmpty()) {
-            validationErrors.add("Password must not be empty");
-        }
+        // validate password
+        validationErrors.addAll(validatePassword(registerDto.getPassword()));
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("User data validation failed");
@@ -73,6 +72,55 @@ public class UserValidator {
             error.add("email is already registered");
             LOGGER.warn("conflict error in create : {}", error);
             throw new ConflictException("Update for customer has a conflict: ", error);
+        }
+    }
+
+    private List<String> validatePassword(String password) {
+
+        List<String> validationErrors = new ArrayList<>();
+        if (password == null || password.isBlank()) {
+            validationErrors.add("Password must not be empty");
+        }
+
+        if (password.length() < 8) {
+            validationErrors.add("Password must be at least 8 characters long");
+        }
+
+        if (!password.matches(".*[A-Z].*")) {
+            validationErrors.add("Password must contain at least one uppercase letter");
+        }
+
+        if (!password.matches(".*[a-z].*")) {
+            validationErrors.add("Password must contain at least one lowercase letter");
+        }
+
+        if (!password.matches(".*\\d.*")) {
+            validationErrors.add("Password must contain at least one digit");
+        }
+
+        if (!password.matches(".*[@#$%^&+=!].*")) {
+            validationErrors.add("Password must contain at least one special character");
+        }
+
+        return validationErrors;
+    }
+
+    public void validateNewPasswords(String password, String confirmPassword)
+        throws ValidationException {
+        LOGGER.trace("validateNewPasswords({},{})", password, confirmPassword);
+
+        List<String> validationErrors = new ArrayList<>();
+
+        if (!password.equals(confirmPassword)) {
+            validationErrors.add("Passwords do not match");
+        }
+
+        validationErrors.addAll(validatePassword(password));
+
+        if (!validationErrors.isEmpty()) {
+            LOGGER.warn("Password validation failed");
+            throw new ValidationException("Reset password validation failed: ",
+                validationErrors);
         }
     }
 }

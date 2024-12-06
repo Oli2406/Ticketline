@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ResetPasswordTokenDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.annotation.security.PermitAll;
@@ -61,6 +63,15 @@ public class AuthenticationEndpoint {
     public ResponseEntity<Void> verifyResetCode(@RequestBody ResetPasswordTokenDto token) {
         LOGGER.trace("POST " + BASE_PATH + "/verify-reset-code {}", token);
         resetPasswordService.verifyResetCode(token);
+        return ResponseEntity.ok().build();
+    }
+
+    @PermitAll
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordDto token)
+        throws ValidationException {
+        LOGGER.trace("POST " + BASE_PATH + "/verify-reset-code {}", token);
+        resetPasswordService.resetPassword(token);
         return ResponseEntity.ok().build();
     }
 }

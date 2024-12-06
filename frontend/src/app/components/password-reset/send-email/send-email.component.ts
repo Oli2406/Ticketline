@@ -1,23 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
-import {Router} from "@angular/router";
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-verify-reset-code',
+  selector: 'app-send-email',
   templateUrl: './send-email.component.html',
   styleUrls: ['./send-email.component.scss']
 })
 export class SendEmailComponent implements OnInit {
   emailForm!: FormGroup;
   submitted = false;
-  error = false;
-  errorMessage: string | null = null;
 
   constructor(
-      private fb: FormBuilder,
-      private authService: AuthService,
-      private router: Router
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -29,29 +29,21 @@ export class SendEmailComponent implements OnInit {
   resetPassword(): void {
     this.submitted = true;
 
-    if (this.emailForm.valid) {
-      const email = this.emailForm.controls.username.value;
-      this.authService.sendEmailToResetPassword(email).subscribe({
-        next: () =>{
-          this.router.navigate(['/verify-reset-code']);
-        },
-        error: err => {
-          console.log(err.message);
-          this.error = true;
-          if (typeof err.error === 'object') {
-            this.errorMessage = err.error.error;
-          } else {
-            this.errorMessage = err.error;
-          }
-        }
-      });
+    if (!this.emailForm.valid) {
+      this.toastr.warning('Please enter a valid email address.', 'Invalid Input');
+      return;
     }
-  }
 
-  /**
-   * Error flag will be deactivated, which clears the error message
-   */
-  vanishError() {
-    this.error = false;
+    const email = this.emailForm.controls.username.value;
+    this.authService.sendEmailToResetPassword(email).subscribe({
+      next: () => {
+        this.toastr.success('Password reset email sent successfully. Please check your inbox.', 'Success');
+        this.router.navigate(['/verify-reset-code']);
+      },
+      error: (err) => {
+        const errorMessage = typeof err.error === 'object' ? err.error.error : err.error;
+        this.toastr.error(errorMessage || 'An error occurred while sending the email. Please try again.', 'Error');
+      }
+    });
   }
 }

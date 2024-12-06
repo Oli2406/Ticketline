@@ -8,7 +8,7 @@ export interface UserDetailDto {
 }
 
 export interface UserResetPasswordDto {
-  email: string;
+  tokenToResetPassword: string;
   newPassword: string;
   newConfirmedPassword: string;
 }
