@@ -24,7 +24,7 @@ public interface ResetPasswordService {
     void verifyResetCode(ResetPasswordTokenDto token);
 
     /**
-     * Resets the password of a user
+     * Resets the password of a user.
      *
      * @param token contains new passwords which need to be validated and token
      */
