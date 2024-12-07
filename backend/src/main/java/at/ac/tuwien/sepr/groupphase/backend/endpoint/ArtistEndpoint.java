@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,7 +44,7 @@ public class ArtistEndpoint {
         return ResponseEntity.ok(createdArtist);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<ArtistDetailDto>> getAllArtists() {
         logger.info("Fetching all artists");
@@ -52,7 +53,7 @@ public class ArtistEndpoint {
         return ResponseEntity.ok(artists);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<ArtistDetailDto> getArtistById(@PathVariable Long id) {
         logger.info("Fetching Artist by ID: {}", id);

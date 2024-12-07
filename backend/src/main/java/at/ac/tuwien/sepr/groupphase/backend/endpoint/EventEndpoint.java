@@ -42,7 +42,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(createdEvent);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<EventDetailDto>> getAllEvents() {
         logger.info("Fetching all events");
@@ -51,7 +51,7 @@ public class EventEndpoint {
         return ResponseEntity.ok(events);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<EventDetailDto> getEventById(@PathVariable Long id) {
         logger.info("Fetching event with ID: {}", id);

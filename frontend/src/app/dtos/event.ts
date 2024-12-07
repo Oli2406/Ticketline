@@ -15,7 +15,6 @@ export interface EventListDto {
   category: string;
   description: string;
   duration: number;
-  performanceIds?: number[];
 }
 
 export interface EventSearch {

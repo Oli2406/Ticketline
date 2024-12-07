@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Event } from 'src/app/dtos/event';
+import {Event, EventListDto} from 'src/app/dtos/event';
 
 @Injectable({
   providedIn: 'root',
@@ -10,10 +10,18 @@ import { Event } from 'src/app/dtos/event';
 export class EventService {
   private apiUrl: string = this.globals.backendUri + '/event';
 
-  constructor(private http: HttpClient, private globals: Globals) {}
+  constructor(private http: HttpClient, private globals: Globals) {
+  }
 
   createEvent(event: Event): Observable<Event> {
     return this.http.put<Event>(this.apiUrl, event).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
+  get(): Observable<EventListDto[]> {
+    return this.http.get<EventListDto[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
@@ -43,10 +51,10 @@ export class EventService {
     let cleanedError = 'An unexpected error occurred.';
     if (error.error) {
       if (error.error.errors) {
-          const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');
-          const errors = rawDetails.split(/(?=[A-Z])/);
-          const cleanedErrors = errors.map((err) => err.replace(/,\s*$/, '').trim());
-          cleanedError = cleanedErrors.join('\n');
+        const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');
+        const errors = rawDetails.split(/(?=[A-Z])/);
+        const cleanedErrors = errors.map((err) => err.replace(/,\s*$/, '').trim());
+        cleanedError = cleanedErrors.join('\n');
       } else if (typeof error.error === 'string') {
         cleanedError = error.error;
       } else if (error.error.message) {

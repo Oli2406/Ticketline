@@ -12,6 +12,10 @@ export class LocationService {
 
   constructor(private http: HttpClient, private globals: Globals) {}
 
+  getById(id: number): Observable<LocationListDto> {
+    return this.http.get<LocationListDto>(`${(this.apiUrl)}/${id}`);
+  }
+
   getLocations(): Observable<LocationListDto[]> {
     return this.http.get<LocationListDto[]>(this.apiUrl);
   }

@@ -19,3 +19,14 @@ export interface PerformanceListDto {
   ticketNumber: number;
   hall: string;
 }
+
+export interface PerformanceWithNamesDto {
+  performanceId: number;
+  name: string;
+  locationName: string;
+  date: string;
+  price: number;
+  artistName: string;
+  ticketNumber: number;
+  hall: string;
+}

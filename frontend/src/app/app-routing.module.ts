@@ -15,6 +15,7 @@ import {NewsComponent} from "./components/news/news.component";
 import {MerchandiseCreateComponent} from "./components/admin/merchandise-create/merchandise-create.component";
 import {MerchandiseComponent} from "./components/merchandise/merchandise.component";
 import {CartComponent} from "./components/cart/cart.component";
+import {SearchComponent} from "./components/search/search.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -22,7 +23,7 @@ const routes: Routes = [
   {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
-  {path: 'events', component: HomeComponent},
+  {path: 'search', component: SearchComponent},
   {path: 'news', component: NewsComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},

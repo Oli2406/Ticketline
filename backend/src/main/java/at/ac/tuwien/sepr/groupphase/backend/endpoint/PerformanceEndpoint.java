@@ -42,7 +42,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(createdPerformance);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<PerformanceDetailDto>> getAllPerformances() {
         logger.info("Fetching all performances");
@@ -51,7 +51,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(performances);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<PerformanceDetailDto> getPerformanceById(@PathVariable Long id) {
         logger.info("Fetching performance with ID: {}", id);

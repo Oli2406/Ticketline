@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Artist, ArtistListDto } from 'src/app/dtos/artist';
+import {Artist, ArtistListDto} from 'src/app/dtos/artist';
 
 @Injectable({
   providedIn: 'root',
@@ -10,12 +10,17 @@ import { Artist, ArtistListDto } from 'src/app/dtos/artist';
 export class ArtistService {
   private apiUrl: string = this.globals.backendUri + '/artist';
 
-  constructor(private http: HttpClient, private globals: Globals) {}
+  constructor(private http: HttpClient, private globals: Globals) {
+  }
 
   getArtists(): Observable<ArtistListDto[]> {
     return this.http.get<ArtistListDto[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
+  }
+
+  getById(id: number): Observable<ArtistListDto> {
+    return this.http.get<ArtistListDto>(`${(this.apiUrl)}/${id}`);
   }
 
   createArtist(artist: Artist): Observable<Artist> {
