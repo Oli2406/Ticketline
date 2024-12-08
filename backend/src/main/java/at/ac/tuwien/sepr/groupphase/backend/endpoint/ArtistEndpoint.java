@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public class ArtistEndpoint {
 
     public static final String BASE_PATH = "/api/v1/artist";
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final ArtistService artistService;
 
     public ArtistEndpoint(ArtistService artistService) {
@@ -39,18 +39,18 @@ public class ArtistEndpoint {
     @Secured("ROLE_ADMIN")
     @PutMapping
     public ResponseEntity<ArtistDetailDto> createOrUpdateArtist(@RequestBody ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
-        logger.info("Received request to create or update Artist: {}", artistCreateDto);
+        LOG.info("Received request to create or update Artist: {}", artistCreateDto);
         ArtistDetailDto createdArtist = artistService.createOrUpdateArtist(artistCreateDto);
-        logger.info("Successfully created/updated Artist: {}", createdArtist);
+        LOG.info("Successfully created/updated Artist: {}", createdArtist);
         return ResponseEntity.ok(createdArtist);
     }
 
     @PermitAll
     @GetMapping
     public ResponseEntity<List<ArtistDetailDto>> getAllArtists() {
-        logger.info("Fetching all artists");
+        LOG.info("Fetching all artists");
         List<ArtistDetailDto> artists = artistService.getAllArtists();
-        logger.info("Successfully fetched {} artists: {}", artists.size(), artists);
+        LOG.info("Successfully fetched {} artists: {}", artists.size(), artists);
         return ResponseEntity.ok(artists);
     }
 
@@ -58,8 +58,8 @@ public class ArtistEndpoint {
     @PermitAll
     @GetMapping("/search")
     public ResponseEntity<Stream<ArtistDetailDto>> search(ArtistSearchDto dto) {
-        logger.info("GET " + BASE_PATH);
-        logger.debug("request parameters: {}", dto);
+        LOG.info("GET " + BASE_PATH);
+        LOG.debug("request parameters: {}", dto);
         Stream<ArtistDetailDto> result = artistService.search(dto);
         return ResponseEntity.ok(result);
     }
@@ -67,18 +67,18 @@ public class ArtistEndpoint {
     @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<ArtistDetailDto> getArtistById(@PathVariable Long id) {
-        logger.info("Fetching Artist by ID: {}", id);
+        LOG.info("Fetching Artist by ID: {}", id);
         ArtistDetailDto artist = artistService.getArtistById(id);
-        logger.info("Successfully fetched Artist: {}", artist);
+        LOG.info("Successfully fetched Artist: {}", artist);
         return ResponseEntity.ok(artist);
     }
 
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteArtist(@PathVariable Long id) {
-        logger.info("Deleting Artist with ID: {}", id);
+        LOG.info("Deleting Artist with ID: {}", id);
         artistService.deleteArtist(id);
-        logger.info("Successfully deleted Artist with ID: {}", id);
+        LOG.info("Successfully deleted Artist with ID: {}", id);
         return ResponseEntity.noContent().build();
     }
 }
