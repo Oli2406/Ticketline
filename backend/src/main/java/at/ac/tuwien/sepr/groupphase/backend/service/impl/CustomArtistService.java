@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 @Service
 public class CustomArtistService implements ArtistService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ArtistRepository artistRepository;
     private final ArtistValidator artistValidator;
@@ -36,7 +36,7 @@ public class CustomArtistService implements ArtistService {
 
     @Override
     public ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
-        logger.info("Creating/Updating Artist with data: {}", artistCreateDto);
+        LOG.info("Creating/Updating Artist with data: {}", artistCreateDto);
 
         artistValidator.validateArtist(artistCreateDto);
 
@@ -46,11 +46,11 @@ public class CustomArtistService implements ArtistService {
             artistCreateDto.getArtistName()
         );
 
-        logger.debug("Mapped Artist entity: {}", artist);
+        LOG.debug("Mapped Artist entity: {}", artist);
 
         artist = artistRepository.save(artist);
 
-        logger.info("Saved Artist to database: {}", artist);
+        LOG.info("Saved Artist to database: {}", artist);
 
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
             artist.getArtistId(),
@@ -59,13 +59,13 @@ public class CustomArtistService implements ArtistService {
             artist.getArtistName()
         );
 
-        logger.info("Returning mapped ArtistDetailDto: {}", artistDetailDto);
+        LOG.info("Returning mapped ArtistDetailDto: {}", artistDetailDto);
         return artistDetailDto;
     }
 
     @Override
     public List<ArtistDetailDto> getAllArtists() {
-        logger.info("Fetching all Artists from database");
+        LOG.info("Fetching all Artists from database");
 
         List<ArtistDetailDto> artistList = artistRepository.findAll().stream()
             .map(artist -> new ArtistDetailDto(
@@ -76,23 +76,23 @@ public class CustomArtistService implements ArtistService {
             ))
             .collect(Collectors.toList());
 
-        logger.info("Fetched {} Artists from database", artistList.size());
-        logger.debug("Artists fetched: {}", artistList);
+        LOG.info("Fetched {} Artists from database", artistList.size());
+        LOG.debug("Artists fetched: {}", artistList);
 
         return artistList;
     }
 
     @Override
     public ArtistDetailDto getArtistById(Long artistId) {
-        logger.info("Fetching Artist by ID: {}", artistId);
+        LOG.info("Fetching Artist by ID: {}", artistId);
 
         Artist artist = artistRepository.findById(artistId)
             .orElseThrow(() -> {
-                logger.error("Artist not found with ID: {}", artistId);
+                LOG.error("Artist not found with ID: {}", artistId);
                 return new IllegalArgumentException("Artist not found with ID: " + artistId);
             });
 
-        logger.debug("Fetched Artist entity: {}", artist);
+        LOG.debug("Fetched Artist entity: {}", artist);
 
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
             artist.getArtistId(),
@@ -101,26 +101,27 @@ public class CustomArtistService implements ArtistService {
             artist.getArtistName()
         );
 
-        logger.info("Returning ArtistDetailDto: {}", artistDetailDto);
+        LOG.info("Returning ArtistDetailDto: {}", artistDetailDto);
         return artistDetailDto;
     }
 
     @Override
     public void deleteArtist(Long artistId) {
-        logger.info("Deleting Artist by ID: {}", artistId);
+        LOG.info("Deleting Artist by ID: {}", artistId);
 
         if (!artistRepository.existsById(artistId)) {
-            logger.error("Attempted to delete non-existent Artist with ID: {}", artistId);
+            LOG.error("Attempted to delete non-existent Artist with ID: {}", artistId);
             throw new IllegalArgumentException("Artist not found with ID: " + artistId);
         }
 
         artistRepository.deleteById(artistId);
 
-        logger.info("Successfully deleted Artist with ID: {}", artistId);
+        LOG.info("Successfully deleted Artist with ID: {}", artistId);
     }
 
     @Override
     public Stream<ArtistDetailDto> search(ArtistSearchDto dto) {
+        LOG.info("Searching artists with data: {}", dto);
         var query = artistRepository.findAll().stream();
         if (dto.getFirstName() != null) {
             query = query.filter(artist -> artist.getFirstName().toLowerCase().contains(dto.getFirstName().toLowerCase()));
