@@ -1,43 +1,89 @@
 <div class="button-group mt-3 text-center">
-  <button class="btn btn-primary me-3" (click)="changeSearchType(searchTypes.event)">Event</button>
-  <button class="btn btn-primary me-3" (click)="changeSearchType(searchTypes.location)">Location</button>
-  <button class="btn btn-primary me-3" (click)="changeSearchType(searchTypes.artist)">Artist</button>
-  <button class="btn btn-primary me-3" (click)="changeSearchType(searchTypes.performance)">Performance</button>
-  <button class="btn btn-primary" (click)="changeSearchType(searchTypes.advanced)">Advanced</button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
+    (click)="changeSearchType(SearchType.event)">
+    event
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
+    (click)="changeSearchType(SearchType.artist)">
+    artist
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
+    (click)="changeSearchType(SearchType.location)">
+    location
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
+    (click)="changeSearchType(SearchType.performance)">
+    performance
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
+    (click)="changeSearchType(SearchType.advanced)">
+    advanced
+  </button>
 </div>
 
-<div *ngIf="curType === searchTypes.artist" class="mt-3">
-  <form>
-    <!-- hidden submit button -->
-    <input hidden="hidden" type="submit"/>
-
+<!-- Artist Search Form -->
+<div *ngIf="curSearchType === SearchType.artist" class="mt-3">
+  <form (ngSubmit)="updateData()">
     <div class="row justify-content-center">
-      <!-- First Name -->
       <div class="col-md-3 mb-3">
         <label class="form-label" for="firstName">First Name</label>
-        <input class="form-control" id="firstName"
-               name="firstName" placeholder="Enter first name" type="text"/>
-      </div>
-      <!--(ngModelChange)="searchChanged()" [(ngModel)]="searchParams.lastName"-->
-      <!-- Last Name -->
-      <div class="col-md-3 mb-3">
-        <label class="form-label" for="lastName">Last Name</label>
-        <input class="form-control" id="lastName"
-               name="lastName" placeholder="Enter last name" type="text"/>
+        <input
+          class="form-control"
+          id="firstName"
+          name="firstName"
+          [(ngModel)]="artistSearchParams.firstName"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter first name"
+          type="text"/>
       </div>
 
-      <!-- Artist/Band Name -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="lastName">Last Name</label>
+        <input
+          class="form-control"
+          id="lastName"
+          name="lastName"
+          [(ngModel)]="artistSearchParams.surname"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter last name"
+          type="text"/>
+      </div>
+
       <div class="col-md-3 mb-3">
         <label class="form-label" for="artistBandName">Artist/Band Name</label>
-        <input class="form-control" id="artistBandName"
-               name="lastName" placeholder="Enter artist/band name" type="text"/>
+        <input
+          class="form-control"
+          id="artistBandName"
+          name="artistBandName"
+          [(ngModel)]="artistSearchParams.artistName"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter artist/band name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
       </div>
     </div>
   </form>
 </div>
 
-<!-- Search Results for event -->
-<table *ngIf="curType === searchTypes.event" class="table table-striped table-hover text-center mt-3">
+<!-- Search Results for events -->
+<table
+  *ngIf="curSearchType === SearchType.event"
+  class="table table-striped table-hover text-center mt-3">
   <thead>
   <tr>
     <th>Name</th>
@@ -63,7 +109,7 @@
 </table>
 
 <!-- Search Results for artist -->
-<table *ngIf="curType === searchTypes.artist" class="table table-striped table-hover text-center mt-3">
+<table *ngIf="curSearchType === SearchType.artist" class="table table-striped table-hover text-center mt-3">
   <thead>
   <tr>
     <th>First Name</th>
@@ -85,7 +131,7 @@
 </table>
 
 <!-- Search Results for location -->
-<table *ngIf="curType === searchTypes.location" class="table table-striped table-hover text-center mt-3">
+<table *ngIf="curSearchType === SearchType.location" class="table table-striped table-hover text-center mt-3">
   <thead>
   <tr>
     <th>Name</th>
@@ -107,7 +153,7 @@
 </table>
 
 <!-- Search Results for performance -->
-<table *ngIf="curType === searchTypes.performance" class="table table-striped table-hover text-center mt-3">
+<table *ngIf="curSearchType === SearchType.performance" class="table table-striped table-hover text-center mt-3">
   <thead>
   <tr>
     <th>Name</th>

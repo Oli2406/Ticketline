@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
@@ -15,20 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-@RequestMapping("/api/v1/artist")
+@RequestMapping(ArtistEndpoint.BASE_PATH)
 public class ArtistEndpoint {
 
+    public static final String BASE_PATH = "/api/v1/artist";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
     private final ArtistService artistService;
 
     public ArtistEndpoint(ArtistService artistService) {
@@ -51,6 +52,16 @@ public class ArtistEndpoint {
         List<ArtistDetailDto> artists = artistService.getAllArtists();
         logger.info("Successfully fetched {} artists: {}", artists.size(), artists);
         return ResponseEntity.ok(artists);
+    }
+
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<ArtistDetailDto>> search(ArtistSearchDto dto) {
+        logger.info("GET " + BASE_PATH);
+        logger.debug("request parameters: {}", dto);
+        Stream<ArtistDetailDto> result = artistService.search(dto);
+        return ResponseEntity.ok(result);
     }
 
     @PermitAll

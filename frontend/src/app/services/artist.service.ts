@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {Artist, ArtistListDto} from 'src/app/dtos/artist';
+import {Artist, ArtistListDto, ArtistSearch} from 'src/app/dtos/artist';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +21,21 @@ export class ArtistService {
 
   getById(id: number): Observable<ArtistListDto> {
     return this.http.get<ArtistListDto>(`${(this.apiUrl)}/${id}`);
+  }
+
+  getAllByFilter(filter: ArtistSearch): Observable<ArtistListDto[]> {
+    let params = new HttpParams();
+    if (filter.firstName?.trim()) {
+      params = params.append('firstName', filter.firstName);
+    }
+    if (filter.surname?.trim()) {
+      params = params.append('surname', filter.surname);
+    }
+    if (filter.artistName?.trim()) {
+      params = params.append('artistName', filter.artistName);
+    }
+
+    return this.http.get<ArtistListDto[]>(this.apiUrl + "/search", {params});
   }
 
   createArtist(artist: Artist): Observable<Artist> {

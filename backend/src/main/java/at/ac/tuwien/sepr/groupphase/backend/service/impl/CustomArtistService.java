@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ArtistMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +26,12 @@ public class CustomArtistService implements ArtistService {
 
     private final ArtistRepository artistRepository;
     private final ArtistValidator artistValidator;
+    private final ArtistMapper artistMapper;
 
-    public CustomArtistService(ArtistRepository artistRepository, ArtistValidator artistValidator) {
+    public CustomArtistService(ArtistRepository artistRepository, ArtistValidator artistValidator, ArtistMapper artistMapper) {
         this.artistRepository = artistRepository;
         this.artistValidator = artistValidator;
+        this.artistMapper = artistMapper;
     }
 
     @Override
@@ -112,6 +117,22 @@ public class CustomArtistService implements ArtistService {
         artistRepository.deleteById(artistId);
 
         logger.info("Successfully deleted Artist with ID: {}", artistId);
+    }
+
+    @Override
+    public Stream<ArtistDetailDto> search(ArtistSearchDto dto) {
+        var query = artistRepository.findAll().stream();
+        if (dto.getFirstName() != null) {
+            query = query.filter(artist -> artist.getFirstName().toLowerCase().contains(dto.getFirstName().toLowerCase()));
+        }
+        if (dto.getSurname() != null) {
+            query = query.filter(artist -> artist.getSurname().toLowerCase().contains(dto.getSurname().toLowerCase()));
+        }
+        if (dto.getArtistName() != null) {
+            query = query.filter(artist -> artist.getArtistName().toLowerCase().contains(dto.getArtistName().toLowerCase()));
+        }
+
+        return query.map(this.artistMapper::artistToArtistDetailDto);
     }
 }
 
