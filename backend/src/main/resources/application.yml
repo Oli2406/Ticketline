@@ -81,5 +81,9 @@ spring:
       on-cloud-platform: kubernetes
   lifecycle:
     timeout-per-shutdown-phase: 30s
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
 server:
   shutdown: graceful

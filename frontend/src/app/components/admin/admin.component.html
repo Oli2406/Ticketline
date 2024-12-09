@@ -1,4 +1,5 @@
-<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+<div *ngIf="error" xmlns="http://www.w3.org/1999/html" class="alert alert-warning alert-dismissible fade show"
+     role="alert">
   <strong>Error!</strong> {{ errorMessage }}
   <button type="button" (click)="vanishError()" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
@@ -16,10 +17,10 @@
   <!-- Action Buttons -->
   <div class="row justify-content-center my-3">
     <div class="col-md-6 d-flex justify-content-between">
-      <button class="btn btn-primary" (click)="navigateToCreateShow()"><i class="bi bi-plus-lg"></i> Create Show</button>
       <button class="btn btn-primary" (click)="navigateToCreateNews()"><i class="bi bi-plus-lg"></i> Create News</button>
       <button class="btn btn-primary" (click)="navigateToCreateEvent()"><i class="bi bi-plus-lg"></i> Create Event</button>
       <button class="btn btn-primary" (click)="navigateToCreateUser()"><i class="bi bi-person-plus"></i> Create User</button>
+      <button class="btn btn-primary" (click)="navigateToCreateMerchandise()"><i class="bi bi-plus-lg"></i> Create Merch</button>
     </div>
   </div>
 

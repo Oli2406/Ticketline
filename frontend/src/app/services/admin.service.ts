@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import { Observable} from 'rxjs';
 import {Globals} from '../global/globals';
 import {UserDetailDto} from "../dtos/user-data";
 import {tap} from "rxjs/operators";
@@ -27,46 +27,12 @@ export class AdminService {
     return this.http.post<void>(`${this.baseUrl}/lock/${id}`, {});
   }
 
-  resetPassword(email:string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/reset-password/${email}`, {});
-  }
   sendEmailToResetPassword(email:string): Observable<string> {
     return this.http.post(`${this.baseUrl}/send-email`, email, {responseType: 'text'})
     .pipe(
       tap((authResponse: string) => {
         this.authService.storeResetToken(authResponse);
-        console.log(authResponse)
       })
     );
-  }
-
-
-  /**
-   * Handles API errors and formats error messages.
-   * @param error - HttpErrorResponse from the backend
-   * @returns Observable that throws a cleaned error message
-   */
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    let cleanedError = 'An unexpected error occurred.';
-    console.log(error.error.errors);
-    if (error.error) {
-      if (error.error.errors) {
-        try {
-          const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');
-          const errors = rawDetails.split(/(?=[A-Z])/);
-          const cleanedErrors = errors.map((err) =>
-            err.replace(/,\s*$/, '').trim()
-          );
-          cleanedError = cleanedErrors.join('\n');
-        } catch {
-          cleanedError = error.error.details;
-        }
-      } else if (typeof error.error === 'string') {
-        cleanedError = error.error;
-      } else if (error.error.message) {
-        cleanedError = error.error.message;
-      }
-    }
-    return throwError(() => new Error(cleanedError));
   }
 }

@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { AuthRequest, ResetPasswordTokenDto } from '../dtos/auth-request';
-import { catchError, Observable, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
-import { jwtDecode } from 'jwt-decode';
-import { Globals } from '../global/globals';
-import { UserResetPasswordDto } from '../dtos/user-data';
-import { ToastrService } from 'ngx-toastr';
+import {Injectable} from '@angular/core';
+import {AuthRequest, ResetPasswordTokenDto} from '../dtos/auth-request';
+import {catchError, Observable, of} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {tap} from 'rxjs/operators';
+import {jwtDecode} from 'jwt-decode';
+import {Globals} from '../global/globals';
+import {UserResetPasswordDto} from '../dtos/user-data';
+import {ToastrService} from 'ngx-toastr';
+import {ErrorFormatterService} from "./error-formatter.service";
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,11 @@ export class AuthService {
   private authBaseUri: string = this.globals.backendUri + '/authentication';
   private resetTokenKey = 'resetPasswordToken';
 
-  constructor(private httpClient: HttpClient, private globals: Globals, private toastr: ToastrService) {}
+  constructor(private httpClient: HttpClient,
+              private globals: Globals,
+              private toastr: ToastrService,
+              private errorFormatterService: ErrorFormatterService) {
+  }
 
   /**
    * Logs in the user and stores a valid JWT token upon success.
@@ -23,7 +28,9 @@ export class AuthService {
    * @param authRequest User login credentials
    */
   loginUser(authRequest: AuthRequest): Observable<string> {
-    return this.httpClient.post(this.authBaseUri, authRequest, { responseType: 'text' }).pipe(
+    this.clearResetToken();
+    this.clearAuthToken();
+    return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'}).pipe(
       tap((authResponse: string) => {
         this.storeAuthToken(authResponse);
         this.toastr.success('Login successful!', 'Success');
@@ -61,9 +68,9 @@ export class AuthService {
     const email = this.getUserEmailFromToken();
 
     if (token && email) {
-      const userLogoutDto = { email, authToken: token };
+      const userLogoutDto = {email, authToken: token};
 
-      this.httpClient.delete(this.authBaseUri, { body: userLogoutDto }).subscribe({
+      this.httpClient.delete(this.authBaseUri, {body: userLogoutDto}).subscribe({
         next: () => {
           this.clearAuthToken();
           this.toastr.success('You have been logged out successfully.', 'Logout');
@@ -141,6 +148,15 @@ export class AuthService {
     return this.getUserRole() === 'ADMIN';
   }
 
+  getUserIdFromToken(): string | null {
+    const token = this.getAuthToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.id || null;
+    }
+    return null;
+  }
+
   /**
    * Retrieves the email from the authentication token.
    */
@@ -156,14 +172,14 @@ export class AuthService {
   /**
    * Validates the given token with the backend.
    */
-  validateTokenInBackend(token: string): Observable<boolean> {
+  validateTokenInBackend(): Observable<boolean> {
     return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`);
   }
 
   /**
    * Validates the reset token with the backend.
    */
-  validateResetTokenInBackend(token: string): Observable<boolean> {
+  validateResetTokenInBackend(): Observable<boolean> {
     return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-reset-token`);
   }
 
@@ -171,7 +187,7 @@ export class AuthService {
    * Sends a reset password email to the user.
    */
   sendEmailToResetPassword(email: string): Observable<string> {
-    return this.httpClient.post(`${this.authBaseUri}/send-email`, email, { responseType: 'text' }).pipe(
+    return this.httpClient.post(`${this.authBaseUri}/send-email`, email, {responseType: 'text'}).pipe(
       tap((authResponse: string) => {
         this.storeResetToken(authResponse);
       })
@@ -190,5 +206,9 @@ export class AuthService {
    */
   verifyResetCode(token: ResetPasswordTokenDto): Observable<void> {
     return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code`, token);
+  }
+
+  getUserPoints(email: string): Observable<number> {
+    return this.httpClient.get<number>(`${this.authBaseUri}/user-points?email=${email}`);
   }
 }

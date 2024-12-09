@@ -1,11 +1,17 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ApplicationUser {
@@ -16,6 +22,7 @@ public class ApplicationUser {
 
     @Column(nullable = false)
     private String firstName;
+
     @Column(nullable = false)
     private String lastName;
 
@@ -40,17 +47,26 @@ public class ApplicationUser {
     @Column(nullable = false)
     private boolean isLoggedIn = false;
 
+    @Column(nullable = false)
+    private int points = 0;
+
+    @ElementCollection
+    @CollectionTable(name = "user_read_news", joinColumns = @JoinColumn(name = "user_id"))
+    @Column
+    private List<Long> readNewsIds = new ArrayList<>();
+
     public ApplicationUser() {
     }
 
     public ApplicationUser(String firstName, String lastName, String email,
-        String password,
-        Boolean admin) {
+                           String password,
+                           Boolean admin, int points) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.admin = admin;
+        this.points = points;
     }
 
     public Long getId() {
@@ -135,5 +151,29 @@ public class ApplicationUser {
 
     public boolean isLoggedIn() {
         return isLoggedIn;
+    }
+
+    public List<Long> getReadNewsIds() {
+        return readNewsIds;
+    }
+
+    public void setReadNewsIds(List<Long> readNewsIds) {
+        this.readNewsIds = readNewsIds;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public void incrementPoints(int points) {
+        points += this.points;
     }
 }

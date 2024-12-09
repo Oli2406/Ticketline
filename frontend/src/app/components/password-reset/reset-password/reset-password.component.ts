@@ -64,7 +64,15 @@ export class ResetPasswordComponent implements OnInit {
         this.router.navigate(['/login']);
       },
       error: (error) => {
-        this.toastr.error('Failed to reset password. Please try again.', 'Error');
+        const errors = Array.isArray(error.error.errors)
+          ? error.error
+          :error.error.errors.replace(/^\[|\]$/g, '').split(',');
+        const errorList = errors
+        .map((error) => `<li>${error.trim()}</li>`)
+        .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error setting new password', {
+          enableHtml: true,
+        });
       }
     });
   }

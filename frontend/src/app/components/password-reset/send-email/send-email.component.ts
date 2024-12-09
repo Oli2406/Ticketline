@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../services/auth.service';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {AuthService} from '../../../services/auth.service';
+import {Router} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
+import {ErrorFormatterService} from "../../../services/error-formatter.service";
 
 @Component({
   selector: 'app-send-email',
@@ -17,8 +18,10 @@ export class SendEmailComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
-  ) {}
+    private toastr: ToastrService,
+    private errorFormatterService: ErrorFormatterService
+  ) {
+  }
 
   ngOnInit(): void {
     this.emailForm = this.fb.group({
@@ -41,8 +44,7 @@ export class SendEmailComponent implements OnInit {
         this.router.navigate(['/verify-reset-code']);
       },
       error: (err) => {
-        const errorMessage = typeof err.error === 'object' ? err.error.error : err.error;
-        this.toastr.error(errorMessage || 'An error occurred while sending the email. Please try again.', 'Error');
+        this.toastr.error(err.error,'Error resetting password');
         this.router.navigate(['/login']);
       }
     });

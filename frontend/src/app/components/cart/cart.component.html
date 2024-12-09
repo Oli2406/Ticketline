@@ -1,0 +1,95 @@
+<div class="cart-container">
+  <h2>Your Cart</h2>
+  <div class="points-header mb-3">
+    <h3 style="background-color: #4D47C3; color: white;" class="bg-primary text-light p-2 rounded d-inline-block">
+      Available points: {{ accountPoints }}
+    </h3>
+  </div>
+
+  <div class="cart-content">
+    <!-- Payment Options Sidebar -->
+    <div class="payment-options">
+      <h3>Payment Options</h3>
+      <div class="payment-methods">
+        <label class="payment-option" [class.selected]="selectedPaymentOption === 'creditCard'">
+          <input type="radio" name="paymentOption" value="creditCard" [(ngModel)]="selectedPaymentOption" />
+          <i class="fas fa-credit-card"></i>
+          Credit Card
+        </label>
+        <label class="payment-option" [class.selected]="selectedPaymentOption === 'paypal'">
+          <input type="radio" name="paymentOption" value="paypal" [(ngModel)]="selectedPaymentOption" />
+          <i class="fab fa-paypal"></i>
+          PayPal
+        </label>
+        <label class="payment-option" [class.selected]="selectedPaymentOption === 'bankTransfer'">
+          <input type="radio" name="paymentOption" value="bankTransfer" [(ngModel)]="selectedPaymentOption" />
+          <i class="fas fa-university"></i>
+          Bank Transfer
+        </label>
+        <label class="payment-option" [class.selected]="selectedPaymentOption === 'points'">
+          <input type="radio" name="paymentOption" value="points" [(ngModel)]="selectedPaymentOption" />
+          <i class="fas fa-coins"></i>
+          Pay with Points
+        </label>
+      </div>
+      <div class="payment-buttons">
+        <button class="btn btn-primary" (click)="buy()">Buy</button>
+      </div>
+    </div>
+
+    <!-- Cart Table -->
+    <div class="cart-table">
+      <div *ngIf="cartItems.length > 0; else emptyCart">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let cartItem of cartItems">
+            <td>
+              <img
+                [src]="'http://localhost:8080/merchandise/' + cartItem.item.imageUrl"
+                alt="{{ cartItem.item.name }}"
+                width="50"
+              />
+            </td>
+            <td>{{ cartItem.item.name }}</td>
+            <td>{{ cartItem.item.price | number: '1.2-2' }} €</td>
+            <td>
+              <input
+                type="number"
+                [(ngModel)]="cartItem.quantity"
+                (change)="updateQuantity(cartItem.item, cartItem.quantity)"
+                min="1"
+              />
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)"><i class="bi bi-trash"></i></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- Conditionally Render Totals -->
+        <div class="totals">
+          <h3 *ngIf="selectedPaymentOption === 'points'">
+            Points Total: {{ getTotalPoints() }}
+          </h3>
+          <h3 *ngIf="selectedPaymentOption !== 'points'">
+            Total: {{ getTotalPrice() | number: '1.2-2' }} €
+          </h3>
+        </div>
+      </div>
+
+      <ng-template #emptyCart>
+        <p></p>
+      </ng-template>
+    </div>
+  </div>
+</div>

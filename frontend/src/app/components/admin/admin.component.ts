@@ -94,18 +94,17 @@ export class AdminComponent implements OnInit {
 
   navigateToCreateUser(): void {
     this.router.navigate(['/admin/createUser']);
-    console.log('Navigating to Create User');
   }
 
   navigateToCreateNews(): void {
-    console.log('Create News functionality will be implemented.');
-  }
-
-  navigateToCreateShow(): void {
-    console.log('Create Show functionality will be implemented.');
+    this.router.navigate(['/admin/createNews']);
   }
 
   navigateToCreateEvent(): void {
-    console.log('Create Event functionality will be implemented.');
+    this.router.navigate(['/admin/createEvent']);
+  }
+
+  navigateToCreateMerchandise() {
+    this.router.navigate(['/admin/createMerchandise']);
   }
 }

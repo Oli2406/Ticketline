@@ -46,8 +46,15 @@ export class VerifyResetCodeComponent implements OnInit {
         this.toastr.success('Reset code verified successfully. Redirecting to reset password page.', 'Success');
         this.router.navigate(['/reset-password']);
       },
-      error: () => {
-        this.toastr.error('The reset code is invalid or expired. Please try again.', 'Verification Failed');
+      error: (err) => {
+        if(err.error.errorMessage) {
+          this.toastr.error(err.error.errorMessage, 'Verification Failed');
+        } else if(err.error) {
+          // In case too many attempts, redirect to login and delete token from local storage
+          this.toastr.error(err.error, 'Verification Failed');
+          this.authService.clearResetToken();
+          this.router.navigate(['/login']);
+        }
       }
     });
   }

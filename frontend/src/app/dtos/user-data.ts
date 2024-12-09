@@ -5,6 +5,12 @@ export interface UserDetailDto {
   email: string;
   isLocked: boolean;
   isLoggedIn: boolean;
+  points: number
+}
+
+export interface UserUpdateReadNewsDto {
+  newsId: number;
+  email: string;
 }
 
 export interface UserResetPasswordDto {

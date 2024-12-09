@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.invoke.MethodHandles;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,11 +35,12 @@ public class RegisterEndpoint {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(
         @RequestBody UserRegistrationDto registerDto)
-        throws ValidationException, ConflictException {
+        throws ValidationException, ConflictException, NoSuchAlgorithmException {
         LOGGER.trace("POST" + basePath + "/register");
         Map<String, String> response = new HashMap<>();
         userService.register(registerDto);
         response.put("message", "User registered successfully");
         return ResponseEntity.ok(response);
     }
+
 }

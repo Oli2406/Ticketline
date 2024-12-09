@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import jakarta.annotation.security.PermitAll;
 import java.lang.invoke.MethodHandles;
+import java.security.NoSuchAlgorithmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class AuthenticationEndpoint {
 
     @PermitAll
     @PostMapping
-    public String login(@RequestBody UserLoginDto userLoginDto) {
+    public String login(@RequestBody UserLoginDto userLoginDto) throws NoSuchAlgorithmException {
         LOGGER.trace("POST " + BASE_PATH + "{}", userLoginDto);
         return userService.login(userLoginDto);
     }

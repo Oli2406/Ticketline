@@ -26,9 +26,6 @@ export class AuthGuard {
       const tokenFromUrl = this.extractTokenFromUrl(state.url);
       const tokenFromStorage = this.authService.getResetToken();
 
-      console.log("Storage: "+tokenFromStorage);
-      console.log("URL: " + tokenFromUrl);
-
       if (tokenFromUrl) {
         this.token = tokenFromUrl;
         this.authService.storeResetToken(this.token);
@@ -42,7 +39,7 @@ export class AuthGuard {
         return false;
       }
 
-      return this.authService.validateResetTokenInBackend(this.token).pipe(
+      return this.authService.validateResetTokenInBackend().pipe(
         tap((isValid) => {
           if (!isValid) {
             this.toastr.error('Reset token is invalid or expired.', 'Invalid Token');

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {AuthService} from "./services/auth.service";
 import {Router} from "@angular/router";
 
@@ -10,14 +10,25 @@ import {Router} from "@angular/router";
 export class AppComponent {
   title = 'SE PR Group Phase';
 
-  constructor(private authService: AuthService, public router: Router) {}
-  ngOnInit(): void {
-    this.authService.validateTokenInBackend(this.authService.getAuthToken()).subscribe((isValid) => {
-      if (!isValid) {
-        this.authService.logoutUser();
-        //this.router.navigate(['/home']);
-      }
-    });
+  constructor(private authService: AuthService, public router: Router) {
   }
 
+  ngOnInit(): void {
+    if (this.authService.getAuthToken()) {
+      this.authService.validateTokenInBackend().subscribe((isValid) => {
+        if (!isValid) {
+          this.authService.logoutUser();
+          //this.router.navigate(['/home']);
+        }
+      });
+    }
+
+    if (this.authService.getResetToken()) {
+      this.authService.validateResetTokenInBackend().subscribe((isValid) => {
+        if (!isValid) {
+          this.authService.clearResetToken();
+        }
+      });
+    }
+  }
 }

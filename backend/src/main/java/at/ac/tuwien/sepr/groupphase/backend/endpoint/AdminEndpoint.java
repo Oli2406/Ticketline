@@ -63,4 +63,5 @@ public class AdminEndpoint {
         List<UserDetailDto> users = adminService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+
 }
