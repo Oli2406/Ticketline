@@ -43,4 +43,6 @@ public interface PerformanceService {
      * @param id the ID of the performance to delete
      */
     void deletePerformance(Long id);
+
+    List<PerformanceDetailDto> performAdvancedSearch(String query);
 }

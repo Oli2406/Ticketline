@@ -10,4 +10,6 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     boolean existsByName(String name);
 
     boolean existsByNameAndCity(String name, String city);
+
+    Location findByLocationId(Long locationId);
 }

@@ -12,10 +12,10 @@ export interface Performance {
 export interface PerformanceListDto {
   performanceId: number;
   name: string;
-  locationId: number; // Populated from Location
+  locationId: number;
   date: string;
   price: number;
-  artistId: number; // Populated from Artist
+  artistId: number;
   ticketNumber: number;
   hall: string;
 }
