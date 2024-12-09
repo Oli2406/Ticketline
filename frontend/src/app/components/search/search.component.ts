@@ -143,16 +143,12 @@ export class SearchComponent {
 
   performAdvancedSearch() {
     if (!this.searchQuery || this.searchQuery.trim() === '') {
-      console.warn('Search query is empty.');
       this.advancedSearchPerformances = [];
       return;
     }
     this.performanceService.advancedSearchPerformances(this.searchQuery).subscribe({
       next: (performances) => {
         this.advancedSearchPerformances = performances;
-        if (performances.length === 0) {
-          console.warn('No matches found for query:', this.searchQuery);
-        }
       },
       error: (err) => {
         console.error('Error performing advanced search:', err);
@@ -171,6 +167,7 @@ export class SearchComponent {
     this.artistSearchParams.firstName = '';
     this.artistSearchParams.surname = '';
     this.artistSearchParams.artistName = '';
+    this.searchQuery = '';
     this.searchChanged();
   }
 

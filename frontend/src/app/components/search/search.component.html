@@ -175,7 +175,7 @@
       <th>Name</th>
       <th>Date</th>
       <th>Price</th>
-      <th>Ticket Number</th>
+      <th>Number of Tickets</th>
       <th>Hall</th>
     </tr>
     </thead>
@@ -183,7 +183,7 @@
     <tr *ngFor="let performance of advancedSearchPerformances">
       <td>{{ performance.name }}</td>
       <td>{{ performance.date | date }}</td>
-      <td>{{ performance.price }}</td>
+      <td>{{ performance.price }} €</td>
       <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
     </tr>

@@ -59,7 +59,7 @@ public class MerchandiseEndpoint {
             merchandiseCreateDtoWithImage.setCategory(merchandiseCreateDto.getCategory());
             merchandiseCreateDtoWithImage.setPrice(merchandiseCreateDto.getPrice());
             merchandiseCreateDtoWithImage.setStock(merchandiseCreateDto.getStock());
-            merchandiseService.saveMerchandise(merchandiseCreateDtoWithImage);
+            merchandiseService.createMerchandise(merchandiseCreateDtoWithImage);
             LOGGER.info("Merchandise successfully created: {}", merchandiseCreateDto);
             return new ResponseEntity<>(merchandiseCreateDto, HttpStatus.CREATED);
         } catch (IOException e) {

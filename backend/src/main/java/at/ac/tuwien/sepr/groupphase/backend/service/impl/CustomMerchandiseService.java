@@ -33,7 +33,7 @@ public class CustomMerchandiseService implements MerchandiseService {
     }
 
     @Override
-    public MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException {
+    public MerchandiseCreateDto createMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException {
         merchandiseValidator.validateCreate(merchandiseCreateDto);
 
         LOGGER.info("Save merchandise {}", merchandiseCreateDto);

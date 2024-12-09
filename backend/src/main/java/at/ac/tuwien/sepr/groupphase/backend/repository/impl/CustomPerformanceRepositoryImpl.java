@@ -19,6 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,15 +33,14 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
     @Override
     public List<PerformanceDetailDto> findByAdvancedSearch(String query) {
 
         if (query == null || query.trim().isEmpty()) {
-            LOGGER.info("Empty query received, returning empty result set.");
             return new ArrayList<>();
         }
-
-        LOGGER.info("Executing advanced search with query: {}", query);
         String[] terms = query.split("\\s+");
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -57,12 +59,21 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
 
         List<Predicate> predicates = new ArrayList<>();
         for (String term : terms) {
-            String likePattern = term.toLowerCase();
+            if (term.contains(".")) {
+                LocalDate date = parseDate(term);
+                if (date != null) {
+                    predicates.add(cb.equal(performance.get("date"), date));
+                    continue;
+                }
+            }
+
+            String likePattern = "%" + term.toLowerCase() + "%";
             predicates.add(cb.or(
                 cb.like(cb.lower(event.get("title")), likePattern),
                 cb.like(cb.lower(event.get("description")), likePattern),
                 cb.like(cb.lower(event.get("category")), likePattern),
                 cb.like(cb.lower(performance.get("name")), likePattern),
+                cb.like(cb.lower(performance.get("hall")), likePattern),
                 cb.like(cb.lower(artist.get("firstName")), likePattern),
                 cb.like(cb.lower(artist.get("surname")), likePattern),
                 cb.like(cb.lower(artist.get("artistName")), likePattern),
@@ -75,13 +86,10 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
         }
 
         if (predicates.isEmpty()) {
-            LOGGER.info("No terms to filter, returning empty result set.");
             return new ArrayList<>();
         }
 
         Predicate combinedPredicate = cb.and(joinCondition, cb.and(predicates.toArray(new Predicate[0])));
-
-        LOGGER.debug("Generated combined predicate: {}", combinedPredicate);
 
         cq.select(cb.construct(
             PerformanceDetailDto.class,
@@ -102,5 +110,14 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
         LOGGER.info(results.toString());
 
         return results;
+    }
+
+    private LocalDate parseDate(String dateStr) {
+        try {
+            return LocalDate.parse(dateStr, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            LOGGER.warn("Failed to parse date: {}", dateStr);
+            return null;
+        }
     }
 }
