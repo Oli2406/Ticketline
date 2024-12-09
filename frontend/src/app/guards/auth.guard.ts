@@ -26,6 +26,9 @@ export class AuthGuard {
       const tokenFromUrl = this.extractTokenFromUrl(state.url);
       const tokenFromStorage = this.authService.getResetToken();
 
+      console.log("Storage: "+tokenFromStorage);
+      console.log("URL: " + tokenFromUrl);
+
       if (tokenFromUrl) {
         this.token = tokenFromUrl;
         this.authService.storeResetToken(this.token);
@@ -59,7 +62,7 @@ export class AuthGuard {
     if (this.authService.isLoggedIn()) {
       return true;
     } else {
-      this.toastr.warning('User is not logged in. Redirecting to login.', 'Access Denied');
+      //this.toastr.warning('User is not logged in. Redirecting to login.', 'Access Denied');
       this.router.navigate(['/login']);
       return false;
     }

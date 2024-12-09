@@ -43,6 +43,7 @@ export class SendEmailComponent implements OnInit {
       error: (err) => {
         const errorMessage = typeof err.error === 'object' ? err.error.error : err.error;
         this.toastr.error(errorMessage || 'An error occurred while sending the email. Please try again.', 'Error');
+        this.router.navigate(['/login']);
       }
     });
   }

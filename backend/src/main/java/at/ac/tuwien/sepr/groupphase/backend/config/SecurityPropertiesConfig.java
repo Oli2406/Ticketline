@@ -25,6 +25,7 @@ public class SecurityPropertiesConfig {
         private String prefix;
         private String loginUri;
         private int maxLoginAttempts;
+        private int maxResetCodeAttempts;
 
         public String getHeader() {
             return header;
@@ -56,6 +57,14 @@ public class SecurityPropertiesConfig {
 
         public void setMaxLoginAttempts(int maxLoginAttempts) {
             this.maxLoginAttempts = maxLoginAttempts;
+        }
+
+        public int getMaxResetCodeAttempts() {
+            return maxResetCodeAttempts;
+        }
+
+        public void setMaxResetCodeAttempts(int maxResetCodeAttempts) {
+            this.maxResetCodeAttempts = maxResetCodeAttempts;
         }
     }
 

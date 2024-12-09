@@ -72,8 +72,6 @@ export class AuthService {
           this.toastr.error('Logout failed. Please try again.', 'Error');
         },
       });
-    } else {
-      this.toastr.warning('No active session found to log out.', 'Warning');
     }
   }
 
@@ -159,26 +157,14 @@ export class AuthService {
    * Validates the given token with the backend.
    */
   validateTokenInBackend(token: string): Observable<boolean> {
-    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`).pipe(
-      tap(() => this.toastr.info('Token validation successful.', 'Info')),
-      catchError(() => {
-        this.toastr.error('Token validation failed.', 'Error');
-        return of(false);
-      })
-    );
+    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`);
   }
 
   /**
    * Validates the reset token with the backend.
    */
   validateResetTokenInBackend(token: string): Observable<boolean> {
-    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-reset-token`).pipe(
-      tap(() => this.toastr.info('Reset token validation successful.', 'Info')),
-      catchError(() => {
-        this.toastr.error('Reset token validation failed.', 'Error');
-        return of(false);
-      })
-    );
+    return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-reset-token`);
   }
 
   /**
@@ -186,12 +172,8 @@ export class AuthService {
    */
   sendEmailToResetPassword(email: string): Observable<string> {
     return this.httpClient.post(`${this.authBaseUri}/send-email`, email, { responseType: 'text' }).pipe(
-      tap(() => {
-        this.toastr.success('Reset password email sent successfully. Please check your inbox.', 'Success');
-      }),
-      catchError(() => {
-        this.toastr.error('Failed to send reset password email.', 'Error');
-        return of('');
+      tap((authResponse: string) => {
+        this.storeResetToken(authResponse);
       })
     );
   }
@@ -200,29 +182,13 @@ export class AuthService {
    * Resets the user's password using the provided data.
    */
   resetPassword(data: UserResetPasswordDto): Observable<boolean> {
-    return this.httpClient.post<boolean>(`${this.authBaseUri}/reset-password`, data).pipe(
-      tap(() => {
-        this.toastr.success('Password reset successfully.', 'Success');
-      }),
-      catchError(() => {
-        this.toastr.error('Failed to reset password.', 'Error');
-        return of(false);
-      })
-    );
+    return this.httpClient.post<boolean>(`${this.authBaseUri}/reset-password`, data);
   }
 
   /**
    * Verifies the reset code provided by the user.
    */
   verifyResetCode(token: ResetPasswordTokenDto): Observable<void> {
-    return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code`, token).pipe(
-      tap(() => {
-        this.toastr.success('Reset code verified successfully.', 'Success');
-      }),
-      catchError(() => {
-        this.toastr.error('Failed to verify reset code.', 'Error');
-        return of();
-      })
-    );
+    return this.httpClient.post<void>(`${this.authBaseUri}/verify-reset-code`, token);
   }
 }

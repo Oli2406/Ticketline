@@ -20,6 +20,9 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expirationTime;
 
+    @Column
+    private int failedAttempts;
+
     public PasswordResetToken(String email, String code, String token,
         LocalDateTime expirationTime) {
         this.email = email;
@@ -61,5 +64,13 @@ public class PasswordResetToken {
 
     public void setExpirationTime(LocalDateTime expirationTime) {
         this.expirationTime = expirationTime;
+    }
+
+    public int getFailedAttempts() {
+        return failedAttempts;
+    }
+
+    public void setFailedAttempts(int failedAttempts) {
+        this.failedAttempts = failedAttempts;
     }
 }
