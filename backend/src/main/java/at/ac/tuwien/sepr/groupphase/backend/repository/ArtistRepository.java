@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
     boolean existsByArtistName(String artistName);
+
+    Artist findArtistByArtistId(Long id);
 }

@@ -3,6 +3,10 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
 import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
+import {EventListDto} from "../dtos/event";
+
+class PerformanceDetailDto {
+}
 
 @Injectable({
   providedIn: 'root',
@@ -16,11 +20,17 @@ export class PerformanceService {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
   }
 
+  advancedSearchPerformances(query: string): Observable<PerformanceListDto[]> {
+    const url = `${this.apiUrl}/advanced-search?query=${query}`;
+    return this.http.get<PerformanceListDto[]>(url);
+  }
+
   createPerformance(performance: Performance): Observable<PerformanceListDto> {
     return this.http.put<PerformanceListDto>(this.apiUrl, performance).pipe(
       catchError(this.handleError)
     );
   }
+
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';

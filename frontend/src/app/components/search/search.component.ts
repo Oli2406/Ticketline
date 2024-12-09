@@ -7,7 +7,7 @@ import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto} from "../../dtos/location";
-import {PerformanceWithNamesDto} from "../../dtos/performance";
+import {PerformanceListDto, PerformanceWithNamesDto} from "../../dtos/performance";
 import {debounceTime, forkJoin, map, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 
@@ -38,6 +38,9 @@ export class SearchComponent {
   artists: ArtistListDto[] = [];
   performances: PerformanceWithNamesDto[] = [];
   locations: LocationListDto[] = [];
+  advancedSearchPerformances: PerformanceListDto[] = [];
+
+  searchQuery: string = '';
 
   searchChangedObservable = new Subject<void>();
   curSearchType = SearchType.event;
@@ -57,6 +60,10 @@ export class SearchComponent {
   }
 
   changeSearchType(type: SearchType) {
+    if (type !== SearchType.advanced) {
+      this.advancedSearchPerformances = [];
+      this.searchQuery = '';
+    }
     this.curSearchType = type;
     this.updateData();
   }
@@ -72,12 +79,19 @@ export class SearchComponent {
       [SearchType.location]: this.updateLocations.bind(this),
       [SearchType.performance]: this.updatePerformances.bind(this),
       [SearchType.advanced]: () => {
+        if (this.searchQuery.trim() !== '') {
+          this.performAdvancedSearch();
+        } else {
+          this.advancedSearchPerformances = [];
+        }
       },
     };
 
     const updateAction = updateActions[this.curSearchType];
     if (updateAction) updateAction();
   }
+
+
 
   updateEvents() {
     this.eventService.get().subscribe({
@@ -127,7 +141,29 @@ export class SearchComponent {
     });
   }
 
+  performAdvancedSearch() {
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      console.warn('Search query is empty.');
+      this.advancedSearchPerformances = [];
+      return;
+    }
+    this.performanceService.advancedSearchPerformances(this.searchQuery).subscribe({
+      next: (performances) => {
+        this.advancedSearchPerformances = performances;
+        if (performances.length === 0) {
+          console.warn('No matches found for query:', this.searchQuery);
+        }
+      },
+      error: (err) => {
+        console.error('Error performing advanced search:', err);
+        this.advancedSearchPerformances = [];
+      }
+    });
+  }
+
+
   searchChanged(): void {
+    this.advancedSearchPerformances = [];
     this.searchChangedObservable.next();
   }
 
