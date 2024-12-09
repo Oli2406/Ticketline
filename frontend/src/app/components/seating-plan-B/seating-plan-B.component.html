@@ -1,0 +1,92 @@
+<div class="container mt-5 seating-plan-B">
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h1 class="text-black bold">Hall A</h1>
+  </div>
+
+  <!-- Seating Plan and Ticket Details -->
+  <div class="row justify-content-center">
+    <!-- Seating Plan -->
+    <div class="col-lg-8">
+      <div class="seating-plan-box p-4 rounded position-relative">
+        <!-- Stage -->
+        <div class="stage text-center">
+          <h4>Stage</h4>
+        </div>
+
+        <!-- Seating Sections -->
+        <div class="seating-container">
+          <!-- Front Section -->
+          <div class="seating-front">
+            <div
+              *ngFor="let seat of frontSeats"
+              class="seat-box"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+            ></div>
+          </div>
+
+          <!-- Back Section -->
+          <div class="seating-back">
+            <div
+              *ngFor="let seat of backSeats"
+              class="seat-box"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+            ></div>
+          </div>
+
+          <!-- Left Section (Rotated) -->
+          <div class="seating-left rotated">
+            <div
+              *ngFor="let seat of leftSeats"
+              class="seat-box"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+            ></div>
+          </div>
+
+          <!-- Right Section (Rotated) -->
+          <div class="seating-right rotated">
+            <div
+              *ngFor="let seat of rightSeats"
+              class="seat-box"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Tickets Info -->
+    <div class="col-lg-4">
+      <div class="p-4 border rounded bg-light">
+        <h5 class="text-center">Selected Tickets</h5>
+        <div *ngIf="selectedTickets.length > 0" class="mt-4">
+          <p><strong>Selected Seats:</strong></p>
+          <ul>
+            <li *ngFor="let seat of selectedTickets">
+              Sector {{ seat.sector }} - Row {{ seat.row }} - Seat {{ seat.col }} ({{ seat.price }}€)
+            </li>
+          </ul>
+        </div>
+        <div class="mt-4">
+          <p><strong>Total Tickets:</strong> {{ totalTickets }}</p>
+          <p><strong>Total Price:</strong> {{ totalPrice }}€</p>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-gray" (click)="resetSelections()">
+            <i class="bi bi-x me-2"></i>Clear
+          </button>
+          <button class="btn btn-light-purple" (click)="reserveTickets()">
+            <i class="bi bi-bookmark me-2"></i>Reserve
+          </button>
+          <button class="btn btn-purple" (click)="buyTickets()">
+            <i class="bi bi-cart me-2"></i>Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
