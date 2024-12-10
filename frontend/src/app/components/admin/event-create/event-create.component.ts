@@ -29,7 +29,7 @@ import {TicketService} from 'src/app/services/ticket.service';
 
 export class EventCreateComponent implements OnInit {
   eventData: Event = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
-  newPerformance: Performance = { name: '', date: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
+  newPerformance: Performance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
 
   newArtist: Artist = { firstName: '', surname: '', artistName: '' };
   newLocation: Location = { name: '', street: '', city: '', postalCode: '', country: '' };
@@ -200,6 +200,7 @@ export class EventCreateComponent implements OnInit {
   }
 
   createPerformance() {
+    this.newPerformance.price = 0.0;
     this.performanceService.createPerformance(this.newPerformance).subscribe({
       next: (performance: PerformanceListDto) => {
         this.performances.push(performance);
@@ -209,7 +210,7 @@ export class EventCreateComponent implements OnInit {
         }
         this.toastr.success('Performance created successfully!', 'Success');
         //this.saveToLocalStorage();
-        this.newPerformance = { name: '', date: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
+        this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
         this.showPerformanceForm = false;
       },
       error: (err) => {
