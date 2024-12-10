@@ -25,7 +25,7 @@ public class JwtTokenizer {
         this.secretKey = Keys.hmacShaKeyFor(securityProperties.getJwtSecret().getBytes());
     }
 
-    public String getAuthToken(String user, List<String> roles, String encryptedId, int points) {
+    public String getAuthToken(String user, List<String> roles, String encryptedId, int points,String firstName, String lastName) {
         String token =
             Jwts.builder()
                 .header()
@@ -42,6 +42,8 @@ public class JwtTokenizer {
                 .claim("rol", roles)
                 .claim("id", encryptedId)
                 .claim("points", points)
+                .claim("firstName", firstName)
+                .claim("lastName", lastName)
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
 

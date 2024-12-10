@@ -2,11 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {CartService} from '../../services/cart.service';
 import {Merchandise} from "../../dtos/merchandise";
 import {FormsModule} from "@angular/forms";
-import {CommonModule, DecimalPipe} from "@angular/common";
+import {CommonModule, DecimalPipe, NgOptimizedImage} from "@angular/common";
 import {AuthService} from "../../services/auth.service";
 import {ToastrService} from "ngx-toastr";
 import {Router} from "@angular/router";
 import {Globals} from "../../global/globals";
+import {ReceiptService} from "../../services/receipt.service";
 
 @Component({
   selector: 'app-cart',
@@ -15,12 +16,16 @@ import {Globals} from "../../global/globals";
   imports: [
     FormsModule,
     DecimalPipe,
-    CommonModule
+    CommonModule,
+    NgOptimizedImage
   ],
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
   cartItems: { item: Merchandise; quantity: number }[] = [];
+  userFirstName: string;
+  userLastName: string;
+  userEmail: string;
 
   selectedPaymentOption: string = 'creditCard'
   protected accountPoints: number;
@@ -30,12 +35,15 @@ export class CartComponent implements OnInit {
   constructor(private cartService: CartService,
               private authService: AuthService,
               private toastr: ToastrService,
+              private receiptService: ReceiptService,
               private router: Router,
-              private global: Globals) {}
+              private global: Globals) {
+  }
 
   ngOnInit(): void {
     this.cartItems = this.cartService.getCart();
-    this.fetchAccountPoints()
+    this.fetchAccountPoints();
+    this.fetchUser();
     this.imageLocation = this.global.backendRessourceUri + '/merchandise/'
   }
 
@@ -51,6 +59,12 @@ export class CartComponent implements OnInit {
         }
       });
     }
+  }
+
+  fetchUser(): void {
+    this.userFirstName = this.authService.getUserFirstNameFromToken();
+    this.userLastName = this.authService.getUserLastNameFromToken();
+    this.userEmail = this.authService.getUserEmailFromToken()
   }
 
   updateQuantity(item: Merchandise, quantity: number): void {
@@ -73,9 +87,18 @@ export class CartComponent implements OnInit {
   getPointsForMoney(): number {
     const PointsToAdd = this.getTotalPrice();
     return Math.trunc(PointsToAdd);
-}
+  }
+
+  public generatePDF() {
+    this.receiptService.exportToPDF();
+  }
+
+  public setInvoiceDate() {
+    return new Date();
+  }
 
   async buy(): Promise<void> {
+    this.receiptService.exportToPDF();
     if (!this.selectedPaymentOption) {
       this.toastr.error('Please select a payment option.');
       return;

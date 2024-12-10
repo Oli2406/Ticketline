@@ -122,6 +122,24 @@ export class AuthService {
     return null;
   }
 
+  getUserFirstNameFromToken(): string|null{
+    const token = this.getToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.firstName;
+    }
+    return null;
+  }
+
+  getUserLastNameFromToken(): string|null{
+    const token = this.getToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.lastName;
+    }
+    return null;
+  }
+
   validateToken(): Observable<boolean> {
     const token = this.getToken();
 

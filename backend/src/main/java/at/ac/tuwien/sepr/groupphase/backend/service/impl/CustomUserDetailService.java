@@ -123,7 +123,7 @@ public class CustomUserDetailService implements UserService {
 
             List<String> roles =
                 userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, randomStringGenerator.generateRandomString(user.getId()), user.getPoints());
+            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, randomStringGenerator.generateRandomString(user.getId()), user.getPoints(), user.getFirstName(), user.getLastName());
         }
 
         user.incrementLoginAttempts();
@@ -192,7 +192,7 @@ public class CustomUserDetailService implements UserService {
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
-        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints());
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(), toRegister.getFirstName(), toRegister.getLastName());
     }
 
     @Override
