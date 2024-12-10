@@ -25,7 +25,8 @@ public class JwtTokenizer {
         this.secretKey = Keys.hmacShaKeyFor(securityProperties.getJwtSecret().getBytes());
     }
 
-    public String getAuthToken(String user, List<String> roles, String encryptedId, int points,String firstName, String lastName) {
+    public String getAuthToken(String user, List<String> roles, String encryptedId, int points,
+        String firstName, String lastName) {
         String token =
             Jwts.builder()
                 .header()
