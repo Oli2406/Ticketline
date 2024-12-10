@@ -43,14 +43,14 @@ public class CustomEventService implements EventService {
         );
         event = eventRepository.save(event);
         logger.debug("Saved event to database: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration(), event.getPerformanceIds());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration());
     }
 
     @Override
     public List<EventDetailDto> getAllEvents() {
         logger.info("Fetching all events");
         List<EventDetailDto> events = eventRepository.findAll().stream()
-            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration(), event.getPerformanceIds()))
+            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration()))
             .collect(Collectors.toList());
         logger.debug("Fetched {} events: {}", events.size(), events);
         return events;
@@ -61,7 +61,7 @@ public class CustomEventService implements EventService {
         logger.info("Fetching event with ID: {}", id);
         Event event = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
         logger.debug("Fetched event: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration(), event.getPerformanceIds());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration());
     }
 
     @Override

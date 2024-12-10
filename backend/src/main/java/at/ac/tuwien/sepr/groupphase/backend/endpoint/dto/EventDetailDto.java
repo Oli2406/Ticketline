@@ -12,16 +12,14 @@ public class EventDetailDto {
     private String category;
     private LocalDate dateOfEvent;
     private int duration;
-    private List<Long> performanceIds; // List of associated Performance IDs
 
-    public EventDetailDto(Long eventId, String title, String description, String category, LocalDate dateOfEvent, int duration, List<Long> performanceIds) {
+    public EventDetailDto(Long eventId, String title, String description, String category, LocalDate dateOfEvent, int duration) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
         this.category = category;
         this.dateOfEvent = dateOfEvent;
         this.duration = duration;
-        this.performanceIds = performanceIds;
     }
 
     public Long getEventId() {
@@ -70,13 +68,5 @@ public class EventDetailDto {
 
     public void setDuration(int duration) {
         this.duration = duration;
-    }
-
-    public List<Long> getPerformanceIds() {
-        return performanceIds;
-    }
-
-    public void setPerformanceIds(List<Long> performanceIds) {
-        this.performanceIds = performanceIds;
     }
 }

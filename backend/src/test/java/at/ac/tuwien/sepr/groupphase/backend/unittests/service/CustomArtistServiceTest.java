@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ArtistMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -28,10 +29,13 @@ public class CustomArtistServiceTest {
     @Mock
     private ArtistValidator artistValidator;
 
+    @Mock
+    private ArtistMapper artistMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        artistService = new CustomArtistService(artistRepository, artistValidator);
+        artistService = new CustomArtistService(artistRepository, artistValidator, artistMapper);
     }
 
     @Test

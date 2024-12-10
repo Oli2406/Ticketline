@@ -9,6 +9,7 @@ import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -42,7 +44,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(createdPerformance);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<PerformanceDetailDto>> getAllPerformances() {
         logger.info("Fetching all performances");
@@ -51,7 +53,7 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(performances);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<PerformanceDetailDto> getPerformanceById(@PathVariable Long id) {
         logger.info("Fetching performance with ID: {}", id);
@@ -67,5 +69,12 @@ public class PerformanceEndpoint {
         performanceService.deletePerformance(id);
         logger.debug("Performance with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/advanced-search")
+    public ResponseEntity<?> advancedSearch(@RequestParam String query) {
+        List<PerformanceDetailDto> events = performanceService.performAdvancedSearch(query);
+        return new ResponseEntity<>(events, HttpStatus.CREATED);
     }
 }

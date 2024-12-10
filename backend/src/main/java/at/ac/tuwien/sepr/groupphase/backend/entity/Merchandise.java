@@ -14,17 +14,17 @@ import java.math.BigDecimal;
 public class Merchandise {
 
     @Column(nullable = false)
-    BigDecimal price;
+    private BigDecimal price;
     @Column(nullable = false)
-    String name;
+    private String name;
     @Column(nullable = false)
-    String category;
+    private String category;
     @Column(nullable = false)
-    int stock;
+    private int stock;
     @Column(nullable = false)
-    String imageUrl;
+    private String imageUrl;
     @Column(nullable = false)
-    int points;
+    private int points;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long merchandiseId;

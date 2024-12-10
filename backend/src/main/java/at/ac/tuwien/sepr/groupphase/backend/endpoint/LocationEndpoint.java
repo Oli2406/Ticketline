@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -43,7 +42,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(createdLocation);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping
     public ResponseEntity<List<LocationDetailDto>> getAllLocations() {
         logger.info("Fetching all locations");
@@ -52,7 +51,7 @@ public class LocationEndpoint {
         return ResponseEntity.ok(locations);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<LocationDetailDto> getLocationById(@PathVariable Long id) {
         logger.info("Fetching location with ID: {}", id);

@@ -1,20 +1,19 @@
 package at.ac.tuwien.sepr.groupphase.backend.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 public class Performance {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,14 +22,25 @@ public class Performance {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "artist_id", insertable = false, updatable = false)
     private Long artistId;
 
-    @Column(nullable = false)
+    @Column(name = "location_id", insertable = false, updatable = false)
     private Long locationId;
+
+    @ManyToOne
+    @JoinColumn(name = "artist_id", referencedColumnName = "artistId")
+    private Artist artist;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id", referencedColumnName = "locationId")
+    private Location location;
 
     @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
+    private BigDecimal price;
 
     @Column(nullable = false)
     private Long ticketNumber;
@@ -38,21 +48,20 @@ public class Performance {
     @Column(nullable = false)
     private String hall;
 
-    /*
-     * @OneToMany(mappedBy = "performance", cascade = CascadeType.ALL, orphanRemoval = true)
-     * private List<Ticket> tickets; // Wird nicht als Spalte in der Tabelle gespeichert
-     */
-
     public Performance() {
     }
 
-    public Performance(String name, Long artistId, Long locationId, LocalDate date, Long ticketNumber, String hall) {
+    public Performance(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price,
+                       Long ticketNumber, String hall, Artist artist, Location location) {
         this.name = name;
-        this.artistId = artistId;
-        this.locationId = locationId;
+        this.artistId = artist != null ? artist.getArtistId() : artistId;
+        this.locationId = location != null ? location.getLocationId() : locationId;
         this.date = date;
+        this.price = price;
         this.ticketNumber = ticketNumber;
         this.hall = hall;
+        this.artist = artist;
+        this.location = location;
     }
 
     public Long getPerformanceId() {
@@ -95,6 +104,14 @@ public class Performance {
         this.date = date;
     }
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
     public String getHall() {
         return hall;
     }
@@ -109,5 +126,21 @@ public class Performance {
 
     public void setTicketNumber(Long ticketNumber) {
         this.ticketNumber = ticketNumber;
+    }
+
+    public String getArtist() {
+        return artist.getArtistName();
+    }
+
+    public void setArtist(Artist artist) {
+        this.artist = artist;
+    }
+
+    public String getLocation() {
+        return location.getName();
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }

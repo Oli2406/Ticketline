@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class PerformanceCreateDto {
 
@@ -10,16 +12,23 @@ public class PerformanceCreateDto {
     private Long artistId;
     private Long locationId;
     private LocalDate date;
+    private BigDecimal price;
     private Long ticketNumber;
     private String hall;
+    private Artist artist;
+    private Location location;
 
-    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDate date, Long ticketNumber, String hall) {
+    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall,
+                                Artist artist, Location location) {
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
         this.date = date;
+        this.price = price;
         this.ticketNumber = ticketNumber;
         this.hall = hall;
+        this.artist = artist;
+        this.location = location;
     }
 
     public PerformanceCreateDto() {}
@@ -56,6 +65,14 @@ public class PerformanceCreateDto {
         this.date = date;
     }
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
     public Long getTicketNumber() {
         return ticketNumber;
     }
@@ -70,5 +87,13 @@ public class PerformanceCreateDto {
 
     public void setHall(String hall) {
         this.hall = hall;
+    }
+
+    public Artist getArtist() {
+        return artist;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }

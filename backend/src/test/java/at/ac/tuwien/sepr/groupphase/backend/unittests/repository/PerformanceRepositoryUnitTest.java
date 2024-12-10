@@ -1,7 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.repository;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +23,36 @@ class PerformanceRepositoryUnitTest {
     @Autowired
     private PerformanceRepository performanceRepository;
 
+    @Autowired
+    private ArtistRepository artistRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
+
     private Performance testPerformance;
+    private Artist testArtist;
+    private Location testLocation;
 
     @BeforeEach
     void setUp() {
+        // Create and save Artist
+        testArtist = new Artist("firstname", "lastname", "artistname");
+        testArtist = artistRepository.save(testArtist);
+
+        // Create and save Location
+        testLocation = new Location("name", "street", "city", "1221", "country");
+        testLocation = locationRepository.save(testLocation);
+
+        // Create Performance
         testPerformance = new Performance();
         testPerformance.setName("Test Performance");
-        testPerformance.setArtistId(1L);
-        testPerformance.setLocationId(1L);
+        testPerformance.setArtistId(testArtist.getArtistId());
+        testPerformance.setLocationId(testLocation.getLocationId());
         testPerformance.setDate(LocalDate.now());
         testPerformance.setTicketNumber(100L);
         testPerformance.setHall("Main Hall");
+        testPerformance.setArtist(testArtist);
+        testPerformance.setLocation(testLocation);
     }
 
     @Test
@@ -50,8 +73,7 @@ class PerformanceRepositoryUnitTest {
     @Test
     void existsByNameAndLocationIdAndDate_ReturnsTrueIfExists() {
         performanceRepository.save(testPerformance);
-        boolean exists = performanceRepository.existsByNameAndLocationIdAndDate("Test Performance", 1L, LocalDate.now());
+        boolean exists = performanceRepository.existsByNameAndLocationIdAndDate("Test Performance", testLocation.getLocationId(), LocalDate.now());
         assertTrue(exists, "Performance with matching name, location, and date should exist");
     }
 }
-

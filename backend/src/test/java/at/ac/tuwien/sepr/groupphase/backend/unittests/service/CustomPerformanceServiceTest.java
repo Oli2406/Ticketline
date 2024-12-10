@@ -1,6 +1,8 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -28,15 +30,30 @@ public class CustomPerformanceServiceTest {
     @Mock
     private PerformanceValidator performanceValidator;
 
+    @Mock
+    private SearchPerformanceRepository searchPerformanceRepository;
+
+    @Mock
+    private ArtistRepository artistRepository;
+
+    @Mock
+    private LocationRepository locationRepository;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        performanceService = new CustomPerformanceService(performanceRepository, performanceValidator);
+        performanceService = new CustomPerformanceService(performanceRepository, performanceValidator, searchPerformanceRepository, artistRepository, locationRepository);
     }
 
     @Test
     void createOrUpdatePerformance_ShouldSavePerformance_WhenValidInput() throws ValidationException, ConflictException {
+<<<<<<< HEAD
         PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDate.now(), 100L, "Main Hall");
+=======
+        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDate.now(), new BigDecimal("50.00"), 100L, "Main Hall",
+                                                            new Artist("first", "name", "band"),
+                                                            new Location("sample", "street", "city", "1234", "country"));
+>>>>>>> origin/develop
 
         when(performanceRepository.save(any(Performance.class))).thenAnswer(invocation -> {
             Performance p = invocation.getArgument(0);
