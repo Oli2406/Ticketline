@@ -36,14 +36,13 @@ export class TicketService {
   }
 
   /**
-   * Updates the status of a ticket to "RESERVED".
-   * @param ticketId - The ID of the ticket to update.
+   * Updates the entire ticket, including its status.
+   * @param ticket - The ticket object to update with its new status.
    * @returns Observable<TicketDto>
    */
-  updateTicketStatusToReserved(ticketId: number): Observable<TicketDto> {
-    const url = `${this.apiUrl}/${ticketId}/status`;
-    const updatedStatus = { status: "RESERVED" };
-    return this.http.patch<TicketDto>(url, updatedStatus).pipe(
+  updateTicket(ticket: TicketDto): Observable<TicketDto> {
+    const url = `${this.apiUrl}/${ticket.ticketId}`;
+    return this.http.put<TicketDto>(url, ticket).pipe(
       catchError(this.handleError)
     );
   }

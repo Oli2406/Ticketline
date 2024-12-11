@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -80,6 +80,14 @@ public class TicketEndpoint {
         return ResponseEntity.noContent().build();
     }
 
-    
-
+    @Secured("ROLE_ADMIN")
+    @PutMapping("/{id}")
+    public ResponseEntity<TicketDetailDto> updateTicket(
+        @PathVariable Long id,
+        @RequestBody TicketCreateDto ticketCreateDto) throws ValidationException, ConflictException {
+        logger.info("Updating ticket with ID: {}", id);
+        TicketDetailDto updatedTicket = ticketService.updateTicket(id, ticketCreateDto);
+        logger.debug("Updated ticket successfully: {}", updatedTicket);
+        return ResponseEntity.ok(updatedTicket);
+    }
 }

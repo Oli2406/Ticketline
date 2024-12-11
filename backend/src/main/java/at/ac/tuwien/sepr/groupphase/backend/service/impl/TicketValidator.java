@@ -60,6 +60,10 @@ public class TicketValidator {
             validationErrors.add("Ticket status is required");
         }
 
+        if (!"AVAILABLE".equals(ticketCreateDto.getStatus()) && !"RESERVED".equals(ticketCreateDto.getStatus()) && !"SOLD".equals(ticketCreateDto.getStatus())) {
+            validationErrors.add("Invalid status value: " + ticketCreateDto.getStatus());
+        }
+
         if (ticketCreateDto.getHall() == null) {
             validationErrors.add("Hall is required");
         }
