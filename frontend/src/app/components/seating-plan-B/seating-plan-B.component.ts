@@ -1,6 +1,13 @@
-import { Component } from '@angular/core';
-import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
-import { ToastrService } from 'ngx-toastr';
+import {Component} from '@angular/core';
+import {Hall, PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
+import {ToastrService} from 'ngx-toastr';
+import { PerformanceService } from 'src/app/services/performance.service';
+import {PerformanceListDto, PerformanceWithNamesDto} from 'src/app/dtos/performance';
+import { LocationService } from 'src/app/services/location.service';
+import { ArtistService } from 'src/app/services/artist.service';
+import {Artist, ArtistListDto} from "../../dtos/artist";
+import {Location, LocationListDto} from "../../dtos/location";
+
 
 @Component({
   selector: 'app-seating-plan-B',
@@ -8,8 +15,8 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./seating-plan-B.component.scss'],
 })
 export class SeatingPlanBComponent {
-  standingTickets: number = 100;
-  vipStandingTickets: number = 80;
+  standingTickets: number = 80;
+  vipStandingTickets: number = 60;
 
   selectedTickets: TicketDto[] = [];
   selectedStanding: { vip: number; regular: number } = { vip: 0, regular: 0 };
@@ -21,11 +28,56 @@ export class SeatingPlanBComponent {
   totalTickets: number = 0;
   totalPrice: number = 0;
 
+  performanceDetails: PerformanceListDto = null;
+  artistDetails: Artist = null;
+  locationDetails: Location = null;
+
   seatedFront: TicketDto[] = this.generateSeatedTickets(3, 14, 50, SectorType.A); // Front Section (Sector A)
   seatedBackRows: TicketDto[][] = this.generateSeatedRows(9, 15, 40, SectorType.B); // Back Section (Sector B)
 
-  constructor(private toastr: ToastrService) {}
+  constructor(private toastr: ToastrService, private performanceService: PerformanceService, private locationService: LocationService, private artistService: ArtistService) {}
 
+  ngOnInit(): void {
+    this.getPerformanceDetails(3); // todo: change hardcoded
+
+  }
+
+  getPerformanceDetails(id: number): void {
+    this.performanceService.getPerformanceById(id).subscribe({
+      next: (performance) => {
+        this.performanceDetails = performance;
+
+        // Fetch artist details only after performanceDetails is populated
+        if (this.performanceDetails.artistId) {
+          this.artistService.getById(this.performanceDetails.artistId).subscribe({
+            next: (artist) => {
+              this.artistDetails = artist;
+              console.log('Artist details:', this.artistDetails);
+            },
+            error: (err) => {
+              console.error('Error fetching artist details:', err);
+            },
+          });
+        }
+
+        // Fetch location details only after performanceDetails is populated
+        if (this.performanceDetails.locationId) {
+          this.locationService.getById(this.performanceDetails.locationId).subscribe({
+            next: (location) => {
+              this.locationDetails = location;
+              console.log('Location details:', this.locationDetails);
+            },
+            error: (err) => {
+              console.error('Error fetching location details:', err);
+            },
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching performance details:', err);
+      },
+    });
+  }
   // Generate tickets for Sector A
   private generateSeatedTickets(rows: number, initialSeats: number, price: number, sector: SectorType): TicketDto[] {
     const tickets: TicketDto[] = [];
@@ -43,6 +95,8 @@ export class SeatingPlanBComponent {
           price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
           performanceId: 1,
+          hall: Hall.B,
+          date: new Date()
         });
       }
     }
@@ -69,6 +123,8 @@ export class SeatingPlanBComponent {
           price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
           performanceId: 1,
+          hall: Hall.B,
+          date: new Date()
         });
       }
 

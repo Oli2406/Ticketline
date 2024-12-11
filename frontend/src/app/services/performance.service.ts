@@ -2,11 +2,9 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
+import {Performance, PerformanceListDto, PerformanceWithNamesDto} from 'src/app/dtos/performance';
 import {EventListDto} from "../dtos/event";
 
-class PerformanceDetailDto {
-}
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +17,14 @@ export class PerformanceService {
   getPerformances(): Observable<PerformanceListDto[]> {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
   }
+
+  getPerformanceById(id: number): Observable<PerformanceListDto> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.get<PerformanceListDto>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   advancedSearchPerformances(query: string): Observable<PerformanceListDto[]> {
     const url = `${this.apiUrl}/advanced-search?query=${query}`;

@@ -24,6 +24,18 @@ export class TicketService {
   }
 
   /**
+   * Retrieves tickets for a specific performance ID from the backend.
+   * @param performanceId - The ID of the performance to fetch tickets for.
+   * @returns Observable<TicketDto[]>
+   */
+  getTicketsByPerformanceId(performanceId: number): Observable<TicketDto[]> {
+    const url = `${this.apiUrl}/performance/${performanceId}`;
+    return this.http.get<TicketDto[]>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * Handles HTTP errors returned from the backend.
    * @param error - The HttpErrorResponse
    * @returns Observable<never>

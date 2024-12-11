@@ -1,7 +1,14 @@
 <div class="container mt-5">
   <!-- Header -->
-  <div class="text-center mb-4">
-    <h1 class="text-black bold">Hall B</h1>
+  <div class="text-center mt-3">
+    <h2>Hall B</h2>
+    <p *ngIf="performanceDetails">
+      <strong>Performance Name:</strong> {{ performanceDetails.name }}<br />
+      <strong>Band:</strong> {{ artistDetails.artistName }}<br />
+      <strong>Location:</strong> {{ locationDetails.name }}<br />
+      <strong>Date:</strong> {{ performanceDetails.date | date: 'mediumDate' }}
+    </p>
+    <p *ngIf="!performanceDetails">Loading performance details...</p>
   </div>
 
   <!-- Seating Plan and Details -->
