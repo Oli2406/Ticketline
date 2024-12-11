@@ -8,7 +8,7 @@ import {Router} from "@angular/router";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'SE PR Group Phase';
+  title = 'Ticketline';
 
   constructor(private authService: AuthService, public router: Router) {
   }
@@ -20,6 +20,8 @@ export class AppComponent {
           this.authService.logoutUser();
           //this.router.navigate(['/home']);
         }
+      }, error => {
+        this.authService.clearAuthToken();
       });
     }
 
@@ -28,6 +30,8 @@ export class AppComponent {
         if (!isValid) {
           this.authService.clearResetToken();
         }
+      }, error => {
+        this.authService.clearResetToken();
       });
     }
   }

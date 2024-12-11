@@ -34,35 +34,32 @@ public class CustomResetPasswordService implements ResetPasswordService {
     private final SecurityPropertiesConfig.Auth auth;
 
     public CustomResetPasswordService(PasswordResetRepository passwordResetRepository,
-        UserRepository userRepository,
-        EmailService emailService,
-        UserValidator userValidator,
+        UserRepository userRepository, EmailService emailService, UserValidator userValidator,
         PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
-        SecurityPropertiesConfig.Auth auth, SecurityPropertiesConfig.Auth auth1) {
+        SecurityPropertiesConfig.Auth auth) {
         this.passwordResetRepository = passwordResetRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.userValidator = userValidator;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
-        this.auth = auth1;
+        this.auth = auth;
     }
 
     @Override
     public String sendEmailToResetPassword(String email) {
         LOGGER.info("Initiating password reset for email: {}", email);
 
-        ApplicationUser user = userRepository.findUserByEmail(email)
-            .orElseThrow(() -> new NotFoundException("User not found"));
-
-        if (user.isLocked()) {
-            throw new BadCredentialsException(
-                "Account is locked");
-        }
+        ApplicationUser user = validateUser(email);
 
         String resetCode = generateResetCode();
         String resetToken = jwtTokenizer.getResetToken(email);
         saveResetToken(user.getEmail(), resetCode, resetToken);
+
+        user.setLatestRequestedResetTokenTime(
+            LocalDateTime.now().plusMinutes(auth.getResetTokenResendInterval()));
+        user.incrementNumberOfRequestedResetTokens();
+        userRepository.save(user);
 
         String resetLink = generateResetLink(resetToken);
         emailService.sendPasswordResetEmail(user.getEmail(), resetCode, resetLink);
@@ -75,8 +72,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
     public void verifyResetCode(ResetPasswordTokenDto tokenDto) {
         LOGGER.info("Verifying reset code for token: {}", tokenDto);
 
-        PasswordResetToken resetToken = validateAndGetResetToken(
-            tokenDto.getTokenFromStorage());
+        PasswordResetToken resetToken = validateAndGetResetToken(tokenDto.getTokenFromStorage());
         validateResetCode(resetToken, tokenDto.getCode());
 
         LOGGER.info("Reset code verified successfully for email: {}", resetToken.getEmail());
@@ -101,19 +97,49 @@ public class CustomResetPasswordService implements ResetPasswordService {
         LOGGER.info("Password reset successfully for email: {}", resetToken.getEmail());
     }
 
+    private ApplicationUser validateUser(String email) {
+        ApplicationUser user = userRepository.findUserByEmail(email)
+            .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if (user.isLocked()) {
+            throw new BadCredentialsException("Account is locked");
+        }
+
+        boolean hasExceededMaxResetTokenRequests =
+            user.getNumberOfRequestedResetTokens() >= auth.getMaxResetTokenRequests();
+
+        boolean isBeforeResendIntervalEnd = LocalDateTime.now()
+            .isBefore(user.getLatestRequestedResetTokenTime());
+
+        boolean isAfterResendIntervalEnd = LocalDateTime.now()
+            .isAfter(user.getLatestRequestedResetTokenTime());
+
+        if (hasExceededMaxResetTokenRequests && isBeforeResendIntervalEnd) {
+            throw new BadCredentialsException(
+                "Too many requests to reset password. Please try again in "
+                    + auth.getResetTokenResendInterval() + "h.");
+        }
+
+        if (hasExceededMaxResetTokenRequests && isAfterResendIntervalEnd) {
+            user.setNumberOfRequestedResetTokens(0);
+        }
+
+        return user;
+    }
 
     private String generateResetCode() {
         return String.valueOf((int) (Math.random() * 90000000) + 10000000);
     }
 
     private void saveResetToken(String email, String resetCode, String resetToken) {
-        PasswordResetToken token = passwordResetRepository.findByEmail(email)
-            .orElse(new PasswordResetToken(email, resetCode, resetToken,
-                LocalDateTime.now().plusMinutes(5)));
+        PasswordResetToken token = passwordResetRepository.findByEmail(email).orElse(
+            new PasswordResetToken(email, resetCode, resetToken,
+                LocalDateTime.now().plusMinutes(auth.getExpirationTimeResetToken())));
 
         token.setCode(resetCode);
         token.setToken(resetToken);
-        token.setExpirationTime(LocalDateTime.now().plusMinutes(5));
+        token.setExpirationTime(
+            LocalDateTime.now().plusMinutes(auth.getExpirationTimeResetToken()));
         token.setFailedAttempts(0);
 
         passwordResetRepository.save(token);
@@ -123,15 +149,6 @@ public class CustomResetPasswordService implements ResetPasswordService {
         return "http://localhost:4200/reset-password?token=" + resetToken;
     }
 
-    /**
-     * Validates the token and retrieves the associated PasswordResetToken.
-     *
-     * @param token JWT token to validate
-     * @return PasswordResetToken associated with the provided JWT token
-     * @throws IllegalArgumentException if the token is expired or invalid
-     * @throws NotFoundException        if no PasswordResetToken is found for the email in the
-     *                                  token
-     */
     private PasswordResetToken validateAndGetResetToken(String token) {
         Claims claims = jwtTokenizer.getClaims(token);
         String email = claims.getSubject();
@@ -150,14 +167,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
 
         return resetToken;
     }
-
-    /**
-     * Validates the reset code against the associated PasswordResetToken.
-     *
-     * @param resetToken PasswordResetToken entity to validate
-     * @param code       Reset code provided by the user
-     * @throws IllegalArgumentException if the code is invalid
-     */
+    
     private void validateResetCode(PasswordResetToken resetToken, String code) {
         if (!resetToken.getCode().equals(code)) {
             resetToken.setFailedAttempts(resetToken.getFailedAttempts() + 1);
