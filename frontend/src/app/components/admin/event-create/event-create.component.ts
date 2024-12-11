@@ -307,10 +307,10 @@ export class EventCreateComponent implements OnInit {
 
     // Weitere Hallenlogik hinzufügen (z. B. Halle B, C...)
 
-    this.createTicketsInBackend(tickets);
+    this.createTicketsInBackend(tickets, performanceId);
   }
 
-  createTicketsInBackend(tickets: Ticket[]) {
+  createTicketsInBackend(tickets: Ticket[], performanceId: number) {
     const createRequests = tickets.map((ticket) =>
       this.ticketService.createTicket(ticket)
     );

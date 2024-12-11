@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
-import { ToastrService } from 'ngx-toastr';
+import {Component} from '@angular/core';
+import {Hall, PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-seating-plan-A',
@@ -48,6 +48,8 @@ export class SeatingPlanAComponent {
           price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE', // Randomly assign reserved/available
           performanceId: 1,
+          hall: Hall.A,
+          date: new Date(),
         });
       }
     }

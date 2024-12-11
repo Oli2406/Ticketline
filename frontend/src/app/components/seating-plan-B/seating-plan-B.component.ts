@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
+import {TicketDto, TicketType, SectorType, PriceCategory, Hall} from "../../dtos/ticket";
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -43,6 +43,8 @@ export class SeatingPlanBComponent {
           price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
           performanceId: 1,
+          hall: Hall.B,
+          date: new Date(),
         });
       }
     }
@@ -69,6 +71,8 @@ export class SeatingPlanBComponent {
           price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
           performanceId: 1,
+          hall: Hall.B,
+          date: new Date(),
         });
       }
 
