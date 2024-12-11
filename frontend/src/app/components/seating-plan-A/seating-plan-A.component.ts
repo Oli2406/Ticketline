@@ -3,11 +3,11 @@ import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/tic
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-seating-plan',
-  templateUrl: './seating-plan.component.html',
-  styleUrls: ['./seating-plan.component.scss'],
+  selector: 'app-seating-plan-A',
+  templateUrl: './seating-plan-A.component.html',
+  styleUrls: ['./seating-plan-A.component.scss'],
 })
-export class SeatingPlanComponent {
+export class SeatingPlanAComponent {
   // Standing Tickets
   standingTickets: number = 100;
   vipStandingTickets: number = 80;
@@ -56,37 +56,60 @@ export class SeatingPlanComponent {
 
 
   toggleTicketSelection(ticket: TicketDto): void {
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+
+    if (index > -1) {
+      // Allow deselecting tickets even if the cap is reached
+      this.selectedTickets.splice(index, 1);
+      this.updateTotalPrice();
+      return;
+    }
+
+    // Prevent selecting more than 5 tickets
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+    if (totalSelected >= 5) {
+      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+      return;
+    }
+
+    // Select the ticket if available
     if (ticket.status !== 'AVAILABLE') {
       this.toastr.error('This ticket is not available.', 'Error');
       return;
     }
 
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
-    if (index > -1) {
-      this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(ticket);
-    }
-
+    this.selectedTickets.push(ticket);
     this.updateTotalPrice();
   }
 
   // Toggle standing sector selection
   toggleStandingSector(ticketType: TicketType, priceCategory: PriceCategory, price: number): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+
     if (priceCategory === this.priceCategory.VIP) {
       if (this.selectedStanding.vip > 0) {
-        this.selectedStanding.vip = 0; // Deselect VIP standing if already selected
+        // Allow deselecting VIP tickets
+        this.selectedStanding.vip = 0;
       } else {
+        if (totalSelected >= 5) {
+          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+          return;
+        }
         if (this.vipStandingTickets <= 0) {
           this.toastr.warning('No VIP Standing tickets available!', 'Warning');
           return;
         }
-        this.selectedStanding.vip = 1; // Select 1 ticket initially
+        this.selectedStanding.vip = 1;
       }
     } else if (priceCategory === this.priceCategory.PREMIUM) {
       if (this.selectedStanding.regular > 0) {
+        // Allow deselecting regular tickets
         this.selectedStanding.regular = 0;
       } else {
+        if (totalSelected >= 5) {
+          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+          return;
+        }
         if (this.standingTickets <= 0) {
           this.toastr.warning('No Standing tickets available!', 'Warning');
           return;
@@ -94,6 +117,20 @@ export class SeatingPlanComponent {
         this.selectedStanding.regular = 1;
       }
     }
+    this.updateTotalPrice();
+  }
+  validateStandingTickets(type: 'vip' | 'regular'): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+
+    if (totalSelected > 5) {
+      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+      if (type === 'vip') {
+        this.selectedStanding.vip = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.regular);
+      } else if (type === 'regular') {
+        this.selectedStanding.regular = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.vip);
+      }
+    }
+
     this.updateTotalPrice();
   }
 

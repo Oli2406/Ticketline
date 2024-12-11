@@ -50,7 +50,6 @@
               (click)="toggleTicketSelection(seat)"
               class="seat-box"
             >
-
             </div>
           </div>
 
@@ -65,7 +64,6 @@
               (click)="toggleTicketSelection(seat)"
               class="seat-box"
             >
-
             </div>
           </div>
         </div>
@@ -94,7 +92,7 @@
                 type="number"
                 min="0"
                 [(ngModel)]="selectedStanding.vip"
-                (change)="updateTotalPrice()"
+                (change)="validateStandingTickets('vip')"
                 class="form-control ticket-input d-inline-block w-auto"
               />
             </li>
@@ -110,7 +108,7 @@
                 type="number"
                 min="0"
                 [(ngModel)]="selectedStanding.regular"
-                (change)="updateTotalPrice()"
+                (change)="validateStandingTickets('regular')"
                 class="form-control ticket-input d-inline-block w-auto"
               />
             </li>

@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-seating-plan-B',
@@ -6,108 +8,210 @@ import { Component } from '@angular/core';
   styleUrls: ['./seating-plan-B.component.scss'],
 })
 export class SeatingPlanBComponent {
-  frontSeats = this.generateSeats(5, 10, 'Front'); // Front Section
-  backSeats = this.generateSeatsBack(5, 10, 'Back'); // Back Section (Correct Row Order)
-  leftSeats = this.generateSeatsRotated(5, 10, 'Left'); // Left Section (Rotated)
-  rightSeats = this.generateSeatsRotated(5, 10, 'Right'); // Right Section (Rotated)
+  standingTickets: number = 100;
+  vipStandingTickets: number = 80;
 
-  selectedTickets = [];
-  totalTickets = 0;
-  totalPrice = 0;
+  selectedTickets: TicketDto[] = [];
+  selectedStanding: { vip: number; regular: number } = { vip: 0, regular: 0 };
 
-  // Generate standard grid seats
-  generateSeats(rows: number, cols: number, sector: string) {
-    const seats = [];
+  priceCategory = PriceCategory;
+  ticketType = TicketType;
+  sectorType = SectorType;
+
+  totalTickets: number = 0;
+  totalPrice: number = 0;
+
+  seatedFront: TicketDto[] = this.generateSeatedTickets(3, 14, 50, SectorType.A); // Front Section (Sector A)
+  seatedBackRows: TicketDto[][] = this.generateSeatedRows(9, 15, 40, SectorType.B); // Back Section (Sector B)
+
+  constructor(private toastr: ToastrService) {}
+
+  // Generate tickets for Sector A
+  private generateSeatedTickets(rows: number, initialSeats: number, price: number, sector: SectorType): TicketDto[] {
+    const tickets: TicketDto[] = [];
+    let ticketId = 1;
+
     for (let row = 1; row <= rows; row++) {
-      for (let col = 1; col <= cols; col++) {
-        seats.push({
-          sector,
-          row,
-          col,
-          price: 50,
+      for (let seat = 1; seat <= initialSeats; seat++) {
+        tickets.push({
+          ticketId: ticketId++,
+          rowNumber: row,
+          seatNumber: seat,
+          priceCategory: PriceCategory.STANDARD,
+          ticketType: TicketType.SEATED,
+          sectorType: sector,
+          price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
+          performanceId: 1,
         });
       }
     }
-    return seats;
+    return tickets;
   }
 
-  // Generate Back Grid with Correct Row Order (Row 1 becomes Row 5, etc.)
-  generateSeatsBack(rows: number, cols: number, sector: string) {
-    const seats = [];
-    for (let row = rows; row >= 1; row--) {
-      for (let col = 1; col <= cols; col++) {
-        seats.push({
-          sector,
-          row: rows - row + 1, // Reverse row numbering
-          col,
-          price: 50,
+  // Generate tickets for Sector B with dynamic rows
+  private generateSeatedRows(rows: number, initialSeats: number, price: number, sector: SectorType): TicketDto[][] {
+    const ticketRows: TicketDto[][] = [];
+    let ticketId = 1;
+
+    for (let row = 1; row <= rows; row++) {
+      const seatsPerRow = initialSeats + (row - 1) ; // Increase seats per row dynamically
+      const rowTickets: TicketDto[] = [];
+
+      for (let seat = 1; seat <= seatsPerRow; seat++) {
+        rowTickets.push({
+          ticketId: ticketId++,
+          rowNumber: row,
+          seatNumber: seat,
+          priceCategory: PriceCategory.STANDARD,
+          ticketType: TicketType.SEATED,
+          sectorType: sector,
+          price,
           status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
+          performanceId: 1,
         });
       }
+
+      ticketRows.push(rowTickets);
     }
-    return seats;
+
+    return ticketRows;
   }
 
-  // Generate rotated grid seats for left and right
-  generateSeatsRotated(rows: number, cols: number, sector: string) {
-    const seats = [];
-    for (let col = 1; col <= cols; col++) {
-      for (let row = rows; row >= 1; row--) {
-        seats.push({
-          sector,
-          row,
-          col,
-          price: 50,
-          status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
-        });
-      }
-    }
-    return seats;
-  }
+  toggleTicketSelection(ticket: TicketDto): void {
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
 
-  toggleTicketSelection(seat: any) {
-    if (seat.status !== 'AVAILABLE') return;
-
-    const index = this.selectedTickets.indexOf(seat);
     if (index > -1) {
+      // Deselecting the ticket
       this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(seat);
+      this.updateTotalPrice();
+      return;
     }
 
-    this.updateTotal();
+    // Prevent selection if total tickets exceed 5
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+    if (totalSelected >= 5) {
+      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+      return;
+    }
+
+    // Select the ticket
+    if (ticket.status !== 'AVAILABLE') {
+      this.toastr.error('This ticket is not available.', 'Error');
+      return;
+    }
+
+    this.selectedTickets.push(ticket);
+    this.updateTotalPrice();
   }
 
-  updateTotal() {
-    this.totalTickets = this.selectedTickets.length;
-    this.totalPrice = this.selectedTickets.reduce((sum, seat) => sum + seat.price, 0);
+
+
+  toggleStandingSector(ticketType: TicketType, priceCategory: PriceCategory, price: number): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+
+    if (priceCategory === this.priceCategory.VIP) {
+      if (this.selectedStanding.vip > 0) {
+        this.selectedStanding.vip = 0;
+      } else {
+        if (totalSelected >= 5) {
+          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+          return;
+        }
+        if (this.vipStandingTickets <= 0) {
+          this.toastr.warning('No VIP Standing tickets available!', 'Warning');
+          return;
+        }
+        this.selectedStanding.vip = 1;
+      }
+    } else if (priceCategory === this.priceCategory.PREMIUM) {
+      if (this.selectedStanding.regular > 0) {
+        this.selectedStanding.regular = 0;
+      } else {
+        if (totalSelected >= 5) {
+          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+          return;
+        }
+        if (this.standingTickets <= 0) {
+          this.toastr.warning('No Regular Standing tickets available!', 'Warning');
+          return;
+        }
+        this.selectedStanding.regular = 1;
+      }
+    }
+
+    this.updateTotalPrice();
   }
 
-  resetSelections() {
+
+
+  updateTotalPrice(): void {
+    const seatedPrice = this.selectedTickets.reduce((sum, ticket) => sum + ticket.price, 0);
+    const standingVipPrice = this.selectedStanding.vip * 100;
+    const standingRegularPrice = this.selectedStanding.regular * 70;
+
+    this.totalTickets = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+    this.totalPrice = seatedPrice + standingVipPrice + standingRegularPrice;
+  }
+
+  resetSelections(): void {
     this.selectedTickets = [];
-    this.updateTotal();
+    this.selectedStanding = { vip: 0, regular: 0 };
+    this.totalTickets = 0;
+    this.totalPrice = 0;
   }
 
-  reserveTickets() {
-    if (this.totalTickets === 0) return;
+  reserveTickets(): void {
+    if (this.totalTickets === 0) {
+      this.toastr.error('No tickets selected to reserve!', 'Warning');
+      return;
+    }
 
-    this.selectedTickets.forEach((seat) => (seat.status = 'RESERVED'));
+    this.selectedTickets.forEach((ticket) => (ticket.status = 'RESERVED'));
+    this.vipStandingTickets -= this.selectedStanding.vip;
+    this.standingTickets -= this.selectedStanding.regular;
+
+    this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
     this.resetSelections();
   }
 
-  buyTickets() {
-    if (this.totalTickets === 0) return;
+  buyTickets(): void {
+    if (this.totalTickets === 0) {
+      this.toastr.error('No tickets selected to buy!', 'Cannot buy tickets:');
+      return;
+    }
 
-    this.selectedTickets.forEach((seat) => (seat.status = 'SOLD'));
+    this.selectedTickets.forEach((ticket) => (ticket.status = 'SOLD'));
+    this.vipStandingTickets -= this.selectedStanding.vip;
+    this.standingTickets -= this.selectedStanding.regular;
+
+    this.toastr.success(`Successfully purchased ${this.totalTickets} tickets for ${this.totalPrice}€!`, 'Purchase Successful');
     this.resetSelections();
   }
 
-  getClass(seat: any) {
+  getClass(ticket: TicketDto): { [key: string]: boolean } {
     return {
-      available: seat.status === 'AVAILABLE',
-      reserved: seat.status === 'RESERVED',
-      'selected-seat': this.selectedTickets.includes(seat),
+      available: ticket.status === 'AVAILABLE',
+      reserved: ticket.status === 'RESERVED',
+      sold: ticket.status === 'SOLD',
+      'selected-seat': this.selectedTickets.includes(ticket),
     };
   }
+  validateStandingTickets(type: 'vip' | 'regular'): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+
+    // Check if the total exceeds the limit
+    if (totalSelected > 5) {
+      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+      if (type === 'vip') {
+        this.selectedStanding.vip = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.regular);
+      } else if (type === 'regular') {
+        this.selectedStanding.regular = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.vip);
+      }
+    }
+
+    this.updateTotalPrice();
+  }
+
 }
+

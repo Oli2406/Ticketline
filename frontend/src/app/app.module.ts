@@ -17,7 +17,7 @@ import {httpInterceptorProviders} from './interceptors';
 import {NewsCreateComponent} from "./components/admin/news-create/news-create.component";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
-import {SeatingPlanComponent} from "./components/seating-plan/seating-plan.component";
+import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
 import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
 
 @NgModule({ declarations: [
@@ -29,7 +29,7 @@ import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.
         MessageComponent,
         AdminComponent,
         CreateUserComponent,
-        SeatingPlanComponent,
+        SeatingPlanAComponent,
         SeatingPlanBComponent,
     ],
     bootstrap: [AppComponent],
