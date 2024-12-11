@@ -8,6 +8,7 @@ import { ArtistService } from 'src/app/services/artist.service';
 import { Artist } from "../../dtos/artist";
 import { Location } from "../../dtos/location";
 import { TicketService } from 'src/app/services/ticket.service';
+import {forkJoin, map, Observable} from "rxjs";
 
 @Component({
   selector: 'app-seating-plan-A',
@@ -230,19 +231,91 @@ export class SeatingPlanAComponent {
     this.totalPrice = 0;
   }
 
+
   reserveTickets(): void {
     if (this.totalTickets === 0) {
       this.toastr.error('No tickets selected to reserve!', 'Warning');
       return;
     }
 
-    this.selectedTickets.forEach((ticket) => (ticket.status = 'RESERVED'));
-    this.vipStandingTickets -= this.selectedStanding.vip;
-    this.standingTickets -= this.selectedStanding.standard;
+    this.toastr.info(
+      'Please arrive at least 30 minutes before your reservation. Failure to do so will result in invalidation.',
+      'Important Notice',
+      {
+        timeOut: 10000,
+        extendedTimeOut: 5000,
+        progressBar: true,
+        closeButton: true
+      }
+    );
 
-    this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
-    this.resetSelections();
+    const updateRequests = [];
+
+    // Handle seated tickets
+    this.selectedTickets.forEach(ticket => {
+      ticket.status = 'RESERVED';
+      updateRequests.push(this.ticketService.updateTicket(ticket));
+    });
+
+    // Handle standing tickets (VIP)
+    if (this.selectedStanding.vip > 0) {
+      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
+        next: vipTickets => {
+          vipTickets.forEach(ticket => {
+            ticket.status = 'RESERVED';
+            updateRequests.push(this.ticketService.updateTicket(ticket));
+          });
+
+          // Handle standing tickets (Regular) after VIP tickets are handled
+          if (this.selectedStanding.standard > 0) {
+            this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
+              next: standardTickets => {
+                standardTickets.forEach(ticket => {
+                  ticket.status = 'RESERVED';
+                  updateRequests.push(this.ticketService.updateTicket(ticket));
+                });
+
+                // Perform the updates
+                this.executeUpdates(updateRequests);
+              },
+              error: err => {
+                console.error('Error fetching regular standing tickets:', err);
+                this.toastr.error('Failed to reserve regular standing tickets. Please try again.', 'Error');
+              }
+            });
+          } else {
+            // Perform the updates if no regular standing tickets are selected
+            this.executeUpdates(updateRequests);
+          }
+        },
+        error: err => {
+          console.error('Error fetching VIP standing tickets:', err);
+          this.toastr.error('Failed to reserve VIP standing tickets. Please try again.', 'Error');
+        }
+      });
+    } else if (this.selectedStanding.standard > 0) {
+      // Handle only regular standing tickets if no VIP tickets are selected
+      this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
+        next: standardTickets => {
+          standardTickets.forEach(ticket => {
+            ticket.status = 'RESERVED';
+            updateRequests.push(this.ticketService.updateTicket(ticket));
+          });
+
+          // Perform the updates
+          this.executeUpdates(updateRequests);
+        },
+        error: err => {
+          console.error('Error fetching regular standing tickets:', err);
+          this.toastr.error('Failed to reserve regular standing tickets. Please try again.', 'Error');
+        }
+      });
+    } else {
+      // Perform the updates if no standing tickets are selected
+      this.executeUpdates(updateRequests);
+    }
   }
+
 
   buyTickets(): void {
     if (this.totalTickets === 0) {
@@ -250,13 +323,113 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    this.selectedTickets.forEach((ticket) => (ticket.status = 'SOLD'));
-    this.vipStandingTickets -= this.selectedStanding.vip;
-    this.standingTickets -= this.selectedStanding.standard;
+    const updateRequests = [];
 
-    this.toastr.success(`Successfully purchased ${this.totalTickets} tickets for ${this.totalPrice}€!`, 'Purchase Successful');
-    this.resetSelections();
+    // Handle seated tickets
+    this.selectedTickets.forEach(ticket => {
+      ticket.status = 'SOLD';
+      updateRequests.push(this.ticketService.updateTicket(ticket));
+    });
+
+    // Handle standing tickets (VIP)
+    if (this.selectedStanding.vip > 0) {
+      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
+        next: vipTickets => {
+          vipTickets.forEach(ticket => {
+            ticket.status = 'SOLD';
+            updateRequests.push(this.ticketService.updateTicket(ticket));
+          });
+
+          // Handle standing tickets (Regular) after VIP tickets are handled
+          if (this.selectedStanding.standard > 0) {
+            this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
+              next: standardTickets => {
+                standardTickets.forEach(ticket => {
+                  ticket.status = 'SOLD';
+                  updateRequests.push(this.ticketService.updateTicket(ticket));
+                });
+
+                // Perform the updates
+                this.executeUpdates(updateRequests);
+              },
+              error: err => {
+                console.error('Error fetching regular standing tickets:', err);
+                this.toastr.error('Failed to purchase regular standing tickets. Please try again.', 'Error');
+              }
+            });
+          } else {
+            // Perform the updates if no regular standing tickets are selected
+            this.executeUpdates(updateRequests);
+          }
+        },
+        error: err => {
+          console.error('Error fetching VIP standing tickets:', err);
+          this.toastr.error('Failed to purchase VIP standing tickets. Please try again.', 'Error');
+        }
+      });
+    } else if (this.selectedStanding.standard > 0) {
+      // Handle only regular standing tickets if no VIP tickets are selected
+      this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
+        next: standardTickets => {
+          standardTickets.forEach(ticket => {
+            ticket.status = 'SOLD';
+            updateRequests.push(this.ticketService.updateTicket(ticket));
+          });
+
+          // Perform the updates
+          this.executeUpdates(updateRequests);
+        },
+        error: err => {
+          console.error('Error fetching regular standing tickets:', err);
+          this.toastr.error('Failed to purchase regular standing tickets. Please try again.', 'Error');
+        }
+      });
+    } else {
+      // Perform the updates if no standing tickets are selected
+      this.executeUpdates(updateRequests);
+    }
   }
+
+  getAvailableStandingTickets(category: PriceCategory, count: number): Observable<TicketDto[]> {
+    return this.ticketService.getTicketsByPerformanceId(this.performanceID).pipe(
+      map(tickets => {
+        const result: TicketDto[] = [];
+        let availableCount = 0;
+
+        for (const ticket of tickets) {
+          if (
+            ticket.sectorType === SectorType.A &&
+            ticket.ticketType === TicketType.STANDING &&
+            ticket.priceCategory === category &&
+            ticket.status === 'AVAILABLE'
+          ) {
+            result.push(ticket);
+            availableCount++;
+
+            if (availableCount >= count) {
+              break;
+            }
+          }
+        }
+
+        return result; // Return the filtered tickets
+      })
+    );
+  }
+  private executeUpdates(updateRequests: Observable<any>[]): void {
+    forkJoin(updateRequests).subscribe({
+      next: () => {
+        this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
+        this.resetSelections();
+        this.loadTicketsByPerformance(this.performanceID); // Reload tickets
+      },
+      error: err => {
+        console.error('Error reserving tickets:', err);
+        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+      }
+    });
+  }
+
 
   getClass(ticket: TicketDto): { [key: string]: boolean } {
     return {

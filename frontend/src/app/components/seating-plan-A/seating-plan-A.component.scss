@@ -86,6 +86,11 @@
   cursor: not-allowed;
 }
 
+.seat-box.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
 .seat-box.selected-seat {
   background-color: #514dc7 !important;
   color: #fff;
