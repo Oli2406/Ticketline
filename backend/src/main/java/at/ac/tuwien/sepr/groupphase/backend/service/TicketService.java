@@ -46,6 +46,15 @@ public interface TicketService {
     List<TicketDetailDto> getTicketsByPerformanceId(Long performanceId);
 
     /**
+     * Updates an existing ticket with the provided details.
+     *
+     * @param ticketId The ID of the ticket to update.
+     * @param ticketCreateDto The new ticket details.
+     * @return The updated ticket details.
+     */
+    TicketDetailDto updateTicket(Long ticketId, TicketCreateDto ticketCreateDto) throws ValidationException, ConflictException;
+
+    /**
      * Deletes a specific ticket by its ID.
      *
      * @param id the ID of the ticket to delete

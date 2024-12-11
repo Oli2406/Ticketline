@@ -303,10 +303,81 @@ export class EventCreateComponent implements OnInit {
           date: date,
         });
       }
+    } else if (hall === 'B') {
+      // Sitzplätze in Sektor B (3 x 14)
+      for (let row = 1; row <= 3; row++) {
+        for (let seat = 1; seat <= 14; seat++) {
+          tickets.push({
+            rowNumber: row,
+            seatNumber: seat,
+            priceCategory: PriceCategory.PREMIUM,
+            ticketType: TicketType.SEATED,
+            sectorType: SectorType.B,
+            price: 80,
+            status: 'AVAILABLE',
+            performanceId,
+            reservationNumber: 0,
+            hall: Hall.B,
+            date: date,
+          });
+        }
+      }
+
+      // Sitzplätze in Sektor C (9 x 15)
+      for (let row = 1; row <= 9; row++) {
+        for (let seat = 1; seat <= 15; seat++) {
+          tickets.push({
+            rowNumber: row,
+            seatNumber: seat,
+            priceCategory: PriceCategory.STANDARD,
+            ticketType: TicketType.SEATED,
+            sectorType: SectorType.C,
+            price: 60,
+            status: 'AVAILABLE',
+            performanceId,
+            reservationNumber: 0,
+            hall: Hall.B,
+            date: date,
+          });
+        }
+      }
+
+      // Standing tickets (Standard: 80)
+      for (let i = 1; i <= 80; i++) {
+        tickets.push({
+          rowNumber: 0,
+          seatNumber: 0,
+          priceCategory: PriceCategory.PREMIUM,
+          ticketType: TicketType.STANDING,
+          sectorType: SectorType.A,
+          price: 70,
+          status: 'AVAILABLE',
+          performanceId,
+          reservationNumber: 0,
+          hall: Hall.B,
+          date: date,
+        });
+      }
+
+      // Standing tickets (VIP: 60)
+      for (let i = 1; i <= 60; i++) {
+        tickets.push({
+          rowNumber: 0,
+          seatNumber: 0,
+          priceCategory: PriceCategory.VIP,
+          ticketType: TicketType.STANDING,
+          sectorType: SectorType.A,
+          price: 100,
+          status: 'AVAILABLE',
+          performanceId,
+          reservationNumber: 0,
+          hall: Hall.B,
+          date: date,
+        });
+      }
     }
 
-    // Weitere Hallenlogik hinzufügen (z. B. Halle B, C...)
-
+    // Add logic for other halls (if needed)
     this.createTicketsInBackend(tickets);
   }
 
@@ -363,8 +434,7 @@ export class EventCreateComponent implements OnInit {
   updateTicketNumber() {
     const hallCapacity = {
       A: 660,
-      B: 150,
-      C: 200,
+      B: 317,
     };
     this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
   }

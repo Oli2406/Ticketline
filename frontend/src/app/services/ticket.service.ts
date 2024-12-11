@@ -36,6 +36,19 @@ export class TicketService {
   }
 
   /**
+   * Updates the entire ticket, including its status.
+   * @param ticket - The ticket object to update with its new status.
+   * @returns Observable<TicketDto>
+   */
+  updateTicket(ticket: TicketDto): Observable<TicketDto> {
+    const url = `${this.apiUrl}/${ticket.ticketId}`;
+    return this.http.put<TicketDto>(url, ticket).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
+  /**
    * Handles HTTP errors returned from the backend.
    * @param error - The HttpErrorResponse
    * @returns Observable<never>

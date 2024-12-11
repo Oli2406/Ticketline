@@ -149,6 +149,55 @@ public class CustomTicketService implements TicketService {
     }
 
     @Override
+    public TicketDetailDto updateTicket(Long ticketId, TicketCreateDto ticketCreateDto) throws ValidationException, ConflictException {
+        logger.info("Updating ticket with ID: {}", ticketId);
+
+        ticketValidator.validateTicket(ticketCreateDto);
+
+        Ticket existingTicket = ticketRepository.findById(ticketId)
+            .orElseThrow(() -> {
+                logger.error("Ticket not found with ID: {}", ticketId);
+                return new IllegalArgumentException("Ticket not found with ID: " + ticketId);
+            });
+
+        // Update the ticket details
+        existingTicket.setRowNumber(ticketCreateDto.getRowNumber());
+        existingTicket.setSeatNumber(ticketCreateDto.getSeatNumber());
+        existingTicket.setPriceCategory(ticketCreateDto.getPriceCategory());
+        existingTicket.setTicketType(ticketCreateDto.getTicketType());
+        existingTicket.setSectorType(ticketCreateDto.getSectorType());
+        existingTicket.setPrice(ticketCreateDto.getPrice());
+        existingTicket.setStatus(ticketCreateDto.getStatus());
+        existingTicket.setPerformanceId(ticketCreateDto.getPerformanceId());
+        existingTicket.setReservationNumber(ticketCreateDto.getReservationNumber());
+        existingTicket.setHall(ticketCreateDto.getHall());
+        existingTicket.setDate(ticketCreateDto.getDate());
+
+        // Save the updated ticket
+        Ticket savedTicket = ticketRepository.save(existingTicket);
+        logger.debug("Updated ticket saved to database: {}", savedTicket);
+
+        // Return the updated ticket as a DTO
+        TicketDetailDto ticketDetailDto = new TicketDetailDto(
+            savedTicket.getTicketId(),
+            savedTicket.getPerformanceId(),
+            savedTicket.getRowNumber(),
+            savedTicket.getSeatNumber(),
+            savedTicket.getPriceCategory(),
+            savedTicket.getTicketType(),
+            savedTicket.getSectorType(),
+            savedTicket.getPrice(),
+            savedTicket.getStatus(),
+            savedTicket.getHall(),
+            savedTicket.getReservationNumber(),
+            savedTicket.getDate()
+        );
+
+        logger.info("Returning updated ticket DTO: {}", ticketDetailDto);
+        return ticketDetailDto;
+    }
+
+    @Override
     public void deleteTicket(Long id) {
         logger.info("Deleting ticket with ID: {}", id);
 

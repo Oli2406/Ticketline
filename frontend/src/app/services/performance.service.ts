@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {Performance, PerformanceListDto, PerformanceWithNamesDto} from 'src/app/dtos/performance';
+import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
 import {EventListDto} from "../dtos/event";
-
 
 @Injectable({
   providedIn: 'root',
