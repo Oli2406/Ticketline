@@ -16,6 +16,8 @@ import {MerchandiseCreateComponent} from "./components/admin/merchandise-create/
 import {MerchandiseComponent} from "./components/merchandise/merchandise.component";
 import {CartComponent} from "./components/cart/cart.component";
 import {SearchComponent} from "./components/search/search.component";
+import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
+import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -23,6 +25,8 @@ const routes: Routes = [
   {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
+  {path: 'seatingPlanA', component: SeatingPlanAComponent},
+  {path: 'seatingPlanB', component: SeatingPlanBComponent},
   {path: 'search', component: SearchComponent},
   {path: 'news', component: NewsComponent},
   {path: 'register', component: RegisterComponent},
@@ -45,3 +49,4 @@ const routes: Routes = [
 })
 export class AppRoutingModule {
 }
+
