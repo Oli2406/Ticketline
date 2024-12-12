@@ -26,7 +26,7 @@
         <!-- VIP Standing -->
         <div
           class="vip-standing position-absolute text-center rounded"
-          (click)="toggleStandingSector(ticketType.STANDING, priceCategory.VIP, 100)"
+          (click)="toggleStandingSector(priceCategory.VIP)"
           [ngClass]="{ 'selected-sector': selectedStanding.vip > 0 }"
         >
           <h5>VIP Standing</h5>
@@ -38,45 +38,48 @@
         <!-- Standing -->
         <div
           class="standing position-absolute text-center rounded"
-          (click)="toggleStandingSector(ticketType.STANDING, priceCategory.PREMIUM, 70)"
-          [ngClass]="{ 'selected-sector': selectedStanding.regular > 0 }"
+          (click)="toggleStandingSector(priceCategory.PREMIUM)"
+          [ngClass]="{ 'selected-sector': selectedStanding.premium > 0 }"
         >
-          <h5>Standing</h5>
+          <h5>Regular Standing</h5>
           <div>
             <span>Available Tickets: {{ standingTickets }}</span>
           </div>
         </div>
 
-        <!-- Seated Front (Sector A) -->
-        <div class="seated-front position-absolute">
-          <div class="seating-grid sector-a">
+        <!-- Sector B -->
+        <div class="seated-back-b mt-4">
+          <div class="seating-grid-b">
             <div
-              *ngFor="let seat of seatedFront"
+              *ngFor="let seat of seatedBackB || []"
               [ngClass]="getClass(seat)"
               (click)="toggleTicketSelection(seat)"
               class="seat-box"
-            ></div>
+            >
+            </div>
           </div>
         </div>
 
         <!-- Space Divider -->
         <div class="seating-divider"></div>
 
-        <!-- Seated Back (Sector B) -->
-        <div class="seated-back position-absolute">
-          <div class="seating-grid sector-b">
-            <div *ngFor="let row of seatedBackRows" class="row">
-              <div
-                *ngFor="let seat of row"
-                [ngClass]="getClass(seat)"
-                (click)="toggleTicketSelection(seat)"
-                class="seat-box-sector-b"
-              ></div>
+        <!-- Sector C -->
+        <div class="seated-back-c mt-4">
+          <div *ngFor="let row of [1, 2, 3, 4, 5, 6, 7, 8, 9]" class="seating-grid-c seating-grid-c{{row}}" id="seatingGridC{{row}}">
+            <div
+              *ngFor="let seat of this['seatedBackC' + row] || []"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+              class="seat-box"
+            >
             </div>
           </div>
         </div>
+
+
       </div>
     </div>
+
 
     <!-- Selected Tickets Info -->
     <div class="col-lg-4">
@@ -95,7 +98,7 @@
           <p><strong>Selected Standing Tickets (VIP):</strong></p>
           <ul>
             <li>
-              VIP Standing - ({{ selectedStanding.vip * 100 }}€)
+              VIP Standing - ({{ selectedStanding.vip * vipStandingPrice }}€)
               <input
                 type="number"
                 min="0"
@@ -107,16 +110,16 @@
           </ul>
         </div>
 
-        <div *ngIf="selectedStanding.regular > 0">
+        <div *ngIf="selectedStanding.premium > 0">
           <p><strong>Selected Standing Tickets (Regular):</strong></p>
           <ul>
             <li>
-              Regular Standing - ({{ selectedStanding.regular * 70 }}€)
+              Regular Standing - ({{ selectedStanding.premium * regularStandingPrice }}€)
               <input
                 type="number"
                 min="0"
-                [(ngModel)]="selectedStanding.regular"
-                (change)="validateStandingTickets('regular')"
+                [(ngModel)]="selectedStanding.premium"
+                (change)="validateStandingTickets('premium')"
                 class="form-control ticket-input d-inline-block w-auto"
               />
             </li>
@@ -133,10 +136,10 @@
           <button class="btn btn-gray" (click)="resetSelections()">
             <i class="bi bi-x me-2"></i>Clear
           </button>
-          <button class="btn btn-purple" (click)="reserveTickets()">
+          <button class="btn btn-light-purple" (click)="reserveTickets()">
             <i class="bi bi-bookmark me-2"></i>Reserve
           </button>
-          <button class="btn btn-light-purple" (click)="buyTickets()">
+          <button class="btn btn-purple" (click)="buyTickets()">
             <i class="bi bi-cart me-2"></i>Add to Cart
           </button>
         </div>

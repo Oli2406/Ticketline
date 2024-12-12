@@ -1,13 +1,14 @@
-import {Component} from '@angular/core';
-import {Hall, PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
-import {ToastrService} from 'ngx-toastr';
+import { Component } from '@angular/core';
+import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
+import { ToastrService } from 'ngx-toastr';
 import { PerformanceService } from 'src/app/services/performance.service';
-import {PerformanceListDto, PerformanceWithNamesDto} from 'src/app/dtos/performance';
+import { PerformanceListDto } from 'src/app/dtos/performance';
 import { LocationService } from 'src/app/services/location.service';
 import { ArtistService } from 'src/app/services/artist.service';
-import {Artist, ArtistListDto} from "../../dtos/artist";
-import {Location, LocationListDto} from "../../dtos/location";
-
+import { Artist } from "../../dtos/artist";
+import { Location } from "../../dtos/location";
+import { TicketService } from 'src/app/services/ticket.service';
+import { forkJoin, map, Observable } from "rxjs";
 
 @Component({
   selector: 'app-seating-plan-B',
@@ -15,16 +16,22 @@ import {Location, LocationListDto} from "../../dtos/location";
   styleUrls: ['./seating-plan-B.component.scss'],
 })
 export class SeatingPlanBComponent {
-  standingTickets: number = 80;
-  vipStandingTickets: number = 60;
+  // Standing Tickets
+  standingTickets: number = 0;
+  vipStandingTickets: number = 0;
+  vipStandingPrice: number = 0;
+  regularStandingPrice: number = 0;
 
+  // Selected Tickets and Info
   selectedTickets: TicketDto[] = [];
-  selectedStanding: { vip: number; regular: number } = { vip: 0, regular: 0 };
+  selectedStanding: { vip: number; premium: number } = { vip: 0, premium: 0 };
 
+  // Enums for easier reference
   priceCategory = PriceCategory;
   ticketType = TicketType;
   sectorType = SectorType;
 
+  // Total tickets and price
   totalTickets: number = 0;
   totalPrice: number = 0;
 
@@ -32,27 +39,101 @@ export class SeatingPlanBComponent {
   artistDetails: Artist = null;
   locationDetails: Location = null;
 
-  seatedFront: TicketDto[] = this.generateSeatedTickets(3, 14, 50, SectorType.A); // Front Section (Sector A)
-  seatedBackRows: TicketDto[][] = this.generateSeatedRows(9, 15, 40, SectorType.B); // Back Section (Sector B)
+  // Seated Tickets
+  seatedBackC1: TicketDto[] = [];
+  seatedBackC2: TicketDto[] = [];
+  seatedBackC3: TicketDto[] = [];
+  seatedBackC4: TicketDto[] = [];
+  seatedBackC5: TicketDto[] = [];
+  seatedBackC6: TicketDto[] = [];
+  seatedBackC7: TicketDto[] = [];
+  seatedBackC8: TicketDto[] = [];
+  seatedBackC9: TicketDto[] = [];
 
-  constructor(private toastr: ToastrService, private performanceService: PerformanceService, private locationService: LocationService, private artistService: ArtistService) {}
+  seatedBackB: TicketDto[] = [];
+
+
+  performanceID: number = 0;
+
+  // Inject dependencies
+  constructor(
+    private toastr: ToastrService,
+    private performanceService: PerformanceService,
+    private locationService: LocationService,
+    private artistService: ArtistService,
+    private ticketService: TicketService
+  ) {}
 
   ngOnInit(): void {
-    this.getPerformanceDetails(3); // todo: change hardcoded
+    this.performanceID = 3; //todo: connect to performances
+    this.getPerformanceDetails(this.performanceID);
+    this.loadTicketsByPerformance(this.performanceID);
 
   }
+
+  loadTicketsByPerformance(performanceId: number): void {
+    this.ticketService.getTicketsByPerformanceId(performanceId).subscribe({
+      next: (tickets: TicketDto[]) => {
+        // Initialize seatedBackC arrays for each row
+        const seatedBackCRows: { [key: number]: TicketDto[] } = {};
+
+        // Group tickets for sector C by row number
+        tickets.forEach((ticket) => {
+          if (ticket.sectorType === SectorType.C) {
+            if (!seatedBackCRows[ticket.rowNumber]) {
+              seatedBackCRows[ticket.rowNumber] = [];
+            }
+            seatedBackCRows[ticket.rowNumber].push(ticket);
+          }
+        });
+
+        // Assign grouped tickets to dynamically named properties (seatedBackC1, seatedBackC2, ...)
+        for (let row = 1; row <= 9; row++) {
+          this[`seatedBackC${row}`] = seatedBackCRows[row] || [];
+        }
+
+        // Filter tickets for Sector B
+        this.seatedBackB = tickets.filter(ticket => ticket.sectorType === SectorType.B);
+
+        // Filter standing tickets for Sector A
+        const standingTickets = tickets.filter(
+          ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
+        );
+
+        // Count VIP and regular standing tickets
+        this.vipStandingTickets = standingTickets.filter(
+          ticket => ticket.priceCategory === PriceCategory.VIP && ticket.status === 'AVAILABLE'
+        ).length;
+
+        this.standingTickets = standingTickets.filter(
+          ticket => ticket.priceCategory === PriceCategory.PREMIUM && ticket.status === 'AVAILABLE'
+        ).length;
+
+        // Extract prices for VIP and regular standing tickets
+        const firstVipStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.VIP);
+        const firstRegularStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.PREMIUM);
+
+        this.vipStandingPrice = firstVipStanding?.price || 0;
+        this.regularStandingPrice = firstRegularStanding?.price || 0;
+      },
+      error: (err) => {
+        console.error('Error fetching tickets:', err);
+        this.toastr.error('Failed to load tickets. Please try again.', 'Error');
+      }
+    });
+  }
+
 
   getPerformanceDetails(id: number): void {
     this.performanceService.getPerformanceById(id).subscribe({
       next: (performance) => {
         this.performanceDetails = performance;
 
-        // Fetch artist details only after performanceDetails is populated
+        // Fetch artist details
         if (this.performanceDetails.artistId) {
           this.artistService.getById(this.performanceDetails.artistId).subscribe({
             next: (artist) => {
               this.artistDetails = artist;
-              console.log('Artist details:', this.artistDetails);
             },
             error: (err) => {
               console.error('Error fetching artist details:', err);
@@ -60,12 +141,11 @@ export class SeatingPlanBComponent {
           });
         }
 
-        // Fetch location details only after performanceDetails is populated
+        // Fetch location details
         if (this.performanceDetails.locationId) {
           this.locationService.getById(this.performanceDetails.locationId).subscribe({
             next: (location) => {
               this.locationDetails = location;
-              console.log('Location details:', this.locationDetails);
             },
             error: (err) => {
               console.error('Error fetching location details:', err);
@@ -78,93 +158,40 @@ export class SeatingPlanBComponent {
       },
     });
   }
-  // Generate tickets for Sector A
-  private generateSeatedTickets(rows: number, initialSeats: number, price: number, sector: SectorType): TicketDto[] {
-    const tickets: TicketDto[] = [];
-    let ticketId = 1;
-
-    for (let row = 1; row <= rows; row++) {
-      for (let seat = 1; seat <= initialSeats; seat++) {
-        tickets.push({
-          ticketId: ticketId++,
-          rowNumber: row,
-          seatNumber: seat,
-          priceCategory: PriceCategory.STANDARD,
-          ticketType: TicketType.SEATED,
-          sectorType: sector,
-          price,
-          status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
-          performanceId: 1,
-          hall: Hall.B,
-          date: new Date()
-        });
-      }
-    }
-    return tickets;
-  }
-
-  // Generate tickets for Sector B with dynamic rows
-  private generateSeatedRows(rows: number, initialSeats: number, price: number, sector: SectorType): TicketDto[][] {
-    const ticketRows: TicketDto[][] = [];
-    let ticketId = 1;
-
-    for (let row = 1; row <= rows; row++) {
-      const seatsPerRow = initialSeats + (row - 1) ; // Increase seats per row dynamically
-      const rowTickets: TicketDto[] = [];
-
-      for (let seat = 1; seat <= seatsPerRow; seat++) {
-        rowTickets.push({
-          ticketId: ticketId++,
-          rowNumber: row,
-          seatNumber: seat,
-          priceCategory: PriceCategory.STANDARD,
-          ticketType: TicketType.SEATED,
-          sectorType: sector,
-          price,
-          status: Math.random() > 0.8 ? 'RESERVED' : 'AVAILABLE',
-          performanceId: 1,
-          hall: Hall.B,
-          date: new Date()
-        });
-      }
-
-      ticketRows.push(rowTickets);
-    }
-
-    return ticketRows;
-  }
 
   toggleTicketSelection(ticket: TicketDto): void {
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+    if (!ticket) return; // Ensure ticket is valid
+
+    // Find the index of the ticket in the selectedTickets array
+    const index = this.selectedTickets.findIndex(
+      (t) =>
+        t.rowNumber === ticket.rowNumber &&
+        t.seatNumber === ticket.seatNumber &&
+        t.sectorType === ticket.sectorType
+    );
 
     if (index > -1) {
-      // Deselecting the ticket
+      // Deselect the ticket if it's already selected
       this.selectedTickets.splice(index, 1);
       this.updateTotalPrice();
       return;
     }
 
-    // Prevent selection if total tickets exceed 5
-    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+    // Check if the max ticket limit is reached
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     if (totalSelected >= 5) {
       this.toastr.error('You cannot select more than 5 tickets.', 'Error');
       return;
     }
 
-    // Select the ticket
-    if (ticket.status !== 'AVAILABLE') {
-      this.toastr.error('This ticket is not available.', 'Error');
-      return;
-    }
-
+    // Add the ticket to the selection
     this.selectedTickets.push(ticket);
     this.updateTotalPrice();
   }
 
 
-
-  toggleStandingSector(ticketType: TicketType, priceCategory: PriceCategory, price: number): void {
-    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+  toggleStandingSector(priceCategory: PriceCategory): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
 
     if (priceCategory === this.priceCategory.VIP) {
       if (this.selectedStanding.vip > 0) {
@@ -181,8 +208,8 @@ export class SeatingPlanBComponent {
         this.selectedStanding.vip = 1;
       }
     } else if (priceCategory === this.priceCategory.PREMIUM) {
-      if (this.selectedStanding.regular > 0) {
-        this.selectedStanding.regular = 0;
+      if (this.selectedStanding.premium > 0) {
+        this.selectedStanding.premium = 0;
       } else {
         if (totalSelected >= 5) {
           this.toastr.error('You cannot select more than 5 tickets.', 'Error');
@@ -192,27 +219,44 @@ export class SeatingPlanBComponent {
           this.toastr.warning('No Regular Standing tickets available!', 'Warning');
           return;
         }
-        this.selectedStanding.regular = 1;
+        this.selectedStanding.premium = 1;
+      }
+    }
+    this.updateTotalPrice();
+  }
+
+  validateStandingTickets(type: 'vip' | 'premium'): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
+
+    if (totalSelected > 5) {
+      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+      if (type === 'vip') {
+        this.selectedStanding.vip = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.premium);
+      } else if (type === 'premium') {
+        this.selectedStanding.premium = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.vip);
       }
     }
 
     this.updateTotalPrice();
   }
 
-
-
   updateTotalPrice(): void {
     const seatedPrice = this.selectedTickets.reduce((sum, ticket) => sum + ticket.price, 0);
-    const standingVipPrice = this.selectedStanding.vip * 100;
-    const standingRegularPrice = this.selectedStanding.regular * 70;
+    const standingVipPrice = this.selectedStanding.vip * this.vipStandingPrice;
+    const standingRegularPrice = this.selectedStanding.premium * this.regularStandingPrice;
 
-    this.totalTickets = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
+    this.totalTickets = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     this.totalPrice = seatedPrice + standingVipPrice + standingRegularPrice;
   }
 
-  resetSelections(): void {
+   resetSelections(): void {
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
+    if (totalSelected === 0){
+      console.log("AHAAAAAA")
+    }
     this.selectedTickets = [];
-    this.selectedStanding = { vip: 0, regular: 0 };
+    this.selectedStanding = { vip: 0, premium: 0 };
+    console.log("meow")
     this.totalTickets = 0;
     this.totalPrice = 0;
   }
@@ -223,12 +267,53 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    this.selectedTickets.forEach((ticket) => (ticket.status = 'RESERVED'));
-    this.vipStandingTickets -= this.selectedStanding.vip;
-    this.standingTickets -= this.selectedStanding.regular;
+    this.toastr.info(
+      'Please arrive at least 30 minutes before your reservation. Failure to do so will result in invalidation.',
+      'Important Notice',
+      {
+        timeOut: 10000,
+        extendedTimeOut: 5000,
+        progressBar: true,
+        closeButton: true
+      }
+    );
 
-    this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
-    this.resetSelections();
+    const updateRequests = [];
+
+    // Handle seated tickets
+    this.selectedTickets.forEach(ticket => {
+      ticket.status = 'RESERVED';
+      updateRequests.push(this.ticketService.updateTicket(ticket));
+    });
+
+    // Handle standing tickets (VIP and Standard)
+    forkJoin([
+      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
+      this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
+    ]).subscribe({
+      next: ([vipTickets, standardTickets]) => {
+        [...vipTickets, ...standardTickets].forEach(ticket => {
+          ticket.status = 'RESERVED';
+          updateRequests.push(this.ticketService.updateTicket(ticket));
+        });
+
+        forkJoin(updateRequests).subscribe({
+          next: () => {
+            this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
+            this.resetSelections();
+            this.loadTicketsByPerformance(this.performanceID);
+          },
+          error: (err) => {
+            console.error('Error reserving tickets:', err);
+            this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching standing tickets:', err);
+        this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
+      }
+    });
   }
 
   buyTickets(): void {
@@ -237,12 +322,70 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    this.selectedTickets.forEach((ticket) => (ticket.status = 'SOLD'));
-    this.vipStandingTickets -= this.selectedStanding.vip;
-    this.standingTickets -= this.selectedStanding.regular;
+    const updateRequests = [];
 
-    this.toastr.success(`Successfully purchased ${this.totalTickets} tickets for ${this.totalPrice}€!`, 'Purchase Successful');
-    this.resetSelections();
+    // Handle seated tickets
+    this.selectedTickets.forEach(ticket => {
+      ticket.status = 'SOLD';
+      updateRequests.push(this.ticketService.updateTicket(ticket));
+    });
+
+    // Handle standing tickets (VIP and Standard)
+    forkJoin([
+      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
+      this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
+    ]).subscribe({
+      next: ([vipTickets, standardTickets]) => {
+        [...vipTickets, ...standardTickets].forEach(ticket => {
+          ticket.status = 'SOLD';
+          updateRequests.push(this.ticketService.updateTicket(ticket));
+        });
+
+        forkJoin(updateRequests).subscribe({
+          next: () => {
+            this.toastr.success(`Successfully purchased ${this.totalTickets} tickets for ${this.totalPrice}€!`, 'Purchase Successful');
+            this.resetSelections();
+            this.loadTicketsByPerformance(this.performanceID);
+          },
+          error: (err) => {
+            console.error('Error purchasing tickets:', err);
+            this.toastr.error('Failed to purchase tickets. Please try again.', 'Error');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching standing tickets:', err);
+        this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
+      }
+    });
+  }
+
+
+  getAvailableStandingTickets(category: PriceCategory, count: number): Observable<TicketDto[]> {
+    return this.ticketService.getTicketsByPerformanceId(this.performanceID).pipe(
+      map(tickets => {
+        const result: TicketDto[] = [];
+        let availableCount = 0;
+
+        for (const ticket of tickets) {
+          if (
+            ticket.sectorType === SectorType.A &&
+            ticket.ticketType === TicketType.STANDING &&
+            ticket.priceCategory === category &&
+            ticket.status === 'AVAILABLE'
+          ) {
+            result.push(ticket);
+            availableCount++;
+
+            if (availableCount >= count) {
+              break;
+            }
+          }
+        }
+
+        return result; // Return the filtered tickets
+      })
+    );
   }
 
   getClass(ticket: TicketDto): { [key: string]: boolean } {
@@ -253,21 +396,9 @@ export class SeatingPlanBComponent {
       'selected-seat': this.selectedTickets.includes(ticket),
     };
   }
-  validateStandingTickets(type: 'vip' | 'regular'): void {
-    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.regular;
 
-    // Check if the total exceeds the limit
-    if (totalSelected > 5) {
-      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
-      if (type === 'vip') {
-        this.selectedStanding.vip = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.regular);
-      } else if (type === 'regular') {
-        this.selectedStanding.regular = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.vip);
-      }
-    }
 
-    this.updateTotalPrice();
-  }
+
+
 
 }
-

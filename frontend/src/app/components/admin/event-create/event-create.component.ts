@@ -342,9 +342,10 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C (9 x 15)
+      // Sitzplätze in Sektor C (Reihe 1: 15 Sitze, Reihe 2: 16 Sitze, ... Reihe 9: 23 Sitze)
       for (let row = 1; row <= 9; row++) {
-        for (let seat = 1; seat <= 15; seat++) {
+        let seatsInRow = 14 + row; // Reihe 1 hat 15 Sitze, Reihe 2 hat 16 Sitze, usw.
+        for (let seat = 1; seat <= seatsInRow; seat++) {
           tickets.push({
             rowNumber: row,
             seatNumber: seat,
@@ -455,8 +456,8 @@ export class EventCreateComponent implements OnInit {
   updateTicketNumber() {
     const hallCapacity = {
       A: 660,
-      B: 317,
+      B: 353,
     };
-    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
+    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
   }
 }

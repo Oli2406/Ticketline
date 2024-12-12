@@ -55,7 +55,7 @@ export class SeatingPlanAComponent {
   ) {}
 
   ngOnInit(): void {
-    this.performanceID = 3; // TODO: hardcoded performance ID !! fetch actual performance ID!!
+    this.performanceID = 1; // TODO: hardcoded performance ID !! fetch actual performance ID!!
     this.getPerformanceDetails(this.performanceID);
     this.loadTicketsByPerformance(this.performanceID);
   }
