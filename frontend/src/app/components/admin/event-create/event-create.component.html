@@ -128,19 +128,17 @@
           <div class="form-group">
             <input type="date" placeholder="Performance Date" [(ngModel)]="newPerformance.date" name="performanceDate" />
           </div>
-          <label class="custom-label fw-bold">Price per ticket</label>
-
-          <div class="form-group">
-            <input type="number" placeholder="Price per ticket" [(ngModel)]="newPerformance.price" name="pricePerTicket" />
-          </div>
-          <label class="custom-label fw-bold">Number of tickets</label>
-
-          <div class="form-group">
-            <input type="number" placeholder="Number of tickets" [(ngModel)]="newPerformance.ticketNumber" name="ticketNumber" />
-          </div>
           <label class="custom-label fw-bold">Hall</label>
           <div class="form-group">
-            <input type="text" placeholder="Hall" [(ngModel)]="newPerformance.hall" name="Hall" />
+            <select [(ngModel)]="newPerformance.hall" (change)="updateTicketNumber()" name="Hall">
+              <option value="" disabled selected>Select Hall</option>
+              <option value="A">Hall A</option>
+              <option value="B">Hall B</option>
+            </select>
+          </div>
+          <label class="custom-label fw-bold">Number of tickets</label>
+          <div class="form-group">
+            <input type="number" placeholder="Number of tickets" [value]="newPerformance.ticketNumber" disabled name="ticketNumber" /> <!-- readonly -->
           </div>
           <button type="button" class="btn-save-performance" (click)="createPerformance()">Save Performance</button>
         </form>

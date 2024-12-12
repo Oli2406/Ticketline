@@ -10,7 +10,6 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.JoinColumn;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
