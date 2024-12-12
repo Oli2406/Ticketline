@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CustomEventService implements EventService {
@@ -23,10 +26,12 @@ public class CustomEventService implements EventService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
     private final EventValidator eventValidator;
+    private final EventMapper eventMapper;
 
-    public CustomEventService(EventRepository eventRepository, EventValidator eventValidator) {
+    public CustomEventService(EventRepository eventRepository, EventValidator eventValidator, EventMapper eventMapper) {
         this.eventRepository = eventRepository;
         this.eventValidator = eventValidator;
+        this.eventMapper = eventMapper;
     }
 
     @Override
@@ -69,5 +74,31 @@ public class CustomEventService implements EventService {
         logger.info("Deleting event with ID: {}", id);
         eventRepository.deleteById(id);
         logger.debug("Deleted event with ID: {}", id);
+    }
+
+    @Override
+    public Stream<EventDetailDto> search(EventSearchDto dto) {
+        logger.info("Searching artists with data: {}", dto);
+        var query = eventRepository.findAll().stream();
+        if (dto.getTitle() != null) {
+            query = query.filter(event -> event.getTitle().toLowerCase().contains(dto.getTitle().toLowerCase()));
+        }
+        if (dto.getCategory() != null) {
+            query = query.filter(event -> event.getCategory().toLowerCase().contains(dto.getCategory().toLowerCase()));
+        }
+        if (dto.getDateEarliest() != null) {
+            query = query.filter(event -> event.getDateOfEvent().isAfter(dto.getDateEarliest()));
+        }
+        if (dto.getDateLatest() != null) {
+            query = query.filter(event -> event.getDateOfEvent().isBefore(dto.getDateLatest()));
+        }
+        if (dto.getMinDuration() != null) {
+            query = query.filter(event -> event.getDuration() >= dto.getMinDuration() - 30);
+        }
+        if (dto.getMaxDuration() != null) {
+            query = query.filter(event -> event.getDuration() <= dto.getMaxDuration() + 30);
+        }
+
+        return query.map(this.eventMapper::eventToEventDetailDto);
     }
 }
