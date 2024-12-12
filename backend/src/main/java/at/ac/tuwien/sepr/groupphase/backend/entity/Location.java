@@ -18,7 +18,7 @@ public class Location {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String street;
 
     @Column(nullable = false)

@@ -17,7 +17,7 @@ public class Artist {
     private String firstName;
 
     @Column(nullable = false)
-    private String surname;
+    private String lastName;
 
     @Column(nullable = false, unique = true)
     private String artistName;
@@ -25,9 +25,9 @@ public class Artist {
     public Artist() {
     }
 
-    public Artist(String firstName, String surname, String artistName) {
+    public Artist(String firstName, String lastName, String artistName) {
         this.firstName = firstName;
-        this.surname = surname;
+        this.lastName = lastName;
         this.artistName = artistName;
     }
 
@@ -47,12 +47,12 @@ public class Artist {
         this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getArtistName() {

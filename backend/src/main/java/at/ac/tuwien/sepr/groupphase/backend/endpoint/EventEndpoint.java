@@ -37,7 +37,7 @@ public class EventEndpoint {
     @PutMapping
     public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update event: {}", eventCreateDto);
-        EventDetailDto createdEvent = eventService.createOrUpdateEvent(eventCreateDto);
+        EventDetailDto createdEvent = eventService.createEvent(eventCreateDto);
         logger.debug("Event created/updated successfully: {}", createdEvent);
         return ResponseEntity.ok(createdEvent);
     }

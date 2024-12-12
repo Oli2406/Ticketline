@@ -31,7 +31,7 @@ public class CustomLocationService implements LocationService {
     }
 
     @Override
-    public LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
+    public LocationDetailDto createLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating location: {}", locationCreateDto);
         locationValidator.validateLocation(locationCreateDto);
         Location location = new Location(

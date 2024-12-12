@@ -1,20 +1,20 @@
 export interface Event {
   eventId?: number; // Primary Key
   title: string;
-  dateOfEvent: Date;
+  dateFrom: Date; // Startdatum
+  dateTo: Date; // Enddatum
   category: string;
   description: string;
-  duration: number;
   performanceIds?: number[];
 }
 
 export interface EventListDto {
   eventId: number;
   title: string;
-  dateOfEvent: Date;
+  dateFrom: Date;
+  dateTo: Date;
   category: string;
   description: string;
-  duration: number;
 }
 
 export interface EventSearch {
@@ -22,7 +22,5 @@ export interface EventSearch {
   category?: string;
   dateEarliest?: Date;
   dateLatest?: Date;
-  minDuration?: number;
-  maxDuration?: number;
   performanceIds?: number[];
 }

@@ -7,6 +7,7 @@ export interface Performance {
   artistId: number; // Foreign Key
   ticketNumber: number;
   hall: string;
+  duration: number;
 }
 
 export interface PerformanceListDto {
@@ -18,6 +19,7 @@ export interface PerformanceListDto {
   artistId: number;
   ticketNumber: number;
   hall: string;
+  duration: number;
 }
 
 export interface PerformanceWithNamesDto {
@@ -29,4 +31,5 @@ export interface PerformanceWithNamesDto {
   artistName: string;
   ticketNumber: number;
   hall: string;
+  duration: number;
 }

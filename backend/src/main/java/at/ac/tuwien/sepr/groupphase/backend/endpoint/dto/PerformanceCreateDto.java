@@ -5,21 +5,23 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class PerformanceCreateDto {
 
     private String name;
     private Long artistId;
     private Long locationId;
-    private LocalDate date;
+    private LocalDateTime date;
     private BigDecimal price;
     private Long ticketNumber;
     private String hall;
     private Artist artist;
     private Location location;
+    private Integer duration;
 
-    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall,
-                                Artist artist, Location location) {
+    public PerformanceCreateDto(String name, Long artistId, Long locationId, LocalDateTime date, BigDecimal price, Long ticketNumber, String hall,
+                                Artist artist, Location location, Integer duration) {
         this.name = name;
         this.artistId = artistId;
         this.locationId = locationId;
@@ -29,6 +31,7 @@ public class PerformanceCreateDto {
         this.hall = hall;
         this.artist = artist;
         this.location = location;
+        this.duration = duration;
     }
 
     public PerformanceCreateDto() {}
@@ -57,11 +60,11 @@ public class PerformanceCreateDto {
         this.locationId = locationId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -95,5 +98,13 @@ public class PerformanceCreateDto {
 
     public Location getLocation() {
         return location;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }

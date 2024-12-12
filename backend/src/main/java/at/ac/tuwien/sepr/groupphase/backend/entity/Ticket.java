@@ -14,6 +14,7 @@ import jakarta.persistence.EnumType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Ticket {
@@ -57,14 +58,14 @@ public class Ticket {
     private Long reservationNumber;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
 
     public Ticket() {
     }
 
     public Ticket(Long performanceId, Integer rowNumber, Integer seatNumber, PriceCategory priceCategory,
                   TicketType ticketType, SectorType sectorType, BigDecimal price, String status, Hall hall,
-                  Long reservationNumber, LocalDate date) {
+                  Long reservationNumber, LocalDateTime date) {
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
         this.priceCategory = priceCategory;
@@ -166,11 +167,11 @@ public class Ticket {
         this.reservationNumber = reservationNumber;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 }

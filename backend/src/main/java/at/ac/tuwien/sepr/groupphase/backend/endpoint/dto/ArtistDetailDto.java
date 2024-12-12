@@ -4,13 +4,13 @@ public class ArtistDetailDto {
 
     private Long artistId;
     private String firstName;
-    private String surname;
+    private String lastName;
     private String artistName;
 
-    public ArtistDetailDto(Long artistId, String firstName, String surname, String artistName) {
+    public ArtistDetailDto(Long artistId, String firstName, String lastName, String artistName) {
         this.artistId = artistId;
         this.firstName = firstName;
-        this.surname = surname;
+        this.lastName = lastName;
         this.artistName = artistName;
     }
 
@@ -30,12 +30,12 @@ public class ArtistDetailDto {
         this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String surname) {
+        this.lastName = surname;
     }
 
     public String getArtistName() {

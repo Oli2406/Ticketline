@@ -53,7 +53,7 @@
           class="form-control"
           id="lastName"
           name="lastName"
-          [(ngModel)]="artistSearchParams.surname"
+          [(ngModel)]="artistSearchParams.lastName"
           (ngModelChange)="searchChanged()"
           placeholder="Enter last name"
           type="text"/>
@@ -121,7 +121,7 @@
   <tbody>
   <tr *ngFor="let artist of artists">
     <td>{{ artist.firstName }}</td>
-    <td>{{ artist.surname }}</td>
+    <td>{{ artist.lastName }}</td>
     <td>{{ artist.artistName }}</td>
     <td>
       <button class="btn btn-secondary"><i class="bi bi-info"></i></button>

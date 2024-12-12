@@ -127,7 +127,7 @@ export class SearchComponent {
             map(({location, artist}) => ({
               ...p,
               locationName: location.name,
-              artistName: `${artist.firstName} ${artist.surname}`
+              artistName: `${artist.firstName} ${artist.lastName}`
             }))
           )
         );
@@ -165,7 +165,7 @@ export class SearchComponent {
 
   clearSearch() {
     this.artistSearchParams.firstName = '';
-    this.artistSearchParams.surname = '';
+    this.artistSearchParams.lastName = '';
     this.artistSearchParams.artistName = '';
     this.searchQuery = '';
     this.searchChanged();

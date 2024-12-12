@@ -26,14 +26,14 @@ public class Event {
     @Column
     private String description;
 
-    @Column
-    private LocalDate dateOfEvent;
+    @Column(nullable = false)
+    private LocalDate dateFrom;
+
+    @Column(nullable = false)
+    private LocalDate dateTo;
 
     @Column(nullable = false)
     private String category;
-
-    @Column(nullable = false)
-    private Integer duration;
 
     @ElementCollection
     @CollectionTable(name = "event_performance_ids", joinColumns = @JoinColumn(name = "event_id"))
@@ -43,12 +43,12 @@ public class Event {
     public Event() {
     }
 
-    public Event(String title, String description, LocalDate dateOfEvent, String category, Integer duration, List<Long> performanceIds) {
+    public Event(String title, String description, LocalDate dateFrom, LocalDate dateTo, String category, List<Long> performanceIds) {
         this.title = title;
         this.description = description;
-        this.dateOfEvent = dateOfEvent;
+        this.dateFrom = dateFrom;
+        this.dateTo = dateTo;
         this.category = category;
-        this.duration = duration;
         this.performanceIds = performanceIds;
     }
 
@@ -76,12 +76,20 @@ public class Event {
         this.description = description;
     }
 
-    public LocalDate getDateOfEvent() {
-        return dateOfEvent;
+    public LocalDate getDateFrom() {
+        return dateFrom;
     }
 
-    public void setDateOfEvent(LocalDate dateOfEvent) {
-        this.dateOfEvent = dateOfEvent;
+    public void setDateFrom(LocalDate dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    public LocalDate getDateTo() {
+        return dateTo;
+    }
+
+    public void setDateTo(LocalDate dateTo) {
+        this.dateTo = dateTo;
     }
 
     public String getCategory() {
@@ -90,14 +98,6 @@ public class Event {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
     }
 
     public List<Long> getPerformanceIds() {

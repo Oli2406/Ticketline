@@ -20,7 +20,7 @@ public interface EventService {
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
      * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
+    EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all events.
