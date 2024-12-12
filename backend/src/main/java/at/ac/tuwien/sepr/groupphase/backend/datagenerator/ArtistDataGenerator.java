@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.lang.invoke.MethodHandles;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 public class ArtistDataGenerator {
 
     private static final Logger LOGGER =

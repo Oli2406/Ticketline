@@ -6,10 +6,12 @@ import jakarta.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("generateData")
 public class UserDataGenerator {
 
     private static final Logger LOGGER =
