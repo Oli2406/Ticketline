@@ -18,6 +18,7 @@ export interface LocationListDto {
 
 export interface LocationSearch {
   name?: string;
+  street?: string;
   city?: string;
   postalCode?: string;
   country?: string;

@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -30,10 +31,13 @@ public class CustomEventServiceTest {
     @Mock
     private EventValidator eventValidator;
 
+    @Mock
+    private EventMapper eventMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        eventService = new CustomEventService(eventRepository, eventValidator);
+        eventService = new CustomEventService(eventRepository, eventValidator, eventMapper);
     }
 
     @Test
@@ -69,13 +73,13 @@ public class CustomEventServiceTest {
 
         assertFalse(result.isEmpty(), "Resulting event list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("Title1", result.get(0).getTitle(), "Title of the first event should match");
+        assertEquals("Title1", result.getFirst().getTitle(), "Title of the first event should match");
 
         verify(eventRepository, times(1)).findAll();
     }
 
     @Test
-    void getEventById_ShouldThrowException_WhenEventNotFound() {
+    void getEventByIdShouldThrowExceptionWhenEventNotFound() {
         when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
