@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 public class NewsDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Path SOURCE_DIR = Paths.get("./src/test/resources/testImages/").toAbsolutePath().normalize();
