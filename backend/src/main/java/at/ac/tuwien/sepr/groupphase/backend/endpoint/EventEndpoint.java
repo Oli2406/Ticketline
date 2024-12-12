@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
@@ -21,11 +24,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v1/event")
+@RequestMapping(EventEndpoint.BASE_PATH)
 public class EventEndpoint {
 
+    public static final String BASE_PATH = "/api/v1/event";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final EventService eventService;
 
@@ -37,7 +42,7 @@ public class EventEndpoint {
     @PutMapping
     public ResponseEntity<EventDetailDto> createOrUpdateEvent(@RequestBody EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update event: {}", eventCreateDto);
-        EventDetailDto createdEvent = eventService.createOrUpdateEvent(eventCreateDto);
+        EventDetailDto createdEvent = eventService.createEvent(eventCreateDto);
         logger.debug("Event created/updated successfully: {}", createdEvent);
         return ResponseEntity.ok(createdEvent);
     }
@@ -58,6 +63,15 @@ public class EventEndpoint {
         EventDetailDto event = eventService.getEventById(id);
         logger.debug("Fetched event: {}", event);
         return ResponseEntity.ok(event);
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<EventDetailDto>> search(EventSearchDto dto) {
+        logger.info("GET " + BASE_PATH);
+        logger.debug("request parameters: {}", dto);
+        Stream<EventDetailDto> result = eventService.search(dto);
+        return ResponseEntity.ok(result);
     }
 
     @Secured("ROLE_ADMIN")

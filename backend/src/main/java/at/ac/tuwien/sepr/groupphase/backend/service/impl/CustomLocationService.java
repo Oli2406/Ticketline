@@ -1,7 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.LocationMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CustomLocationService implements LocationService {
@@ -23,15 +28,17 @@ public class CustomLocationService implements LocationService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final LocationRepository locationRepository;
     private final LocationValidator locationValidator;
+    private final LocationMapper locationMapper;
 
 
-    public CustomLocationService(LocationRepository locationRepository, LocationValidator locationValidator) {
+    public CustomLocationService(LocationRepository locationRepository, LocationValidator locationValidator, LocationMapper locationMapper) {
         this.locationRepository = locationRepository;
         this.locationValidator = locationValidator;
+        this.locationMapper = locationMapper;
     }
 
     @Override
-    public LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
+    public LocationDetailDto createLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating location: {}", locationCreateDto);
         locationValidator.validateLocation(locationCreateDto);
         Location location = new Location(
@@ -69,5 +76,28 @@ public class CustomLocationService implements LocationService {
         logger.info("Deleting location with ID: {}", id);
         locationRepository.deleteById(id);
         logger.debug("Deleted location with ID: {}", id);
+    }
+
+    @Override
+    public Stream<LocationDetailDto> search(LocationSearchDto dto) {
+        logger.info("Searching artists with data: {}", dto);
+        var query = locationRepository.findAll().stream();
+        if (dto.getName() != null) {
+            query = query.filter(location -> location.getName().toLowerCase().contains(dto.getName().toLowerCase()));
+        }
+        if (dto.getStreet() != null) {
+            query = query.filter(location -> location.getStreet().toLowerCase().contains(dto.getStreet().toLowerCase()));
+        }
+        if (dto.getCity() != null) {
+            query = query.filter(location -> location.getCity().toLowerCase().contains(dto.getCity().toLowerCase()));
+        }
+        if (dto.getCountry() != null) {
+            query = query.filter(location -> location.getCountry().toLowerCase().contains(dto.getCountry().toLowerCase()));
+        }
+        if (dto.getPostalCode() != null) {
+            query = query.filter(location -> location.getPostalCode().toLowerCase().contains(dto.getPostalCode().toLowerCase()));
+        }
+
+        return query.map(this.locationMapper::locationToLocationDetailDto);
     }
 }

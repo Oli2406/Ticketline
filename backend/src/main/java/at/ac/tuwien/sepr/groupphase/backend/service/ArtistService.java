@@ -22,7 +22,7 @@ public interface ArtistService {
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
      * @throws ConflictException   if there are conflicts, such as an artist with the same name already existing
      */
-    ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException;
+    ArtistDetailDto createArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all artists.

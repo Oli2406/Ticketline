@@ -28,8 +28,8 @@ export class ArtistService {
     if (filter.firstName?.trim()) {
       params = params.append('firstName', filter.firstName);
     }
-    if (filter.surname?.trim()) {
-      params = params.append('surname', filter.surname);
+    if (filter.lastName?.trim()) {
+      params = params.append('lastName', filter.lastName);
     }
     if (filter.artistName?.trim()) {
       params = params.append('artistName', filter.artistName);

@@ -46,7 +46,7 @@ public class NewsValidator {
         if (news.getContent() == null || news.getContent().isEmpty()) {
             validationErrors.add("News content is required");
         } else if (news.getContent().length() > 4096) {
-            validationErrors.add("News content length cannot exceed 255 characters");
+            validationErrors.add("News content cannot exceed 4096 characters");
         }
 
         if (!validationErrors.isEmpty()) {

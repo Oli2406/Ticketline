@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.LocationMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -28,10 +29,13 @@ public class CustomLocationServiceTest {
     @Mock
     private LocationValidator locationValidator;
 
+    @Mock
+    private LocationMapper locationMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        locationService = new CustomLocationService(locationRepository, locationValidator);
+        locationService = new CustomLocationService(locationRepository, locationValidator, locationMapper);
     }
 
     @Test
@@ -44,7 +48,7 @@ public class CustomLocationServiceTest {
             return l;
         });
 
-        LocationDetailDto created = locationService.createOrUpdateLocation(dto);
+        LocationDetailDto created = locationService.createLocation(dto);
 
         assertNotNull(created, "Created location DTO should not be null");
         assertAll(

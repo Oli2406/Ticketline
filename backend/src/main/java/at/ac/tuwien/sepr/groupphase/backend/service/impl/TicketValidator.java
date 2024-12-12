@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class TicketValidator {
 
         if (ticketCreateDto.getDate() == null) {
             validationErrors.add("Ticket date is required");
-        } else if (ticketCreateDto.getDate().isBefore(LocalDate.now())) {
+        } else if (ticketCreateDto.getDate().isBefore(LocalDateTime.now())) {
             validationErrors.add("Ticket date cannot be in the past");
         }
 

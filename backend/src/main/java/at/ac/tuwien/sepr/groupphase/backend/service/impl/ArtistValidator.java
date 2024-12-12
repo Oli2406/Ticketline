@@ -37,11 +37,11 @@ public class ArtistValidator {
         }
 
         // Check if surname is valid
-        if (artistCreateDto.getSurname() == null || artistCreateDto.getSurname().trim().isEmpty()) {
+        if (artistCreateDto.getLastName() == null || artistCreateDto.getLastName().trim().isEmpty()) {
             validationErrors.add("Surname is required");
         }
 
-        if (artistCreateDto.getSurname().length() > 255) {
+        if (artistCreateDto.getLastName().length() > 255) {
             validationErrors.add("Surname must be less than 255 characters");
         }
 

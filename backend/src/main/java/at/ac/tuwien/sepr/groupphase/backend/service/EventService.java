@@ -2,10 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Service interface for managing events.
@@ -20,7 +22,7 @@ public interface EventService {
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
      * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
+    EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all events.
@@ -43,4 +45,13 @@ public interface EventService {
      * @param id the ID of the event to delete
      */
     void deleteEvent(Long id);
+
+    /**
+     * Search for events in the persistent data store matching all provided fields.
+     * The title and category are considered a match, if the search string is a substring of the field in event.
+     *
+     * @param dto the search parameters to use in filtering.
+     * @return the event where the given fields match.
+     */
+    Stream<EventDetailDto> search(EventSearchDto dto);
 }

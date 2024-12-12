@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {Event, EventListDto} from 'src/app/dtos/event';
+import {Event, EventListDto, EventSearch} from 'src/app/dtos/event';
 
 @Injectable({
   providedIn: 'root',
@@ -19,12 +19,34 @@ export class EventService {
     );
   }
 
-
-
   get(): Observable<EventListDto[]> {
     return this.http.get<EventListDto[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
+  }
+
+  getAllByFilter(filter: EventSearch): Observable<EventListDto[]> {
+    let params = new HttpParams();
+    if (filter.title?.trim()) {
+      params = params.append('title', filter.title);
+    }
+    if (filter.category?.trim()) {
+      params = params.append('category', filter.category);
+    }
+    if (filter.dateEarliest?.trim()) {
+      params = params.append('dateEarliest', filter.dateEarliest);
+    }
+    if (filter.dateLatest?.trim()) {
+      params = params.append('dateLatest', filter.dateLatest);
+    }/*
+    if (filter.minDuration != null) {
+      params = params.append('minDuration', filter.minDuration);
+    }
+    if (filter.maxDuration != null) {
+      params = params.append('maxDuration', filter.maxDuration);
+    }*/
+
+    return this.http.get<EventListDto[]>(this.apiUrl + "/search", {params});
   }
 
   public handleError(error: HttpErrorResponse): Observable<never> {
