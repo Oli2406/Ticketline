@@ -102,7 +102,8 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
             performance.get("ticketNumber"),
             performance.get("hall"),
             performance.get("artist"),
-            performance.get("location")
+            performance.get("location"),
+            performance.get("duration")
         )).distinct(true).where(combinedPredicate);
 
         List<PerformanceDetailDto> results = entityManager.createQuery(cq).getResultList();
