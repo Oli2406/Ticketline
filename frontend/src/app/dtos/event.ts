@@ -20,7 +20,7 @@ export interface EventListDto {
 export interface EventSearch {
   title?: string;
   category?: string;
-  dateEarliest?: Date;
-  dateLatest?: Date;
+  dateEarliest?: string;
+  dateLatest?: string;
   performanceIds?: number[];
 }

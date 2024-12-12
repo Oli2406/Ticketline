@@ -48,6 +48,7 @@ export class EventCreateComponent implements OnInit {
 
   selectedArtist = null;
   selectedLocation = null;
+  flatpickrInstance: any;
 
   constructor(
     private datePipe: DatePipe,
@@ -75,6 +76,9 @@ export class EventCreateComponent implements OnInit {
         console.log("Date From:", this.eventData.dateFrom);
         console.log("Date To:", this.eventData.dateTo);
       },
+      onReady: (selectedDates, dateStr, instance) => {
+        this.flatpickrInstance = instance; // Speichere die Instanz
+      }
     });
   }
 
@@ -415,8 +419,10 @@ export class EventCreateComponent implements OnInit {
     this.eventService.createEvent(this.eventData).subscribe({
       next: (event: Event) => {
         this.toastr.success('Event created successfully!', 'Success');
-        this.clearLocalStorage();
         this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+        if (this.flatpickrInstance) {
+          this.flatpickrInstance.clear();
+        }
         this.performances = [];
       },
       error: (err) => {
