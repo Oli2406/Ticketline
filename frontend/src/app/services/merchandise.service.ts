@@ -3,15 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import {catchError, Observable} from 'rxjs';
 import {Merchandise} from "../dtos/merchandise";
 import {ErrorFormatterService} from "./error-formatter.service";
+import {Globals} from "../global/globals";
 
 @Injectable({
   providedIn: 'root',
 })
 export class MerchandiseService {
-  private apiUrl = 'http://localhost:8080/api/v1/merchandise';
+  private apiUrl = this.globals.backendUri + '/merchandise';
 
   constructor(private http: HttpClient,
-              private errorFormatter: ErrorFormatterService) {}
+              private errorFormatter: ErrorFormatterService,
+              private globals: Globals) {}
 
   createMerchandise(merchandiseData: any, imageFile: File): Observable<any> {
     const formData = new FormData();
