@@ -21,20 +21,4 @@ export class UserService {
   updateReadNews(dto: UserUpdateReadNewsDto):Observable<boolean> {
     return this.httpClient.put<boolean>(`${this.baseUri}`, dto);
   }
-
-  /*updateReadNews(dto: UserUpdateReadNewsDto): Observable<string> {
-
-
-    this.notification.success(this.baseUri); // Verifies the URL is correct
-
-    const dtoTest: UserUpdateReadNewsDto = {
-      newsId: 2,
-      email: 'karl.admin@email.com',
-    }
-    console.log('DTO being sent:', dto);
-    console.log('Endpoint being hit:', this.baseUri);
-    return this.httpClient.put<string>(`${this.baseUri}`, dto, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }*/
 }
