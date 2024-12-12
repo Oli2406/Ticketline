@@ -68,7 +68,7 @@
                id="eventDateLatest" name="eventDateLatest" type="date"/>
       </div>
 
-      <!-- Min duration -->
+      <!-- Min duration
       <div class="col-md-3 mb-3">
         <label class="form-label" for="eventMinDuration">Minimum Duration [min]</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.minDuration" class="form-control"
@@ -76,13 +76,13 @@
                name="eventMinDuration" placeholder="Enter minimum duration" type="number"/>
       </div>
 
-      <!-- Max duration -->
+
       <div class="col-md-3 mb-3">
         <label class="form-label" for="eventMaxDuration">Maximum Duration [min]</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.maxDuration" class="form-control"
                id="eventMaxDuration"
                name="eventMaxDuration" placeholder="Enter maximum duration" type="number"/>
-      </div>
+      </div>-->
 
       <div class="col-md-3 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
@@ -172,7 +172,7 @@
           class="form-control"
           id="lastName"
           name="lastName"
-          [(ngModel)]="artistSearchParams.surname"
+          [(ngModel)]="artistSearchParams.lastName"
           (ngModelChange)="searchChanged()"
           placeholder="Enter last name"
           type="text"/>
@@ -208,8 +208,9 @@
     <th>Name</th>
     <th>Category</th>
     <th>Description</th>
-    <th>Date</th>
-    <th>Duration</th>
+    <th>Startdate</th>
+    <th>Enddate</th>
+    <!--<th>Duration</th>-->
     <th>Actions</th>
   </tr>
   </thead>
@@ -218,8 +219,9 @@
     <td>{{ event.title }}</td>
     <td>{{ event.category }}</td>
     <td>{{ event.description }}</td>
-    <td>{{ event.dateOfEvent }}</td>
-    <td>{{ event.duration }}</td>
+    <td>{{ event.dateFrom }}</td>
+    <td>{{ event.dateTo }}</td>
+    <!--<td>{{ event.duration }}</td>-->
     <td>
       <button class="btn btn-secondary"><i class="bi bi-info"></i></button>
     </td>
@@ -240,7 +242,7 @@
   <tbody>
   <tr *ngFor="let artist of artists">
     <td>{{ artist.firstName }}</td>
-    <td>{{ artist.surname }}</td>
+    <td>{{ artist.lastName }}</td>
     <td>{{ artist.artistName }}</td>
     <td>
       <button class="btn btn-secondary"><i class="bi bi-info"></i></button>

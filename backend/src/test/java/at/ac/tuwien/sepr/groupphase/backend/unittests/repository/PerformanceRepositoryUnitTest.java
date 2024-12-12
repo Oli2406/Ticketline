@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,12 +49,13 @@ class PerformanceRepositoryUnitTest {
         testPerformance.setName("Test Performance");
         testPerformance.setArtistId(testArtist.getArtistId());
         testPerformance.setLocationId(testLocation.getLocationId());
-        testPerformance.setDate(LocalDate.now());
+        testPerformance.setDate(LocalDateTime.of(2024, 12, 25, 15, 30));
         testPerformance.setPrice(BigDecimal.valueOf(100));
         testPerformance.setTicketNumber(100L);
         testPerformance.setHall("Main Hall");
         testPerformance.setArtist(testArtist);
         testPerformance.setLocation(testLocation);
+        testPerformance.setDuration(300);
     }
 
     @Test
@@ -74,7 +76,7 @@ class PerformanceRepositoryUnitTest {
     @Test
     void existsByNameAndLocationIdAndDate_ReturnsTrueIfExists() {
         performanceRepository.save(testPerformance);
-        boolean exists = performanceRepository.existsByNameAndLocationIdAndDate("Test Performance", testLocation.getLocationId(), LocalDate.now());
+        boolean exists = performanceRepository.existsByNameAndLocationIdAndDate("Test Performance", testLocation.getLocationId(), LocalDateTime.of(2024, 12, 25, 15, 30));
         assertTrue(exists, "Performance with matching name, location, and date should exist");
     }
 }

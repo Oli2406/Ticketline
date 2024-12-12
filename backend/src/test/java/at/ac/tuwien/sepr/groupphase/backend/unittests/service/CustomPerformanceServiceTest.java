@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,7 +57,7 @@ public class CustomPerformanceServiceTest {
         when(artistRepository.findArtistByArtistId(1L)).thenReturn(artist);
         when(locationRepository.findByLocationId(1L)).thenReturn(location);
 
-        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDate.now(), new BigDecimal("50.00"), 100L, "Main Hall", null, null);
+        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDateTime.now(), new BigDecimal("50.00"), 100L, "Main Hall", artist, location, 300);
 
         when(performanceRepository.save(any(Performance.class))).thenAnswer(invocation -> {
             Performance p = invocation.getArgument(0);
@@ -64,7 +65,7 @@ public class CustomPerformanceServiceTest {
             return p;
         });
 
-        PerformanceDetailDto created = performanceService.createOrUpdatePerformance(dto);
+        PerformanceDetailDto created = performanceService.createPerformance(dto);
 
         assertNotNull(created, "Created performance DTO should not be null");
         assertAll(

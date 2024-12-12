@@ -35,27 +35,27 @@ public class CustomEventService implements EventService {
     }
 
     @Override
-    public EventDetailDto createOrUpdateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
+    public EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating event: {}", eventCreateDto);
         eventValidator.validateEvent(eventCreateDto);
         Event event = new Event(
             eventCreateDto.getTitle(),
             eventCreateDto.getDescription(),
-            eventCreateDto.getDateOfEvent(),
+            eventCreateDto.getDateFrom(),
+            eventCreateDto.getDateTo(),
             eventCreateDto.getCategory(),
-            eventCreateDto.getDuration(),
             eventCreateDto.getPerformanceIds()
         );
         event = eventRepository.save(event);
         logger.debug("Saved event to database: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
     public List<EventDetailDto> getAllEvents() {
         logger.info("Fetching all events");
         List<EventDetailDto> events = eventRepository.findAll().stream()
-            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration()))
+            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo()))
             .collect(Collectors.toList());
         logger.debug("Fetched {} events: {}", events.size(), events);
         return events;
@@ -66,7 +66,7 @@ public class CustomEventService implements EventService {
         logger.info("Fetching event with ID: {}", id);
         Event event = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
         logger.debug("Fetched event: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateOfEvent(), event.getDuration());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
@@ -87,17 +87,17 @@ public class CustomEventService implements EventService {
             query = query.filter(event -> event.getCategory().toLowerCase().contains(dto.getCategory().toLowerCase()));
         }
         if (dto.getDateEarliest() != null) {
-            query = query.filter(event -> event.getDateOfEvent().isAfter(dto.getDateEarliest()));
+            query = query.filter(event -> event.getDateFrom().isAfter(dto.getDateEarliest()));
         }
         if (dto.getDateLatest() != null) {
-            query = query.filter(event -> event.getDateOfEvent().isBefore(dto.getDateLatest()));
+            query = query.filter(event -> event.getDateTo().isBefore(dto.getDateLatest()));
         }
-        if (dto.getMinDuration() != null) {
+        /*if (dto.getMinDuration() != null) {
             query = query.filter(event -> event.getDuration() >= dto.getMinDuration() - 30);
         }
         if (dto.getMaxDuration() != null) {
             query = query.filter(event -> event.getDuration() <= dto.getMaxDuration() + 30);
-        }
+        }*/
 
         return query.map(this.eventMapper::eventToEventDetailDto);
     }

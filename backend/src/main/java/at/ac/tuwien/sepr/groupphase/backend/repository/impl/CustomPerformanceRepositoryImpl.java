@@ -75,7 +75,7 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
                 cb.like(cb.lower(performance.get("name")), likePattern),
                 cb.like(cb.lower(performance.get("hall")), likePattern),
                 cb.like(cb.lower(artist.get("firstName")), likePattern),
-                cb.like(cb.lower(artist.get("surname")), likePattern),
+                cb.like(cb.lower(artist.get("lastName")), likePattern),
                 cb.like(cb.lower(artist.get("artistName")), likePattern),
                 cb.like(cb.lower(location.get("name")), likePattern),
                 cb.like(cb.lower(location.get("street")), likePattern),
@@ -102,7 +102,8 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
             performance.get("ticketNumber"),
             performance.get("hall"),
             performance.get("artist"),
-            performance.get("location")
+            performance.get("location"),
+            performance.get("duration")
         )).distinct(true).where(combinedPredicate);
 
         List<PerformanceDetailDto> results = entityManager.createQuery(cq).getResultList();

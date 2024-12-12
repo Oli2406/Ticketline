@@ -20,7 +20,7 @@ public interface PerformanceService {
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
      * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
      */
-    PerformanceDetailDto createOrUpdatePerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException;
+    PerformanceDetailDto createPerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all performances.

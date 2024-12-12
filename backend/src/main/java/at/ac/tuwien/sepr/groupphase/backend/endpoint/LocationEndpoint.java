@@ -42,7 +42,7 @@ public class LocationEndpoint {
     @PutMapping
     public ResponseEntity<LocationDetailDto> createOrUpdateLocation(@RequestBody LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update location: {}", locationCreateDto);
-        LocationDetailDto createdLocation = locationService.createOrUpdateLocation(locationCreateDto);
+        LocationDetailDto createdLocation = locationService.createLocation(locationCreateDto);
         logger.debug("Location created/updated successfully: {}", createdLocation);
         return ResponseEntity.ok(createdLocation);
     }

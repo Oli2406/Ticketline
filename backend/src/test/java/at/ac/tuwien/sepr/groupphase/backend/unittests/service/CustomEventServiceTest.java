@@ -41,8 +41,8 @@ public class CustomEventServiceTest {
     }
 
     @Test
-    void createOrUpdateEventShouldSaveEventWhenValidInput() throws ValidationException, ConflictException {
-        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(), 120, List.of(1L));
+    void createOrUpdateEvent_ShouldSaveEvent_WhenValidInput() throws ValidationException, ConflictException {
+        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(), LocalDate.now().plusDays(1), List.of(1L));
 
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event e = invocation.getArgument(0);
@@ -50,7 +50,7 @@ public class CustomEventServiceTest {
             return e;
         });
 
-        EventDetailDto created = eventService.createOrUpdateEvent(dto);
+        EventDetailDto created = eventService.createEvent(dto);
 
         assertNotNull(created, "Created event DTO should not be null");
         assertAll(
@@ -65,8 +65,8 @@ public class CustomEventServiceTest {
     }
 
     @Test
-    void getAllEventsShouldReturnEventList() {
-        List<Event> events = List.of(new Event("Title1", "Description1", LocalDate.now(), "Category1", 90, List.of(1L)));
+    void getAllEvents_ShouldReturnEventList() {
+        List<Event> events = List.of(new Event("Title1", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L)));
         when(eventRepository.findAll()).thenReturn(events);
 
         List<EventDetailDto> result = eventService.getAllEvents();

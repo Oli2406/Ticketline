@@ -21,8 +21,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * Checks if an event with the specified title and date of event exists in the repository.
      *
      * @param title the title of the event to check for
-     * @param dateOfEvent the date of the event to check for
+     * @param dateFrom the start date of the event to check for
+     * @param dateTo the end date of the event to check for
      * @return true if an event with the given title and date exists, false otherwise
      */
-    boolean existsByTitleAndDateOfEvent(String title, LocalDate dateOfEvent);
+    boolean existsByTitleAndDateFromAndDateTo(String title, LocalDate dateFrom, LocalDate dateTo);
+
 }

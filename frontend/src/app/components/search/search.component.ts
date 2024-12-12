@@ -128,7 +128,7 @@ export class SearchComponent {
             map(({location, artist}) => ({
               ...p,
               locationName: location.name,
-              artistName: `${artist.firstName} ${artist.surname}`
+              artistName: `${artist.firstName} ${artist.lastName}`
             }))
           )
         );

@@ -3,12 +3,12 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 public class ArtistSearchDto {
 
     private String firstName;
-    private String surname;
+    private String lastName;
     private String artistName;
 
-    public ArtistSearchDto(String firstName, String surname, String artistName) {
+    public ArtistSearchDto(String firstName, String lastName, String artistName) {
         this.firstName = firstName;
-        this.surname = surname;
+        this.lastName = lastName;
         this.artistName = artistName;
     }
 
@@ -23,12 +23,12 @@ public class ArtistSearchDto {
         this.firstName = firstName;
     }
 
-    public String getSurname() {
-        return surname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getArtistName() {

@@ -23,7 +23,7 @@ public class ArtistRepositoryUnitTest {
     void setUp() {
         testArtist = new Artist();
         testArtist.setFirstName("John");
-        testArtist.setSurname("Doe");
+        testArtist.setLastName("Doe");
         testArtist.setArtistName("JohnDoe");
     }
 

@@ -23,7 +23,7 @@ public interface LocationService {
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
      * @throws ConflictException   if there are conflicts, such as an artist with the same name already existing
      */
-    LocationDetailDto createOrUpdateLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException;
+    LocationDetailDto createLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves all locations.

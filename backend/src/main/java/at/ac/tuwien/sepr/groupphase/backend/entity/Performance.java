@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Performance {
@@ -37,7 +38,7 @@ public class Performance {
     private Location location;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(nullable = false)
     private BigDecimal price;
@@ -48,11 +49,15 @@ public class Performance {
     @Column(nullable = false)
     private String hall;
 
+    @Column(nullable = false)
+    private Integer duration;
+
+
     public Performance() {
     }
 
-    public Performance(String name, Long artistId, Long locationId, LocalDate date, BigDecimal price,
-                       Long ticketNumber, String hall, Artist artist, Location location) {
+    public Performance(String name, Long artistId, Long locationId, LocalDateTime date, BigDecimal price,
+                       Long ticketNumber, String hall, Artist artist, Location location, Integer duration) {
         this.name = name;
         this.artistId = artist != null ? artist.getArtistId() : artistId;
         this.locationId = location != null ? location.getLocationId() : locationId;
@@ -62,6 +67,7 @@ public class Performance {
         this.hall = hall;
         this.artist = artist;
         this.location = location;
+        this.duration = duration;
     }
 
     public Long getPerformanceId() {
@@ -96,11 +102,11 @@ public class Performance {
         this.locationId = locationId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -142,5 +148,13 @@ public class Performance {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }

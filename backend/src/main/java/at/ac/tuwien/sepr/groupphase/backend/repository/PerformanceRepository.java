@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Repository
 public interface PerformanceRepository extends JpaRepository<Performance, Long> {
@@ -25,6 +26,6 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
      * @param date the date of the performance to be checked
      * @return true if a performance with the specified name, location, and date exists, false otherwise
      */
-    boolean existsByNameAndLocationIdAndDate(String name, Long locationId, LocalDate date);
+    boolean existsByNameAndLocationIdAndDate(String name, Long locationId, LocalDateTime date);
 
 }

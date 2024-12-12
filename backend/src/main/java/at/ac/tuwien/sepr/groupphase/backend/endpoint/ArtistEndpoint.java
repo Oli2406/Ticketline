@@ -40,7 +40,7 @@ public class ArtistEndpoint {
     @PutMapping
     public ResponseEntity<ArtistDetailDto> createOrUpdateArtist(@RequestBody ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
         LOG.info("Received request to create or update Artist: {}", artistCreateDto);
-        ArtistDetailDto createdArtist = artistService.createOrUpdateArtist(artistCreateDto);
+        ArtistDetailDto createdArtist = artistService.createArtist(artistCreateDto);
         LOG.info("Successfully created/updated Artist: {}", createdArtist);
         return ResponseEntity.ok(createdArtist);
     }

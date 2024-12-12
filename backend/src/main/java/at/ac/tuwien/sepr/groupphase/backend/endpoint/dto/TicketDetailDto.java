@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import at.ac.tuwien.sepr.groupphase.backend.enums.Hall;
 import at.ac.tuwien.sepr.groupphase.backend.enums.PriceCategory;
@@ -21,13 +22,13 @@ public class TicketDetailDto {
     private String status; // e.g., "AVAILABLE", "RESERVED", "SOLD"
     private Hall hall;
     private Long reservationNumber;
-    private LocalDate date;
+    private LocalDateTime date;
 
     public TicketDetailDto() {}
 
     public TicketDetailDto(Long ticketId, Long performanceId, Integer rowNumber, Integer seatNumber,
                            PriceCategory priceCategory, TicketType ticketType, SectorType sectorType,
-                           BigDecimal price, String status, Hall hall, Long reservationNumber, LocalDate date) {
+                           BigDecimal price, String status, Hall hall, Long reservationNumber, LocalDateTime date) {
         this.ticketId = ticketId;
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
@@ -130,11 +131,11 @@ public class TicketDetailDto {
         this.reservationNumber = reservationNumber;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 }

@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class PerformanceDetailDto {
 
@@ -12,15 +13,16 @@ public class PerformanceDetailDto {
     private String name;
     private Long artistId;
     private Long locationId;
-    private LocalDate date;
+    private LocalDateTime date;
     private BigDecimal price;
     private Long ticketNumber;
     private String hall;
     private Artist artist;
     private Location location;
+    private Integer duration;
 
-    public PerformanceDetailDto(Long performanceId, String name, Long artistId, Long locationId, LocalDate date, BigDecimal price, Long ticketNumber, String hall,
-                                Artist artist, Location location) {
+    public PerformanceDetailDto(Long performanceId, String name, Long artistId, Long locationId, LocalDateTime date, BigDecimal price, Long ticketNumber, String hall,
+                                Artist artist, Location location, Integer duration) {
         this.performanceId = performanceId;
         this.name = name;
         this.artistId = artistId;
@@ -31,9 +33,10 @@ public class PerformanceDetailDto {
         this.hall = hall;
         this.artist = artist;
         this.location = location;
+        this.duration = duration;
     }
 
-    public PerformanceDetailDto(String performanceName, String artistName, String locationName, LocalDate performanceDate, BigDecimal price) {
+    public PerformanceDetailDto(String performanceName, String artistName, String locationName, LocalDateTime performanceDate, BigDecimal price) {
         this.name = performanceName;
         this.date = performanceDate;
         this.price = price;
@@ -71,11 +74,11 @@ public class PerformanceDetailDto {
         this.locationId = locationId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -109,5 +112,13 @@ public class PerformanceDetailDto {
 
     public Location getLocation() {
         return location;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 }

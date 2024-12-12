@@ -25,9 +25,9 @@ class EventRepositoryUnitTest {
         testEvent = new Event();
         testEvent.setTitle("Test Event");
         testEvent.setDescription("Description for Test Event");
-        testEvent.setDateOfEvent(LocalDate.now());
+        testEvent.setDateFrom(LocalDate.now());
+        testEvent.setDateTo(LocalDate.now().plusDays(1));
         testEvent.setCategory("Category1");
-        testEvent.setDuration(120);
     }
 
     @Test
@@ -54,13 +54,13 @@ class EventRepositoryUnitTest {
     @Test
     void existsByTitleAndDateOfEvent_ReturnsTrueIfExists() {
         eventRepository.save(testEvent);
-        boolean exists = eventRepository.existsByTitleAndDateOfEvent("Test Event", LocalDate.now());
+        boolean exists = eventRepository.existsByTitleAndDateFromAndDateTo("Test Event", LocalDate.now(), LocalDate.now().plusDays(1));
         assertTrue(exists, "Event with matching title and date should exist");
     }
 
     @Test
     void existsByTitleAndDateOfEvent_ReturnsFalseIfNotExists() {
-        boolean exists = eventRepository.existsByTitleAndDateOfEvent("Test Event", LocalDate.of(2000, 1, 1));
+        boolean exists = eventRepository.existsByTitleAndDateFromAndDateTo("Test Event", LocalDate.of(2000, 1, 1), LocalDate.now());
         assertFalse(exists, "Event with mismatched title or date should not exist");
     }
 }

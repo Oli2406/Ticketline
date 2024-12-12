@@ -48,7 +48,7 @@ public class CustomLocationServiceTest {
             return l;
         });
 
-        LocationDetailDto created = locationService.createOrUpdateLocation(dto);
+        LocationDetailDto created = locationService.createLocation(dto);
 
         assertNotNull(created, "Created location DTO should not be null");
         assertAll(

@@ -13,6 +13,10 @@ import {ToastrService} from 'ngx-toastr';
 import {LocalStorageService} from "../../../services/LocalStorageService";
 import {Hall, PriceCategory, SectorType, Ticket, TicketType} from 'src/app/dtos/ticket';
 import {TicketService} from 'src/app/services/ticket.service';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css'; // Standard-Theme
+import 'flatpickr/dist/themes/material_blue.css'; // Material Blue Theme
+
 
 @Component({
   selector: 'app-event-create',
@@ -28,10 +32,10 @@ import {TicketService} from 'src/app/services/ticket.service';
 })
 
 export class EventCreateComponent implements OnInit {
-  eventData: Event = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
-  newPerformance: Performance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
+  eventData: Event = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+  newPerformance: Performance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
 
-  newArtist: Artist = { firstName: '', surname: '', artistName: '' };
+  newArtist: Artist = { firstName: '', lastName: '', artistName: '' };
   newLocation: Location = { name: '', street: '', city: '', postalCode: '', country: '' };
 
   showPerformanceForm = false;
@@ -44,6 +48,7 @@ export class EventCreateComponent implements OnInit {
 
   selectedArtist = null;
   selectedLocation = null;
+  flatpickrInstance: any;
 
   constructor(
     private datePipe: DatePipe,
@@ -60,6 +65,21 @@ export class EventCreateComponent implements OnInit {
     this.loadFromLocalStorage();
     this.loadArtists();
     this.loadLocations();
+
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      onClose: (selectedDates: Date[], dateStr: string, instance: any) => {
+        const [dateFrom, dateTo] = selectedDates;
+        this.eventData.dateFrom = dateFrom;
+        this.eventData.dateTo = dateTo;
+        console.log("Date From:", this.eventData.dateFrom);
+        console.log("Date To:", this.eventData.dateTo);
+      },
+      onReady: (selectedDates, dateStr, instance) => {
+        this.flatpickrInstance = instance; // Speichere die Instanz
+      }
+    });
   }
 
   saveToLocalStorage() {
@@ -112,7 +132,7 @@ export class EventCreateComponent implements OnInit {
     this.artistService.createArtist(this.newArtist).subscribe({
       next: () => {
         this.toastr.success('Artist created successfully!', 'Success');
-        this.newArtist = { firstName: '', surname: '', artistName: '' };
+        this.newArtist = { firstName: '', lastName: '', artistName: '' };
         this.showArtistForm = false;
         //this.saveToLocalStorage();
         this.loadArtists();
@@ -200,7 +220,6 @@ export class EventCreateComponent implements OnInit {
   }
 
   createPerformance() {
-    this.newPerformance.price = 0.0;
     this.performanceService.createPerformance(this.newPerformance).subscribe({
       next: (performance: PerformanceListDto) => {
         this.performances.push(performance);
@@ -210,7 +229,7 @@ export class EventCreateComponent implements OnInit {
         }
         this.toastr.success('Performance created successfully!', 'Success');
         //this.saveToLocalStorage();
-        this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null };
+        this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
         this.showPerformanceForm = false;
       },
       error: (err) => {
@@ -400,8 +419,10 @@ export class EventCreateComponent implements OnInit {
     this.eventService.createEvent(this.eventData).subscribe({
       next: (event: Event) => {
         this.toastr.success('Event created successfully!', 'Success');
-        this.clearLocalStorage();
-        this.eventData = { title: '', description: '', dateOfEvent: null, category: '', duration: 0, performanceIds: [] };
+        this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+        if (this.flatpickrInstance) {
+          this.flatpickrInstance.clear();
+        }
         this.performances = [];
       },
       error: (err) => {

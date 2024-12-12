@@ -42,7 +42,7 @@ public class CustomPerformanceService implements PerformanceService {
     }
 
     @Override
-    public PerformanceDetailDto createOrUpdatePerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
+    public PerformanceDetailDto createPerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Creating or updating performance: {}", performanceCreateDto);
         performanceValidator.validatePerformance(performanceCreateDto);
         Artist artist = artistRepository.findArtistByArtistId(performanceCreateDto.getArtistId());
@@ -56,13 +56,14 @@ public class CustomPerformanceService implements PerformanceService {
             performanceCreateDto.getTicketNumber(),
             performanceCreateDto.getHall(),
             artist,
-            location
+            location,
+            performanceCreateDto.getDuration()
         );
         performance = performanceRepository.save(performance);
         logger.debug("Saved performance to database: {}", performance);
         return new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
             performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall(),
-            artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId()));
+            artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId()), performance.getDuration());
     }
 
     @Override
@@ -71,7 +72,7 @@ public class CustomPerformanceService implements PerformanceService {
         List<PerformanceDetailDto> performances = performanceRepository.findAll().stream()
             .map(performance -> new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
                 performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall(),
-                artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId())))
+                artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId()), performance.getDuration()))
             .collect(Collectors.toList());
         logger.debug("Fetched {} performances: {}", performances.size(), performances);
         return performances;
@@ -84,7 +85,7 @@ public class CustomPerformanceService implements PerformanceService {
         logger.debug("Fetched performance: {}", performance);
         return new PerformanceDetailDto(performance.getPerformanceId(), performance.getName(), performance.getArtistId(),
             performance.getLocationId(), performance.getDate(), performance.getPrice(), performance.getTicketNumber(), performance.getHall(),
-            artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId()));
+            artistRepository.findArtistByArtistId(performance.getArtistId()), locationRepository.findByLocationId(performance.getLocationId()), performance.getDuration());
     }
 
     @Override

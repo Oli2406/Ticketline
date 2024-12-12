@@ -38,13 +38,13 @@ export class EventService {
     }
     if (filter.dateLatest?.trim()) {
       params = params.append('dateLatest', filter.dateLatest);
-    }
+    }/*
     if (filter.minDuration != null) {
       params = params.append('minDuration', filter.minDuration);
     }
     if (filter.maxDuration != null) {
       params = params.append('maxDuration', filter.maxDuration);
-    }
+    }*/
 
     return this.http.get<EventListDto[]>(this.apiUrl + "/search", {params});
   }
