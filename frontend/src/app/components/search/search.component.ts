@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {EventListDto} from "../../dtos/event";
+import {EventListDto, EventSearch} from "../../dtos/event";
 import {EventService} from "../../services/event.service";
 import {DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {ArtistListDto, ArtistSearch} from "../../dtos/artist";
@@ -45,6 +45,7 @@ export class SearchComponent {
   searchChangedObservable = new Subject<void>();
   curSearchType = SearchType.event;
   artistSearchParams: ArtistSearch = {};
+  eventSearchParams: EventSearch = {};
 
   constructor(
     private eventService: EventService,
@@ -92,9 +93,8 @@ export class SearchComponent {
   }
 
 
-
   updateEvents() {
-    this.eventService.get().subscribe({
+    this.eventService.getAllByFilter(this.eventSearchParams).subscribe({
       next: events => (this.events = events),
       error: err => console.error('Error fetching events:', err)
     });
@@ -164,9 +164,8 @@ export class SearchComponent {
   }
 
   clearSearch() {
-    this.artistSearchParams.firstName = '';
-    this.artistSearchParams.surname = '';
-    this.artistSearchParams.artistName = '';
+    this.artistSearchParams = {};
+    this.eventSearchParams = {};
     this.searchQuery = '';
     this.searchChanged();
   }
