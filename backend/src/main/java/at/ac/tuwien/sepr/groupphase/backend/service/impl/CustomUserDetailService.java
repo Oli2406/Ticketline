@@ -16,7 +16,6 @@ import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 
 import java.lang.invoke.MethodHandles;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -97,7 +96,7 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
-    public String login(UserLoginDto userLoginDto) throws NoSuchAlgorithmException {
+    public String login(UserLoginDto userLoginDto) {
         LOGGER.debug("Login user: {}", userLoginDto);
         ApplicationUser user =
             userRepository
@@ -174,7 +173,7 @@ public class CustomUserDetailService implements UserService {
 
     @Override
     public String register(UserRegistrationDto userRegistrationDto)
-        throws ValidationException, ConflictException, NoSuchAlgorithmException {
+        throws ValidationException, ConflictException {
         LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
 
         userValidator.validateRegister(userRegistrationDto);
@@ -224,7 +223,7 @@ public class CustomUserDetailService implements UserService {
 
     @Transactional
     @Override
-    public void addUserPoints(String encryptedId, int pointsToAdd) throws Exception {
+    public void addUserPoints(String encryptedId, int pointsToAdd) {
         Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
             .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
 

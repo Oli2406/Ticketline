@@ -1,0 +1,173 @@
+.seating-plan-box {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  position: relative;
+  height: 500px;
+  width: 90%;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Stage */
+.row .bg-black {
+  width: 70%;
+  margin: 0 auto;
+}
+
+/* VIP Standing */
+.vip-standing {
+  width: 60%;
+  top: 80px;
+  left: 20%;
+  border: 1px solid #6c757d;
+  padding: 10px;
+  background-color: transparent;
+}
+
+/* Selected Section (Purple) */
+.selected-sector,
+.seat-box.selected-seat {
+  background-color: #514dc7 !important;
+  color: #fff;
+}
+
+
+/* Standing */
+.standing {
+  width: 60%;
+  height: 20%;
+  top: 163px;
+  left: 20%;
+  border: 1px solid #6c757d;
+  padding: 20px;
+  background-color: transparent;
+}
+
+/* Seated Front (Sector A) */
+.seated-front {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  top: 250px;
+  left: 10px;
+}
+
+/* Seated Back (Sector B) */
+.seated-back {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 20%;
+  position: absolute;
+  top: 365px;
+  left: 10px;
+}
+/* Base grid styling for Sector A */
+.seating-grid.sector-a {
+  display: grid;
+  grid-template-columns: repeat(14, 15px); /* Fixed seats for Sector A */
+  grid-template-rows: repeat(4, 15px); /* 4 rows */
+  row-gap: 3px; /* Adjust the gap between rows */
+  column-gap: 13px; /* Keep the existing column spacing */
+}
+
+
+/* Dynamic grid styling for Sector B */
+.seating-grid.sector-b {
+  display: grid;
+  grid-template-rows: repeat(4, 15px);
+  justify-content: center;
+  gap: 3px;
+}
+
+.seating-grid.sector-b .row {
+  //display: flex;
+  //flex-wrap: wrap; /* Allows rows to wrap dynamically if they grow too large */
+  justify-content: center; /* Centers content horizontally */
+  align-items: center; /* Centers content vertically */
+  gap: 3px; /* Space between seats */
+}
+
+
+
+
+
+/* Seat Box Styling */
+.seat-box {
+  width: 25px;
+  height: 15px;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.seat-box.available {
+  background-color: white;
+}
+
+.seat-box.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box.selected-seat {
+  background-color: #514dc7 ;
+  color: #fff;
+}
+
+
+/* Seat Box Styling for Sector B */
+.seat-box-sector-b {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.seat-box-sector-b.available {
+  background-color: white;
+}
+
+.seat-box-sector-b.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box-sector-b.selected-seat {
+  background-color: #514dc7 ;
+  color: #fff;
+}
+
+
+
+
+
+/* Button Styling */
+button.btn-secondary {
+  background-color: gray;
+  border: none;
+  color: white;
+}
+
+.btn-gray {
+  background-color: gray;
+  border: none;
+  color: white;
+}
+
+.btn-purple {
+  background-color: #514dc7;
+  border: none;
+  color: white;
+}
+
+.btn-light-purple {
+  background-color: #8573d1;
+  border: none;
+  color: white;
+}

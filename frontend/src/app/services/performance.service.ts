@@ -5,9 +5,6 @@ import {Globals} from '../global/globals';
 import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
 import {EventListDto} from "../dtos/event";
 
-class PerformanceDetailDto {
-}
-
 @Injectable({
   providedIn: 'root',
 })

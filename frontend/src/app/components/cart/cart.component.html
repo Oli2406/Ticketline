@@ -18,18 +18,64 @@
           <i class="fas fa-credit-card"></i>
           Credit Card
         </label>
+        <div *ngIf="selectedPaymentOption === 'creditCard'" class="payment-fields">
+          <label for="creditCardNumber" class="form-label w-100 mt-2">
+            Credit Card Number
+            <input
+              id="creditCardNumber"
+              type="text"
+              class="form-control"
+              [(ngModel)]="paymentDetails.creditCardNumber"
+              (input)="formatCreditCardNumber($event)"
+              placeholder="xxxx-xxxx-xxxx-xxxx"
+              maxlength="23"
+              required
+            />
+          </label>
+        </div>
+
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'paypal'">
           <input type="radio" name="paymentOption" value="paypal"
                  [(ngModel)]="selectedPaymentOption"/>
           <i class="fab fa-paypal"></i>
           PayPal
         </label>
+        <div *ngIf="selectedPaymentOption === 'paypal'" class="payment-fields">
+          <label for="paypalEmail" class="form-label w-100 mt-2">
+            PayPal Email
+            <input
+              id="paypalEmail"
+              type="email"
+              class="form-control"
+              [(ngModel)]="paymentDetails.paypalEmail"
+              placeholder="example@domain.com"
+              required
+            />
+          </label>
+        </div>
+
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'bankTransfer'">
           <input type="radio" name="paymentOption" value="bankTransfer"
                  [(ngModel)]="selectedPaymentOption"/>
           <i class="fas fa-university"></i>
           Bank Transfer
         </label>
+        <div *ngIf="selectedPaymentOption === 'bankTransfer'" class="payment-fields">
+          <label for="bankAccount" class="form-label w-100 mt-2">
+            Bank Account Number
+            <input
+              id="bankAccount"
+              type="text"
+              class="form-control"
+              [(ngModel)]="paymentDetails.bankAccount"
+              (input)="formatBankAccountNumber($event)"
+              placeholder="xxxx-xxxx-xxxx-xxxx"
+              maxlength="19"
+              required
+            />
+          </label>
+        </div>
+
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'points'">
           <input type="radio" name="paymentOption" value="points"
                  [(ngModel)]="selectedPaymentOption"/>
@@ -37,6 +83,51 @@
           Pay with Points
         </label>
       </div>
+
+      <!-- Address Fields -->
+      <div class="address-fields mt-4">
+        <h4>Delivery Address</h4>
+        <div class="input-group mb-3">
+          <label for="street" class="form-label w-100">
+            Street & House Number
+            <input
+              id="street"
+              type="text"
+              class="form-control"
+              [(ngModel)]="address.street"
+              placeholder="Enter street and house number"
+              required
+            />
+          </label>
+        </div>
+        <div class="input-group mb-3">
+          <label for="postalCode" class="form-label w-100">
+            Postal Code
+            <input
+              id="postalCode"
+              type="text"
+              class="form-control"
+              [(ngModel)]="address.postalCode"
+              placeholder="Enter postal code"
+              required
+            />
+          </label>
+        </div>
+        <div class="input-group mb-3">
+          <label for="city" class="form-label w-100">
+            City
+            <input
+              id="city"
+              type="text"
+              class="form-control"
+              [(ngModel)]="address.city"
+              placeholder="Enter city"
+              required
+            />
+          </label>
+        </div>
+      </div>
+
       <div class="payment-buttons">
         <button class="btn btn-primary" (click)="buy()">Buy</button>
       </div>
@@ -54,7 +145,7 @@
           <tr>
             <th>Image</th>
             <th>Name</th>
-            <th>Price</th>
+            <th>Price per item</th>
             <th>Quantity</th>
             <th>Actions</th>
           </tr>
@@ -63,13 +154,20 @@
           <tr *ngFor="let cartItem of cartItems">
             <td>
               <img
-                [src]="'http://localhost:8080/merchandise/' + cartItem.item.imageUrl"
+                [src]=" imageLocation + cartItem.item.imageUrl"
                 alt="{{ cartItem.item.name }}"
                 width="50"
               />
             </td>
             <td>{{ cartItem.item.name }}</td>
-            <td>{{ cartItem.item.price | number: '1.2-2' }} €</td>
+            <td>
+              <span *ngIf="selectedPaymentOption !== 'points'">
+                {{ cartItem.item.price | number: '1.2-2' }} €
+              </span>
+              <span *ngIf="selectedPaymentOption === 'points'">
+                {{ cartItem.item.points }} Points
+              </span>
+            </td>
             <td>
               <input
                 type="number"
@@ -98,7 +196,7 @@
       </div>
 
       <ng-template #emptyCart>
-        <p></p>
+        <p>Your cart is empty.</p>
       </ng-template>
     </div>
   </div>
@@ -138,8 +236,8 @@
         <td>
           <strong>Rechnung an:</strong><br>
           {{ userFirstName }} {{ userLastName }}<br>
-          Beispielweg 2<br>
-          67890 Beispielstadt<br>
+          {{ address.street }}<br>
+          {{ address.postalCode }} {{address.city}}<br>
           E-Mail: {{ userEmail }} <br>
           Zahlungsmethode: {{ selectedPaymentOption }}
         </td>
