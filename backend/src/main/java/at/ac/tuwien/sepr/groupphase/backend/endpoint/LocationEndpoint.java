@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
@@ -21,11 +24,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v1/location")
+@RequestMapping(LocationEndpoint.BASE_PATH)
 public class LocationEndpoint {
 
+    public static final String BASE_PATH = "/api/v1/location";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final LocationService locationService;
 
@@ -58,6 +63,15 @@ public class LocationEndpoint {
         LocationDetailDto location = locationService.getLocationById(id);
         logger.debug("Fetched location: {}", location);
         return ResponseEntity.ok(location);
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<LocationDetailDto>> search(LocationSearchDto dto) {
+        logger.info("GET " + BASE_PATH);
+        logger.debug("request parameters: {}", dto.toString());
+        Stream<LocationDetailDto> result = locationService.search(dto);
+        return ResponseEntity.ok(result);
     }
 
     @Secured("ROLE_ADMIN")

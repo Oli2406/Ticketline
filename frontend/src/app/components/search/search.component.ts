@@ -6,7 +6,7 @@ import {ArtistListDto, ArtistSearch} from "../../dtos/artist";
 import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
-import {LocationListDto} from "../../dtos/location";
+import {LocationListDto, LocationSearch} from "../../dtos/location";
 import {PerformanceListDto, PerformanceWithNamesDto} from "../../dtos/performance";
 import {debounceTime, forkJoin, map, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
@@ -46,6 +46,7 @@ export class SearchComponent {
   curSearchType = SearchType.event;
   artistSearchParams: ArtistSearch = {};
   eventSearchParams: EventSearch = {};
+  locationSearchParams: LocationSearch = {};
 
   constructor(
     private eventService: EventService,
@@ -110,7 +111,7 @@ export class SearchComponent {
   }
 
   updateLocations() {
-    this.locationService.getLocations().subscribe({
+    this.locationService.getAllByFilter(this.locationSearchParams).subscribe({
       next: locations => (this.locations = locations),
       error: err => console.error('Error fetching locations:', err)
     });
@@ -166,6 +167,7 @@ export class SearchComponent {
   clearSearch() {
     this.artistSearchParams = {};
     this.eventSearchParams = {};
+    this.locationSearchParams = {};
     this.searchQuery = '';
     this.searchChanged();
   }

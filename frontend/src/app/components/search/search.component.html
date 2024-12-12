@@ -93,6 +93,63 @@
   </form>
 </div>
 
+<!-- Location Search Form -->
+<div *ngIf="curSearchType === SearchType.location" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <!-- hidden submit button -->
+    <input hidden="hidden" type="submit"/>
+
+    <div class="row">
+      <!-- Location name -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationName">Name</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.name" class="form-control"
+               id="locationName"
+               name="locationName" placeholder="Enter location name" type="text"/>
+      </div>
+
+      <!-- Location street -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationStreet">Street</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.street" class="form-control"
+               id="locationStreet"
+               name="locationStreet" placeholder="Enter street" type="text"/>
+      </div>
+
+      <!-- Location city -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationCity">City</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.city" class="form-control"
+               id="locationCity"
+               name="locationCity" placeholder="Enter city" type="text"/>
+      </div>
+
+      <!-- Location country -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationCountry">Country</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.country" class="form-control"
+               id="locationCountry"
+               name="locationCountry" placeholder="Enter country" type="text"/>
+      </div>
+
+      <!-- Location postal code -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationPostalCode">Postal Code</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.postalCode" class="form-control"
+               id="locationPostalCode"
+               name="locationPostalCode" placeholder="Enter postal code" type="number"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
 <!-- Artist Search Form -->
 <div *ngIf="curSearchType === SearchType.artist" class="mt-3">
   <form (ngSubmit)="updateData()">
@@ -198,7 +255,6 @@
   <tr>
     <th>Name</th>
     <th>Address</th>
-    <th>Country</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -206,7 +262,6 @@
   <tr *ngFor="let location of locations">
     <td>{{ location.name }}</td>
     <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
-    <td>{{ location.country }}</td>
     <td>
       <button class="btn btn-secondary"><i class="bi bi-info"></i></button>
     </td>
