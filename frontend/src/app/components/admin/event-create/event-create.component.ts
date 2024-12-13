@@ -15,7 +15,9 @@ import {Hall, PriceCategory, SectorType, Ticket, TicketType} from 'src/app/dtos/
 import {TicketService} from 'src/app/services/ticket.service';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css'; // Standard-Theme
-import 'flatpickr/dist/themes/material_blue.css'; // Material Blue Theme
+import 'flatpickr/dist/themes/material_blue.css';
+import {Purchase} from "../../../dtos/purchase"; // Material Blue Theme
+import {PurchaseService} from 'src/app/services/purchase.service';
 
 
 @Component({
@@ -58,7 +60,8 @@ export class EventCreateComponent implements OnInit {
     private eventService: EventService,
     private toastr: ToastrService,
     private localStorageService: LocalStorageService,
-    private ticketService: TicketService
+    private ticketService: TicketService,
+  private purchaseService: PurchaseService
   ) {}
 
   ngOnInit() {
@@ -417,26 +420,20 @@ export class EventCreateComponent implements OnInit {
   }
 
   onSubmit() {
-    this.eventService.createEvent(this.eventData).subscribe({
-      next: (event: Event) => {
-        this.toastr.success('Event created successfully!', 'Success');
-        this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
-        if (this.flatpickrInstance) {
-          this.flatpickrInstance.clear();
-        }
-        this.performances = [];
+    const purchase1: Purchase = {
+      userId: 1,
+      ticketIds: [1, 2, 3],
+      merchandiseIds: [1, 2],
+      totalPrice: 250,
+      purchaseDate: new Date(),
+    };
+    // Call the backend API for purchase creation
+    this.purchaseService.createPurchase(purchase1).subscribe({
+      next: (response) => {
+        console.log('Purchase 1 created successfully:', response);
       },
-      error: (err) => {
-        console.error('Error during registration:', err.message);
-        const errors = Array.isArray(err.message)
-          ? err.message
-          : err.message.split(/\n/);
-        const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
-        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
-          enableHtml: true,
-        });
+      error: (error) => {
+        console.error('Error creating Purchase 1:', error);
       },
     });
   }
@@ -456,7 +453,7 @@ export class EventCreateComponent implements OnInit {
   updateTicketNumber() {
     const hallCapacity = {
       A: 660,
-      B: 317,
+      B: 353,
     };
     this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
   }
