@@ -6,7 +6,7 @@
       <strong>Performance Name:</strong> {{ performanceDetails.name }}<br />
       <strong>Band:</strong> {{ artistDetails.artistName }}<br />
       <strong>Location:</strong> {{ locationDetails.name }}<br />
-      <strong>Date:</strong> {{ performanceDetails.date | date: 'mediumDate' }}
+      <strong>Date:</strong> {{ performanceDetails.date | date: 'medium' }}
     </p>
     <p *ngIf="!performanceDetails">Loading performance details...</p>
   </div>
@@ -139,7 +139,7 @@
           <button class="btn btn-light-purple" (click)="reserveTickets()">
             <i class="bi bi-bookmark me-2"></i>Reserve
           </button>
-          <button class="btn btn-purple" (click)="buyTickets()">
+          <button class="btn btn-purple" (click)="addToCart()">
             <i class="bi bi-cart me-2"></i>Add to Cart
           </button>
         </div>

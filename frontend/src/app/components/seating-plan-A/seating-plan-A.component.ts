@@ -9,6 +9,7 @@ import { Artist } from "../../dtos/artist";
 import { Location } from "../../dtos/location";
 import { TicketService } from 'src/app/services/ticket.service';
 import {forkJoin, map, Observable} from "rxjs";
+import { CartService } from "../../services/cart.service";
 
 @Component({
   selector: 'app-seating-plan-A',
@@ -51,7 +52,8 @@ export class SeatingPlanAComponent {
     private performanceService: PerformanceService,
     private locationService: LocationService,
     private artistService: ArtistService,
-    private ticketService: TicketService
+    private ticketService: TicketService,
+    private cartService: CartService,
   ) {}
 
   ngOnInit(): void {
@@ -439,4 +441,46 @@ export class SeatingPlanAComponent {
       'selected-seat': this.selectedTickets.includes(ticket),
     };
   }
+
+  addToCart(): void {
+    if (this.totalTickets === 0) {
+      this.toastr.error("No tickets selected to add to the cart!", "Error");
+      return;
+    }
+
+    // Add seated tickets to the cart
+    this.selectedTickets.forEach(ticket => {
+      this.cartService.addToCart(ticket);
+    });
+
+    // Add VIP standing tickets to the cart
+    if (this.selectedStanding.vip > 0) {
+      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
+        next: vipTickets => {
+          vipTickets.forEach(ticket => this.cartService.addToCart(ticket));
+        },
+        error: err => {
+          console.error('Error fetching VIP standing tickets:', err);
+          this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
+        }
+      });
+    }
+
+    // Add regular standing tickets to the cart
+    if (this.selectedStanding.standard > 0) {
+      this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
+        next: standardTickets => {
+          standardTickets.forEach(ticket => this.cartService.addToCart(ticket));
+        },
+        error: err => {
+          console.error('Error fetching regular standing tickets:', err);
+          this.toastr.error('Failed to add regular standing tickets to the cart.', 'Error');
+        }
+      });
+    }
+
+    this.toastr.success("Successfully added selected tickets to the cart.", "Success");
+    this.resetSelections(); // Optionally reset selections after adding to the cart
+  }
+
 }

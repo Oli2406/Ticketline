@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Merchandise } from '../dtos/merchandise';
-import { AuthService } from "./auth.service";
-import { HttpClient } from "@angular/common/http";
-import {Globals} from "../global/globals";
+import { TicketDto } from '../dtos/ticket';
+import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
+import { Globals } from '../global/globals';
 
 @Injectable({
   providedIn: 'root',
@@ -16,25 +17,27 @@ export class CartService {
               private http: HttpClient,
               private globals: Globals) {}
 
-
-
   private getCartKey(): string {
     this.currentUserId = this.authService.getUserIdFromToken();
     return `${this.CART_STORAGE_KEY_PREFIX}${this.currentUserId}`;
   }
 
-  getCart(): { item: Merchandise; quantity: number }[] {
+  getCart(): { item: Merchandise | TicketDto; quantity: number }[] {
     const storedCart = localStorage.getItem(this.getCartKey());
     return storedCart ? JSON.parse(storedCart) : [];
   }
 
-  private saveCart(cartItems: { item: Merchandise; quantity: number }[]): void {
+  private saveCart(cartItems: { item: Merchandise | TicketDto; quantity: number }[]): void {
     localStorage.setItem(this.getCartKey(), JSON.stringify(cartItems));
   }
 
-  addToCart(item: Merchandise): void {
+  addToCart(item: Merchandise | TicketDto): void {
     const cartItems = this.getCart();
-    const existingItem = cartItems.find(cartItem => cartItem.item.merchandiseId === item.merchandiseId);
+    const existingItem = cartItems.find(cartItem =>
+      'merchandiseId' in item
+        ? 'merchandiseId' in cartItem.item && cartItem.item.merchandiseId === item.merchandiseId
+        : 'ticketId' in cartItem.item && cartItem.item.ticketId === item.ticketId
+    );
 
     if (existingItem) {
       existingItem.quantity++;
@@ -45,9 +48,13 @@ export class CartService {
     this.saveCart(cartItems);
   }
 
-  updateCartItem(item: Merchandise, quantity: number): void {
+  updateCartItem(item: Merchandise | TicketDto, quantity: number): void {
     const cartItems = this.getCart();
-    const cartItem = cartItems.find(cartItem => cartItem.item.merchandiseId === item.merchandiseId);
+    const cartItem = cartItems.find(cartItem =>
+      'merchandiseId' in item
+        ? 'merchandiseId' in cartItem.item && cartItem.item.merchandiseId === item.merchandiseId
+        : 'ticketId' in cartItem.item && cartItem.item.ticketId === item.ticketId
+    );
 
     if (cartItem) {
       cartItem.quantity = quantity;
@@ -55,9 +62,13 @@ export class CartService {
     }
   }
 
-  removeFromCart(item: Merchandise): void {
+  removeFromCart(item: Merchandise | TicketDto): void {
     let cartItems = this.getCart();
-    cartItems = cartItems.filter(cartItem => cartItem.item.merchandiseId !== item.merchandiseId);
+    cartItems = cartItems.filter(cartItem =>
+      'merchandiseId' in item
+        ? !('merchandiseId' in cartItem.item && cartItem.item.merchandiseId === item.merchandiseId)
+        : !('ticketId' in cartItem.item && cartItem.item.ticketId === item.ticketId)
+    );
     this.saveCart(cartItems);
   }
 
@@ -66,8 +77,7 @@ export class CartService {
   }
 
   deductPoints(points: number): Promise<void> {
-    this.API_URL = this.globals.backendUri + '/users/deduct-points'
-    console.log(this.API_URL)
+    this.API_URL = this.globals.backendUri + '/users/deduct-points';
     const encryptedId = this.authService.getUserIdFromToken();
     return this.http
       .post<void>(`${this.API_URL}`, null, {
@@ -87,12 +97,11 @@ export class CartService {
   }
 
   purchaseItems(purchasePayload: { itemId: number; quantity: number }[]): Promise<void> {
-    this.API_URL = this.globals.backendUri + '/users/purchase'
+    this.API_URL = this.globals.backendUri + '/users/purchase';
     return this.http
       .post<void>(`${this.API_URL}`, purchasePayload, {
         headers: { 'Content-Type': 'application/json' }
       })
       .toPromise();
   }
-
 }
