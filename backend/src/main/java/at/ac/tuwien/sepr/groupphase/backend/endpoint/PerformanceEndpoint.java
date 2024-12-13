@@ -1,7 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
@@ -23,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v1/performance")
+@RequestMapping(PerformanceEndpoint.BASE_PATH)
 public class PerformanceEndpoint {
 
+    public static final String BASE_PATH = "/api/v1/performance";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PerformanceService performanceService;
 
@@ -69,6 +74,15 @@ public class PerformanceEndpoint {
         performanceService.deletePerformance(id);
         logger.debug("Performance with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<PerformanceDetailDto>> search(PerformanceSearchDto dto) {
+        logger.info("GET " + BASE_PATH);
+        logger.debug("request parameters: {}", dto.toString());
+        Stream<PerformanceDetailDto> result = performanceService.search(dto);
+        return ResponseEntity.ok(result);
     }
 
     @PermitAll

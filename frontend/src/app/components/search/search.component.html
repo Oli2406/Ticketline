@@ -199,6 +199,55 @@
   </form>
 </div>
 
+<!-- Performance Search Form -->
+<div *ngIf="curSearchType === SearchType.performance" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-3">
+
+        <label class="form-label" for="performanceDate">Date and Time</label>
+        <input
+          class="form-control"
+          id="performanceDate"
+          name="performanceDate"
+          [(ngModel)]="performanceSearchParams.date"
+          (ngModelChange)="searchChanged()"
+          type="datetime-local"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="performancePrice">Price</label>
+        <input
+          class="form-control"
+          id="performancePrice"
+          name="performancePrice"
+          [(ngModel)]="performanceSearchParams.price"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter base price"
+          type="number"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="performanceHall">Artist/Band Name</label>
+        <input
+          class="form-control"
+          id="performanceHall"
+          name="performanceHall"
+          [(ngModel)]="performanceSearchParams.hall"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter hall name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
 <!-- Search Results for events -->
 <table
   *ngIf="curSearchType === SearchType.event"
@@ -301,7 +350,7 @@
     <tbody>
     <tr *ngFor="let performance of advancedSearchPerformances">
       <td>{{ performance.name }}</td>
-      <td>{{ performance.date | date }}</td>
+      <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
       <td>{{ performance.price }} €</td>
       <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
@@ -332,10 +381,10 @@
   <tbody>
   <tr *ngFor="let performance of performances">
     <td>{{ performance.name }}</td>
-    <td>{{ performance.locationName }}</td>
-    <td>{{ performance.date }}</td>
+    <td>{{ performance.location.name }}</td>
+    <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
     <td>{{ performance.price }}</td>
-    <td>{{ performance.artistName }}</td>
+    <td>{{ performance.artist.artistName }}</td>
     <td>{{ performance.ticketNumber }}</td>
     <td>{{ performance.hall }}</td>
     <td>

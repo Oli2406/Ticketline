@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
-import {EventListDto} from "../dtos/event";
+import {
+  Performance,
+  PerformanceDetailDto,
+  PerformanceListDto,
+  PerformanceSearch
+} from 'src/app/dtos/performance';
+
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +20,21 @@ export class PerformanceService {
 
   getPerformances(): Observable<PerformanceListDto[]> {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
+  }
+
+  getAllByFilter(filter: PerformanceSearch): Observable<PerformanceDetailDto[]> {
+    let params = new HttpParams();
+    if (filter.date?.trim()) {
+      params = params.append('date', filter.date);
+    }
+    if (filter.price != null) {
+      params = params.append('price', filter.price);
+    }
+    if (filter.hall?.trim()) {
+      params = params.append('hall', filter.hall);
+    }
+
+    return this.http.get<PerformanceDetailDto[]>(this.apiUrl + "/search", {params});
   }
 
   advancedSearchPerformances(query: string): Observable<PerformanceListDto[]> {

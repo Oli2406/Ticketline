@@ -7,8 +7,8 @@ import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto, LocationSearch} from "../../dtos/location";
-import {PerformanceListDto, PerformanceWithNamesDto} from "../../dtos/performance";
-import {debounceTime, forkJoin, map, Subject} from "rxjs";
+import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
+import {debounceTime, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 
 export enum SearchType {
@@ -36,7 +36,7 @@ export enum SearchType {
 export class SearchComponent {
   events: EventListDto[] = [];
   artists: ArtistListDto[] = [];
-  performances: PerformanceWithNamesDto[] = [];
+  performances: PerformanceDetailDto[] = [];
   locations: LocationListDto[] = [];
   advancedSearchPerformances: PerformanceListDto[] = [];
 
@@ -46,6 +46,7 @@ export class SearchComponent {
   curSearchType = SearchType.event;
   artistSearchParams: ArtistSearch = {};
   eventSearchParams: EventSearch = {};
+  performanceSearchParams: PerformanceSearch = {};
   locationSearchParams: LocationSearch = {};
 
   constructor(
@@ -118,27 +119,9 @@ export class SearchComponent {
   }
 
   updatePerformances() {
-    this.performanceService.getPerformances().subscribe({
-      next: performances => {
-        const performanceObservables = performances.map(p =>
-          forkJoin({
-            location: this.locationService.getById(p.locationId),
-            artist: this.artistService.getById(p.artistId)
-          }).pipe(
-            map(({location, artist}) => ({
-              ...p,
-              locationName: location.name,
-              artistName: `${artist.firstName} ${artist.lastName}`
-            }))
-          )
-        );
-
-        forkJoin(performanceObservables).subscribe({
-          next: performanceWithNamesArray => (this.performances = performanceWithNamesArray),
-          error: err => console.error('Error loading performances:', err)
-        });
-      },
-      error: err => console.error('Error fetching performances:', err)
+    this.performanceService.getAllByFilter(this.performanceSearchParams).subscribe({
+      next: performances => (this.performances = performances),
+      error: err => console.error('Error fetching artists:', err)
     });
   }
 
@@ -168,6 +151,7 @@ export class SearchComponent {
     this.artistSearchParams = {};
     this.eventSearchParams = {};
     this.locationSearchParams = {};
+    this.performanceSearchParams = {};
     this.searchQuery = '';
     this.searchChanged();
   }

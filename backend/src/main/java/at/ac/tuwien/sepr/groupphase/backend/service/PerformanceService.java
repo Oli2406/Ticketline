@@ -2,10 +2,12 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Service interface for managing performances.
@@ -44,5 +46,15 @@ public interface PerformanceService {
      */
     void deletePerformance(Long id);
 
+
     List<PerformanceDetailDto> performAdvancedSearch(String query);
+
+    /**
+     * Search for performances in the persistent data store matching all provided fields.
+     * The hall is considered a match, if the search string is a substring of the field in performances.
+     *
+     * @param dto the search parameters to use in filtering.
+     * @return the performances where the given fields match.
+     */
+    Stream<PerformanceDetailDto> search(PerformanceSearchDto dto);
 }
