@@ -23,7 +23,9 @@ public class CustomEmailService implements EmailService {
         String message = String.format(
             "Hello,\n\nYou requested a password reset. Here is your reset code: %s\n\n"
                 + "Alternatively, click the link below to reset your password:\n%s\n\n"
-                + "If you did not request this, please ignore this email.\n\nRegards,\nYour Team",
+                + "If you did not request this, please ignore this email.\n\n"
+                + "The Code expires in five Minutes! The reset will not work when the token expired. \n\n"
+                + "Regards,\nYour Team",
             resetCode, resetLink);
 
         sendEmail(email, subject, message);
@@ -48,8 +50,6 @@ public class CustomEmailService implements EmailService {
     private void sendEmail(String to, String subject, String text) {
         MimeMessage message = mailSender.createMimeMessage();
 
-        //TODO send link to set new password
-        //TODO validate email?
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, false);
             helper.setTo(to);

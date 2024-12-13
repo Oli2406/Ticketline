@@ -30,4 +30,43 @@ public class ResetPasswordDto {
         this.newConfirmedPassword = newConfirmedPassword;
     }
 
+    public static final class ResetPasswordDtoBuilder {
+
+        private String tokenToReset;
+        private String newPassword;
+        private String newConfirmedPassword;
+
+        private ResetPasswordDtoBuilder() {
+        }
+
+        public static ResetPasswordDto.ResetPasswordDtoBuilder anResetPasswordDto() {
+            return new ResetPasswordDto.ResetPasswordDtoBuilder();
+        }
+
+        public ResetPasswordDto.ResetPasswordDtoBuilder withTokenToReset(
+            String tokenToReset) {
+            this.tokenToReset = tokenToReset;
+            return this;
+        }
+
+        public ResetPasswordDto.ResetPasswordDtoBuilder withNewPassword(String newPassword) {
+            this.newPassword = newPassword;
+            return this;
+        }
+
+        public ResetPasswordDto.ResetPasswordDtoBuilder withNewConfirmedPassword(
+            String newConfirmedPassword) {
+            this.newConfirmedPassword = newConfirmedPassword;
+            return this;
+        }
+
+        public ResetPasswordDto build() {
+            ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
+            resetPasswordDto.setTokenToResetPassword(tokenToReset);
+            resetPasswordDto.setNewPassword(newPassword);
+            resetPasswordDto.setNewConfirmedPassword(newConfirmedPassword);
+            return resetPasswordDto;
+        }
+    }
+
 }
