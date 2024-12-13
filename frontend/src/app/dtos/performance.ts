@@ -1,10 +1,13 @@
+import {Location, LocationListDto} from "./location";
+import {ArtistListDto} from "./artist";
+
 export interface Performance {
-  performanceId?: number; // Primary Key
+  performanceId?: number;
   name: string;
-  locationId: number; // Foreign Key
+  locationId: number;
   date: Date;
   price: number;
-  artistId: number; // Foreign Key
+  artistId: number;
   ticketNumber: number;
   hall: string;
   duration: number;
@@ -22,14 +25,20 @@ export interface PerformanceListDto {
   duration: number;
 }
 
-export interface PerformanceWithNamesDto {
+export interface PerformanceDetailDto {
   performanceId: number;
   name: string;
-  locationName: string;
+  location: LocationListDto;
   date: Date;
   price: number;
-  artistName: string;
+  artist: ArtistListDto;
   ticketNumber: number;
   hall: string;
   duration: number;
+}
+
+export interface PerformanceSearch {
+  date?: string;
+  price?: number;
+  hall?: string;
 }
