@@ -4,7 +4,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PerformanceDetailDto {
@@ -34,12 +33,6 @@ public class PerformanceDetailDto {
         this.artist = artist;
         this.location = location;
         this.duration = duration;
-    }
-
-    public PerformanceDetailDto(String performanceName, String artistName, String locationName, LocalDateTime performanceDate, BigDecimal price) {
-        this.name = performanceName;
-        this.date = performanceDate;
-        this.price = price;
     }
 
     public Long getPerformanceId() {

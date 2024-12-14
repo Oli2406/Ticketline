@@ -1,0 +1,41 @@
+<h1  class="mt-5">
+  {{ artist?.artistName || (artist?.firstName + ' ' + artist?.lastName) }}
+</h1>
+<div *ngIf="events.length > 0">
+  <p>
+    Events associated with this artist:
+  </p>
+
+
+  <table
+    class="table table-hover text-center mt-3">
+    <thead class="th-purp">
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Description</th>
+      <th>Startdate</th>
+      <th>Enddate</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let event of events">
+      <td>{{ event.title }}</td>
+      <td>{{ event.category }}</td>
+      <td>{{ event.description }}</td>
+      <td>{{ event.dateFrom }}</td>
+      <td>{{ event.dateTo }}</td>
+      <td>
+        <a [routerLink]="['/event', event.eventId]" class="btn btn-primary bg-purp"><i class="bi bi-info-lg"></i></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div *ngIf="events.length === 0">
+  <p>
+    There are no events associated with this artist.
+  </p>
+</div>

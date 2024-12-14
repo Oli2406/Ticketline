@@ -20,7 +20,7 @@ public interface PerformanceService {
      * @param performanceCreateDto the data for creating or updating the performance
      * @return the detailed representation of the created or updated performance
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
-     * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
+     * @throws ConflictException   if there are conflicts, such as an artist with the same name already existing
      */
     PerformanceDetailDto createPerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException;
 
@@ -57,4 +57,12 @@ public interface PerformanceService {
      * @return the performances where the given fields match.
      */
     Stream<PerformanceDetailDto> search(PerformanceSearchDto dto);
+
+    /**
+     * Retrieves all performances that are mapped to event with id {@code id}.
+     *
+     * @param id the ID of the event to get the performances from
+     * @return the performances mapped to the event
+     */
+    List<PerformanceDetailDto> getByEventId(Long id);
 }

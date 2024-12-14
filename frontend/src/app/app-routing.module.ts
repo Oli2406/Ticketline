@@ -18,10 +18,14 @@ import {CartComponent} from "./components/cart/cart.component";
 import {SearchComponent} from "./components/search/search.component";
 import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
 import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
+import {ArtistComponent} from "./components/artist/artist.component";
+import {EventComponent} from "./components/event/event.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'artist/:id', canActivate: mapToCanActivate([AuthGuard]), component: ArtistComponent},
+  {path: 'event/:id', canActivate: mapToCanActivate([AuthGuard]), component: EventComponent},
   {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},

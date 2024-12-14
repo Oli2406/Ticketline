@@ -10,6 +10,7 @@ import {LocationListDto, LocationSearch} from "../../dtos/location";
 import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
 import {debounceTime, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {RouterLink} from "@angular/router";
 
 export enum SearchType {
   event,
@@ -28,7 +29,8 @@ export enum SearchType {
     NgForOf,
     NgIf,
     FormsModule,
-    KeyValuePipe
+    KeyValuePipe,
+    RouterLink
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
