@@ -33,14 +33,20 @@
           <th>First name</th>
           <th>Last name</th>
           <th>Email</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let user of users">
+        <tr *ngFor="let user of users" [ngClass]="{'table-danger': user.locked}">
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
+          <td>@if(user.locked){
+            <i class="bi bi-lock-fill"></i> Locked
+          } @else {
+            <i class="bi bi-unlock-fill"></i> Unlocked
+          }</td>
           <td>
             <div class="btn-group button-cell">
             @if(user.locked) {
