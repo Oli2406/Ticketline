@@ -20,6 +20,8 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -32,8 +34,6 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
     private EntityManager entityManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
     public List<PerformanceDetailDto> findByAdvancedSearch(String query) {
@@ -59,10 +59,20 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
 
         List<Predicate> predicates = new ArrayList<>();
         for (String term : terms) {
-            if (term.contains(".")) {
-                LocalDate date = parseDate(term);
-                if (date != null) {
-                    predicates.add(cb.equal(performance.get("date"), date));
+            if (term.contains("-")) {
+                LocalDateTime dateTime = parseDateTime(term);
+                if (dateTime != null) {
+                    LocalDate dateOnly = dateTime.toLocalDate();
+                    LocalDateTime startOfDay = dateOnly.atStartOfDay();
+                    LocalDateTime endOfDay = dateOnly.atTime(LocalTime.MAX);
+
+                    Predicate matchDateTime = cb.equal(performance.get("date"), dateTime);
+                    Predicate withinDayRange = cb.and(
+                        cb.greaterThanOrEqualTo(performance.get("date"), startOfDay),
+                        cb.lessThanOrEqualTo(performance.get("date"), endOfDay)
+                    );
+
+                    predicates.add(cb.or(matchDateTime, withinDayRange));
                     continue;
                 }
             }
@@ -113,12 +123,17 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
         return results;
     }
 
-    private LocalDate parseDate(String dateStr) {
+    private LocalDateTime parseDateTime(String term) {
         try {
-            return LocalDate.parse(dateStr, DATE_FORMATTER);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+            return LocalDateTime.parse(term, formatter);
         } catch (DateTimeParseException e) {
-            LOGGER.warn("Failed to parse date: {}", dateStr);
-            return null;
+            try {
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                return LocalDate.parse(term, dateFormatter).atStartOfDay();
+            } catch (DateTimeParseException ex) {
+                return null;
+            }
         }
     }
 }
