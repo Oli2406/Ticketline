@@ -123,7 +123,6 @@ export class CartComponent implements OnInit {
   }
 
   async buy(): Promise<void> {
-    this.receiptService.exportToPDF();
     if (!this.selectedPaymentOption) {
       this.toastr.error('Please select a payment option.');
       if (!this.address.street || !this.address.postalCode || !this.address.city) {
@@ -157,6 +156,7 @@ export class CartComponent implements OnInit {
         this.toastr.success('Thank you for your purchase.');
         this.cartService.deductPoints(this.getTotalPoints());
         this.cartService.clearCart();
+        this.receiptService.exportToPDF();
         await this.router.navigate(['merchandise']);
       } catch (error) {
         if (error instanceof HttpErrorResponse && error.status === 409) {
