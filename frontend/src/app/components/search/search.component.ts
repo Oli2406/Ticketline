@@ -1,15 +1,16 @@
 import {Component} from '@angular/core';
-import {EventListDto} from "../../dtos/event";
+import {EventListDto, EventSearch} from "../../dtos/event";
 import {EventService} from "../../services/event.service";
-import {DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {CurrencyPipe, DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {ArtistListDto, ArtistSearch} from "../../dtos/artist";
 import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
-import {LocationListDto} from "../../dtos/location";
-import {PerformanceWithNamesDto} from "../../dtos/performance";
-import {debounceTime, forkJoin, map, Subject} from "rxjs";
+import {LocationListDto, LocationSearch} from "../../dtos/location";
+import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
+import {debounceTime, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {RouterLink} from "@angular/router";
 
 export enum SearchType {
   event,
@@ -28,7 +29,9 @@ export enum SearchType {
     NgForOf,
     NgIf,
     FormsModule,
-    KeyValuePipe
+    KeyValuePipe,
+    RouterLink,
+    CurrencyPipe
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
@@ -36,12 +39,18 @@ export enum SearchType {
 export class SearchComponent {
   events: EventListDto[] = [];
   artists: ArtistListDto[] = [];
-  performances: PerformanceWithNamesDto[] = [];
+  performances: PerformanceDetailDto[] = [];
   locations: LocationListDto[] = [];
+  advancedSearchPerformances: PerformanceListDto[] = [];
+
+  searchQuery: string = '';
 
   searchChangedObservable = new Subject<void>();
   curSearchType = SearchType.event;
   artistSearchParams: ArtistSearch = {};
+  eventSearchParams: EventSearch = {};
+  performanceSearchParams: PerformanceSearch = {};
+  locationSearchParams: LocationSearch = {};
 
   constructor(
     private eventService: EventService,
@@ -53,12 +62,18 @@ export class SearchComponent {
 
   ngOnInit() {
     this.setupSearchListener();
+    this.loadSearchType();
     this.updateData();
   }
 
   changeSearchType(type: SearchType) {
+    if (type !== SearchType.advanced) {
+      this.advancedSearchPerformances = [];
+      this.searchQuery = '';
+    }
     this.curSearchType = type;
     this.updateData();
+    this.saveSearchType(type);
   }
 
   setupSearchListener() {
@@ -72,6 +87,11 @@ export class SearchComponent {
       [SearchType.location]: this.updateLocations.bind(this),
       [SearchType.performance]: this.updatePerformances.bind(this),
       [SearchType.advanced]: () => {
+        if (this.searchQuery.trim() !== '') {
+          this.performAdvancedSearch();
+        } else {
+          this.advancedSearchPerformances = [];
+        }
       },
     };
 
@@ -79,8 +99,9 @@ export class SearchComponent {
     if (updateAction) updateAction();
   }
 
+
   updateEvents() {
-    this.eventService.get().subscribe({
+    this.eventService.getAllByFilter(this.eventSearchParams).subscribe({
       next: events => (this.events = events),
       error: err => console.error('Error fetching events:', err)
     });
@@ -96,45 +117,57 @@ export class SearchComponent {
   }
 
   updateLocations() {
-    this.locationService.getLocations().subscribe({
+    this.locationService.getAllByFilter(this.locationSearchParams).subscribe({
       next: locations => (this.locations = locations),
       error: err => console.error('Error fetching locations:', err)
     });
   }
 
   updatePerformances() {
-    this.performanceService.getPerformances().subscribe({
-      next: performances => {
-        const performanceObservables = performances.map(p =>
-          forkJoin({
-            location: this.locationService.getById(p.locationId),
-            artist: this.artistService.getById(p.artistId)
-          }).pipe(
-            map(({location, artist}) => ({
-              ...p,
-              locationName: location.name,
-              artistName: `${artist.firstName} ${artist.surname}`
-            }))
-          )
-        );
-
-        forkJoin(performanceObservables).subscribe({
-          next: performanceWithNamesArray => (this.performances = performanceWithNamesArray),
-          error: err => console.error('Error loading performances:', err)
-        });
-      },
-      error: err => console.error('Error fetching performances:', err)
+    this.performanceService.getAllByFilter(this.performanceSearchParams).subscribe({
+      next: performances => (this.performances = performances),
+      error: err => console.error('Error fetching artists:', err)
     });
   }
 
+  performAdvancedSearch() {
+    if (!this.searchQuery || this.searchQuery.trim() === '') {
+      this.advancedSearchPerformances = [];
+      return;
+    }
+    this.performanceService.advancedSearchPerformances(this.searchQuery).subscribe({
+      next: (performances) => {
+        this.advancedSearchPerformances = performances;
+      },
+      error: (err) => {
+        console.error('Error performing advanced search:', err);
+        this.advancedSearchPerformances = [];
+      }
+    });
+  }
+
+  private saveSearchType(type: SearchType): void {
+    localStorage.setItem('curSearchType', type.toString());
+  }
+
+  private loadSearchType(): void {
+    const storedType = localStorage.getItem('curSearchType');
+    if (storedType) {
+      this.curSearchType = parseInt(storedType, 10) as SearchType;
+    }
+  }
+
   searchChanged(): void {
+    this.advancedSearchPerformances = [];
     this.searchChangedObservable.next();
   }
 
   clearSearch() {
-    this.artistSearchParams.firstName = '';
-    this.artistSearchParams.surname = '';
-    this.artistSearchParams.artistName = '';
+    this.artistSearchParams = {};
+    this.eventSearchParams = {};
+    this.locationSearchParams = {};
+    this.performanceSearchParams = {};
+    this.searchQuery = '';
     this.searchChanged();
   }
 

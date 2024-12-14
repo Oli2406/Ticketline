@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,13 +51,30 @@ public class PerformanceValidator {
 
         if (performanceCreateDto.getDate() == null) {
             validationErrors.add("Performance date is required");
-        } else if (performanceCreateDto.getDate().isBefore(LocalDate.now())) {
+        } else if (performanceCreateDto.getDate().isBefore(LocalDateTime.now())) {
             validationErrors.add("Performance date cannot be in the past");
         }
 
-        if (performanceCreateDto.getPrice() == null || performanceCreateDto.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            validationErrors.add("Performance price must be greater than 0");
+        if (performanceCreateDto.getPrice() == null) {
+            validationErrors.add("Price must not be null");
         }
+
+        if (performanceCreateDto.getPrice() != null && !(performanceCreateDto.getPrice() instanceof BigDecimal)) {
+            validationErrors.add("Price must be a valid number");
+        }
+
+        if (performanceCreateDto.getPrice() != null && performanceCreateDto.getPrice() instanceof BigDecimal) {
+            BigDecimal price = performanceCreateDto.getPrice();
+
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                validationErrors.add("Price must be greater than 0");
+            }
+
+            if (price.compareTo(new BigDecimal("500")) > 0) {
+                validationErrors.add("Price must not exceed 500");
+            }
+        }
+
 
         if (performanceCreateDto.getTicketNumber() == null || performanceCreateDto.getTicketNumber() <= 0) {
             validationErrors.add("Number of tickets must be greater than 0");
@@ -70,6 +88,14 @@ public class PerformanceValidator {
             validationErrors.add("Performance hall must be less than 50 characters");
         }
 
+        if (performanceCreateDto.getDuration() <= 0) {
+            validationErrors.add("Event duration must be greater than 0 minutes");
+        }
+
+        if (performanceCreateDto.getDuration() >= 600) {
+            validationErrors.add("Event duration must be less than 600 minutes or 10 hours");
+        }
+
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Performance validation failed with errors: {}", validationErrors);
             throw new ValidationException("Performance validation failed", validationErrors);
@@ -79,7 +105,7 @@ public class PerformanceValidator {
         LOGGER.info("Performance validation passed for: {}", performanceCreateDto);
     }
 
-    public void checkPerformanceUnique(String name, Long locationId, LocalDate date) throws ConflictException {
+    public void checkPerformanceUnique(String name, Long locationId, LocalDateTime date) throws ConflictException {
         if (performanceRepository.existsByNameAndLocationIdAndDate(name, locationId, date)) {
             List<String> conflictErrors = new ArrayList<>();
             conflictErrors.add("Performance with the name '" + name + "' already exists at this location on the given date");

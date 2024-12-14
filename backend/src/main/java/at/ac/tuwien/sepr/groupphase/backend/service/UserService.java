@@ -44,7 +44,7 @@ public interface UserService extends UserDetailsService {
      * @throws org.springframework.security.authentication.BadCredentialsException if credentials
      *                                                                             are bad
      */
-    String login(UserLoginDto userLoginDto) throws NoSuchAlgorithmException;
+    String login(UserLoginDto userLoginDto);
 
     /**
      * Log out an user.
@@ -65,8 +65,7 @@ public interface UserService extends UserDetailsService {
      * @return the created JWT Token, if successful
      */
     String register(UserRegistrationDto userRegistrationDto)
-
-        throws ValidationException, ConflictException, NoSuchAlgorithmException;
+        throws ValidationException, ConflictException;
 
 
     /**

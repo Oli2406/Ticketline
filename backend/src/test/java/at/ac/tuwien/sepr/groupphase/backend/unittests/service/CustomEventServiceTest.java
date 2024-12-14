@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -30,15 +31,18 @@ public class CustomEventServiceTest {
     @Mock
     private EventValidator eventValidator;
 
+    @Mock
+    private EventMapper eventMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        eventService = new CustomEventService(eventRepository, eventValidator);
+        eventService = new CustomEventService(eventRepository, eventValidator, eventMapper);
     }
 
     @Test
     void createOrUpdateEvent_ShouldSaveEvent_WhenValidInput() throws ValidationException, ConflictException {
-        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(), 120, List.of(1L));
+        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(), LocalDate.now().plusDays(1), List.of(1L));
 
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event e = invocation.getArgument(0);
@@ -46,7 +50,7 @@ public class CustomEventServiceTest {
             return e;
         });
 
-        EventDetailDto created = eventService.createOrUpdateEvent(dto);
+        EventDetailDto created = eventService.createEvent(dto);
 
         assertNotNull(created, "Created event DTO should not be null");
         assertAll(
@@ -62,20 +66,20 @@ public class CustomEventServiceTest {
 
     @Test
     void getAllEvents_ShouldReturnEventList() {
-        List<Event> events = List.of(new Event("Title1", "Description1", LocalDate.now(), "Category1", 90, List.of(1L)));
+        List<Event> events = List.of(new Event("Title1", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L)));
         when(eventRepository.findAll()).thenReturn(events);
 
         List<EventDetailDto> result = eventService.getAllEvents();
 
         assertFalse(result.isEmpty(), "Resulting event list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("Title1", result.get(0).getTitle(), "Title of the first event should match");
+        assertEquals("Title1", result.getFirst().getTitle(), "Title of the first event should match");
 
         verify(eventRepository, times(1)).findAll();
     }
 
     @Test
-    void getEventById_ShouldThrowException_WhenEventNotFound() {
+    void getEventByIdShouldThrowExceptionWhenEventNotFound() {
         when(eventRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,

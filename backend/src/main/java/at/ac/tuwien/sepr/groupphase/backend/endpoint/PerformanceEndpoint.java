@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
@@ -9,6 +10,7 @@ import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,14 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v1/performance")
+@RequestMapping(PerformanceEndpoint.BASE_PATH)
 public class PerformanceEndpoint {
 
+    public static final String BASE_PATH = "/api/v1/performance";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PerformanceService performanceService;
 
@@ -37,7 +42,7 @@ public class PerformanceEndpoint {
     @PutMapping
     public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update performance: {}", performanceCreateDto);
-        PerformanceDetailDto createdPerformance = performanceService.createOrUpdatePerformance(performanceCreateDto);
+        PerformanceDetailDto createdPerformance = performanceService.createPerformance(performanceCreateDto);
         logger.debug("Performance created/updated successfully: {}", createdPerformance);
         return ResponseEntity.ok(createdPerformance);
     }
@@ -60,6 +65,22 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(performance);
     }
 
+    @PermitAll
+    @GetMapping("/event/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByEventId(@PathVariable Long id) {
+        logger.info("Fetching performance by event id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByEventId(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/location/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByLocationId(@PathVariable Long id) {
+        logger.info("Fetching performance by location id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByLocationId(id);
+        return ResponseEntity.ok(result);
+    }
+
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable Long id) {
@@ -67,5 +88,21 @@ public class PerformanceEndpoint {
         performanceService.deletePerformance(id);
         logger.debug("Performance with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<PerformanceDetailDto>> search(PerformanceSearchDto dto) {
+        logger.info("GET " + BASE_PATH);
+        logger.debug("request parameters: {}", dto.toString());
+        Stream<PerformanceDetailDto> result = performanceService.search(dto);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/advanced-search")
+    public ResponseEntity<?> advancedSearch(@RequestParam String query) {
+        List<PerformanceDetailDto> events = performanceService.performAdvancedSearch(query);
+        return new ResponseEntity<>(events, HttpStatus.CREATED);
     }
 }

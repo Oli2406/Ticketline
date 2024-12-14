@@ -35,14 +35,14 @@ public class CustomArtistService implements ArtistService {
     }
 
     @Override
-    public ArtistDetailDto createOrUpdateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
+    public ArtistDetailDto createArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
         LOG.info("Creating/Updating Artist with data: {}", artistCreateDto);
 
         artistValidator.validateArtist(artistCreateDto);
 
         Artist artist = new Artist(
             artistCreateDto.getFirstName(),
-            artistCreateDto.getSurname(),
+            artistCreateDto.getLastName(),
             artistCreateDto.getArtistName()
         );
 
@@ -55,7 +55,7 @@ public class CustomArtistService implements ArtistService {
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
             artist.getArtistId(),
             artist.getFirstName(),
-            artist.getSurname(),
+            artist.getLastName(),
             artist.getArtistName()
         );
 
@@ -71,7 +71,7 @@ public class CustomArtistService implements ArtistService {
             .map(artist -> new ArtistDetailDto(
                 artist.getArtistId(),
                 artist.getFirstName(),
-                artist.getSurname(),
+                artist.getLastName(),
                 artist.getArtistName()
             ))
             .collect(Collectors.toList());
@@ -97,7 +97,7 @@ public class CustomArtistService implements ArtistService {
         ArtistDetailDto artistDetailDto = new ArtistDetailDto(
             artist.getArtistId(),
             artist.getFirstName(),
-            artist.getSurname(),
+            artist.getLastName(),
             artist.getArtistName()
         );
 
@@ -126,8 +126,8 @@ public class CustomArtistService implements ArtistService {
         if (dto.getFirstName() != null) {
             query = query.filter(artist -> artist.getFirstName().toLowerCase().contains(dto.getFirstName().toLowerCase()));
         }
-        if (dto.getSurname() != null) {
-            query = query.filter(artist -> artist.getSurname().toLowerCase().contains(dto.getSurname().toLowerCase()));
+        if (dto.getLastName() != null) {
+            query = query.filter(artist -> artist.getLastName().toLowerCase().contains(dto.getLastName().toLowerCase()));
         }
         if (dto.getArtistName() != null) {
             query = query.filter(artist -> artist.getArtistName().toLowerCase().contains(dto.getArtistName().toLowerCase()));

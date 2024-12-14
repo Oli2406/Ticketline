@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 public class MerchandiseDataGenerator {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

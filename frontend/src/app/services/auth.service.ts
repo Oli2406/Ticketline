@@ -13,6 +13,7 @@ import {ErrorFormatterService} from "./error-formatter.service";
   providedIn: 'root',
 })
 export class AuthService {
+
   private authBaseUri: string = this.globals.backendUri + '/authentication';
   private resetTokenKey = 'resetPasswordToken';
 
@@ -33,14 +34,10 @@ export class AuthService {
     return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'}).pipe(
       tap((authResponse: string) => {
         this.storeAuthToken(authResponse);
-        this.toastr.success('Login successful!', 'Success');
-      }),
-      catchError((err) => {
-        this.toastr.error('Login failed. Please check your credentials.', 'Error');
-        return of('');
       })
     );
   }
+
 
   /**
    * Checks if a valid JWT token is saved in the localStorage.
@@ -174,6 +171,23 @@ export class AuthService {
    */
   validateTokenInBackend(): Observable<boolean> {
     return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`);
+  }
+  getUserFirstNameFromToken(): string|null{
+    const token = this.getAuthToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.firstName;
+    }
+    return null;
+  }
+
+  getUserLastNameFromToken(): string|null{
+    const token = this.getAuthToken();
+    if (token) {
+      const decoded: any = jwtDecode(token);
+      return decoded.lastName;
+    }
+    return null;
   }
 
   /**

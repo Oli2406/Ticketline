@@ -19,16 +19,26 @@ import {MerchandiseCreateComponent} from "./components/admin/merchandise-create/
 import {MerchandiseComponent} from "./components/merchandise/merchandise.component";
 import {CartComponent} from "./components/cart/cart.component";
 import {SearchComponent} from "./components/search/search.component";
+import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
+import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
+import {ArtistComponent} from "./components/artist/artist.component";
+import {EventComponent} from "./components/event/event.component";
+import {LocationComponent} from "./components/location/location.component";
 
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
+  {path: 'artist/:id', canActivate: mapToCanActivate([AuthGuard]), component: ArtistComponent},
+  {path: 'event/:id', canActivate: mapToCanActivate([AuthGuard]), component: EventComponent},
+  {path: 'location/:id', canActivate: mapToCanActivate([AuthGuard]), component: LocationComponent},
   {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
-  {path: 'search', component: SearchComponent},
-  {path: 'news', component: NewsComponent},
+  {path: 'seatingPlanA', component: SeatingPlanAComponent},
+  {path: 'seatingPlanB', component: SeatingPlanBComponent},
+  {path: 'search', canActivate: mapToCanActivate([AuthGuard]), component: SearchComponent},
+  {path: 'news', canActivate: mapToCanActivate([AuthGuard]), component: NewsComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'news/details/:id', component: NewsDetailComponent },
@@ -52,3 +62,4 @@ const routes: Routes = [
 })
 export class AppRoutingModule {
 }
+

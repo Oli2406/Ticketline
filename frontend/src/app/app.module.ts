@@ -23,6 +23,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {httpInterceptorProviders} from './interceptors';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
+import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
 
 @NgModule({
   declarations: [
@@ -37,6 +39,8 @@ import { ToastrModule } from 'ngx-toastr';
     ResetPasswordComponent,
     VerifyResetCodeComponent,
     SendEmailComponent,
+    SeatingPlanAComponent,
+    SeatingPlanBComponent,
   ],
   bootstrap: [AppComponent],
   imports: [BrowserModule,
@@ -58,5 +62,5 @@ import { ToastrModule } from 'ngx-toastr';
   ],
   providers: [httpInterceptorProviders, provideHttpClient(withInterceptorsFromDi())]
 })
-export class AppModule {
-}
+  export class AppModule {
+  }

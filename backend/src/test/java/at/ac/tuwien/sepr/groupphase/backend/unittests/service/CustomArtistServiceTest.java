@@ -48,13 +48,13 @@ public class CustomArtistServiceTest {
             return a;
         });
 
-        ArtistDetailDto created = artistService.createOrUpdateArtist(dto);
+        ArtistDetailDto created = artistService.createArtist(dto);
 
         assertNotNull(created, "Created artist DTO should not be null");
         assertAll(
             () -> assertNotNull(created.getArtistId(), "Artist ID should not be null"),
             () -> assertEquals(dto.getFirstName(), created.getFirstName(), "First name should match"),
-            () -> assertEquals(dto.getSurname(), created.getSurname(), "Surname should match"),
+            () -> assertEquals(dto.getLastName(), created.getLastName(), "Surname should match"),
             () -> assertEquals(dto.getArtistName(), created.getArtistName(), "Artist name should match")
         );
 

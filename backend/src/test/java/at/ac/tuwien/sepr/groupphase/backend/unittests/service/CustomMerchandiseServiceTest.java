@@ -54,7 +54,7 @@ class CustomMerchandiseServiceTest {
 
         ArgumentCaptor<Merchandise> captor = ArgumentCaptor.forClass(Merchandise.class);
 
-        MerchandiseCreateDto result = customMerchandiseService.saveMerchandise(createDto);
+        MerchandiseCreateDto result = customMerchandiseService.createMerchandise(createDto);
 
         verify(merchandiseRepository).save(captor.capture());
         Merchandise savedEntity = captor.getValue();

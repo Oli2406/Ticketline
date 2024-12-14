@@ -19,7 +19,7 @@ public interface MerchandiseService {
      *                             name, category, stock, and image URL
      * @return the DTO containing the details of the saved merchandise
      */
-    MerchandiseCreateDto saveMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException;
+    MerchandiseCreateDto createMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException;
 
     /**
      * Retrieves a list of all available merchandises.
