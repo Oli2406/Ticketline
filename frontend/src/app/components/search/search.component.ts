@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EventListDto, EventSearch} from "../../dtos/event";
 import {EventService} from "../../services/event.service";
-import {DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {CurrencyPipe, DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {ArtistListDto, ArtistSearch} from "../../dtos/artist";
 import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
@@ -30,7 +30,8 @@ export enum SearchType {
     NgIf,
     FormsModule,
     KeyValuePipe,
-    RouterLink
+    RouterLink,
+    CurrencyPipe
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
@@ -61,6 +62,7 @@ export class SearchComponent {
 
   ngOnInit() {
     this.setupSearchListener();
+    this.loadSearchType();
     this.updateData();
   }
 
@@ -71,6 +73,7 @@ export class SearchComponent {
     }
     this.curSearchType = type;
     this.updateData();
+    this.saveSearchType(type);
   }
 
   setupSearchListener() {
@@ -143,6 +146,16 @@ export class SearchComponent {
     });
   }
 
+  private saveSearchType(type: SearchType): void {
+    localStorage.setItem('curSearchType', type.toString());
+  }
+
+  private loadSearchType(): void {
+    const storedType = localStorage.getItem('curSearchType');
+    if (storedType) {
+      this.curSearchType = parseInt(storedType, 10) as SearchType;
+    }
+  }
 
   searchChanged(): void {
     this.advancedSearchPerformances = [];

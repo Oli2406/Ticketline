@@ -65,4 +65,12 @@ public interface PerformanceService {
      * @return the performances mapped to the event
      */
     List<PerformanceDetailDto> getByEventId(Long id);
+
+    /**
+     * Retrieves all performances that are mapped to location with id {@code id}.
+     *
+     * @param id the ID of the location to get the performances from
+     * @return the performances mapped to the location
+     */
+    List<PerformanceDetailDto> getByLocationId(Long id);
 }

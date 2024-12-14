@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import { Location as AppLocation } from '@angular/common';
 import {ActivatedRoute, RouterLink} from "@angular/router";
 import {ArtistService} from "../../services/artist.service";
 import {ArtistListDto} from "../../dtos/artist";
@@ -23,7 +24,8 @@ export class ArtistComponent {
   constructor(private route: ActivatedRoute,
               private artistService: ArtistService,
               private eventService: EventService,
-              private notification: ToastrService) {
+              private notification: ToastrService,
+              private appLocation: AppLocation) {
   }
 
   private artistId: number | null = null;
@@ -57,5 +59,7 @@ export class ArtistComponent {
       }
     });
   }
-
+  goBack(): void {
+    this.appLocation.back();
+  }
 }

@@ -314,7 +314,7 @@
     <td>{{ location.name }}</td>
     <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
     <td>
-      <button class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></button>
+      <button [routerLink]="['/location', location.locationId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></button>
     </td>
   </tr>
   </tbody>
@@ -352,7 +352,7 @@
     <tr *ngFor="let performance of advancedSearchPerformances">
       <td>{{ performance.name }}</td>
       <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
-      <td>{{ performance.price }} €</td>
+      <td>{{ performance.price | currency: 'EUR' }}</td>
       <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
       <td>
@@ -387,7 +387,7 @@
     <td>{{ performance.name }}</td>
     <td>{{ performance.location.name }}</td>
     <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
-    <td>{{ performance.price }}</td>
+    <td>{{ performance.price | currency: 'EUR' }}</td>
     <td>{{ performance.artist.artistName }}</td>
     <td>{{ performance.ticketNumber }}</td>
     <td>{{ performance.hall }}</td>

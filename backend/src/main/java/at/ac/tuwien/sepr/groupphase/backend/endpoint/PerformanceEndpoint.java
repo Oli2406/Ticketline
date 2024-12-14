@@ -73,6 +73,14 @@ public class PerformanceEndpoint {
         return ResponseEntity.ok(result);
     }
 
+    @PermitAll
+    @GetMapping("/location/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByLocationId(@PathVariable Long id) {
+        logger.info("Fetching performance by location id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByLocationId(id);
+        return ResponseEntity.ok(result);
+    }
+
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable Long id) {

@@ -1,6 +1,14 @@
-<h1  class="mt-5">
+<div class="text-center">
+<h1 class="mt-5">
   {{ artist?.artistName || (artist?.firstName + ' ' + artist?.lastName) }}
 </h1>
+<div *ngIf="events.length === 0" class="mt-5">
+  <p>
+    There are no events associated with this artist.
+  </p>
+  <button class="btn btn-secondary" (click)="goBack()"><i class="bi bi-arrow-return-left"></i> Go Back</button>
+</div>
+</div>
 <div *ngIf="events.length > 0">
   <p>
     Events associated with this artist:
@@ -34,8 +42,4 @@
   </table>
 </div>
 
-<div *ngIf="events.length === 0">
-  <p>
-    There are no events associated with this artist.
-  </p>
-</div>
+

@@ -26,6 +26,10 @@ export class PerformanceService {
     return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/event/${id}`);
   }
 
+  getByLocationId(id: number):Observable<PerformanceDetailDto[]> {
+    return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/location/${id}`);
+  }
+
   getAllByFilter(filter: PerformanceSearch): Observable<PerformanceDetailDto[]> {
     let params = new HttpParams();
     if (filter.date?.trim()) {

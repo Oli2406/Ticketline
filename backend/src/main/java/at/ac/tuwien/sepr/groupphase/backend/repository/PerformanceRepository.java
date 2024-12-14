@@ -37,4 +37,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
      */
     @Query("SELECT p from Performance p WHERE p.performanceId IN (SELECT e.performanceIds from Event e WHERE e.eventId = :eventId)")
     List<Performance> findByEventId(Long eventId);
+
+    /**
+     * Finds all performances assoicated with location {@code locationId}.
+     *
+     * @param locationId the location to find the performances by
+     * @return list of performances associated with the location
+     */
+    @Query("SELECT p from Performance p WHERE p.locationId = :locationId")
+    List<Performance> findByLocationId(Long locationId);
 }

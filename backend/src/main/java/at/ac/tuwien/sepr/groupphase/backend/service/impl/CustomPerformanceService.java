@@ -152,4 +152,18 @@ public class CustomPerformanceService implements PerformanceService {
             })
             .collect(Collectors.toList());
     }
+
+    @Override
+    public List<PerformanceDetailDto> getByLocationId(Long id) {
+        logger.info("Getting performances by location id: {}", id);
+        List<Performance> result = performanceRepository.findByLocationId(id);
+
+        return result.stream()
+            .map(performance -> {
+                Artist artist = artistRepository.findArtistByArtistId(performance.getArtistId());
+                Location location = locationRepository.findByLocationId(performance.getLocationId());
+                return performanceMapper.toPerformanceDetailDto(performance, artist, location);
+            })
+            .collect(Collectors.toList());
+    }
 }
