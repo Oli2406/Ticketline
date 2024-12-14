@@ -16,7 +16,8 @@ import {
 export class PerformanceService {
   private apiUrl: string = this.globals.backendUri + '/performance';
 
-  constructor(private http: HttpClient, private globals: Globals) {}
+  constructor(private http: HttpClient, private globals: Globals) {
+  }
 
   get(): Observable<PerformanceListDto[]> {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
@@ -26,7 +27,7 @@ export class PerformanceService {
     return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/event/${id}`);
   }
 
-  getByLocationId(id: number):Observable<PerformanceDetailDto[]> {
+  getByLocationId(id: number): Observable<PerformanceDetailDto[]> {
     return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/location/${id}`);
   }
 
@@ -78,5 +79,12 @@ export class PerformanceService {
       }
     }
     return throwError(() => new Error(cleanedError));
+  }
+
+  getPerformanceById(id: number): Observable<PerformanceListDto> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.get<PerformanceListDto>(url).pipe(
+      catchError(this.handleError)
+    );
   }
 }

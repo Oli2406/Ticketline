@@ -412,7 +412,7 @@ export class SeatingPlanBComponent {
   }
 
   addToCart(): void {
-    if (this.totalTickets === 0) {
+   /* if (this.totalTickets === 0) {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
       return;
     }
@@ -449,14 +449,7 @@ export class SeatingPlanBComponent {
     }
 
     this.toastr.success("Successfully added selected tickets to the cart.", "Success");
-    this.resetSelections();
+    this.resetSelections();*/
   }
-
-
-
-
-
-
-
 
 }

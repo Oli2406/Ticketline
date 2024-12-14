@@ -455,17 +455,17 @@ export class SeatingPlanAComponent {
   }
 
   addToCart(): void {
-    if (this.totalTickets === 0) {
+    /*if (this.totalTickets === 0) {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
       return;
     }
 
-    // Add seated tickets to the cart
+
     this.selectedTickets.forEach(ticket => {
       this.cartService.addToCart(ticket);
     });
 
-    // Add VIP standing tickets to the cart
+
     if (this.selectedStanding.vip > 0) {
       this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
         next: vipTickets => {
@@ -478,7 +478,7 @@ export class SeatingPlanAComponent {
       });
     }
 
-    // Add regular standing tickets to the cart
+
     if (this.selectedStanding.standard > 0) {
       this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
         next: standardTickets => {
@@ -492,7 +492,7 @@ export class SeatingPlanAComponent {
     }
 
     this.toastr.success("Successfully added selected tickets to the cart.", "Success");
-    this.resetSelections(); // Optionally reset selections after adding to the cart
+    this.resetSelections(); */
   }
 
 }

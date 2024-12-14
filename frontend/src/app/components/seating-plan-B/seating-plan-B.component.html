@@ -1,9 +1,9 @@
 <div class="container mt-5">
   <!-- Header -->
   <div class="text-center mt-3">
-    <h2>Hall B</h2>
+    <h2>{{ performanceDetails.name }}</h2>
     <p *ngIf="performanceDetails">
-      <strong>Performance Name:</strong> {{ performanceDetails.name }}<br />
+      <strong>Hall:</strong> {{ performanceDetails.hall }}<br />
       <strong>Band:</strong> {{ artistDetails.artistName }}<br />
       <strong>Location:</strong> {{ locationDetails.name }}<br />
       <strong>Date:</strong> {{ performanceDetails.date | date: 'medium' }}
