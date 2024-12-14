@@ -1,5 +1,5 @@
 import {Merchandise} from "./merchandise";
-import {Ticket} from "./ticket";
+import {Ticket, TicketDto} from "./ticket";
 
 export interface Purchase {
   purchaseId?: number; // Primary Key
@@ -13,7 +13,7 @@ export interface Purchase {
 export interface PurchaseListDto {
   purchaseId: number;
   userId: number;
-  tickets: Ticket[];
+  tickets: TicketDto[];
   merchandises: Merchandise[];
   totalPrice: number;
   purchaseDate: Date;

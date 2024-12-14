@@ -1,0 +1,37 @@
+<div class="user-orders">
+  <h1>Your Tickets</h1>
+
+  <ng-container *ngIf="sortedTickets.length > 0; else noTickets">
+    <div *ngFor="let group of sortedTickets" class="ticket-group">
+      <h2>{{ group.date | date: 'longDate' }}</h2>
+
+      <div class="ticket-section">
+        <h3>Reserved Tickets</h3>
+        <ul *ngIf="group.reserved.length > 0; else noReserved">
+          <li *ngFor="let ticket of group.reserved">
+            <span>Ticket ID: {{ ticket.ticketId }}</span>
+            <span>Performance: {{ ticket.hall }}</span>
+            <span>Price: {{ ticket.price | currency }}</span>
+          </li>
+        </ul>
+        <ng-template #noReserved><p>No reserved tickets for this date.</p></ng-template>
+      </div>
+
+      <div class="ticket-section">
+        <h3>Purchased Tickets</h3>
+        <ul *ngIf="group.purchased.length > 0; else noPurchased">
+          <li *ngFor="let ticket of group.purchased">
+            <span>Ticket ID: {{ ticket.ticketId }}</span>
+            <span>Performance: {{ ticket.hall }}</span>
+            <span>Price: {{ ticket.price | currency }}</span>
+          </li>
+        </ul>
+        <ng-template #noPurchased><p>No purchased tickets for this date.</p></ng-template>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #noTickets>
+    <p>You have no tickets yet.</p>
+  </ng-template>
+</div>

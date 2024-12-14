@@ -1,0 +1,40 @@
+.user-orders {
+  h1 {
+    text-align: center;
+  }
+
+  .ticket-group {
+    margin-bottom: 20px;
+
+    h2 {
+      text-align: center;
+      background-color: #e0e0e0;
+      padding: 10px;
+    }
+
+    .ticket-section {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+
+      h3 {
+        text-align: left;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+
+        li {
+          display: flex;
+          justify-content: space-between;
+          padding: 5px 0;
+
+          span {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+}
