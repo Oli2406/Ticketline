@@ -1,15 +1,16 @@
 import {Component} from '@angular/core';
 import {EventListDto, EventSearch} from "../../dtos/event";
 import {EventService} from "../../services/event.service";
-import {DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
+import {CurrencyPipe, DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {ArtistListDto, ArtistSearch} from "../../dtos/artist";
 import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto, LocationSearch} from "../../dtos/location";
-import {PerformanceListDto, PerformanceWithNamesDto} from "../../dtos/performance";
-import {debounceTime, forkJoin, map, Subject} from "rxjs";
+import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
+import {debounceTime, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {RouterLink} from "@angular/router";
 
 export enum SearchType {
   event,
@@ -28,7 +29,9 @@ export enum SearchType {
     NgForOf,
     NgIf,
     FormsModule,
-    KeyValuePipe
+    KeyValuePipe,
+    RouterLink,
+    CurrencyPipe
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
@@ -36,7 +39,7 @@ export enum SearchType {
 export class SearchComponent {
   events: EventListDto[] = [];
   artists: ArtistListDto[] = [];
-  performances: PerformanceWithNamesDto[] = [];
+  performances: PerformanceDetailDto[] = [];
   locations: LocationListDto[] = [];
   advancedSearchPerformances: PerformanceListDto[] = [];
 
@@ -46,6 +49,7 @@ export class SearchComponent {
   curSearchType = SearchType.event;
   artistSearchParams: ArtistSearch = {};
   eventSearchParams: EventSearch = {};
+  performanceSearchParams: PerformanceSearch = {};
   locationSearchParams: LocationSearch = {};
 
   constructor(
@@ -58,6 +62,7 @@ export class SearchComponent {
 
   ngOnInit() {
     this.setupSearchListener();
+    this.loadSearchType();
     this.updateData();
   }
 
@@ -68,6 +73,7 @@ export class SearchComponent {
     }
     this.curSearchType = type;
     this.updateData();
+    this.saveSearchType(type);
   }
 
   setupSearchListener() {
@@ -118,27 +124,9 @@ export class SearchComponent {
   }
 
   updatePerformances() {
-    this.performanceService.getPerformances().subscribe({
-      next: performances => {
-        const performanceObservables = performances.map(p =>
-          forkJoin({
-            location: this.locationService.getById(p.locationId),
-            artist: this.artistService.getById(p.artistId)
-          }).pipe(
-            map(({location, artist}) => ({
-              ...p,
-              locationName: location.name,
-              artistName: `${artist.firstName} ${artist.lastName}`
-            }))
-          )
-        );
-
-        forkJoin(performanceObservables).subscribe({
-          next: performanceWithNamesArray => (this.performances = performanceWithNamesArray),
-          error: err => console.error('Error loading performances:', err)
-        });
-      },
-      error: err => console.error('Error fetching performances:', err)
+    this.performanceService.getAllByFilter(this.performanceSearchParams).subscribe({
+      next: performances => (this.performances = performances),
+      error: err => console.error('Error fetching artists:', err)
     });
   }
 
@@ -158,6 +146,16 @@ export class SearchComponent {
     });
   }
 
+  private saveSearchType(type: SearchType): void {
+    localStorage.setItem('curSearchType', type.toString());
+  }
+
+  private loadSearchType(): void {
+    const storedType = localStorage.getItem('curSearchType');
+    if (storedType) {
+      this.curSearchType = parseInt(storedType, 10) as SearchType;
+    }
+  }
 
   searchChanged(): void {
     this.advancedSearchPerformances = [];
@@ -168,6 +166,7 @@ export class SearchComponent {
     this.artistSearchParams = {};
     this.eventSearchParams = {};
     this.locationSearchParams = {};
+    this.performanceSearchParams = {};
     this.searchQuery = '';
     this.searchChanged();
   }

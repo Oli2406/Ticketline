@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.PerformanceMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
@@ -14,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -40,10 +40,13 @@ public class CustomPerformanceServiceTest {
     @Mock
     private LocationRepository locationRepository;
 
+    @Mock
+    private PerformanceMapper performanceMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        performanceService = new CustomPerformanceService(performanceRepository, performanceValidator, searchPerformanceRepository, artistRepository, locationRepository);
+        performanceService = new CustomPerformanceService(performanceRepository, performanceValidator, searchPerformanceRepository, artistRepository, locationRepository, performanceMapper);
     }
 
     @Test

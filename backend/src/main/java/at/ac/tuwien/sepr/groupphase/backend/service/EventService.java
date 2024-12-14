@@ -20,7 +20,7 @@ public interface EventService {
      * @param eventCreateDto the data for creating or updating the event
      * @return the detailed representation of the created or updated event
      * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
-     * @throws ConflictException if there are conflicts, such as an artist with the same name already existing
+     * @throws ConflictException   if there are conflicts, such as an artist with the same name already existing
      */
     EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException;
 
@@ -54,4 +54,12 @@ public interface EventService {
      * @return the event where the given fields match.
      */
     Stream<EventDetailDto> search(EventSearchDto dto);
+
+    /**
+     * Retrieves all events that contain at least one performance with artist {@code id}.
+     *
+     * @param id artist id to look for
+     * @return a list of all events found
+     */
+    List<EventDetailDto> getEventsByArtistId(Long id);
 }

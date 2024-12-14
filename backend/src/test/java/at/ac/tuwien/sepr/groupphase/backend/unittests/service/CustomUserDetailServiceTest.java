@@ -1,5 +1,13 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
@@ -11,6 +19,8 @@ import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomUserDetailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
+import java.util.ArrayList;
+import java.util.List;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,8 +28,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,7 +68,8 @@ class CustomUserDetailServiceTest {
         MockitoAnnotations.openMocks(this);
         userService =
             new CustomUserDetailService(
-                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator, jwt, auth, randomStringGenerator);
+                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator,
+                jwt, auth, randomStringGenerator);
     }
 
     @Test
