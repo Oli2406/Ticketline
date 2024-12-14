@@ -1,7 +1,8 @@
 <div class="cart-container">
   <h2>Your Cart</h2>
   <div class="points-header mb-3">
-    <h3 style="background-color: #4D47C3; color: white;" class="bg-primary text-light p-2 rounded d-inline-block">
+    <h3 style="background-color: #4D47C3; color: white;"
+        class="bg-primary text-light p-2 rounded d-inline-block">
       Available points: {{ accountPoints }}
     </h3>
   </div>
@@ -12,8 +13,10 @@
       <h3>Payment Options</h3>
       <div class="payment-methods">
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'creditCard'">
-          <input type="radio" name="paymentOption" value="creditCard" [(ngModel)]="selectedPaymentOption" />
-          <i class="fas fa-credit-card"></i> Credit Card
+          <input type="radio" name="paymentOption" value="creditCard"
+                 [(ngModel)]="selectedPaymentOption"/>
+          <i class="fas fa-credit-card"></i>
+          Credit Card
         </label>
         <div *ngIf="selectedPaymentOption === 'creditCard'" class="payment-fields">
           <label for="creditCardNumber" class="form-label w-100 mt-2">
@@ -32,8 +35,10 @@
         </div>
 
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'paypal'">
-          <input type="radio" name="paymentOption" value="paypal" [(ngModel)]="selectedPaymentOption" />
-          <i class="fab fa-paypal"></i> PayPal
+          <input type="radio" name="paymentOption" value="paypal"
+                 [(ngModel)]="selectedPaymentOption"/>
+          <i class="fab fa-paypal"></i>
+          PayPal
         </label>
         <div *ngIf="selectedPaymentOption === 'paypal'" class="payment-fields">
           <label for="paypalEmail" class="form-label w-100 mt-2">
@@ -50,8 +55,10 @@
         </div>
 
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'bankTransfer'">
-          <input type="radio" name="paymentOption" value="bankTransfer" [(ngModel)]="selectedPaymentOption" />
-          <i class="fas fa-university"></i> Bank Transfer
+          <input type="radio" name="paymentOption" value="bankTransfer"
+                 [(ngModel)]="selectedPaymentOption"/>
+          <i class="fas fa-university"></i>
+          Bank Transfer
         </label>
         <div *ngIf="selectedPaymentOption === 'bankTransfer'" class="payment-fields">
           <label for="bankAccount" class="form-label w-100 mt-2">
@@ -70,8 +77,10 @@
         </div>
 
         <label class="payment-option" [class.selected]="selectedPaymentOption === 'points'">
-          <input type="radio" name="paymentOption" value="points" [(ngModel)]="selectedPaymentOption" />
-          <i class="fas fa-coins"></i> Pay with Points
+          <input type="radio" name="paymentOption" value="points"
+                 [(ngModel)]="selectedPaymentOption"/>
+          <i class="fas fa-coins"></i>
+          Pay with Points
         </label>
       </div>
 
@@ -123,8 +132,9 @@
         <button class="btn btn-primary" (click)="buy()">Buy</button>
       </div>
       <div class="payment-buttons" [hidden]="true">
-        <button class="btn-download" (click)="generatePDF()">Download/Print Receipt</button>
+        <button class="btn-download" (click)="generatePDF()"> Download/Print Receipt</button>
       </div>
+
     </div>
 
     <!-- Cart Table -->
@@ -144,39 +154,31 @@
           <tr *ngFor="let cartItem of cartItems">
             <td>
               <img
-                [src]="imageLocation + cartItem.item.imageUrl"
-                alt="Item Image"
+                [src]=" imageLocation + cartItem.item.imageUrl"
+                alt="{{ cartItem.item.name }}"
                 width="50"
               />
             </td>
-            <td>
-              <span>{{ getItemDisplayName(cartItem.item) }}</span>
-            </td>
+            <td>{{ cartItem.item.name }}</td>
             <td>
               <span *ngIf="selectedPaymentOption !== 'points'">
                 {{ cartItem.item.price | number: '1.2-2' }} €
               </span>
               <span *ngIf="selectedPaymentOption === 'points'">
-                {{ cartItem.item.points || 0 }} Points
+                {{ cartItem.item.points }} Points
               </span>
             </td>
             <td>
-              <ng-container *ngIf="!isTicket(cartItem.item); else quantityAsText">
-                <input
-                  type="number"
-                  [(ngModel)]="cartItem.quantity"
-                  (change)="updateQuantity(cartItem.item, cartItem.quantity)"
-                  min="1"
-                />
-              </ng-container>
-              <ng-template #quantityAsText>
-                <div class="quantity-text">{{ cartItem.quantity }}</div>
-              </ng-template>
+              <input
+                type="number"
+                [(ngModel)]="cartItem.quantity"
+                (change)="updateQuantity(cartItem.item, cartItem.quantity)"
+                min="1"
+              />
             </td>
             <td>
-              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)">
-                <i class="bi bi-trash"></i>
-              </button>
+              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)"><i
+                class="bi bi-trash"></i></button>
             </td>
           </tr>
           </tbody>
@@ -198,4 +200,93 @@
       </ng-template>
     </div>
   </div>
+</div>
+
+<!-- Hidden invoice html for creating the receipt -->
+
+<div class="invoice-div">
+  <!DOCTYPE html>
+  <html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechnung</title>
+  </head>
+  <body>
+  <div class="invoice-container">
+    <div class="invoice-header">
+      <h1>Rechnung</h1>
+      <div>
+        <p>Rechnungsdatum: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
+        <p>Rechnungsnummer: <strong>2024-001</strong></p>
+      </div>
+    </div>
+
+    <table class="invoice-details">
+      <tr>
+        <td>
+          <strong>Rechnungssteller:</strong> <br>
+          Ticketline- GmbH<br>
+          Wiedner Hautpstrasse 76/2/2<br>
+          1040 Wien <br>
+          E-Mail: info&#64;ticketline-website.at<br>
+          UID: ATU12345678
+        </td>
+        <td>
+          <strong>Rechnung an:</strong><br>
+          {{ userFirstName }} {{ userLastName }}<br>
+          {{ address.street }}<br>
+          {{ address.postalCode }} {{address.city}}<br>
+          E-Mail: {{ userEmail }} <br>
+          Zahlungsmethode: {{ selectedPaymentOption }}
+        </td>
+      </tr>
+    </table>
+
+    <table class="invoice-items">
+      <thead>
+      <tr>
+        <th>Beschreibung</th>
+        <th>Menge</th>
+        <th>Einzelpreis</th>
+        <th>Gesamtpreis</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (item of cartItems; track item) {
+          <tr>
+            <td>{{ item.item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.item.price }}</td>
+            <td>{{ item.item.price * item.quantity }} €</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <table class="invoice-footer">
+      <tr>
+        <td><strong>Gesamtbetrag:</strong></td>
+        <td><strong>{{ (getTotalPrice() / 120) * 100 | number: '1.2-2' }} €</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Umsatzsteuer (20%):</strong></td>
+        <td><strong>{{ ((getTotalPrice() / 120) * 100) * 0.2 | number: '1.2-2' }} €</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Gesamtbetrag inkl. USt:</strong></td>
+        <td><strong>{{ getTotalPrice()| number: '1.2-2' }} €</strong></td>
+      </tr>
+    </table>
+
+    <div class="invoice-bank">
+      <p>Vielen Dank für Ihren Einkauf bei Ticket-Line!</p>
+      <p>Bankverbindung: IBAN: AT08 1750 2024 8558 1234, BIC: BAWAATWW</p>
+    </div>
+
+  </div>
+  </body>
+  </html>
+
+
 </div>

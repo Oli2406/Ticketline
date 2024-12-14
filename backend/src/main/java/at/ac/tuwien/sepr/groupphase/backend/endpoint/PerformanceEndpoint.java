@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
@@ -23,12 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v1/performance")
+@RequestMapping(PerformanceEndpoint.BASE_PATH)
 public class PerformanceEndpoint {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public static final String BASE_PATH = "/api/v1/performance";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PerformanceService performanceService;
 
     public PerformanceEndpoint(PerformanceService performanceService) {
@@ -38,37 +41,62 @@ public class PerformanceEndpoint {
     @Secured("ROLE_ADMIN")
     @PutMapping
     public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
-        logger.info("Received request to create or update performance: {}", performanceCreateDto);
+        LOGGER.info("Received request to create or update performance: {}", performanceCreateDto);
         PerformanceDetailDto createdPerformance = performanceService.createPerformance(performanceCreateDto);
-        logger.debug("Performance created/updated successfully: {}", createdPerformance);
+        LOGGER.debug("Performance created/updated successfully: {}", createdPerformance);
         return ResponseEntity.ok(createdPerformance);
     }
 
     @PermitAll
     @GetMapping
     public ResponseEntity<List<PerformanceDetailDto>> getAllPerformances() {
-        logger.info("Fetching all performances");
+        LOGGER.info("Fetching all performances");
         List<PerformanceDetailDto> performances = performanceService.getAllPerformances();
-        logger.debug("Fetched {} performances: {}", performances.size(), performances);
+        LOGGER.debug("Fetched {} performances: {}", performances.size(), performances);
         return ResponseEntity.ok(performances);
     }
 
     @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<PerformanceDetailDto> getPerformanceById(@PathVariable Long id) {
-        logger.info("Fetching performance with ID: {}", id);
+        LOGGER.info("Fetching performance with ID: {}", id);
         PerformanceDetailDto performance = performanceService.getPerformanceById(id);
-        logger.debug("Fetched performance: {}", performance);
+        LOGGER.debug("Fetched performance: {}", performance);
         return ResponseEntity.ok(performance);
+    }
+
+    @PermitAll
+    @GetMapping("/event/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByEventId(@PathVariable Long id) {
+        LOGGER.info("Fetching performance by event id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByEventId(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/location/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByLocationId(@PathVariable Long id) {
+        LOGGER.info("Fetching performance by location id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByLocationId(id);
+        return ResponseEntity.ok(result);
     }
 
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerformance(@PathVariable Long id) {
-        logger.info("Deleting performance with ID: {}", id);
+        LOGGER.info("Deleting performance with ID: {}", id);
         performanceService.deletePerformance(id);
-        logger.debug("Performance with ID {} deleted successfully", id);
+        LOGGER.debug("Performance with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public ResponseEntity<Stream<PerformanceDetailDto>> search(PerformanceSearchDto dto) {
+        LOGGER.info("GET " + BASE_PATH);
+        LOGGER.debug("request parameters: {}", dto.toString());
+        Stream<PerformanceDetailDto> result = performanceService.search(dto);
+        return ResponseEntity.ok(result);
     }
 
     @PermitAll

@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @Service
 public class CustomEventService implements EventService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
@@ -36,7 +36,7 @@ public class CustomEventService implements EventService {
 
     @Override
     public EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
-        logger.info("Creating or updating event: {}", eventCreateDto);
+        LOGGER.info("Creating or updating event: {}", eventCreateDto);
         eventValidator.validateEvent(eventCreateDto);
         Event event = new Event(
             eventCreateDto.getTitle(),
@@ -47,38 +47,38 @@ public class CustomEventService implements EventService {
             eventCreateDto.getPerformanceIds()
         );
         event = eventRepository.save(event);
-        logger.debug("Saved event to database: {}", event);
+        LOGGER.debug("Saved event to database: {}", event);
         return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
     public List<EventDetailDto> getAllEvents() {
-        logger.info("Fetching all events");
+        LOGGER.info("Fetching all events");
         List<EventDetailDto> events = eventRepository.findAll().stream()
             .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo()))
             .collect(Collectors.toList());
-        logger.debug("Fetched {} events: {}", events.size(), events);
+        LOGGER.debug("Fetched {} events: {}", events.size(), events);
         return events;
     }
 
     @Override
     public EventDetailDto getEventById(Long id) {
-        logger.info("Fetching event with ID: {}", id);
+        LOGGER.info("Fetching event with ID: {}", id);
         Event event = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
-        logger.debug("Fetched event: {}", event);
+        LOGGER.debug("Fetched event: {}", event);
         return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
     public void deleteEvent(Long id) {
-        logger.info("Deleting event with ID: {}", id);
+        LOGGER.info("Deleting event with ID: {}", id);
         eventRepository.deleteById(id);
-        logger.debug("Deleted event with ID: {}", id);
+        LOGGER.debug("Deleted event with ID: {}", id);
     }
 
     @Override
     public Stream<EventDetailDto> search(EventSearchDto dto) {
-        logger.info("Searching artists with data: {}", dto);
+        LOGGER.info("Searching events with data: {}", dto);
         var query = eventRepository.findAll().stream();
         if (dto.getTitle() != null) {
             query = query.filter(event -> event.getTitle().toLowerCase().contains(dto.getTitle().toLowerCase()));
@@ -100,5 +100,14 @@ public class CustomEventService implements EventService {
         }*/
 
         return query.map(this.eventMapper::eventToEventDetailDto);
+    }
+
+    @Override
+    public List<EventDetailDto> getEventsByArtistId(Long id) {
+        LOGGER.info("Getting events with artistId: {}", id);
+        return eventRepository.findEventsByArtistId(id)
+            .stream()
+            .map(this.eventMapper::eventToEventDetailDto)
+            .collect(Collectors.toList());
     }
 }

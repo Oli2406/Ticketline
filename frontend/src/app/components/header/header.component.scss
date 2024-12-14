@@ -89,12 +89,12 @@ button.active {
 }
 
 .admin-button {
-  background: #FF4D4D;
+  background-color: #4D47C3;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   font-weight: 500;
-  color: #000000;
+  color: #fff;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, box-shadow 0.3s;
@@ -105,7 +105,8 @@ button.active {
 }
 
 .admin-button:hover {
-  background: #E57373;
+  background-color: #514dc7;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
 button.active {
@@ -114,6 +115,7 @@ button.active {
 
 .login-button:hover {
   background: #f1f1f1;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
 .signup-button {
@@ -129,17 +131,16 @@ button.active {
   background: #FFC107;
   color: #000000;
   border: none;
-  padding: 6px 12px;
-  font-size: 14px;
+  padding: 10px 20px;
+  font-size: 16px;
   font-weight: 500;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 16px;
+  width: 120px;
+  text-align: center;
+  margin-right: 8px; /* Ensure spacing from Logout */
 }
 
 .cart-button i {

@@ -54,19 +54,28 @@ public class ApplicationUser {
     @CollectionTable(name = "user_read_news", joinColumns = @JoinColumn(name = "user_id"))
     @Column
     private List<Long> readNewsIds = new ArrayList<>();
+    @Column(nullable = false)
+    private int numberOfRequestedResetTokens;
+    @Column(nullable = false)
+    private LocalDateTime latestRequestedResetTokenTime;
 
     public ApplicationUser() {
+        this.latestRequestedResetTokenTime = LocalDateTime.MIN;
     }
 
-    public ApplicationUser(String firstName, String lastName, String email,
-                           String password,
-                           Boolean admin, int points) {
+    public ApplicationUser(String firstName,
+        String lastName,
+        String email,
+        String password,
+        Boolean admin,
+        int points) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.admin = admin;
         this.points = points;
+        this.latestRequestedResetTokenTime = LocalDateTime.MIN;
     }
 
     public Long getId() {
@@ -103,10 +112,6 @@ public class ApplicationUser {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Boolean getAdmin() {
-        return admin;
     }
 
     public void setAdmin(Boolean admin) {
@@ -176,4 +181,25 @@ public class ApplicationUser {
     public void incrementPoints(int points) {
         points += this.points;
     }
+
+    public int getNumberOfRequestedResetTokens() {
+        return numberOfRequestedResetTokens;
+    }
+
+    public void setNumberOfRequestedResetTokens(int requestedResetTokens) {
+        this.numberOfRequestedResetTokens = requestedResetTokens;
+    }
+
+    public void incrementNumberOfRequestedResetTokens() {
+        this.numberOfRequestedResetTokens++;
+    }
+
+    public LocalDateTime getLatestRequestedResetTokenTime() {
+        return latestRequestedResetTokenTime;
+    }
+
+    public void setLatestRequestedResetTokenTime(LocalDateTime latestRequestedResetTokenTime) {
+        this.latestRequestedResetTokenTime = latestRequestedResetTokenTime;
+    }
+
 }

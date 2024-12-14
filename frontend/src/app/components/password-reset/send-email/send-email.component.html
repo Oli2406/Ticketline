@@ -1,0 +1,37 @@
+<div class="container-fluid d-flex flex-column">
+  <div class="row flex-grow-1 align-items-center justify-content-center">
+    <div class="col-md-6 text-center">
+      <h1 class="custom-heading">Reset your password</h1>
+    </div>
+    <div class="col-md-4 p-4">
+      <h2 class="mb-4">Please enter your email</h2>
+      <form [formGroup]="emailForm" (ngSubmit)="resetPassword()">
+        <!-- Enter Email Field -->
+        <div class="form-group">
+          <label for="inputEmail" class="custom-label fw-bold">Email</label>
+          <input
+              type="text"
+              id="inputEmail"
+              name="username"
+              class="form-control custom-input"
+              placeholder="Email"
+              formControlName="username"
+          />
+          <div *ngIf="submitted && emailForm.controls.username.errors" class="text-danger mt-1">
+            <small *ngIf="emailForm.controls.username.errors.required">
+              Your email is required!
+            </small>
+            <small *ngIf="emailForm.controls.username.errors.email">
+              Please enter a valid email address!
+            </small>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex flex-column align-items-center mt-4">
+          <button type="submit" class="btn btn-primary w-100 custom-button">Send email</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

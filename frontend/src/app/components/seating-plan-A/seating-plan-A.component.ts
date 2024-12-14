@@ -10,6 +10,7 @@ import { Location } from "../../dtos/location";
 import { TicketService } from 'src/app/services/ticket.service';
 import {forkJoin, map, Observable} from "rxjs";
 import { CartService } from "../../services/cart.service";
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-seating-plan-A',
@@ -54,10 +55,21 @@ export class SeatingPlanAComponent {
     private artistService: ArtistService,
     private ticketService: TicketService,
     private cartService: CartService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.performanceID = 1; // TODO: hardcoded performance ID !! fetch actual performance ID!!
+    this.route.queryParams.subscribe(params => {
+      const performanceId = +params['id'];
+      const hall = params['hall'];
+
+      if (performanceId) {
+        this.performanceID = performanceId;
+        this.getPerformanceDetails(performanceId);
+        this.loadTicketsByPerformance(performanceId);
+      }
+
+    });
     this.getPerformanceDetails(this.performanceID);
     this.loadTicketsByPerformance(this.performanceID);
   }

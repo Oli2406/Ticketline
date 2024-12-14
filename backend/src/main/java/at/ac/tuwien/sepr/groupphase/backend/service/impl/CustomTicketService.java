@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class CustomTicketService implements TicketService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final TicketRepository ticketRepository;
     private final TicketValidator ticketValidator;
 
@@ -31,7 +31,7 @@ public class CustomTicketService implements TicketService {
 
     @Override
     public TicketDetailDto createTicket(TicketCreateDto ticketCreateDto) throws ValidationException, ConflictException {
-        logger.info("Creating or updating ticket: {}", ticketCreateDto);
+        LOGGER.info("Creating or updating ticket: {}", ticketCreateDto);
 
         // Validierung der Ticketdaten
         ticketValidator.validateTicket(ticketCreateDto);
@@ -52,7 +52,7 @@ public class CustomTicketService implements TicketService {
         );
 
         ticket = ticketRepository.save(ticket);
-        logger.debug("Saved ticket to database: {}", ticket);
+        LOGGER.debug("Saved ticket to database: {}", ticket);
 
         // Rückgabe als TicketDetailDto
         return new TicketDetailDto(
@@ -73,7 +73,7 @@ public class CustomTicketService implements TicketService {
 
     @Override
     public List<TicketDetailDto> getAllTickets() {
-        logger.info("Fetching all tickets");
+        LOGGER.info("Fetching all tickets");
 
         // Alle Tickets abrufen und als DTOs zurückgeben
         List<TicketDetailDto> tickets = ticketRepository.findAll().stream()
@@ -93,17 +93,17 @@ public class CustomTicketService implements TicketService {
             ))
             .collect(Collectors.toList());
 
-        logger.debug("Fetched {} tickets: {}", tickets.size(), tickets);
+        LOGGER.debug("Fetched {} tickets: {}", tickets.size(), tickets);
         return tickets;
     }
 
     @Override
     public TicketDetailDto getTicketById(Long id) {
-        logger.info("Fetching ticket with ID: {}", id);
+        LOGGER.info("Fetching ticket with ID: {}", id);
 
         // Ticket anhand der ID abrufen
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
-        logger.debug("Fetched ticket: {}", ticket);
+        LOGGER.debug("Fetched ticket: {}", ticket);
 
         // Rückgabe als TicketDetailDto
         return new TicketDetailDto(
@@ -124,7 +124,7 @@ public class CustomTicketService implements TicketService {
 
     @Override
     public List<TicketDetailDto> getTicketsByPerformanceId(Long performanceId) {
-        logger.info("Fetching tickets for performance ID: {}", performanceId);
+        LOGGER.info("Fetching tickets for performance ID: {}", performanceId);
 
         // Tickets anhand der Performance-ID abrufen
         List<TicketDetailDto> tickets = ticketRepository.findByPerformanceId(performanceId).stream()
@@ -144,19 +144,19 @@ public class CustomTicketService implements TicketService {
             ))
             .collect(Collectors.toList());
 
-        logger.debug("Fetched {} tickets for performance ID {}: {}", tickets.size(), performanceId, tickets);
+        LOGGER.debug("Fetched {} tickets for performance ID {}: {}", tickets.size(), performanceId, tickets);
         return tickets;
     }
 
     @Override
     public TicketDetailDto updateTicket(Long ticketId, TicketCreateDto ticketCreateDto) throws ValidationException, ConflictException {
-        logger.info("Updating ticket with ID: {}", ticketId);
+        LOGGER.info("Updating ticket with ID: {}", ticketId);
 
         ticketValidator.validateTicket(ticketCreateDto);
 
         Ticket existingTicket = ticketRepository.findById(ticketId)
             .orElseThrow(() -> {
-                logger.error("Ticket not found with ID: {}", ticketId);
+                LOGGER.error("Ticket not found with ID: {}", ticketId);
                 return new IllegalArgumentException("Ticket not found with ID: " + ticketId);
             });
 
@@ -175,7 +175,7 @@ public class CustomTicketService implements TicketService {
 
         // Save the updated ticket
         Ticket savedTicket = ticketRepository.save(existingTicket);
-        logger.debug("Updated ticket saved to database: {}", savedTicket);
+        LOGGER.debug("Updated ticket saved to database: {}", savedTicket);
 
         // Return the updated ticket as a DTO
         TicketDetailDto ticketDetailDto = new TicketDetailDto(
@@ -193,16 +193,16 @@ public class CustomTicketService implements TicketService {
             savedTicket.getDate()
         );
 
-        logger.info("Returning updated ticket DTO: {}", ticketDetailDto);
+        LOGGER.info("Returning updated ticket DTO: {}", ticketDetailDto);
         return ticketDetailDto;
     }
 
     @Override
     public void deleteTicket(Long id) {
-        logger.info("Deleting ticket with ID: {}", id);
+        LOGGER.info("Deleting ticket with ID: {}", id);
 
         // Ticket löschen
         ticketRepository.deleteById(id);
-        logger.debug("Deleted ticket with ID: {}", id);
+        LOGGER.debug("Deleted ticket with ID: {}", id);
     }
 }

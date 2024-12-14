@@ -1,17 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { CartService } from '../../services/cart.service';
-import { Merchandise } from "../../dtos/merchandise";
-import { TicketDto } from "../../dtos/ticket";
-import { PerformanceListDto } from "../../dtos/performance";
-import { FormsModule } from "@angular/forms";
-import { CommonModule, DecimalPipe, NgOptimizedImage } from "@angular/common";
-import { AuthService } from "../../services/auth.service";
-import { ToastrService } from "ngx-toastr";
-import { Router } from "@angular/router";
-import { Globals } from "../../global/globals";
-import { ReceiptService } from "../../services/receipt.service";
-import { HttpErrorResponse } from "@angular/common/http";
-import { PerformanceService } from 'src/app/services/performance.service';
+import {Component, OnInit} from '@angular/core';
+import {CartService} from '../../services/cart.service';
+import {Merchandise} from "../../dtos/merchandise";
+import {FormsModule} from "@angular/forms";
+import {CommonModule, DecimalPipe, NgOptimizedImage} from "@angular/common";
+import {AuthService} from "../../services/auth.service";
+import {ToastrService} from "ngx-toastr";
+import {Router} from "@angular/router";
+import {Globals} from "../../global/globals";
+import {ReceiptService} from "../../services/receipt.service";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-cart',
@@ -26,13 +23,14 @@ import { PerformanceService } from 'src/app/services/performance.service';
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
-  cartItems: { item: Merchandise | TicketDto; quantity: number }[] = [];
+  cartItems: { item: Merchandise; quantity: number }[] = [];
   userFirstName: string;
   userLastName: string;
   userEmail: string;
 
-  selectedPaymentOption: string = 'creditCard';
+  selectedPaymentOption: string = 'creditCard'
   protected accountPoints: number;
+
 
   imageLocation: string = this.global.backendRessourceUri + '/merchandise/';
 
@@ -48,10 +46,6 @@ export class CartComponent implements OnInit {
     bankAccount: '',
   };
 
-  performanceDetails: PerformanceListDto = null;
-  performanceCache: { [id: number]: string } = {};
-  isLoading: boolean = false;
-
   get showPaymentDetails(): boolean {
     return this.selectedPaymentOption !== 'points';
   }
@@ -60,7 +54,6 @@ export class CartComponent implements OnInit {
               private authService: AuthService,
               private toastr: ToastrService,
               private receiptService: ReceiptService,
-              private performanceService: PerformanceService,
               private router: Router,
               private global: Globals) {
   }
@@ -69,8 +62,7 @@ export class CartComponent implements OnInit {
     this.cartItems = this.cartService.getCart();
     this.fetchAccountPoints();
     this.fetchUser();
-    this.fetchAllPerformanceNames();
-    this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
+    this.imageLocation = this.global.backendRessourceUri + '/merchandise/'
   }
 
   fetchAccountPoints(): void {
@@ -90,40 +82,14 @@ export class CartComponent implements OnInit {
   fetchUser(): void {
     this.userFirstName = this.authService.getUserFirstNameFromToken();
     this.userLastName = this.authService.getUserLastNameFromToken();
-    this.userEmail = this.authService.getUserEmailFromToken();
+    this.userEmail = this.authService.getUserEmailFromToken()
   }
 
-  private fetchAllPerformanceNames(): void {
-    const performanceIds = new Set(
-      this.cartItems
-        .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
-        .filter((id) => id !== null)
-    );
-
-    const fetchRequests = Array.from(performanceIds).map((id) =>
-      this.performanceService.getPerformanceById(id).toPromise()
-    );
-
-    Promise.all(fetchRequests)
-      .then((performances) => {
-        performances.forEach((performance) => {
-          this.performanceCache[performance.performanceId] = performance.name;
-        });
-      })
-      .catch((error) => {
-        console.error('Error fetching performances:', error);
-        this.toastr.error('Failed to load performance names.');
-      })
-      .finally(() => {
-        this.isLoading = false;
-      });
-  }
-
-  updateQuantity(item: Merchandise | TicketDto, quantity: number): void {
+  updateQuantity(item: Merchandise, quantity: number): void {
     this.cartService.updateCartItem(item, quantity);
   }
 
-  removeFromCart(item: Merchandise | TicketDto): void {
+  removeFromCart(item: Merchandise): void {
     this.cartService.removeFromCart(item);
     this.cartItems = this.cartService.getCart();
   }
@@ -133,7 +99,7 @@ export class CartComponent implements OnInit {
   }
 
   getTotalPoints(): number {
-    return this.cartItems.reduce((sum, cartItem) => sum + ('points' in cartItem.item ? cartItem.item.points : 0) * cartItem.quantity, 0);
+    return this.cartItems.reduce((sum, cartItem) => sum + cartItem.item.points * cartItem.quantity, 0);
   }
 
   formatCreditCardNumber(event: Event): void {
@@ -148,29 +114,13 @@ export class CartComponent implements OnInit {
     this.paymentDetails.bankAccount = input.value;
   }
 
-  public generatePDF(): void {
+  public generatePDF() {
     this.receiptService.exportToPDF();
   }
 
-  public setInvoiceDate(): Date {
+  public setInvoiceDate() {
     return new Date();
   }
-
-  getItemDisplayName(item: Merchandise | TicketDto): string {
-    if ('name' in item && item.name) {
-      return item.name;
-    } else if ('performanceId' in item) {
-      const performanceId = item.performanceId;
-      const performanceName = this.performanceCache[performanceId];
-      return performanceName ? `Ticket for ${performanceName}` : 'Loading...';
-    }
-    return 'Unknown Item';
-  }
-
-  isTicket(item: Merchandise | TicketDto): boolean {
-    return 'performanceId' in item;
-  }
-
 
   async buy(): Promise<void> {
     if (!this.selectedPaymentOption) {
@@ -199,17 +149,16 @@ export class CartComponent implements OnInit {
       this.toastr.error('Your cart is empty.');
       return;
     }
-
     try {
       const purchasePayload = this.cartItems.map(cartItem => ({
-        itemId: 'merchandiseId' in cartItem.item ? cartItem.item.merchandiseId : cartItem.item.ticketId,
+        itemId: cartItem.item.merchandiseId,
         quantity: cartItem.quantity,
       }));
-
       await this.cartService.purchaseItems(purchasePayload);
       this.toastr.success('Thank you for your purchase.');
       this.cartService.deductPoints(this.getTotalPoints());
       this.cartService.clearCart();
+      this.receiptService.exportToPDF();
       await this.router.navigate(['merchandise']);
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 409) {
@@ -220,4 +169,6 @@ export class CartComponent implements OnInit {
       }
     }
   }
+
 }
+
