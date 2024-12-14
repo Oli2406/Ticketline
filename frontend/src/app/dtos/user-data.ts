@@ -12,3 +12,9 @@ export interface UserUpdateReadNewsDto {
   newsId: number;
   email: string;
 }
+
+export interface UserResetPasswordDto {
+  tokenToResetPassword: string;
+  newPassword: string;
+  newConfirmedPassword: string;
+}

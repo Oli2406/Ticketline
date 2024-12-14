@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,25 @@ public class AuthTokenEndpoint {
             return ResponseEntity.ok(false);
         }
     }
+
+    @PermitAll
+    @GetMapping("/validate-reset-token")
+    public ResponseEntity<Boolean> validateResetToken(
+        @RequestHeader("Authorization") String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                String jwt = token.substring(7);
+                Claims claims = jwtTokenizer.getClaims(jwt);
+                boolean isValid = "reset_password".equals(claims.get("purpose"))
+                    && !jwtTokenizer.isTokenBlocked(jwt);
+                return ResponseEntity.ok(isValid);
+            }
+            return ResponseEntity.ok(false);
+        } catch (JwtException e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+
 }
 
 
