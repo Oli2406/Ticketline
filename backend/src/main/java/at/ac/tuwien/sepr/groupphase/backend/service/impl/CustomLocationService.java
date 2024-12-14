@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 @Service
 public class CustomLocationService implements LocationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final LocationRepository locationRepository;
     private final LocationValidator locationValidator;
     private final LocationMapper locationMapper;
@@ -39,7 +39,7 @@ public class CustomLocationService implements LocationService {
 
     @Override
     public LocationDetailDto createLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
-        logger.info("Creating or updating location: {}", locationCreateDto);
+        LOGGER.info("Creating or updating location: {}", locationCreateDto);
         locationValidator.validateLocation(locationCreateDto);
         Location location = new Location(
             locationCreateDto.getName(),
@@ -49,38 +49,38 @@ public class CustomLocationService implements LocationService {
             locationCreateDto.getCountry()
         );
         location = locationRepository.save(location);
-        logger.debug("Saved location to database: {}", location);
+        LOGGER.debug("Saved location to database: {}", location);
         return new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry());
     }
 
     @Override
     public List<LocationDetailDto> getAllLocations() {
-        logger.info("Fetching all locations");
+        LOGGER.info("Fetching all locations");
         List<LocationDetailDto> locations = locationRepository.findAll().stream()
             .map(location -> new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry()))
             .collect(Collectors.toList());
-        logger.debug("Fetched {} locations: {}", locations.size(), locations);
+        LOGGER.debug("Fetched {} locations: {}", locations.size(), locations);
         return locations;
     }
 
     @Override
     public LocationDetailDto getLocationById(Long id) {
-        logger.info("Fetching location with ID: {}", id);
+        LOGGER.info("Fetching location with ID: {}", id);
         Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found"));
-        logger.debug("Fetched location: {}", location);
+        LOGGER.debug("Fetched location: {}", location);
         return new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry());
     }
 
     @Override
     public void deleteLocation(Long id) {
-        logger.info("Deleting location with ID: {}", id);
+        LOGGER.info("Deleting location with ID: {}", id);
         locationRepository.deleteById(id);
-        logger.debug("Deleted location with ID: {}", id);
+        LOGGER.debug("Deleted location with ID: {}", id);
     }
 
     @Override
     public Stream<LocationDetailDto> search(LocationSearchDto dto) {
-        logger.info("Searching artists with data: {}", dto);
+        LOGGER.info("Searching artists with data: {}", dto);
         var query = locationRepository.findAll().stream();
         if (dto.getName() != null) {
             query = query.filter(location -> location.getName().toLowerCase().contains(dto.getName().toLowerCase()));

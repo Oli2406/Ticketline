@@ -15,12 +15,7 @@ import java.util.List;
 @Component
 public class NewsValidator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final NewsRepository newsRepository;
-
-    public NewsValidator(NewsRepository newsRepository) {
-        this.newsRepository = newsRepository;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     /**
      * Method for validating a NewsCreateMpfDto.
@@ -28,7 +23,7 @@ public class NewsValidator {
      * @param news - dto for validation
      */
     public void validateNews(NewsCreateMpfDto news) throws ValidationException {
-        LOG.info("validateNews({})", news);
+        LOGGER.info("validateNews({})", news);
         List<String> validationErrors = new ArrayList<>();
 
         if (news.getTitle() == null || news.getTitle().isEmpty()) {
@@ -50,7 +45,7 @@ public class NewsValidator {
         }
 
         if (!validationErrors.isEmpty()) {
-            LOG.warn("News validation failed with errors: {}", validationErrors);
+            LOGGER.warn("News validation failed with errors: {}", validationErrors);
             throw new ValidationException("Validation Exception: ", validationErrors);
         }
     }

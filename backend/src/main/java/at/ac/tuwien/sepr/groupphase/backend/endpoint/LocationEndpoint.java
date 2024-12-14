@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class LocationEndpoint {
 
     public static final String BASE_PATH = "/api/v1/location";
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final LocationService locationService;
 
     public LocationEndpoint(LocationService locationService) {
@@ -41,35 +41,35 @@ public class LocationEndpoint {
     @Secured("ROLE_ADMIN")
     @PutMapping
     public ResponseEntity<LocationDetailDto> createOrUpdateLocation(@RequestBody LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
-        logger.info("Received request to create or update location: {}", locationCreateDto);
+        LOGGER.info("Received request to create or update location: {}", locationCreateDto);
         LocationDetailDto createdLocation = locationService.createLocation(locationCreateDto);
-        logger.debug("Location created/updated successfully: {}", createdLocation);
+        LOGGER.debug("Location created/updated successfully: {}", createdLocation);
         return ResponseEntity.ok(createdLocation);
     }
 
     @PermitAll
     @GetMapping
     public ResponseEntity<List<LocationDetailDto>> getAllLocations() {
-        logger.info("Fetching all locations");
+        LOGGER.info("Fetching all locations");
         List<LocationDetailDto> locations = locationService.getAllLocations();
-        logger.debug("Fetched {} locations: {}", locations.size(), locations);
+        LOGGER.debug("Fetched {} locations: {}", locations.size(), locations);
         return ResponseEntity.ok(locations);
     }
 
     @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<LocationDetailDto> getLocationById(@PathVariable Long id) {
-        logger.info("Fetching location with ID: {}", id);
+        LOGGER.info("Fetching location with ID: {}", id);
         LocationDetailDto location = locationService.getLocationById(id);
-        logger.debug("Fetched location: {}", location);
+        LOGGER.debug("Fetched location: {}", location);
         return ResponseEntity.ok(location);
     }
 
     @PermitAll
     @GetMapping("/search")
     public ResponseEntity<Stream<LocationDetailDto>> search(LocationSearchDto dto) {
-        logger.info("GET " + BASE_PATH);
-        logger.debug("request parameters: {}", dto.toString());
+        LOGGER.info("GET " + BASE_PATH);
+        LOGGER.debug("request parameters: {}", dto.toString());
         Stream<LocationDetailDto> result = locationService.search(dto);
         return ResponseEntity.ok(result);
     }
@@ -77,9 +77,9 @@ public class LocationEndpoint {
     @Secured("ROLE_ADMIN")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
-        logger.info("Deleting location with ID: {}", id);
+        LOGGER.info("Deleting location with ID: {}", id);
         locationService.deleteLocation(id);
-        logger.debug("Location with ID {} deleted successfully", id);
+        LOGGER.debug("Location with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
     }
 }
