@@ -420,20 +420,23 @@ export class EventCreateComponent implements OnInit {
   }
 
   onSubmit() {
-    const purchase1: Purchase = {
-      userId: 1,
-      ticketIds: [1, 2, 3],
-      merchandiseIds: [1, 2],
-      totalPrice: 250,
-      purchaseDate: new Date(),
-    };
-    // Call the backend API for purchase creation
-    this.purchaseService.createPurchase(purchase1).subscribe({
-      next: (response) => {
-        console.log('Purchase 1 created successfully:', response);
+    this.eventService.createEvent(this.eventData).subscribe({
+      next: (event: Event) => {
+        this.toastr.success('Event created successfully!', 'Success');
+        this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+        this.performances = [];
       },
-      error: (error) => {
-        console.error('Error creating Purchase 1:', error);
+      error: (err) => {
+        console.error('Error during registration:', err.message);
+        const errors = Array.isArray(err.message)
+          ? err.message
+          : err.message.split(/\n/);
+        const errorList = errors
+          .map((error) => `<li>${error.trim()}</li>`)
+          .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
+          enableHtml: true,
+        });
       },
     });
   }
