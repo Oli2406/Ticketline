@@ -249,8 +249,9 @@
 </div>
 
 <!-- Search Results for events -->
+<p *ngIf="curSearchType === SearchType.event && events.length === 0">No events were found.</p>
 <table
-  *ngIf="curSearchType === SearchType.event"
+  *ngIf="curSearchType === SearchType.event && events.length > 0"
   class="table table-hover text-center mt-3">
   <thead class="th-purp">
   <tr>
@@ -279,7 +280,9 @@
 </table>
 
 <!-- Search Results for artist -->
-<table *ngIf="curSearchType === SearchType.artist" class="table table-hover text-center mt-3">
+<p *ngIf="curSearchType === SearchType.artist && artists.length === 0">No artists were found.</p>
+
+<table *ngIf="curSearchType === SearchType.artist && artists.length > 0" class="table table-hover text-center mt-3">
   <thead class="th-purp">
   <tr>
     <th>First Name</th>
@@ -301,7 +304,9 @@
 </table>
 
 <!-- Search Results for location -->
-<table *ngIf="curSearchType === SearchType.location" class="table table-hover text-center mt-3">
+<p *ngIf="curSearchType === SearchType.location && locations.length === 0">No locations were found.</p>
+
+<table *ngIf="curSearchType === SearchType.location && locations.length > 0" class="table table-hover text-center mt-3">
   <thead class="th-purp">
   <tr>
     <th>Name</th>
@@ -369,7 +374,9 @@
 
 
 <!-- Search Results for performance -->
-<table *ngIf="curSearchType === SearchType.performance" class="table table-hover text-center mt-3">
+<p *ngIf="curSearchType === SearchType.performance && performances.length === 0">No performances were found.</p>
+
+<table *ngIf="curSearchType === SearchType.performance && performances.length > 0" class="table table-hover text-center mt-3">
   <thead class="th-purp">
   <tr>
     <th>Name</th>
