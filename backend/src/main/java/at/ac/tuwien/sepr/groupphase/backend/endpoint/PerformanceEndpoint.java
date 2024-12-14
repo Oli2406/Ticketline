@@ -1,7 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
@@ -65,6 +63,22 @@ public class PerformanceEndpoint {
         PerformanceDetailDto performance = performanceService.getPerformanceById(id);
         logger.debug("Fetched performance: {}", performance);
         return ResponseEntity.ok(performance);
+    }
+
+    @PermitAll
+    @GetMapping("/event/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByEventId(@PathVariable Long id) {
+        logger.info("Fetching performance by event id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByEventId(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/location/{id}")
+    public ResponseEntity<List<PerformanceDetailDto>> getByLocationId(@PathVariable Long id) {
+        logger.info("Fetching performance by location id: {}", id);
+        List<PerformanceDetailDto> result = performanceService.getByLocationId(id);
+        return ResponseEntity.ok(result);
     }
 
     @Secured("ROLE_ADMIN")

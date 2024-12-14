@@ -19,6 +19,10 @@ export class EventService {
     );
   }
 
+  getById(id: number): Observable<EventListDto> {
+    return this.http.get<EventListDto>(`${(this.apiUrl)}/${id}`);
+  }
+
   get(): Observable<EventListDto[]> {
     return this.http.get<EventListDto[]>(this.apiUrl).pipe(
       catchError(this.handleError)
@@ -47,6 +51,10 @@ export class EventService {
     }*/
 
     return this.http.get<EventListDto[]>(this.apiUrl + "/search", {params});
+  }
+
+  getEventsByArtistId(id: number): Observable<EventListDto[]> {
+    return this.http.get<EventListDto[]>(`${(this.apiUrl)}/artist/${id}`);
   }
 
   public handleError(error: HttpErrorResponse): Observable<never> {

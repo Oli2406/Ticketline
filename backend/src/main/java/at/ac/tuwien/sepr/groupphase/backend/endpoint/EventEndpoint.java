@@ -1,7 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
@@ -81,5 +79,13 @@ public class EventEndpoint {
         eventService.deleteEvent(id);
         logger.debug("Event with ID {} deleted successfully", id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/artist/{id}")
+    public ResponseEntity<List<EventDetailDto>> getEventsByArtistId(@PathVariable Long id) {
+        logger.info("Fetching events containing performances with artistId: {}", id);
+        List<EventDetailDto> result = eventService.getEventsByArtistId(id);
+        return ResponseEntity.ok(result);
     }
 }

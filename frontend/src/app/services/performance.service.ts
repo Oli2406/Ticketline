@@ -18,8 +18,16 @@ export class PerformanceService {
 
   constructor(private http: HttpClient, private globals: Globals) {}
 
-  getPerformances(): Observable<PerformanceListDto[]> {
+  get(): Observable<PerformanceListDto[]> {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
+  }
+
+  getByEventId(id: number): Observable<PerformanceDetailDto[]> {
+    return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/event/${id}`);
+  }
+
+  getByLocationId(id: number):Observable<PerformanceDetailDto[]> {
+    return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/location/${id}`);
   }
 
   getAllByFilter(filter: PerformanceSearch): Observable<PerformanceDetailDto[]> {

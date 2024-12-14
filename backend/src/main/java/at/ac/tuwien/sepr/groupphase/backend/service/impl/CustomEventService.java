@@ -78,7 +78,7 @@ public class CustomEventService implements EventService {
 
     @Override
     public Stream<EventDetailDto> search(EventSearchDto dto) {
-        logger.info("Searching artists with data: {}", dto);
+        logger.info("Searching events with data: {}", dto);
         var query = eventRepository.findAll().stream();
         if (dto.getTitle() != null) {
             query = query.filter(event -> event.getTitle().toLowerCase().contains(dto.getTitle().toLowerCase()));
@@ -100,5 +100,14 @@ public class CustomEventService implements EventService {
         }*/
 
         return query.map(this.eventMapper::eventToEventDetailDto);
+    }
+
+    @Override
+    public List<EventDetailDto> getEventsByArtistId(Long id) {
+        logger.info("Getting events with artistId: {}", id);
+        return eventRepository.findEventsByArtistId(id)
+            .stream()
+            .map(this.eventMapper::eventToEventDetailDto)
+            .collect(Collectors.toList());
     }
 }

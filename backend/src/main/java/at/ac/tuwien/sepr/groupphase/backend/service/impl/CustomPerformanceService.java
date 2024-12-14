@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.PerformanceMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
@@ -35,14 +36,16 @@ public class CustomPerformanceService implements PerformanceService {
     private final SearchPerformanceRepository searchPerformanceRepository;
     private final ArtistRepository artistRepository;
     private final LocationRepository locationRepository;
+    private final PerformanceMapper performanceMapper;
 
     public CustomPerformanceService(PerformanceRepository performanceRepository, PerformanceValidator performanceValidator, SearchPerformanceRepository searchPerformanceRepository,
-                                    ArtistRepository artistRepository, LocationRepository locationRepository) {
+                                    ArtistRepository artistRepository, LocationRepository locationRepository, PerformanceMapper performanceMapper) {
         this.performanceRepository = performanceRepository;
         this.performanceValidator = performanceValidator;
         this.searchPerformanceRepository = searchPerformanceRepository;
         this.artistRepository = artistRepository;
         this.locationRepository = locationRepository;
+        this.performanceMapper = performanceMapper;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class CustomPerformanceService implements PerformanceService {
 
     @Override
     public Stream<PerformanceDetailDto> search(PerformanceSearchDto dto) {
-        logger.info("Searching artists with data: {}", dto);
+        logger.info("Searching performances with data: {}", dto);
         var query = performanceRepository.findAll().stream();
 
         if (dto.getDate() != null) {
@@ -129,18 +132,38 @@ public class CustomPerformanceService implements PerformanceService {
             query = query.filter(performance -> performance.getHall().toLowerCase().contains(dto.getHall().toLowerCase()));
         }
 
-        return query.map(performance -> new PerformanceDetailDto(
-            performance.getPerformanceId(),
-            performance.getName(),
-            performance.getArtistId(),
-            performance.getLocationId(),
-            performance.getDate(),
-            performance.getPrice(),
-            performance.getTicketNumber(),
-            performance.getHall(),
-            artistRepository.findArtistByArtistId(performance.getArtistId()),
-            locationRepository.findByLocationId(performance.getLocationId()),
-            performance.getDuration()
-        ));
+        return query.map(performance -> {
+            Artist artist = artistRepository.findArtistByArtistId(performance.getArtistId());
+            Location location = locationRepository.findByLocationId(performance.getLocationId());
+            return performanceMapper.toPerformanceDetailDto(performance, artist, location);
+        });
+    }
+
+    @Override
+    public List<PerformanceDetailDto> getByEventId(Long id) {
+        logger.info("Getting performances by event id: {}", id);
+        List<Performance> result = performanceRepository.findByEventId(id);
+
+        return result.stream()
+            .map(performance -> {
+                Artist artist = artistRepository.findArtistByArtistId(performance.getArtistId());
+                Location location = locationRepository.findByLocationId(performance.getLocationId());
+                return performanceMapper.toPerformanceDetailDto(performance, artist, location);
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PerformanceDetailDto> getByLocationId(Long id) {
+        logger.info("Getting performances by location id: {}", id);
+        List<Performance> result = performanceRepository.findByLocationId(id);
+
+        return result.stream()
+            .map(performance -> {
+                Artist artist = artistRepository.findArtistByArtistId(performance.getArtistId());
+                Location location = locationRepository.findByLocationId(performance.getLocationId());
+                return performanceMapper.toPerformanceDetailDto(performance, artist, location);
+            })
+            .collect(Collectors.toList());
     }
 }
