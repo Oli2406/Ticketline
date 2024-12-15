@@ -80,7 +80,7 @@ export class EventCreateComponent implements OnInit {
         console.log("Date To:", this.eventData.dateTo);
       },
       onReady: (selectedDates, dateStr, instance) => {
-        this.flatpickrInstance = instance; // Speichere die Instanz
+        this.flatpickrInstance = instance;
       }
     });
   }
@@ -233,7 +233,6 @@ export class EventCreateComponent implements OnInit {
     const tickets: Ticket[] = [];
 
     if (hall === 'A') {
-      // Sitzplätze in Sektor B
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -252,7 +251,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -303,7 +301,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     } else if (hall === 'B') {
-      // Sitzplätze in Sektor B (3 x 14)
       for (let row = 1; row <= 3; row++) {
         for (let seat = 1; seat <= 14; seat++) {
           tickets.push({
@@ -322,9 +319,8 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C (Reihe 1: 15 Sitze, Reihe 2: 16 Sitze, ... Reihe 9: 23 Sitze)
       for (let row = 1; row <= 9; row++) {
-        let seatsInRow = 14 + row; // Reihe 1 hat 15 Sitze, Reihe 2 hat 16 Sitze, usw.
+        let seatsInRow = 14 + row;
         for (let seat = 1; seat <= seatsInRow; seat++) {
           tickets.push({
             rowNumber: row,
@@ -342,7 +338,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Standing tickets (Standard: 80)
       for (let i = 1; i <= 80; i++) {
         tickets.push({
           rowNumber: 0,
@@ -359,7 +354,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
 
-      // Standing tickets (VIP: 60)
       for (let i = 1; i <= 60; i++) {
         tickets.push({
           rowNumber: 0,
@@ -376,8 +370,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     }
-
-    // Add logic for other halls (if needed)
     this.createTicketsInBackend(tickets);
   }
 
