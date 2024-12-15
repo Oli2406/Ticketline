@@ -104,9 +104,24 @@ button.active {
   margin-right: 8px; /* Ensure spacing from Logout */
 }
 
-.admin-button:hover {
+.admin-button:hover, .my-account-button:hover {
   background-color: #514dc7;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.my-account-button{
+  background-color: #4D47C3;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  margin-right: 8px; /* Ensure spacing from Logout */
 }
 
 button.active {
@@ -167,7 +182,7 @@ button.active {
     font-size: 16px;
   }
 
-  .login-button, .signup-button, .admin-button, .cart-button {
+  .login-button, .signup-button, .admin-button, .cart-button, .my-account-button {
     padding: 8px 16px;
     font-size: 14px;
   }
@@ -182,7 +197,7 @@ button.active {
     justify-content: flex-end;
   }
 
-  .login-button, .signup-button, .admin-button, .cart-button {
+  .login-button, .signup-button, .admin-button, .cart-button, .my-account-button {
     font-size: 12px;
     padding: 6px 12px;
   }
