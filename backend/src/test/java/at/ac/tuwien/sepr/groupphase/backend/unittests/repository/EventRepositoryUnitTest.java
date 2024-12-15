@@ -2,9 +2,11 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,9 +34,15 @@ class EventRepositoryUnitTest {
     @Autowired
     private ArtistRepository artistRepository;
 
+    @Autowired
+    private LocationRepository locationRepository;
+
     private Artist artist;
     private Performance performance;
+    private Performance performance2;
     private Event event;
+    private Location location;
+
 
     private Event testEvent;
 
@@ -43,16 +51,14 @@ class EventRepositoryUnitTest {
         artist = new Artist("John", "Doe", "JDArtist");
         artist = artistRepository.save(artist);
 
-        // Create and save a performance for the artist
-        performance = new Performance();
-        performance.setName("Concert A");
-        performance.setArtist(artist);
-        performance.setDate(LocalDateTime.now().plusDays(1));
-        performance.setPrice(BigDecimal.valueOf(50));
-        performance.setHall("Main Hall");
-        performance.setTicketNumber(100L);
-        performance.setDuration(120);
+        location = new Location("Location Name", "Some Street", "Vienna", "1010", "Austria");
+        location = locationRepository.save(location);
+
+        performance = new Performance("Concert A", artist.getArtistId(), location.getLocationId(), LocalDateTime.now().plusDays(1), BigDecimal.valueOf(50), 100L, "Main Hall", artist, location, 120);
         performance = performanceRepository.save(performance);
+
+        performance2 = new Performance("Concert B", artist.getArtistId(), location.getLocationId(), LocalDateTime.now().plusDays(2), BigDecimal.valueOf(60), 120L, "Small Hall", artist, location, 90);
+        performance2 = performanceRepository.save(performance2);
 
         event = new Event();
         event.setTitle("Event 1");
@@ -123,6 +129,42 @@ class EventRepositoryUnitTest {
 
         assertThat(events).isNotNull();
         assertThat(events).isEmpty();
+    }
+
+    @Test
+    void findByEventId_returnsPerformancesForEventId() {
+        List<Performance> performances = performanceRepository.findByEventId(event.getEventId());
+
+        assertThat(performances).isNotNull();
+        assertThat(performances).hasSize(1);
+        assertThat(performances.getFirst().getPerformanceId()).isEqualTo(performance.getPerformanceId());
+    }
+
+    @Test
+    void findByEventId_returnsEmptyListWhenNoPerformancesFound() {
+        Long nonExistingEventId = 999L;
+        List<Performance> performances = performanceRepository.findByEventId(nonExistingEventId);
+
+        assertThat(performances).isNotNull();
+        assertThat(performances).isEmpty();
+    }
+
+    @Test
+    void findByLocationId_returnsPerformancesForLocationId() {
+        List<Performance> performances = performanceRepository.findByLocationId(location.getLocationId());
+
+        assertThat(performances).isNotNull();
+        assertThat(performances).hasSize(2);
+        assertThat(performances).contains(performance, performance2);
+    }
+
+    @Test
+    void findByLocationId_returnsEmptyListWhenNoPerformancesFound() {
+        Long nonExistingLocationId = 999L;
+        List<Performance> performances = performanceRepository.findByLocationId(nonExistingLocationId);
+
+        assertThat(performances).isNotNull();
+        assertThat(performances).isEmpty();
     }
 }
 
