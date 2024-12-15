@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 @Component
@@ -54,11 +55,9 @@ public class TicketDataGenerator {
 
     private void createTicketsForPerformance(Performance performance) {
         String hall = performance.getHall();
-        int ticketCount = getTicketCountByHall(hall);
-
         List<Ticket> tickets = new ArrayList<>();
 
-        if (hall.equals("A")) {
+        if ("A".equals(hall)) {
             for (int row = 1; row <= 12; row++) {
                 for (int seat = 1; seat <= 20; seat++) {
                     tickets.add(new Ticket(
@@ -126,7 +125,7 @@ public class TicketDataGenerator {
                     performance.getDate()
                 ));
             }
-        } else if (hall.equals("B")) {
+        } else if ("B".equals(hall)) {
             for (int row = 1; row <= 3; row++) {
                 for (int seat = 1; seat <= 14; seat++) {
                     tickets.add(new Ticket(
@@ -145,8 +144,8 @@ public class TicketDataGenerator {
                 }
             }
 
-            for (int row = 4; row <= 9; row++) {
-                int seatsInRow = 14 + (row - 3);
+            for (int row = 1; row <= 9; row++) {
+                int seatsInRow = 14 + row;
                 for (int seat = 1; seat <= seatsInRow; seat++) {
                     tickets.add(new Ticket(
                         performance.getPerformanceId(),

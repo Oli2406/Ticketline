@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,34 +58,22 @@ public class EventDataGenerator {
     private List<Event> createEvents(List<Performance> performances) {
         List<Event> events = new ArrayList<>();
 
-        for (int i = 1; i <= 10; i++) {
-            LocalDate dateFrom = getRandomFutureDate();
-            LocalDate dateTo = dateFrom.plusDays(random.nextInt(3) + 1);
+        for (int i = 0; i < performances.size(); i++) {
+            Performance performance = performances.get(i);
+            LocalDate performanceDate = performance.getDate().toLocalDate();
+            LocalDate dateFrom = performanceDate.minusDays(2); // Datum des Events anpassen, falls es nicht passt
+            LocalDate dateTo = performanceDate.plusDays(7);
 
-            List<Performance> eventPerformances = performances.stream()
-                .filter(performance -> {
-                    LocalDate performanceDate = performance.getDate().toLocalDate();
-                    return !performanceDate.isBefore(dateFrom) && !performanceDate.isAfter(dateTo);
-                })
-                .limit(random.nextInt(3) + 1)
-                .toList();
-
-            if (eventPerformances.isEmpty()) {
-                i--;
-                continue;
-            }
-
-            List<Long> performanceIds = eventPerformances.stream()
-                .map(Performance::getPerformanceId)
-                .collect(Collectors.toList());
+            // IDs direkt aus der Performance nehmen
+            List<Long> performanceIds = List.of(performance.getPerformanceId());
 
             Event event = new Event(
-                "Event " + i,
-                "Description for Event " + i,
-                dateFrom,
-                dateTo,
-                getRandomCategory(),
-                performanceIds
+                    "Event " + (i + 1),
+                    "Description for Event " + (i + 1),
+                    dateFrom,
+                    dateTo,
+                    getRandomCategory(),
+                    performanceIds
             );
 
             events.add(event);

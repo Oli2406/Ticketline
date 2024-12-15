@@ -27,40 +27,26 @@ public class ArtistValidator {
         LOGGER.trace("Validating artist: {}", artistCreateDto);
         List<String> validationErrors = new ArrayList<>();
 
-        // Check if first name is valid
-        if (artistCreateDto.getFirstName() == null || artistCreateDto.getFirstName().trim().isEmpty()) {
-            validationErrors.add("First name is required");
-        }
-
-        if (artistCreateDto.getFirstName().length() > 255) {
-            validationErrors.add("First name must be less than 255 characters");
-        }
-
-        // Check if surname is valid
-        if (artistCreateDto.getLastName() == null || artistCreateDto.getLastName().trim().isEmpty()) {
-            validationErrors.add("Surname is required");
-        }
-
-        if (artistCreateDto.getLastName().length() > 255) {
-            validationErrors.add("Surname must be less than 255 characters");
-        }
-
-        // Check if artistName is valid
         if (artistCreateDto.getArtistName() == null || artistCreateDto.getArtistName().trim().isEmpty()) {
             validationErrors.add("Artist name is required");
         }
-
-        if (artistCreateDto.getArtistName().length() > 255) {
-            validationErrors.add("Artist name must be less than 255 characters");
+        if (artistCreateDto.getArtistName().length() > 64) {
+            validationErrors.add("Artist name must be less than 64 characters");
         }
 
-        // If there are validation errors, log and throw ValidationException
+        if (artistCreateDto.getFirstName() != null && artistCreateDto.getFirstName().length() > 64) {
+            validationErrors.add("First name must be less than 64 characters");
+        }
+
+        if (artistCreateDto.getLastName() != null && artistCreateDto.getLastName().length() > 64) {
+            validationErrors.add("Surname must be less than 64 characters");
+        }
+
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Artist validation failed with errors: {}", validationErrors);
             throw new ValidationException("Artist validation failed", validationErrors);
         }
 
-        // Check for conflict: artistName uniqueness
         checkArtistNameUnique(artistCreateDto.getArtistName());
 
         LOGGER.info("Artist validation passed for: {}", artistCreateDto);

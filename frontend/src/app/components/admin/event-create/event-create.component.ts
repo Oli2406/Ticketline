@@ -471,4 +471,9 @@ export class EventCreateComponent implements OnInit {
       this.toastr.error('Failed to process all performances.', 'Error');
     }
   }
+
+  deletePerformance(index: number): void {
+    this.performances.splice(index, 1);
+    console.log('Deleted performance at index:', index);
+  }
 }
