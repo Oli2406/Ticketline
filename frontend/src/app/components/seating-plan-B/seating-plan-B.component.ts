@@ -194,6 +194,11 @@ export class SeatingPlanBComponent {
       return;
     }
 
+    if (ticket.status !== 'AVAILABLE') {
+      this.toastr.error('This ticket is not available.', 'Error');
+      return;
+    }
+
     // Check if the max ticket limit is reached
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     if (totalSelected >= 5) {
