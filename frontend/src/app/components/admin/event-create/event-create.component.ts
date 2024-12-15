@@ -46,7 +46,7 @@ export class EventCreateComponent implements OnInit {
 
   artists: ArtistListDto[] = [];
   locations: LocationListDto[] = [];
-  performances: PerformanceListDto[] = [];
+  performances: Performance[] = [];
 
   selectedArtist = null;
   selectedLocation = null;
@@ -223,33 +223,10 @@ export class EventCreateComponent implements OnInit {
   }
 
   createPerformance() {
-    this.performanceService.createPerformance(this.newPerformance).subscribe({
-      next: (performance: PerformanceListDto) => {
-        this.performances.push(performance);
-        if (performance.performanceId) {
-          this.eventData.performanceIds?.push(performance.performanceId);
-          this.generateTicketsForPerformance(performance.performanceId, this.newPerformance.hall, this.newPerformance.date);
-        }
-        this.toastr.success('Performance created successfully!', 'Success');
-        //this.saveToLocalStorage();
-        this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
-        this.showPerformanceForm = false;
-      },
-      error: (err) => {
-        //err = this.eventService.handleErrorAndRethrow(err);
-        const errors = Array.isArray(err.message)
-          ? err.message
-          : err.message.split(/\n/);
-        const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
-        this.toastr.error(
-          `<ul>${errorList}</ul>`,
-          'Error creating performance',
-          { enableHtml: true }
-        );
-      },
-    });
+    this.performances.push(this.newPerformance);
+    this.toastr.success('Performance added locally!', 'Success');
+    this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
+    this.showPerformanceForm = false;
   }
 
   generateTicketsForPerformance(performanceId: number, hall: string, date: Date) {
@@ -420,25 +397,34 @@ export class EventCreateComponent implements OnInit {
   }
 
   onSubmit() {
-    this.eventService.createEvent(this.eventData).subscribe({
-      next: (event: Event) => {
-        this.toastr.success('Event created successfully!', 'Success');
-        this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
-        this.performances = [];
-      },
-      error: (err) => {
-        console.error('Error during registration:', err.message);
-        const errors = Array.isArray(err.message)
-          ? err.message
-          : err.message.split(/\n/);
-        const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
-        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
-          enableHtml: true,
+    this.sendPerformancesToBackend()
+      .then(() => {
+        console.log('Finale Performance IDs:', this.eventData.performanceIds); // Garantiert vorhanden
+        this.eventService.createEvent(this.eventData).subscribe({
+          next: (event: Event) => {
+            console.log('Event wurde erstellt mit IDs:', this.eventData.performanceIds);
+            this.toastr.success('Event created successfully!', 'Success');
+            this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+            this.performances = [];
+          },
+          error: (err) => {
+            console.error('Error during event creation:', err);
+            const errors = Array.isArray(err.message)
+              ? err.message
+              : err.message.split(/\n/);
+            const errorList = errors
+              .map((error) => `<li>${error.trim()}</li>`)
+              .join('');
+            this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
+              enableHtml: true,
+            });
+          },
         });
-      },
-    });
+      })
+      .catch(() => {
+        console.error('Failed to save all performances.');
+        this.toastr.error('Cannot create event because performance saving failed.', 'Error');
+      });
   }
 
   toggleArtistForm() {
@@ -459,5 +445,37 @@ export class EventCreateComponent implements OnInit {
       B: 353,
     };
     this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
+  }
+
+  sendPerformancesToBackend(): Promise<void> {
+    if (this.performances.length === 0) {
+      this.toastr.warning('No performances to send.', 'Warning');
+      return Promise.resolve(); // Direkt gelöstes Promise
+    }
+
+    const performancePromises = this.performances.map(performance =>
+      this.performanceService.createPerformance(performance).toPromise()
+        .then((createdPerformance: PerformanceListDto) => {
+          if (createdPerformance.performanceId) {
+            this.eventData.performanceIds.push(createdPerformance.performanceId);
+            console.log("Performance ID hinzugefügt:", createdPerformance.performanceId);
+          }
+          this.toastr.success('Performance saved to backend.', 'Success');
+        })
+        .catch((err) => {
+          console.error('Error saving performance:', err);
+          this.toastr.error('Error saving performance.', 'Error');
+          throw err; // Fehler weiterwerfen
+        })
+    );
+
+    return Promise.all(performancePromises)
+      .then(() => {
+        this.toastr.success('All performances successfully saved to backend!', 'Success');
+        this.performances = [];
+      })
+      .catch(() => {
+        this.toastr.error('Failed to save all performances.', 'Error');
+      });
   }
 }

@@ -40,7 +40,7 @@ public class PerformanceEndpoint {
 
     @Secured("ROLE_ADMIN")
     @PutMapping
-    public ResponseEntity<PerformanceDetailDto> createOrUpdatePerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
+    public ResponseEntity<PerformanceDetailDto> createPerformance(@RequestBody PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
         logger.info("Received request to create or update performance: {}", performanceCreateDto);
         PerformanceDetailDto createdPerformance = performanceService.createPerformance(performanceCreateDto);
         logger.debug("Performance created/updated successfully: {}", createdPerformance);

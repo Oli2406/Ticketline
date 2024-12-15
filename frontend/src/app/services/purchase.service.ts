@@ -16,8 +16,8 @@ export class PurchaseService {
   /**
    * Get all purchases for a specific user by userId
    */
-  getPurchasesByUser(userId: number): Observable<PurchaseListDto[]> {
-    const url = `${this.apiUrl}/user/${userId}`;
+  getPurchasesByUser(encryptedUserId: string): Observable<PurchaseListDto[]> {
+    const url = `${this.apiUrl}/user/${encryptedUserId}`;
     return this.http.get<PurchaseListDto[]>(url).pipe(
       catchError(this.handleError)
     );

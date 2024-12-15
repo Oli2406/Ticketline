@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 @DependsOn("performanceDataGenerator")
 public class EventDataGenerator {
 
@@ -88,7 +88,7 @@ public class EventDataGenerator {
     }
 
     private LocalDate getRandomFutureDate() {
-        return LocalDate.of(2025, 3, 1).plusDays(random.nextInt(365)); // Dates after 01.03.2025
+        return LocalDate.of(2023, 3, 1).plusDays(random.nextInt(365)); // Dates after 01.03.2025
     }
 
     private String getRandomCategory() {

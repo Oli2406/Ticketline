@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 @DependsOn({"artistDataGenerator", "locationDataGenerator"})
 public class PerformanceDataGenerator {
 
@@ -83,7 +83,7 @@ public class PerformanceDataGenerator {
     }
 
     private LocalDateTime generateRandomFutureDate() {
-        int year = 2025 + random.nextInt(3); // Jahre zwischen 2025 und 2027
+        int year = 2023 + random.nextInt(3); // Jahre zwischen 2025 und 2027
         int month = random.nextInt(12) + 1;
         int day = random.nextInt(28) + 1;
         int hour = random.nextInt(24);
@@ -91,7 +91,7 @@ public class PerformanceDataGenerator {
         LocalDateTime date = LocalDateTime.of(year, month, day, hour, minute);
 
         // Sicherstellen, dass das Datum nach dem 01.03.2025 liegt
-        LocalDateTime minDate = LocalDateTime.of(2025, 3, 1, 0, 0);
+        LocalDateTime minDate = LocalDateTime.of(2022, 3, 1, 0, 0);
         return date.isBefore(minDate) ? minDate.plusDays(random.nextInt(365)) : date;
     }
 

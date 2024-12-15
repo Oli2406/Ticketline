@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 @DependsOn("performanceDataGenerator")
 public class TicketDataGenerator {
 
@@ -71,7 +71,7 @@ public class TicketDataGenerator {
                         BigDecimal.valueOf(120),
                         getRandomTicketStatus(),
                         Hall.A,
-                        null,
+                        1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                         performance.getDate()
                     ));
                 }
@@ -89,7 +89,7 @@ public class TicketDataGenerator {
                         BigDecimal.valueOf(120),
                         getRandomTicketStatus(),
                         Hall.A,
-                        null,
+                        1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                         performance.getDate()
                     ));
                 }
@@ -106,7 +106,7 @@ public class TicketDataGenerator {
                     BigDecimal.valueOf(150),
                     getRandomTicketStatus(),
                     Hall.A,
-                    null,
+                    1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                     performance.getDate()
                 ));
             }
@@ -122,7 +122,7 @@ public class TicketDataGenerator {
                     BigDecimal.valueOf(80),
                     getRandomTicketStatus(),
                     Hall.A,
-                    null,
+                    1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                     performance.getDate()
                 ));
             }
@@ -139,7 +139,7 @@ public class TicketDataGenerator {
                         BigDecimal.valueOf(80),
                         getRandomTicketStatus(),
                         Hall.B,
-                        null,
+                        1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                         performance.getDate()
                     ));
                 }
@@ -158,7 +158,7 @@ public class TicketDataGenerator {
                         BigDecimal.valueOf(60),
                         getRandomTicketStatus(),
                         Hall.B,
-                        null,
+                        1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                         performance.getDate()
                     ));
                 }
@@ -175,7 +175,7 @@ public class TicketDataGenerator {
                     BigDecimal.valueOf(70),
                     getRandomTicketStatus(),
                     Hall.B,
-                    null,
+                    1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                     performance.getDate()
                 ));
             }
@@ -191,7 +191,7 @@ public class TicketDataGenerator {
                     BigDecimal.valueOf(100),
                     getRandomTicketStatus(),
                     Hall.B,
-                    null,
+                    1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
                     performance.getDate()
                 ));
             }

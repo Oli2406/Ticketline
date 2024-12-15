@@ -5,10 +5,11 @@ import { PurchaseService } from '../../services/purchase.service';
 import { ToastrService } from 'ngx-toastr';
 import { TicketDto } from '../../dtos/ticket';
 import { PurchaseListDto } from '../../dtos/purchase';
-import jwtDecode from 'jwt-decode';
+import { PerformanceService } from 'src/app/services/performance.service';
+import {LocationService} from "../../services/location.service";
 
 @Component({
-  selector: 'app-user-orders',
+  selector: 'app-order-overview',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './order-overview.component.html',
@@ -17,34 +18,30 @@ import jwtDecode from 'jwt-decode';
 export class OrderOverviewComponent implements OnInit {
   reservedTickets: TicketDto[] = [];
   purchasedTickets: TicketDto[] = [];
-  sortedTickets: { date: Date; reserved: TicketDto[]; purchased: TicketDto[] }[] = [];
+  sortedTickets: { date: Date; reserved: TicketDto[]; purchased: TicketDto[]; showDetails: boolean }[] = [];
+  pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
+  performanceNames: { [performanceId: number]: string } = {};
+  performanceLocations: { [locationId: number]: string } = {};
 
   constructor(
     private authService: AuthService,
     private purchaseService: PurchaseService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private performanceService: PerformanceService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
     const userId = this.authService.getUserIdFromToken();
     if (userId) {
-      const decoded: any = userId;
-      const numericUserId = parseInt(decoded.id, 10);
-      this.loadUserPurchases(numericUserId);
-      console.log('User ID:', decoded);
-      console.log(numericUserId);
+      this.loadUserPurchases(userId);
+      console.log('User ID:', userId);
     } else {
       this.toastr.error('Unable to identify the user.', 'Error');
     }
   }
 
-  private decodeBase64Url(encodedString: string): string {
-    const base64 = encodedString.replace(/-/g, '+').replace(/_/g, '/');
-    const paddedBase64 = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
-    return atob(paddedBase64);
-  }
-
-  loadUserPurchases(userId: number): void {
+  loadUserPurchases(userId: string): void {
     this.purchaseService.getPurchasesByUser(userId).subscribe({
       next: (purchases: PurchaseListDto[]) => {
         this.processPurchases(purchases);
@@ -57,30 +54,97 @@ export class OrderOverviewComponent implements OnInit {
   }
 
   private processPurchases(purchases: PurchaseListDto[]): void {
-    // Map to organize tickets by date
-    const ticketMap: { [key: string]: { reserved: TicketDto[]; purchased: TicketDto[] } } = {};
+    const today = new Date();
+    const currentMap: { [key: string]: { reserved: TicketDto[]; purchased: TicketDto[] } } = {};
+    const pastMap: { [key: string]: { purchased: TicketDto[] } } = {};
 
     purchases.forEach((purchase) => {
+      const purchaseDate = new Date(purchase.purchaseDate).toDateString();
+
       purchase.tickets.forEach((ticket) => {
-        const ticketDate = new Date(ticket.date).toDateString();
-        if (!ticketMap[ticketDate]) {
-          ticketMap[ticketDate] = { reserved: [], purchased: [] };
-        }
-        if (ticket.status === 'RESERVED') {
-          ticketMap[ticketDate].reserved.push(ticket);
+        const eventDate = new Date(ticket.date);
+        if (eventDate >= today) {
+          // Aktuelle Käufe (zukünftige Veranstaltungen)
+          if (!currentMap[purchaseDate]) {
+            currentMap[purchaseDate] = { reserved: [], purchased: [] };
+          }
+          if (ticket.status === 'RESERVED') {
+            currentMap[purchaseDate].reserved.push(ticket);
+          } else if (ticket.status === 'PURCHASED') {
+            currentMap[purchaseDate].purchased.push(ticket);
+          }
         } else if (ticket.status === 'PURCHASED') {
-          ticketMap[ticketDate].purchased.push(ticket);
+          // Vergangene Käufe (nur gekaufte Tickets)
+          if (!pastMap[purchaseDate]) {
+            pastMap[purchaseDate] = { purchased: [] };
+          }
+          pastMap[purchaseDate].purchased.push(ticket);
         }
       });
     });
 
-    // Convert ticketMap to sorted array
-    this.sortedTickets = Object.entries(ticketMap)
+    // Convert currentMap to sorted array (by date descending)
+    this.sortedTickets = Object.entries(currentMap)
       .map(([date, tickets]) => ({
-        date: new Date(date),
+        date: new Date(date), // Purchase date
         reserved: tickets.reserved,
         purchased: tickets.purchased,
+        showDetails: false,
       }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime()); // Sort by descending date
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    // Convert pastMap to sorted array (by date descending)
+    this.pastTickets = Object.entries(pastMap)
+      .map(([date, tickets]) => ({
+        date: new Date(date), // Purchase date
+        purchased: tickets.purchased,
+        showDetails: false,
+      }))
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }
+
+  getPerformanceName(performanceId: number): string {
+    if (!this.performanceNames[performanceId]) {
+      this.performanceService.getPerformanceById(performanceId).subscribe({
+        next: (performance) => {
+          this.performanceNames[performanceId] = performance.name;
+        },
+        error: (err) => {
+          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
+          this.performanceNames[performanceId] = 'Error loading name'; // Setze einen Fallback
+        },
+      });
+      return 'Loading...'; // Platzhalter, während der Name geladen wird
+    }
+
+    return this.performanceNames[performanceId]; // Gibt den Namen zurück, wenn er schon geladen wurde
+  }
+
+  getPerformanceLocation(performanceId: number): string {
+    if (!this.performanceLocations[performanceId]) {
+      this.performanceService.getPerformanceById(performanceId).subscribe({
+        next: (performance) => {
+          if (performance.locationId) {
+            this.locationService.getById(performance.locationId).subscribe({
+              next: (location) => {
+                this.performanceLocations[performanceId] = location.name;
+              },
+              error: (err) => {
+                console.error(`Error fetching location details for ID ${performance.locationId}:`, err);
+                this.performanceLocations[performanceId] = 'Error loading location';
+              },
+            });
+          } else {
+            this.performanceLocations[performanceId] = 'Location not found';
+          }
+        },
+        error: (err) => {
+          console.error(`Error fetching performance with ID ${performanceId}:`, err);
+          this.performanceLocations[performanceId] = 'Error loading performance';
+        },
+      });
+      return 'Loading...';
+    }
+    return this.performanceLocations[performanceId];
   }
 }

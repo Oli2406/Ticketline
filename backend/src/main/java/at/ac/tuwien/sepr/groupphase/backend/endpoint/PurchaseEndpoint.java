@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
+import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
@@ -27,9 +28,11 @@ public class PurchaseEndpoint {
     public static final String BASE_PATH = "/api/v1/purchase";
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PurchaseService purchaseService;
+    private final RandomStringGenerator randomStringGenerator;
 
-    public PurchaseEndpoint(PurchaseService purchaseService) {
+    public PurchaseEndpoint(PurchaseService purchaseService, RandomStringGenerator randomStringGenerator) {
         this.purchaseService = purchaseService;
+        this.randomStringGenerator = randomStringGenerator;
     }
 
     @PermitAll
@@ -42,13 +45,16 @@ public class PurchaseEndpoint {
     }
 
     @PermitAll
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<PurchaseDetailDto>> getPurchasesByUser(@PathVariable Long userId) {
-        LOG.info("Fetching purchases for user with ID: {}", userId);
+    @GetMapping("/user/{encryptedUserId}")
+    public ResponseEntity<List<PurchaseDetailDto>> getPurchasesByUser(@PathVariable String encryptedUserId) {
+        LOG.info("Fetching purchases for user with encrypted ID: {}", encryptedUserId);
+        Long userId = randomStringGenerator.retrieveOriginalId(encryptedUserId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
         List<PurchaseDetailDto> purchases = purchaseService.getPurchasesByUserId(userId);
         LOG.info("Fetched {} purchases for user with ID: {}", purchases.size(), userId);
         return ResponseEntity.ok(purchases);
     }
+
 
     @PermitAll
     @PostMapping

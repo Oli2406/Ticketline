@@ -20,7 +20,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 @Component
-@Profile("datagen")
+@Profile("generateData")
 @DependsOn({"ticketDataGenerator", "performanceDataGenerator", "merchandiseDataGenerator"})
 public class PurchaseDataGenerator {
 
@@ -115,6 +115,6 @@ public class PurchaseDataGenerator {
     }
 
     private LocalDate getRandomPastDate() {
-        return LocalDate.now().minusDays(random.nextInt(50));
+        return LocalDate.now().minusDays(random.nextInt(1000));
     }
 }

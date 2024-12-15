@@ -56,6 +56,12 @@ export class PerformanceService {
     );
   }
 
+  getPerformanceById(id: number): Observable<PerformanceListDto> {
+    return this.http.get<PerformanceListDto>(`${(this.apiUrl)}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';

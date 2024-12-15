@@ -1,37 +1,88 @@
 <div class="user-orders">
-  <h1>Your Tickets</h1>
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>My Tickets</h1>
+  </div>
 
-  <ng-container *ngIf="sortedTickets.length > 0; else noTickets">
+  <!-- Aktuelle Käufe -->
+  <section *ngIf="sortedTickets.length > 0" class="section">
+    <h2>Current Purchases and Reservations</h2>
     <div *ngFor="let group of sortedTickets" class="ticket-group">
-      <h2>{{ group.date | date: 'longDate' }}</h2>
-
-      <div class="ticket-section">
-        <h3>Reserved Tickets</h3>
-        <ul *ngIf="group.reserved.length > 0; else noReserved">
-          <li *ngFor="let ticket of group.reserved">
-            <span>Ticket ID: {{ ticket.ticketId }}</span>
-            <span>Performance: {{ ticket.hall }}</span>
-            <span>Price: {{ ticket.price | currency }}</span>
-          </li>
-        </ul>
-        <ng-template #noReserved><p>No reserved tickets for this date.</p></ng-template>
+      <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
+        <h3>{{ group.date | date: 'yyyy-MM-dd' }}</h3>
+        <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
       </div>
 
-      <div class="ticket-section">
-        <h3>Purchased Tickets</h3>
-        <ul *ngIf="group.purchased.length > 0; else noPurchased">
-          <li *ngFor="let ticket of group.purchased">
-            <span>Ticket ID: {{ ticket.ticketId }}</span>
-            <span>Performance: {{ ticket.hall }}</span>
-            <span>Price: {{ ticket.price | currency }}</span>
-          </li>
-        </ul>
-        <ng-template #noPurchased><p>No purchased tickets for this date.</p></ng-template>
+      <div *ngIf="group.showDetails">
+        <div class="ticket-section" *ngIf="group.reserved.length > 0">
+          <h4>Reserved Tickets</h4>
+          <ul>
+            <li *ngFor="let ticket of group.reserved">
+              <div class="ticket-details">
+                <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
+                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
+                <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="ticket-section" *ngIf="group.purchased.length > 0">
+          <h4>Purchased Tickets</h4>
+          <ul>
+            <li *ngFor="let ticket of group.purchased">
+              <div class="ticket-details">
+                <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
+                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
+                <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-  </ng-container>
+  </section>
 
-  <ng-template #noTickets>
+  <!-- Vergangene Käufe -->
+  <section *ngIf="pastTickets.length > 0" class="section">
+    <h2>Purchase History</h2>
+    <div *ngFor="let group of pastTickets" class="ticket-group">
+      <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
+        <h3>{{ group.date | date: 'yyyy-MM-dd' }}</h3>
+        <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
+      </div>
+
+      <div *ngIf="group.showDetails">
+        <div class="ticket-section" *ngIf="group.purchased.length > 0">
+          <h4>Purchased Tickets</h4>
+          <ul>
+            <li *ngFor="let ticket of group.purchased">
+              <div class="ticket-details">
+                <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
+                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
+                <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wenn keine Tickets vorhanden sind -->
+  <ng-container *ngIf="sortedTickets.length === 0 && pastTickets.length === 0">
     <p>You have no tickets yet.</p>
-  </ng-template>
+  </ng-container>
 </div>
