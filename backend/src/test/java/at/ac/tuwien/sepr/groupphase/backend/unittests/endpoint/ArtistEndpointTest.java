@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,29 +25,22 @@ import static org.mockito.Mockito.*;
 
 class ArtistEndpointTest {
 
-    @Mock
-    private ArtistService artistService;
-
-    @InjectMocks
-    private ArtistEndpoint artistEndpoint;
-
     private final ArtistDetailDto artistDetailDto1 = new ArtistDetailDto(1L, "John", "Doe", "John Doe");
     private final ArtistDetailDto artistDetailDto2 = new ArtistDetailDto(2L, "Jane", "Doe", "Jane Doe");
     private final List<ArtistDetailDto> mockArtists = List.of(artistDetailDto1, artistDetailDto2);
+    @Mock
+    private ArtistService artistService;
+    @InjectMocks
+    private ArtistEndpoint artistEndpoint;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-    private ArtistCreateDto createArtistCreateDto() {
-        return new ArtistCreateDto("John", "Doe", "John Doe");
-    }
-
-
     @Test
     void createArtistWhenValidInputReturnsSuccess() throws ValidationException, ConflictException {
-        ArtistCreateDto artistCreateDto = createArtistCreateDto();
+        ArtistCreateDto artistCreateDto = new ArtistCreateDto("John", "Doe", "John Doe");
 
         when(artistService.createArtist(any(ArtistCreateDto.class))).thenReturn(artistDetailDto1);
 
@@ -60,13 +54,11 @@ class ArtistEndpointTest {
 
     @Test
     void createArtistWhenInvalidInputThrowsValidationException() throws ValidationException, ConflictException {
-        ArtistCreateDto artistCreateDto = createArtistCreateDto();
+        ArtistCreateDto artistCreateDto = new ArtistCreateDto("John", "Doe", "John Doe");
         List<String> validationErrors = List.of("Name is required", "Genre must not be empty");
         doThrow(new ValidationException("Invalid input", validationErrors)).when(artistService).createArtist(any());
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
-            artistEndpoint.createOrUpdateArtist(artistCreateDto);
-        });
+        ValidationException exception = assertThrows(ValidationException.class, () -> artistEndpoint.createOrUpdateArtist(artistCreateDto));
 
         assertTrue(exception.getMessage().contains("Invalid input"));
         assertEquals(validationErrors.toString(), exception.getErrors());
@@ -107,14 +99,14 @@ class ArtistEndpointTest {
     void searchArtistReturnsMatchingArtist() {
         ArtistSearchDto artistSearchDto = new ArtistSearchDto("John", "Doe", "");
 
-        when(artistService.search(artistSearchDto)).thenReturn(List.of(artistDetailDto1).stream());
+        when(artistService.search(artistSearchDto)).thenReturn(Stream.of(artistDetailDto1));
 
         ResponseEntity<Stream<ArtistDetailDto>> response = artistEndpoint.search(artistSearchDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        List<ArtistDetailDto> result = response.getBody().toList();
+        List<ArtistDetailDto> result = Objects.requireNonNull(response.getBody()).toList();
         assertEquals(1, result.size());
-        assertEquals(artistDetailDto1, result.get(0));
+        assertEquals(artistDetailDto1, result.getFirst());
     }
 }
