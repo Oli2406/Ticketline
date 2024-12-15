@@ -12,8 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.NoSuchAlgorithmException;
-
 public interface UserService extends UserDetailsService {
 
     /**
@@ -52,6 +50,15 @@ public interface UserService extends UserDetailsService {
      * @param userLogoutDto logout credentials
      */
     void logout(UserLogoutDto userLogoutDto);
+
+    /**
+     * Checks if a given User is logged in. In case user is not logged in the authToken will be
+     * blocked.
+     *
+     * @param userLogoutDto credentials to check
+     * @return true in case user is logged in, otherwise false
+     */
+    boolean isUserLoggedIn(UserLogoutDto userLogoutDto);
 
     /**
      * Registers a new user using the provided UserRegistrationDto.

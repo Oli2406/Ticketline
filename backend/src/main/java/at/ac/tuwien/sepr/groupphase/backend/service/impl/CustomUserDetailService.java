@@ -14,11 +14,9 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CustomUserDetailService implements UserService {
 
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenizer jwtTokenizer;
@@ -47,15 +45,10 @@ public class CustomUserDetailService implements UserService {
     private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
-    public CustomUserDetailService(
-        UserRepository userRepository,
-        PasswordEncoder passwordEncoder,
-        JwtTokenizer jwtTokenizer,
-        RegisterRepository registerRepository,
-        UserValidator userValidator,
-        SecurityPropertiesConfig.Jwt jwt,
-        SecurityPropertiesConfig.Auth auth,
-        RandomStringGenerator randomStringGenerator) {
+    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+        JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
+        UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
+        SecurityPropertiesConfig.Auth auth, RandomStringGenerator randomStringGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
@@ -72,57 +65,44 @@ public class CustomUserDetailService implements UserService {
         ApplicationUser applicationUser = findApplicationUserByEmail(email);
 
         List<GrantedAuthority> grantedAuthorities =
-            applicationUser.isAdmin()
-                ? AuthorityUtils.createAuthorityList("ROLE_ADMIN", "ROLE_USER")
-                : AuthorityUtils.createAuthorityList("ROLE_USER");
+            applicationUser.isAdmin() ? AuthorityUtils.createAuthorityList("ROLE_ADMIN",
+                "ROLE_USER") : AuthorityUtils.createAuthorityList("ROLE_USER");
 
-        return User.builder()
-            .username(applicationUser.getEmail())
-            .password(applicationUser.getPassword())
-            .accountLocked(applicationUser.isLocked())
-            .authorities(grantedAuthorities)
-            .build();
+        return User.builder().username(applicationUser.getEmail())
+            .password(applicationUser.getPassword()).accountLocked(applicationUser.isLocked())
+            .authorities(grantedAuthorities).build();
     }
 
     @Override
     public ApplicationUser findApplicationUserByEmail(String email) {
         LOGGER.debug("Finding application user by email: {}", email);
-        return userRepository
-            .findUserByEmail(email)
-            .orElseThrow(
-                () ->
-                    new NotFoundException(
-                        String.format("Could not find the user with the email address %s", email)));
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new NotFoundException(
+            String.format("Could not find the user with the email address %s", email)));
     }
 
     @Override
     public String login(UserLoginDto userLoginDto) {
         LOGGER.debug("Login user: {}", userLoginDto);
-        ApplicationUser user =
-            userRepository
-                .findUserByEmail(userLoginDto.getEmail())
-                .orElseThrow(
-                    () ->
-                        new NotFoundException(
-                            String.format(
-                                "Could not find the user with the email address %s",
-                                userLoginDto.getEmail())));
+        ApplicationUser user = userRepository.findUserByEmail(userLoginDto.getEmail()).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    userLoginDto.getEmail())));
 
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
         if (!userDetails.isAccountNonLocked()) {
-            throw new BadCredentialsException(
-                "Account is locked");
+            throw new BadCredentialsException("Account is locked");
         }
-        if (userDetails.isAccountNonExpired()
-            && userDetails.isCredentialsNonExpired()
+        if (userDetails.isAccountNonExpired() && userDetails.isCredentialsNonExpired()
             && passwordEncoder.matches(userLoginDto.getPassword(), userDetails.getPassword())) {
             user.resetLoginAttempts();
             user.setLoggedIn(true);
             userRepository.save(user);
 
-            List<String> roles =
-                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, randomStringGenerator.generateRandomString(user.getId()), user.getPoints(), user.getFirstName(), user.getLastName());
+            List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).toList();
+            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles,
+                randomStringGenerator.generateRandomString(user.getId()), user.getPoints(),
+                user.getFirstName(), user.getLastName());
         }
 
         user.incrementLoginAttempts();
@@ -143,20 +123,15 @@ public class CustomUserDetailService implements UserService {
         LOGGER.debug("Logout user: {}", userLogoutDto);
         String authToken = userLogoutDto.getAuthToken();
 
-        ApplicationUser user =
-            userRepository
-                .findUserByEmail(userLogoutDto.getEmail())
-                .orElseThrow(
-                    () ->
-                        new NotFoundException(
-                            String.format(
-                                "Could not find the user with the email address %s",
-                                userLogoutDto.getEmail())));
+        ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail()).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    userLogoutDto.getEmail())));
 
         if (!user.isLoggedIn()) {
             throw new IllegalStateException(
-                String.format(
-                    "The user with email %s is not currently logged in", userLogoutDto.getEmail()));
+                String.format("The user with email %s is not currently logged in",
+                    userLogoutDto.getEmail()));
         }
 
         if (!jwtTokenizer.validateToken(authToken)) {
@@ -169,6 +144,24 @@ public class CustomUserDetailService implements UserService {
         userRepository.save(user);
 
         LOGGER.info("User with email {} has successfully logged out.", userLogoutDto.getEmail());
+    }
+
+    @Override
+    public boolean isUserLoggedIn(UserLogoutDto userLogoutDto) {
+        LOGGER.debug("Is user logged in: {}", userLogoutDto);
+        String authToken = userLogoutDto.getAuthToken();
+
+        ApplicationUser user = userRepository.findUserByEmail(userLogoutDto.getEmail()).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    userLogoutDto.getEmail())));
+
+        if (!user.isLoggedIn()) {
+            jwtTokenizer.blockToken(authToken);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -191,7 +184,9 @@ public class CustomUserDetailService implements UserService {
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
-        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(), toRegister.getFirstName(), toRegister.getLastName());
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles,
+            randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(),
+            toRegister.getFirstName(), toRegister.getLastName());
     }
 
     @Override
