@@ -103,18 +103,20 @@ export class SeatingPlanBComponent {
 
         // Assign grouped tickets to dynamically named properties (seatedBackC1, seatedBackC2, ...)
         for (let row = 1; row <= 9; row++) {
-          this[`seatedBackC${row}`] = seatedBackCRows[row] || [];
+          this[`seatedBackC${row}`] = seatedBackCRows[row]?.sort((a, b) => a.seatNumber - b.seatNumber) || [];
         }
 
-        // Filter tickets for Sector B
-        this.seatedBackB = tickets.filter(ticket => ticket.sectorType === SectorType.B);
+        // Filter and sort tickets for Sector B
+        this.seatedBackB = tickets
+          .filter(ticket => ticket.sectorType === SectorType.B)
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
 
         // Filter standing tickets for Sector A
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
         );
 
-        // Count VIP and regular standing tickets
+        // Count VIP and Premium standing tickets
         this.vipStandingTickets = standingTickets.filter(
           ticket => ticket.priceCategory === PriceCategory.VIP && ticket.status === 'AVAILABLE'
         ).length;
@@ -123,7 +125,7 @@ export class SeatingPlanBComponent {
           ticket => ticket.priceCategory === PriceCategory.PREMIUM && ticket.status === 'AVAILABLE'
         ).length;
 
-        // Extract prices for VIP and regular standing tickets
+        // Extract prices for VIP and Premium standing tickets
         const firstVipStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.VIP);
         const firstRegularStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.PREMIUM);
 
@@ -136,6 +138,7 @@ export class SeatingPlanBComponent {
       }
     });
   }
+
 
 
   getPerformanceDetails(id: number): void {
