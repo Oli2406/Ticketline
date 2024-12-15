@@ -28,10 +28,6 @@ import static org.mockito.Mockito.*;
 
 class EventEndpointTest {
 
-    private final Artist artist = new Artist();
-    private final Artist artist2 = new Artist();
-    private final Location location = new Location();
-    private final Location location2 = new Location();
     private final EventDetailDto event1 = new EventDetailDto(1L, "Event1", "Descr1", "Category1", LocalDate.now(), LocalDate.now().plusDays(1));
     private final EventDetailDto event2 = new EventDetailDto(2L, "Event2", "Descr2", "Category2", LocalDate.now(), LocalDate.now().plusDays(1));
     private final List<EventDetailDto> mockEvents = List.of(event1, event2);
