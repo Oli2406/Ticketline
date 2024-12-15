@@ -154,31 +154,39 @@
           <tr *ngFor="let cartItem of cartItems">
             <td>
               <img
-                [src]=" imageLocation + cartItem.item.imageUrl"
-                alt="{{ cartItem.item.name }}"
+                [src]="isTicket(cartItem.item) ? null : imageLocation + cartItem.item.imageUrl"
+                alt="Item Image"
                 width="50"
               />
             </td>
-            <td>{{ cartItem.item.name }}</td>
+            <td>
+              <span>{{ getItemDisplayName(cartItem.item) }}</span>
+            </td>
             <td>
               <span *ngIf="selectedPaymentOption !== 'points'">
                 {{ cartItem.item.price | number: '1.2-2' }} €
               </span>
               <span *ngIf="selectedPaymentOption === 'points'">
-                {{ cartItem.item.points }} Points
+                {{ cartItem.item.points || 0 }} Points
               </span>
             </td>
             <td>
-              <input
-                type="number"
-                [(ngModel)]="cartItem.quantity"
-                (change)="updateQuantity(cartItem.item, cartItem.quantity)"
-                min="1"
-              />
+              <ng-container *ngIf="!isTicket(cartItem.item); else quantityAsText">
+                <input
+                  type="number"
+                  [(ngModel)]="cartItem.quantity"
+                  (change)="updateQuantity(cartItem.item, cartItem.quantity)"
+                  min="1"
+                />
+              </ng-container>
+              <ng-template #quantityAsText>
+                <div class="quantity-text">{{ cartItem.quantity }}</div>
+              </ng-template>
             </td>
             <td>
-              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)"><i
-                class="bi bi-trash"></i></button>
+              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
           </tbody>
@@ -203,7 +211,6 @@
 </div>
 
 <!-- Hidden invoice html for creating the receipt -->
-
 <div class="invoice-div">
   <!DOCTYPE html>
   <html lang="de">
@@ -255,7 +262,9 @@
       <tbody>
         @for (item of cartItems; track item) {
           <tr>
-            <td>{{ item.item.name }}</td>
+            <td>
+              <span>{{ getItemDisplayName(item.item) }}</span>
+            </td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.item.price }}</td>
             <td>{{ item.item.price * item.quantity }} €</td>
@@ -290,3 +299,4 @@
 
 
 </div>
+

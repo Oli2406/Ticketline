@@ -21,7 +21,8 @@
   left: 10%;
   border: 1px solid #6c757d;
   padding: 10px;
-  background-color: transparent;
+  background-color: #fff9e6;
+
 }
 
 /* Standing */
@@ -32,7 +33,7 @@
   left: 10%; /* Center align */
   border: 1px solid #6c757d;
   padding: 20px;
-  background-color: transparent;
+  background-color: #f9f3fc;
 }
 
 /* Selected Section (Purple) */
@@ -78,7 +79,8 @@
 }
 
 .seat-box.available {
-  background-color: white;
+  background-color: #f0f8ff;
+
 }
 
 .seat-box.reserved {
@@ -86,7 +88,38 @@
   cursor: not-allowed;
 }
 
+.seat-box.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
 .seat-box.selected-seat {
+  background-color: #514dc7 !important;
+  color: #fff;
+}
+.seat-box-b {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.seat-box-b.available {
+  background-color: #e6f9e6;
+}
+
+.seat-box-b.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box-b.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box-b.selected-seat {
   background-color: #514dc7 !important;
   color: #fff;
 }

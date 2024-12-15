@@ -9,7 +9,7 @@
     <h2>Current Purchases and Reservations</h2>
     <div *ngFor="let group of sortedTickets" class="ticket-group">
       <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
-        <h3>{{ group.date | date: 'yyyy-MM-dd' }}</h3>
+        <h3>{{ group.date | date: 'yyyy-MM-dd hh:mm' }}</h3>
         <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
       </div>
 
@@ -22,7 +22,7 @@
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
-                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
@@ -39,7 +39,7 @@
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
-                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
@@ -56,7 +56,7 @@
     <h2>Purchase History</h2>
     <div *ngFor="let group of pastTickets" class="ticket-group">
       <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
-        <h3>{{ group.date | date: 'yyyy-MM-dd' }}</h3>
+        <h3>{{ group.date | date: 'yyyy-MM-dd hh:mm' }}</h3>
         <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
       </div>
 
@@ -69,7 +69,7 @@
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
-                <span><strong>Date:</strong> {{ ticket.date | date: 'yyyy-MM-dd' }}</span>
+                <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>

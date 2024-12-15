@@ -8,9 +8,10 @@ import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto, LocationSearch} from "../../dtos/location";
 import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
-import {debounceTime, Subject} from "rxjs";
+import {debounceTime, forkJoin, map, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
+import {TicketService} from "../../services/ticket.service";
 
 export enum SearchType {
   event,
@@ -56,7 +57,8 @@ export class SearchComponent {
     private eventService: EventService,
     private artistService: ArtistService,
     private performanceService: PerformanceService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private ticketService: TicketService
   ) {
   }
 
@@ -97,6 +99,7 @@ export class SearchComponent {
 
     const updateAction = updateActions[this.curSearchType];
     if (updateAction) updateAction();
+    this.updateTicketNumbers(); this.updateTicketNumbers();
   }
 
 
@@ -129,6 +132,31 @@ export class SearchComponent {
       error: err => console.error('Error fetching artists:', err)
     });
   }
+
+  updateTicketNumbers() {
+    this.performanceService.get().subscribe({
+      next: (performances) => {
+        const updateRequests = performances.map((performance) =>
+          this.ticketService.getTicketsByPerformanceId(performance.performanceId).pipe(
+            map((tickets) => {
+              const availableTickets = tickets.filter(ticket => ticket.status === 'AVAILABLE').length;
+              console.log(performance.ticketNumber);
+              console.log(availableTickets);
+              return this.performanceService.updateTicketNumber(performance.performanceId, availableTickets).subscribe();
+
+            })
+          )
+        );
+
+        forkJoin(updateRequests).subscribe({
+          next: () => console.log('All ticket numbers updated successfully'),
+          error: (err) => console.error('Error updating ticket numbers:', err),
+        });
+      },
+      error: (err) => console.error('Error fetching performances for ticket update:', err),
+    });
+  }
+
 
   performAdvancedSearch() {
     if (!this.searchQuery || this.searchQuery.trim() === '') {

@@ -361,7 +361,12 @@
       <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
       <td>
-        <button class="btn btn-secondary bg-purp"><i class="bi bi-ticket-fill"> Tickets</i></button>
+        <button
+          class="btn btn-secondary bg-purp"
+          [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
+          [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+          <i class="bi bi-ticket-fill"></i> Tickets
+        </button>
       </td>
     </tr>
     </tbody>
@@ -399,8 +404,14 @@
     <td>{{ performance.ticketNumber }}</td>
     <td>{{ performance.hall }}</td>
     <td>
-      <button class="btn btn-secondary bg-purp"><i class="bi bi-ticket-fill"> Tickets</i></button>
+      <button
+        class="btn btn-secondary bg-purp"
+        [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
+        [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+        <i class="bi bi-ticket-fill"></i> Tickets
+      </button>
     </td>
+
   </tr>
   </tbody>
 </table>

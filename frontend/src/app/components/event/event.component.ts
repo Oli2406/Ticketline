@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, RouterLink} from "@angular/router";
 import {EventService} from "../../services/event.service";
 import {ToastrService} from "ngx-toastr";
 import {EventListDto} from "../../dtos/event";
@@ -14,7 +14,8 @@ import {CurrencyPipe, DatePipe, NgForOf, NgIf} from "@angular/common";
     DatePipe,
     NgForOf,
     NgIf,
-    CurrencyPipe
+    CurrencyPipe,
+    RouterLink
   ],
   templateUrl: './event.component.html',
   styleUrl: './event.component.scss'
