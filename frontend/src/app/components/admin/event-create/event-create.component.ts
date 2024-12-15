@@ -447,35 +447,36 @@ export class EventCreateComponent implements OnInit {
     this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
   }
 
-  sendPerformancesToBackend(): Promise<void> {
+  async sendPerformancesToBackend(): Promise<void> {
     if (this.performances.length === 0) {
       this.toastr.warning('No performances to send.', 'Warning');
-      return Promise.resolve(); // Direkt gelöstes Promise
+      return Promise.resolve();
     }
 
-    const performancePromises = this.performances.map(performance =>
-      this.performanceService.createPerformance(performance).toPromise()
-        .then((createdPerformance: PerformanceListDto) => {
-          if (createdPerformance.performanceId) {
-            this.eventData.performanceIds.push(createdPerformance.performanceId);
-            console.log("Performance ID hinzugefügt:", createdPerformance.performanceId);
-          }
-          this.toastr.success('Performance saved to backend.', 'Success');
-        })
-        .catch((err) => {
-          console.error('Error saving performance:', err);
-          this.toastr.error('Error saving performance.', 'Error');
-          throw err; // Fehler weiterwerfen
-        })
-    );
-
-    return Promise.all(performancePromises)
-      .then(() => {
-        this.toastr.success('All performances successfully saved to backend!', 'Success');
-        this.performances = [];
-      })
-      .catch(() => {
-        this.toastr.error('Failed to save all performances.', 'Error');
-      });
+    try {
+      const performancePromises = this.performances.map(performance =>
+        this.performanceService.createPerformance(performance).toPromise()
+          .then((createdPerformance: PerformanceListDto) => {
+            if (createdPerformance.performanceId) {
+              this.eventData.performanceIds.push(createdPerformance.performanceId);
+              return this.generateTicketsForPerformance(
+                createdPerformance.performanceId,
+                createdPerformance.hall,
+                createdPerformance.date
+              );
+            }
+          })
+          .then(() => {
+            this.toastr.success('Performance and tickets saved to backend.', 'Success');
+          })
+          .catch((err) => {
+            this.toastr.error('Error saving performance or generating tickets.', 'Error');
+            throw err; // Fehler weiterwerfen
+          })
+      );
+      await Promise.all(performancePromises);
+    } catch (err) {
+      this.toastr.error('Failed to process all performances.', 'Error');
+    }
   }
 }

@@ -39,7 +39,11 @@ public class PurchaseDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 7; // Number of users
+        int userCount = 7;
+
+        if(purchaseRepository.count() > 0) {
+            return;
+        }
 
         for (long userId = 1; userId <= userCount; userId++) {
             createPurchasesForUser(userId);
@@ -94,9 +98,9 @@ public class PurchaseDataGenerator {
             .distinct()
             .limit(count)
             .mapToObj(i -> {
-                if (items.get(0) instanceof Ticket) {
+                if (items.getFirst() instanceof Ticket) {
                     return ((Ticket) items.get(i)).getTicketId();
-                } else if (items.get(0) instanceof Merchandise) {
+                } else if (items.getFirst() instanceof Merchandise) {
                     return ((Merchandise) items.get(i)).getMerchandiseId();
                 }
                 return null;
