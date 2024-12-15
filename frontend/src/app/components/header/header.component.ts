@@ -29,7 +29,14 @@ export class HeaderComponent implements OnInit {
   }
 
   logoutUser(): void {
-    this.authService.logoutUser();
-    this.setActivePage('home');
+    this.authService.isCurrentUserLoggedInInBackend().subscribe((isLoggedIn) => {
+      if(!isLoggedIn){
+        this.authService.clearAuthToken();
+        this.router.navigate(['/login'])
+      } else {
+        this.authService.logoutUser();
+        this.setActivePage('home');
+      }
+    });
   }
 }

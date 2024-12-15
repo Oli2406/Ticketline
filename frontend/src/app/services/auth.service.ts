@@ -32,9 +32,9 @@ export class AuthService {
     this.clearResetToken();
     this.clearAuthToken();
     return this.httpClient.post(this.authBaseUri, authRequest, {responseType: 'text'}).pipe(
-      tap((authResponse: string) => {
-        this.storeAuthToken(authResponse);
-      })
+        tap((authResponse: string) => {
+          this.storeAuthToken(authResponse);
+        })
     );
   }
 
@@ -76,6 +76,20 @@ export class AuthService {
           this.toastr.error('Logout failed. Please try again.', 'Error');
         },
       });
+    }
+  }
+
+  /**
+   * Check if current user is logged in in Backend. Returns true in case user is logged in, false otherwise
+   */
+  isCurrentUserLoggedInInBackend(): Observable<boolean> {
+    const token = this.getAuthToken()
+    const email = this.getUserEmailFromToken();
+
+    if (token && email) {
+      const userLogoutDto = {email, authToken: token};
+
+      return this.httpClient.post<boolean>(`${this.authBaseUri}/get-login-status`, userLogoutDto);
     }
   }
 
@@ -172,7 +186,8 @@ export class AuthService {
   validateTokenInBackend(): Observable<boolean> {
     return this.httpClient.get<boolean>(`${this.authBaseUri}/validate-token`);
   }
-  getUserFirstNameFromToken(): string|null{
+
+  getUserFirstNameFromToken(): string | null {
     const token = this.getAuthToken();
     if (token) {
       const decoded: any = jwtDecode(token);
@@ -181,7 +196,7 @@ export class AuthService {
     return null;
   }
 
-  getUserLastNameFromToken(): string|null{
+  getUserLastNameFromToken(): string | null {
     const token = this.getAuthToken();
     if (token) {
       const decoded: any = jwtDecode(token);
@@ -202,9 +217,9 @@ export class AuthService {
    */
   sendEmailToResetPassword(email: string): Observable<string> {
     return this.httpClient.post(`${this.authBaseUri}/send-email`, email, {responseType: 'text'}).pipe(
-      tap((authResponse: string) => {
-        this.storeResetToken(authResponse);
-      })
+        tap((authResponse: string) => {
+          this.storeResetToken(authResponse);
+        })
     );
   }
 

@@ -14,11 +14,9 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +120,9 @@ public class CustomUserDetailService implements UserService {
 
             List<String> roles =
                 userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles, randomStringGenerator.generateRandomString(user.getId()), user.getPoints(), user.getFirstName(), user.getLastName());
+            return jwtTokenizer.getAuthToken(userDetails.getUsername(), roles,
+                randomStringGenerator.generateRandomString(user.getId()), user.getPoints(),
+                user.getFirstName(), user.getLastName());
         }
 
         user.incrementLoginAttempts();
@@ -172,6 +172,33 @@ public class CustomUserDetailService implements UserService {
     }
 
     @Override
+    public boolean isUserLoggedIn(UserLogoutDto userLogoutDto) {
+        LOGGER.debug("Is user logged in: {}", userLogoutDto);
+        String authToken = userLogoutDto.getAuthToken();
+
+        ApplicationUser user =
+            userRepository
+                .findUserByEmail(userLogoutDto.getEmail())
+                .orElseThrow(
+                    () ->
+                        new NotFoundException(
+                            String.format(
+                                "Could not find the user with the email address %s",
+                                userLogoutDto.getEmail())));
+
+//        if (!jwtTokenizer.validateToken(authToken)) {
+//            throw new SecurityException("Invalid authentication token");
+//        }
+
+        if (!user.isLoggedIn()) {
+            jwtTokenizer.blockToken(authToken);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public String register(UserRegistrationDto userRegistrationDto)
         throws ValidationException, ConflictException {
         LOGGER.info("register user with email: {}", userRegistrationDto.getEmail());
@@ -191,7 +218,9 @@ public class CustomUserDetailService implements UserService {
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
-        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(), toRegister.getFirstName(), toRegister.getLastName());
+        return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles,
+            randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(),
+            toRegister.getFirstName(), toRegister.getLastName());
     }
 
     @Override
