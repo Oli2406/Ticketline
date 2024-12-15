@@ -123,49 +123,51 @@ export class CartComponent implements OnInit {
   }
 
   async buy(): Promise<void> {
-    this.receiptService.exportToPDF();
     if (!this.selectedPaymentOption) {
       this.toastr.error('Please select a payment option.');
-      if (!this.address.street || !this.address.postalCode || !this.address.city) {
-        this.toastr.error('Please fill in all address fields.');
+      return;
+    }
+    if (!this.address.street || !this.address.postalCode || !this.address.city) {
+      this.toastr.error('Please fill in all address fields.');
+      return;
+    }
+    if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
+      this.toastr.error('You do not have enough points.');
+      return;
+    }
+    if (this.showPaymentDetails) {
+      if (
+        (this.selectedPaymentOption === 'creditCard' && !this.paymentDetails.creditCardNumber) ||
+        (this.selectedPaymentOption === 'paypal' && !this.paymentDetails.paypalEmail) ||
+        (this.selectedPaymentOption === 'bankTransfer' && !this.paymentDetails.bankAccount)
+      ) {
+        this.toastr.error('Please fill in the required payment details.');
         return;
       }
-      if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
-        this.toastr.error('You do not have enough points.');
-        return;
-      }
-      if (this.showPaymentDetails) {
-        if (
-          (this.selectedPaymentOption === 'creditCard' && !this.paymentDetails.creditCardNumber) ||
-          (this.selectedPaymentOption === 'paypal' && !this.paymentDetails.paypalEmail) ||
-          (this.selectedPaymentOption === 'bankTransfer' && !this.paymentDetails.bankAccount)
-        ) {
-          this.toastr.error('Please fill in the required payment details.');
-          return;
-        }
-      }
-      if (this.cartItems.length === 0) {
-        this.toastr.error('Your cart is empty.');
-        return;
-      }
-      try {
-        const purchasePayload = this.cartItems.map(cartItem => ({
-          itemId: cartItem.item.merchandiseId,
-          quantity: cartItem.quantity,
-        }));
-        await this.cartService.purchaseItems(purchasePayload);
-        this.toastr.success('Thank you for your purchase.');
-        this.cartService.deductPoints(this.getTotalPoints());
-        this.cartService.clearCart();
-        await this.router.navigate(['merchandise']);
-      } catch (error) {
-        if (error instanceof HttpErrorResponse && error.status === 409) {
-          const backendMessage = error.error?.error || 'Error processing your purchase.';
-          this.toastr.error(backendMessage);
-        } else {
-          this.toastr.error('An unexpected error occurred. Please try again.');
-        }
+    }
+    if (this.cartItems.length === 0) {
+      this.toastr.error('Your cart is empty.');
+      return;
+    }
+    try {
+      const purchasePayload = this.cartItems.map(cartItem => ({
+        itemId: cartItem.item.merchandiseId,
+        quantity: cartItem.quantity,
+      }));
+      await this.cartService.purchaseItems(purchasePayload);
+      this.toastr.success('Thank you for your purchase.');
+      this.cartService.deductPoints(this.getTotalPoints());
+      this.cartService.clearCart();
+      this.receiptService.exportToPDF();
+      await this.router.navigate(['merchandise']);
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 409) {
+        const backendMessage = error.error?.error || 'Error processing your purchase.';
+        this.toastr.error(backendMessage);
+      } else {
+        this.toastr.error('An unexpected error occurred. Please try again.');
       }
     }
   }
+
 }

@@ -131,17 +131,16 @@ button.active {
   background: #FFC107;
   color: #000000;
   border: none;
-  padding: 6px 12px;
-  font-size: 14px;
+  padding: 10px 20px;
+  font-size: 16px;
   font-weight: 500;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 16px;
+  width: 120px;
+  text-align: center;
+  margin-right: 8px; /* Ensure spacing from Logout */
 }
 
 .cart-button i {

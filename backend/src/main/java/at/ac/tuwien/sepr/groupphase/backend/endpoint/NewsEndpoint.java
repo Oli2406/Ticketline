@@ -31,7 +31,7 @@ import java.util.List;
 @RequestMapping(NewsEndpoint.BASE_PATH)
 public class NewsEndpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String BASE_PATH = "/api/v1/news";
     private final NewsService newsService;
 
@@ -43,15 +43,15 @@ public class NewsEndpoint {
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public NewsCreateDto createNews(@ModelAttribute NewsCreateMpfDto news)
         throws ValidationException, IOException, URISyntaxException {
-        LOG.info("POST /api/v1/create");
-        LOG.debug("Request parameters: {}", news);
+        LOGGER.info("POST /api/v1/create");
+        LOGGER.debug("Request parameters: {}", news);
         return this.newsService.createNews(news);
     }
 
     @PermitAll
     @GetMapping("{id}")
     public ResponseEntity<NewsDetailDto> getById(@PathVariable("id") long id) {
-        LOG.info("GET " + BASE_PATH + "/{}", id);
+        LOGGER.info("GET " + BASE_PATH + "/{}", id);
 
         try {
             NewsDetailDto news = newsService.getById(id);
@@ -65,7 +65,7 @@ public class NewsEndpoint {
     @PermitAll
     @GetMapping
     public ResponseEntity<List<NewsDetailDto>> getNews() {
-        LOG.info("GET " + BASE_PATH);
+        LOGGER.info("GET " + BASE_PATH);
 
         List<NewsDetailDto> news = newsService.getNews();
         return ResponseEntity.ok(news);
@@ -74,7 +74,7 @@ public class NewsEndpoint {
     @PermitAll
     @GetMapping(value = "/unread")
     public ResponseEntity<List<NewsDetailDto>> getUnreadNews(@RequestParam String email) {
-        LOG.info("GET " + BASE_PATH + "/unread?email=" + email);
+        LOGGER.info("GET " + BASE_PATH + "/unread?email=" + email);
         List<NewsDetailDto> news = newsService.getUnreadNews(email);
         return ResponseEntity.ok(news);
     }
