@@ -1,9 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -18,9 +20,11 @@ public class EventValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventValidator.class);
 
     private final EventRepository eventRepository;
+    private final PerformanceRepository performanceRepository;
 
-    public EventValidator(EventRepository eventRepository) {
+    public EventValidator(EventRepository eventRepository, PerformanceRepository performanceRepository) {
         this.eventRepository = eventRepository;
+        this.performanceRepository = performanceRepository;
     }
 
     public void validateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
@@ -66,6 +70,21 @@ public class EventValidator {
         if (eventCreateDto.getPerformanceIds() == null || eventCreateDto.getPerformanceIds().isEmpty()) {
             validationErrors.add("At least one performance must be provided");
         }
+
+        if (eventCreateDto.getPerformanceIds() != null && !eventCreateDto.getPerformanceIds().isEmpty()) {
+            List<Performance> performances = performanceRepository.findAllById(eventCreateDto.getPerformanceIds());
+
+            for (Performance performance : performances) {
+                if (performance.getDate().toLocalDate().isBefore(eventCreateDto.getDateFrom().plusDays(1))
+                    || performance.getDate().toLocalDate().isAfter(eventCreateDto.getDateTo().plusDays(1))) {
+                    validationErrors.add("Performance date " + performance.getDate().toLocalDate()
+                        + " for performance " + performance.getName()
+                        + " must be within the event date range from "
+                        + eventCreateDto.getDateFrom().plusDays(1) + " to " + eventCreateDto.getDateTo().plusDays(1) + "");
+                }
+            }
+        }
+
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Event validation failed with errors: {}", validationErrors);

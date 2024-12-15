@@ -53,7 +53,7 @@ public class PerformanceDataGenerator {
             return;
         }
 
-        for (int i = 1; i <= 30; i++) {
+        for (int i = 1; i <= 10; i++) {
             Artist artist = artists.get(random.nextInt(artists.size()));
             Location location = locations.get(random.nextInt(locations.size()));
 

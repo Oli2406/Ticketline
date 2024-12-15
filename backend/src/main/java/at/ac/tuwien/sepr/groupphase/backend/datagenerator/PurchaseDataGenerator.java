@@ -55,13 +55,13 @@ public class PurchaseDataGenerator {
             .filter(ticket -> ticket.getStatus().equals("RESERVED"))
             .collect(Collectors.toList());
 
-        List<Ticket> purchasedTickets = ticketRepository.findAll().stream()
-            .filter(ticket -> ticket.getStatus().equals("PURCHASED"))
-            .collect(Collectors.toList());
+        /*List<Ticket> purchasedTickets = ticketRepository.findAll().stream()
+            .filter(ticket -> ticket.getStatus().equals("SOLD"))
+            .collect(Collectors.toList());*/
 
         List<Merchandise> allMerchandise = merchandiseRepository.findAll();
 
-        if (reservedTickets.size() < 2 || purchasedTickets.size() < 2 || allMerchandise.isEmpty()) {
+        if (reservedTickets.size() < 2 || /*purchasedTickets.size() < 2 ||*/ allMerchandise.isEmpty()) {
             LOGGER.warn("Not enough reserved or purchased tickets or merchandise to create purchases.");
             return;
         }
@@ -69,7 +69,7 @@ public class PurchaseDataGenerator {
         for (int i = 0; i < 2; i++) { // 2 purchases per user
             // Je 2 gekaufte und reservierte Tickets
             List<Long> ticketIds = new ArrayList<>();
-            ticketIds.addAll(getRandomIds(purchasedTickets, 2));
+            //ticketIds.addAll(getRandomIds(purchasedTickets, 2));
             ticketIds.addAll(getRandomIds(reservedTickets, 2));
 
             // 2 Merchandise-Artikel je Kauf

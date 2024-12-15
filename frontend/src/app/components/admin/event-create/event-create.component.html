@@ -25,7 +25,7 @@
             placeholder="Select date"
             class="form-control pe-5"
           />
-          <i class="bi bi-calendar position-absolute" style="right: 14rem; top: 50%; transform: translateY(-50%); pointer-events: none; font-size: 1.1rem;"></i>
+          <i class="bi bi-calendar calendar-icon"></i>
         </div>
 
         <label class="custom-label fw-bold">Category</label>
@@ -41,8 +41,11 @@
 
       <!-- List of Created Performances -->
       <ul class="performance-list">
-        <li *ngFor="let performance of performances">
+        <li *ngFor="let performance of performances; let i = index" class="performance-item">
           <span>{{ performance.name }}</span>
+          <button (click)="deletePerformance(i)" class="delete-button" aria-label="Delete performance">
+            <i class="bi bi-trash"></i>
+          </button>
         </li>
       </ul>
 
