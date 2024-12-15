@@ -30,6 +30,15 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     boolean existsByNameAndLocationIdAndDate(String name, Long locationId, LocalDateTime date);
 
     /**
+     * Checks if a performance with the specified name and date exists.
+     *
+     * @param name the name of the performance to check for existence
+     * @param date the date of the performance to be checked
+     * @return true if a performance with the specified name and date exists, false otherwise
+     */
+    boolean existsByNameAndDate(String name, LocalDateTime date);
+
+    /**
      * Finds all performances assoicated with event {@code eventId}.
      *
      * @param eventId the event to find the performances by

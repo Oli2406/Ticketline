@@ -44,6 +44,9 @@
       </div>
     } @else {
       <div class="button-container">
+        <button class="admin-button" [class.active]="currentPage === 'order-overview'" (click)="setActivePage('order-overview')">
+          <i class="fas fa-list-alt"></i> Orders
+        </button>
         <button class="cart-button" [class.active]="currentPage === 'cart'" (click)="routeToUserCart('cart/')">
           <i class="fas fa-shopping-cart"></i> Cart
         </button>
