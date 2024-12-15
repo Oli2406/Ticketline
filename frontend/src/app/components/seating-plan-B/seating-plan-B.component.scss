@@ -37,6 +37,7 @@
   left: 20%;
   border: 1px solid #6c757d;
   padding: 20px;
+  z-index:10;
   background-color: transparent;
 }
 
@@ -80,6 +81,7 @@
   row-gap: 10px;
   column-gap: 10px;
   margin: 0 auto;
+  z-index:10;
 }
 
 .seating-grid-c1 {
@@ -200,6 +202,7 @@ button.btn-secondary {
   background-color: gray;
   border: none;
   color: white;
+  z-index:10;
 }
 
 .btn-purple {
