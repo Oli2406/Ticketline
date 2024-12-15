@@ -56,7 +56,7 @@ class LocationEndpointTest {
     void createLocationWhenInvalidInputThrowsValidationException() throws ValidationException, ConflictException {
         LocationCreateDto locationCreateDto = new LocationCreateDto("Location1", "Street1", "City1", "Postal2", "Country2");
 
-        List<String> validationErrors = List.of("Name is required", "Genre must not be empty");
+        List<String> validationErrors = List.of("Name is required", "Name cannot exceed 64 Characters");
         doThrow(new ValidationException("Invalid input", validationErrors)).when(locationService).createLocation(any());
 
         ValidationException exception = assertThrows(ValidationException.class, () -> locationEndpoint.createOrUpdateLocation(locationCreateDto));

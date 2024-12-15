@@ -55,7 +55,7 @@ class ArtistEndpointTest {
     @Test
     void createArtistWhenInvalidInputThrowsValidationException() throws ValidationException, ConflictException {
         ArtistCreateDto artistCreateDto = new ArtistCreateDto("John", "Doe", "John Doe");
-        List<String> validationErrors = List.of("Name is required", "Genre must not be empty");
+        List<String> validationErrors = List.of("Name is required", "Name cannot exceed 64 Characters");
         doThrow(new ValidationException("Invalid input", validationErrors)).when(artistService).createArtist(any());
 
         ValidationException exception = assertThrows(ValidationException.class, () -> artistEndpoint.createOrUpdateArtist(artistCreateDto));
