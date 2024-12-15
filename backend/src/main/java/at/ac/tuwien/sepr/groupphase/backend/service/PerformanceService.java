@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -73,4 +74,16 @@ public interface PerformanceService {
      * @return the performances mapped to the location
      */
     List<PerformanceDetailDto> getByLocationId(Long id);
+
+    /**
+     * Updates the ticket number for a performance by its ID.
+     *
+     * @param id the ID of the performance to update
+     * @param ticketNumber the new ticket number
+     * @return the updated performance details
+     * @throws NotFoundException if the performance with the specified ID does not exist
+     */
+    PerformanceDetailDto updateTicketNumberById(Long id, Long ticketNumber) throws NotFoundException;
+
+
 }
