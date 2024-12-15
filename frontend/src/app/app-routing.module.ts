@@ -24,6 +24,7 @@ import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.
 import {ArtistComponent} from "./components/artist/artist.component";
 import {EventComponent} from "./components/event/event.component";
 import {LocationComponent} from "./components/location/location.component";
+import {UserAccountComponent} from "./components/user-account/user-account.component";
 
 
 const routes: Routes = [
@@ -53,6 +54,7 @@ const routes: Routes = [
   {path: 'reset-password', canActivate: [AuthGuard] ,component: ResetPasswordComponent},
   {path: 'verify-reset-code',  canActivate: [AuthGuard] , component: VerifyResetCodeComponent},
   {path: 'send-email' , component: SendEmailComponent},
+  {path: 'user-account', canActivate:[AuthGuard] ,component: UserAccountComponent},
   {path: 'home', component: HomeComponent}
 ];
 

@@ -25,6 +25,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
 import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
+import {UserAccountComponent} from "./components/user-account/user-account.component";
 
 @NgModule({
   declarations: [
@@ -41,6 +42,7 @@ import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.
     SendEmailComponent,
     SeatingPlanAComponent,
     SeatingPlanBComponent,
+    UserAccountComponent,
   ],
   bootstrap: [AppComponent],
   imports: [BrowserModule,

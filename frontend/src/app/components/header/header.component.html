@@ -53,7 +53,7 @@
             Admin
           </button>
         }
-        <button class="my-account-button">
+        <button class="my-account-button" [class.active]="currentPage === 'user-account'" (click)="setActivePage('user-account')">
           <i class="bi bi-person"></i> My Account
         </button>
         <button class="login-button" [class.active]="currentPage === 'logout'"
