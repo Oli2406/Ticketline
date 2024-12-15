@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -88,5 +89,38 @@ public class CustomEventServiceTest {
 
         assertEquals("Event not found", exception.getMessage(), "Exception message should match");
         verify(eventRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void searchEventByTitleReturnsMatchingEvent() {
+        EventDetailDto event1DetailDto = new EventDetailDto(1L, "Matching Title", "Description1", "Category1", LocalDate.now(), LocalDate.now().plusDays(1));
+        Event event1 = new Event("Matching Title", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L));
+        Event event2 = new Event("Other Title", "Description2", LocalDate.now(), LocalDate.now().plusDays(1), "Category2", List.of(1L));
+        when(eventRepository.findAll()).thenReturn(List.of(event1, event2));
+        when(eventMapper.eventToEventDetailDto(event1)).thenReturn(event1DetailDto);
+
+        EventSearchDto searchDto = new EventSearchDto("Matching", null, null, null, null, null);
+
+        List<EventDetailDto> result = eventService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return only one event");
+        verify(eventRepository, times(1)).findAll();
+        verify(eventMapper, times(1)).eventToEventDetailDto(event1);
+        verify(eventMapper, never()).eventToEventDetailDto(event2);
+    }
+
+    @Test
+    void searchEventByTitleReturnsNoEventsWhenNoMatch() {
+        Event event1 = new Event("Some Title", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L));
+        Event event2 = new Event("Other Title", "Description2", LocalDate.now(), LocalDate.now().plusDays(1), "Category2", List.of(1L));
+        when(eventRepository.findAll()).thenReturn(List.of(event1, event2));
+
+        EventSearchDto searchDto = new EventSearchDto(null, null, null, LocalDate.of(1900, 1, 1), null, null);
+
+        List<EventDetailDto> result = eventService.search(searchDto).toList();
+
+        assertEquals(0, result.size(), "Should return no events");
+        verify(eventRepository, times(1)).findAll();
+        verify(eventMapper, never()).eventToEventDetailDto(any(Event.class));
     }
 }
