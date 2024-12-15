@@ -95,14 +95,14 @@ public class UserValidator {
     }
 
     private static void validateName(String registerDto, List<String> validationErrors,
-        String Last_name_is_required, String e, String Last_name_contains_illegal_characters) {
+        String requiredErrorMessage, String e, String containsIllegalCharacters) {
         if (registerDto == null || registerDto.trim().isEmpty()) {
-            validationErrors.add(Last_name_is_required);
+            validationErrors.add(requiredErrorMessage);
         } else if (registerDto.length() > 255) {
             validationErrors.add(e);
         } else if (!registerDto.matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
             validationErrors.add(
-                Last_name_contains_illegal_characters);
+                containsIllegalCharacters);
         }
     }
 

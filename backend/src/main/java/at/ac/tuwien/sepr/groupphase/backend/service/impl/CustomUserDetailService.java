@@ -237,8 +237,6 @@ public class CustomUserDetailService implements UserService {
         LOGGER.info("update user: {}", user);
         userValidator.validateUserForUpdate(user);
 
-        String authToken = user.getCurrentAuthToken();
-
         Long originalId = randomStringGenerator.retrieveOriginalId(user.getId())
             .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
 
@@ -257,6 +255,7 @@ public class CustomUserDetailService implements UserService {
 
         userRepository.save(userToUpdate);
 
+        String authToken = user.getCurrentAuthToken();
         if (!jwtTokenizer.validateToken(authToken)) {
             throw new SecurityException("Invalid authentication token");
         }
@@ -267,8 +266,7 @@ public class CustomUserDetailService implements UserService {
             userToUpdate.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
         return jwtTokenizer.getAuthToken(userToUpdate.getEmail(), roles,
             randomStringGenerator.generateRandomString(userToUpdate.getId()),
-            userToUpdate.getPoints(),
-            userToUpdate.getFirstName(), userToUpdate.getLastName());
+            userToUpdate.getPoints(), userToUpdate.getFirstName(), userToUpdate.getLastName());
 
     }
 }
