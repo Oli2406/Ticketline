@@ -53,6 +53,13 @@ public class AuthenticationEndpoint {
     }
 
     @PermitAll
+    @PostMapping("/get-login-status")
+    public ResponseEntity<Boolean> isUserLoggedIn(@RequestBody UserLogoutDto userLogoutDto) {
+        LOGGER.trace("GET " + BASE_PATH + "/get-login-status {}", userLogoutDto);
+        return ResponseEntity.ok(userService.isUserLoggedIn(userLogoutDto));
+    }
+
+    @PermitAll
     @PostMapping("/send-email")
     public String sendEmailToResetPassword(@RequestBody String email) {
         LOGGER.trace("POST " + BASE_PATH + "/send-email {}", email);

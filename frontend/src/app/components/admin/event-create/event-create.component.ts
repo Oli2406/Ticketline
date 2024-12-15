@@ -15,7 +15,9 @@ import {Hall, PriceCategory, SectorType, Ticket, TicketType} from 'src/app/dtos/
 import {TicketService} from 'src/app/services/ticket.service';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css'; // Standard-Theme
-import 'flatpickr/dist/themes/material_blue.css'; // Material Blue Theme
+import 'flatpickr/dist/themes/material_blue.css';
+import {Purchase} from "../../../dtos/purchase"; // Material Blue Theme
+import {PurchaseService} from 'src/app/services/purchase.service';
 
 
 @Component({
@@ -44,7 +46,7 @@ export class EventCreateComponent implements OnInit {
 
   artists: ArtistListDto[] = [];
   locations: LocationListDto[] = [];
-  performances: PerformanceListDto[] = [];
+  performances: Performance[] = [];
 
   selectedArtist = null;
   selectedLocation = null;
@@ -58,7 +60,8 @@ export class EventCreateComponent implements OnInit {
     private eventService: EventService,
     private toastr: ToastrService,
     private localStorageService: LocalStorageService,
-    private ticketService: TicketService
+    private ticketService: TicketService,
+  private purchaseService: PurchaseService
   ) {}
 
   ngOnInit() {
@@ -77,7 +80,7 @@ export class EventCreateComponent implements OnInit {
         console.log("Date To:", this.eventData.dateTo);
       },
       onReady: (selectedDates, dateStr, instance) => {
-        this.flatpickrInstance = instance; // Speichere die Instanz
+        this.flatpickrInstance = instance;
       }
     });
   }
@@ -220,40 +223,16 @@ export class EventCreateComponent implements OnInit {
   }
 
   createPerformance() {
-    this.performanceService.createPerformance(this.newPerformance).subscribe({
-      next: (performance: PerformanceListDto) => {
-        this.performances.push(performance);
-        if (performance.performanceId) {
-          this.eventData.performanceIds?.push(performance.performanceId);
-          this.generateTicketsForPerformance(performance.performanceId, this.newPerformance.hall, this.newPerformance.date);
-        }
-        this.toastr.success('Performance created successfully!', 'Success');
-        //this.saveToLocalStorage();
-        this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
-        this.showPerformanceForm = false;
-      },
-      error: (err) => {
-        //err = this.eventService.handleErrorAndRethrow(err);
-        const errors = Array.isArray(err.message)
-          ? err.message
-          : err.message.split(/\n/);
-        const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
-        this.toastr.error(
-          `<ul>${errorList}</ul>`,
-          'Error creating performance',
-          { enableHtml: true }
-        );
-      },
-    });
+    this.performances.push(this.newPerformance);
+    this.toastr.success('Performance added locally!', 'Success');
+    this.newPerformance = { name: '', date: null, price: null, hall: '', artistId: null, locationId: null, ticketNumber: null, duration: null };
+    this.showPerformanceForm = false;
   }
 
   generateTicketsForPerformance(performanceId: number, hall: string, date: Date) {
     const tickets: Ticket[] = [];
 
     if (hall === 'A') {
-      // Sitzplätze in Sektor B
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -272,7 +251,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -323,7 +301,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     } else if (hall === 'B') {
-      // Sitzplätze in Sektor B (3 x 14)
       for (let row = 1; row <= 3; row++) {
         for (let seat = 1; seat <= 14; seat++) {
           tickets.push({
@@ -342,9 +319,8 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C (Reihe 1: 15 Sitze, Reihe 2: 16 Sitze, ... Reihe 9: 23 Sitze)
       for (let row = 1; row <= 9; row++) {
-        let seatsInRow = 14 + row; // Reihe 1 hat 15 Sitze, Reihe 2 hat 16 Sitze, usw.
+        let seatsInRow = 14 + row;
         for (let seat = 1; seat <= seatsInRow; seat++) {
           tickets.push({
             rowNumber: row,
@@ -362,7 +338,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Standing tickets (Standard: 80)
       for (let i = 1; i <= 80; i++) {
         tickets.push({
           rowNumber: 0,
@@ -379,7 +354,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
 
-      // Standing tickets (VIP: 60)
       for (let i = 1; i <= 60; i++) {
         tickets.push({
           rowNumber: 0,
@@ -396,8 +370,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     }
-
-    // Add logic for other halls (if needed)
     this.createTicketsInBackend(tickets);
   }
 
@@ -417,28 +389,34 @@ export class EventCreateComponent implements OnInit {
   }
 
   onSubmit() {
-    this.eventService.createEvent(this.eventData).subscribe({
-      next: (event: Event) => {
-        this.toastr.success('Event created successfully!', 'Success');
-        this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
-        if (this.flatpickrInstance) {
-          this.flatpickrInstance.clear();
-        }
-        this.performances = [];
-      },
-      error: (err) => {
-        console.error('Error during registration:', err.message);
-        const errors = Array.isArray(err.message)
-          ? err.message
-          : err.message.split(/\n/);
-        const errorList = errors
-          .map((error) => `<li>${error.trim()}</li>`)
-          .join('');
-        this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
-          enableHtml: true,
+    this.sendPerformancesToBackend()
+      .then(() => {
+        console.log('Finale Performance IDs:', this.eventData.performanceIds); // Garantiert vorhanden
+        this.eventService.createEvent(this.eventData).subscribe({
+          next: (event: Event) => {
+            console.log('Event wurde erstellt mit IDs:', this.eventData.performanceIds);
+            this.toastr.success('Event created successfully!', 'Success');
+            this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
+            this.performances = [];
+          },
+          error: (err) => {
+            console.error('Error during event creation:', err);
+            const errors = Array.isArray(err.message)
+              ? err.message
+              : err.message.split(/\n/);
+            const errorList = errors
+              .map((error) => `<li>${error.trim()}</li>`)
+              .join('');
+            this.toastr.error(`<ul>${errorList}</ul>`, 'Error creating event', {
+              enableHtml: true,
+            });
+          },
         });
-      },
-    });
+      })
+      .catch(() => {
+        console.error('Failed to save all performances.');
+        this.toastr.error('Cannot create event because performance saving failed.', 'Error');
+      });
   }
 
   toggleArtistForm() {
@@ -458,6 +436,39 @@ export class EventCreateComponent implements OnInit {
       A: 660,
       B: 353,
     };
-    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
+    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
+  }
+
+  async sendPerformancesToBackend(): Promise<void> {
+    if (this.performances.length === 0) {
+      this.toastr.warning('No performances to send.', 'Warning');
+      return Promise.resolve();
+    }
+
+    try {
+      const performancePromises = this.performances.map(performance =>
+        this.performanceService.createPerformance(performance).toPromise()
+          .then((createdPerformance: PerformanceListDto) => {
+            if (createdPerformance.performanceId) {
+              this.eventData.performanceIds.push(createdPerformance.performanceId);
+              return this.generateTicketsForPerformance(
+                createdPerformance.performanceId,
+                createdPerformance.hall,
+                createdPerformance.date
+              );
+            }
+          })
+          .then(() => {
+            this.toastr.success('Performance and tickets saved to backend.', 'Success');
+          })
+          .catch((err) => {
+            this.toastr.error('Error saving performance or generating tickets.', 'Error');
+            throw err; // Fehler weiterwerfen
+          })
+      );
+      await Promise.all(performancePromises);
+    } catch (err) {
+      this.toastr.error('Failed to process all performances.', 'Error');
+    }
   }
 }
