@@ -7,7 +7,7 @@
       <strong>Hall:</strong> {{ performanceDetails.hall }}<br />
       <strong>Band:</strong> {{ artistDetails.artistName }}<br />
       <strong>Location:</strong> {{ locationDetails.name }}<br />
-      <strong>Date:</strong> {{ performanceDetails.date | date: 'medium' }}
+      <strong>Date:</strong> {{ performanceDetails.date | date: 'yyyy-MM-dd hh:mm' }}
     </p>
     <p *ngIf="!performanceDetails">Loading performance details...</p>
   </div>
@@ -56,7 +56,7 @@
               *ngFor="let seat of seatedBackB || []"
               [ngClass]="getClass(seat)"
               (click)="toggleTicketSelection(seat)"
-              class="seat-box"
+              class="seat-box-b"
             >
             </div>
           </div>

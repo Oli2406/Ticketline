@@ -6,7 +6,7 @@
       <strong>Hall:</strong> {{ performanceDetails.hall }}<br />
       <strong>Band:</strong> {{ artistDetails.artistName }}<br />
       <strong>Location:</strong> {{ locationDetails.name }}<br />
-      <strong>Date:</strong> {{ performanceDetails.date | date: 'medium' }}
+      <strong>Date:</strong> {{ performanceDetails.date | date: 'yyyy-MM-dd hh:mm' }}
     </p>
     <p *ngIf="!performanceDetails">Loading performance details...</p>
   </div>
@@ -54,7 +54,7 @@
               *ngFor="let seat of seatedBackB || []"
               [ngClass]="getClass(seat)"
               (click)="toggleTicketSelection(seat)"
-              class="seat-box"
+              class="seat-box-sector-b"
             >
             </div>
           </div>
@@ -98,7 +98,7 @@
           <p><strong>Selected Standing Tickets (VIP):</strong></p>
           <ul>
             <li>
-              VIP Standing - ({{ selectedStanding.vip * vipStandingPrice }}€)
+              Sector A - VIP Standing - ({{ selectedStanding.vip * vipStandingPrice }}€)
               <input
                 type="number"
                 min="0"
@@ -114,7 +114,7 @@
           <p><strong>Selected Standing Tickets (Regular):</strong></p>
           <ul>
             <li>
-              Regular Standing - ({{ selectedStanding.premium * regularStandingPrice }}€)
+              Sector A - Regular Standing - ({{ selectedStanding.premium * regularStandingPrice }}€)
               <input
                 type="number"
                 min="0"
