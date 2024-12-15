@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class CustomNewsService implements NewsService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private final UserService userService;
     private final NewsRepository newsRepository;
@@ -53,7 +53,7 @@ public class CustomNewsService implements NewsService {
     @Override
     @Transactional(readOnly = true)
     public List<NewsDetailDto> getNews() {
-        LOG.trace("getNews()");
+        LOGGER.trace("getNews()");
 
         return newsRepository.findAll().stream().map(newsMapper::entityToDetailDto).toList();
     }
@@ -61,7 +61,7 @@ public class CustomNewsService implements NewsService {
     @Override
     @Transactional(readOnly = true)
     public List<NewsDetailDto> getUnreadNews(String email) {
-        LOG.trace("getUnreadNews({})", email);
+        LOGGER.trace("getUnreadNews({})", email);
         ApplicationUser user = userService.findApplicationUserByEmail(email);
 
         return newsRepository.findUnreadNews(user.getReadNewsIds()).stream().map(newsMapper::entityToDetailDto).toList();
@@ -69,7 +69,7 @@ public class CustomNewsService implements NewsService {
 
     @Override
     public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException {
-        LOG.trace("createNews({})", mpfDto);
+        LOGGER.trace("createNews({})", mpfDto);
         newsValidator.validateNews(mpfDto);
 
         List<String> imageUrls = new ArrayList<>();
@@ -92,7 +92,7 @@ public class CustomNewsService implements NewsService {
     @Override
     @Transactional(readOnly = true)
     public NewsDetailDto getById(long id) throws NotFoundException {
-        LOG.trace("getById({})", id);
+        LOGGER.trace("getById({})", id);
         News news = newsRepository.findById(id).orElseThrow(() -> new NotFoundException("News not found with id: " + id));
 
         return newsMapper.entityToDetailDto(news);
@@ -118,7 +118,7 @@ public class CustomNewsService implements NewsService {
     }
 
     private String saveImageLocally(MultipartFile image) throws IOException {
-        LOG.trace("saveImageLocally({})", image.getOriginalFilename());
+        LOGGER.trace("saveImageLocally({})", image.getOriginalFilename());
 
         if (!Files.exists(imageDir)) {
             Files.createDirectories(imageDir);
@@ -132,7 +132,7 @@ public class CustomNewsService implements NewsService {
     }
 
     private void deleteImageLocally(String imageName) throws IOException {
-        LOG.trace("deleteImageLocally({})", imageName);
+        LOGGER.trace("deleteImageLocally({})", imageName);
         Files.delete(imageDir.resolve(imageName));
     }
 }

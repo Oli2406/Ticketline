@@ -1,4 +1,4 @@
-<div class="mt-5">
+<div class="mt-3">
   <a *ngIf="!isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
   <div *ngIf="isLoggedIn()">
     <h1 class="text-center">Unread News</h1>
@@ -12,7 +12,7 @@
           <img [src]="n.images[0]" class="card-img-top" alt="News Image">
           <div class="card-body">
             <h2 class="card-title">{{ n.title }}</h2>
-            <p class="card-text text-muted">{{ n.date | date }}</p>
+            <p class="card-text text-muted">{{ n.date | date: 'yyyy-MM-dd' }}</p>
             <p>{{ truncate(n.summary, 200) }}</p>
           </div>
         </div>

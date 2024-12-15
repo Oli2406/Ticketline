@@ -26,7 +26,7 @@ import java.util.Map;
 @RequestMapping(UserEndpoint.BASE_PATH)
 public class UserEndpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final String BASE_PATH = "/api/v1/users";
     private final UserService userService;
     private final RandomStringGenerator randomStringGenerator;
@@ -41,8 +41,8 @@ public class UserEndpoint {
     @PermitAll
     @PutMapping()
     public ResponseEntity<Void> updateReadNews(@RequestBody UserUpdateReadNewsDto dto) {
-        LOG.info("PUT " + BASE_PATH + "/{}", dto);
-        LOG.debug("Body of request:\n{}", dto);
+        LOGGER.info("PUT " + BASE_PATH + "/{}", dto);
+        LOGGER.debug("Body of request:\n{}", dto);
 
         userService.updateReadNews(dto);
         return ResponseEntity.ok().build();
