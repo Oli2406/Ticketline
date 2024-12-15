@@ -212,7 +212,7 @@ public class TicketDataGenerator {
     }
 
     private String getRandomTicketStatus() {
-        String[] statuses = {"AVAILABLE", "RESERVED", "PURCHASED"};
+        String[] statuses = {"AVAILABLE", "RESERVED"};
         return statuses[random.nextInt(statuses.length)];
     }
 }
