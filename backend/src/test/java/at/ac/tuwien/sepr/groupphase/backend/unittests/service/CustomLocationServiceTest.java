@@ -70,7 +70,7 @@ public class CustomLocationServiceTest {
 
         assertFalse(result.isEmpty(), "Resulting location list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("LocationName", result.get(0).getName(), "Location name should match");
+        assertEquals("LocationName", result.getFirst().getName(), "Location name should match");
 
         verify(locationRepository, times(1)).findAll();
     }
@@ -106,7 +106,7 @@ public class CustomLocationServiceTest {
     }
 
     @Test
-    void searchLocationByTitleReturnsNoEventsWhenNoMatch() {
+    void searchLocationByNameReturnsNoEventsWhenNoMatch() {
         Location location1 = new Location("Matching Name", "Street1", "City1", "12345", "Country1");
         Location location2 = new Location("Matching Name", "Street2", "City2", "12345", "Country2");
         when(locationRepository.findAll()).thenReturn(List.of(location1, location2));
