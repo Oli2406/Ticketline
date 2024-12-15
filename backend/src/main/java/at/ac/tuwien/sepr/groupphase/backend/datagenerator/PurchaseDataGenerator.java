@@ -1,11 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,11 @@ public class PurchaseDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 7; // Number of users
+        int userCount = 7;
+
+        if (purchaseRepository.count() > 0) {
+            return;
+        }
 
         for (long userId = 1; userId <= userCount; userId++) {
             createPurchasesForUser(userId);
@@ -94,9 +98,9 @@ public class PurchaseDataGenerator {
             .distinct()
             .limit(count)
             .mapToObj(i -> {
-                if (items.get(0) instanceof Ticket) {
+                if (items.getFirst() instanceof Ticket) {
                     return ((Ticket) items.get(i)).getTicketId();
-                } else if (items.get(0) instanceof Merchandise) {
+                } else if (items.getFirst() instanceof Merchandise) {
                     return ((Merchandise) items.get(i)).getMerchandiseId();
                 }
                 return null;

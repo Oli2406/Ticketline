@@ -36,6 +36,11 @@ public class EventDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
+        if (eventRepository.count() > 0) {
+            LOGGER.info("Events already exist in the database. Skipping initial data generation.");
+            return;
+        }
+
         List<Performance> performances = performanceRepository.findAll();
 
         if (performances.isEmpty()) {
@@ -53,15 +58,15 @@ public class EventDataGenerator {
 
         for (int i = 1; i <= 10; i++) {
             LocalDate dateFrom = getRandomFutureDate();
-            LocalDate dateTo = dateFrom.plusDays(random.nextInt(3) + 1); // Event duration: 1-3 days
+            LocalDate dateTo = dateFrom.plusDays(random.nextInt(3) + 1);
 
             List<Performance> eventPerformances = performances.stream()
                 .filter(performance -> {
                     LocalDate performanceDate = performance.getDate().toLocalDate();
                     return !performanceDate.isBefore(dateFrom) && !performanceDate.isAfter(dateTo);
                 })
-                .limit(random.nextInt(3) + 1) // Each event has 1-3 performances
-                .collect(Collectors.toList());
+                .limit(random.nextInt(3) + 1)
+                .toList();
 
             if (eventPerformances.isEmpty()) {
                 i--;
@@ -88,7 +93,7 @@ public class EventDataGenerator {
     }
 
     private LocalDate getRandomFutureDate() {
-        return LocalDate.of(2023, 3, 1).plusDays(random.nextInt(365)); // Dates after 01.03.2025
+        return LocalDate.of(2023, 3, 1).plusDays(random.nextInt(365));
     }
 
     private String getRandomCategory() {

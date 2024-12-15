@@ -40,6 +40,11 @@ public class PerformanceDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
+        if (performanceRepository.count() > 0) {
+            LOGGER.info("Performances already exist in the database. Skipping initial data generation.");
+            return;
+        }
+
         List<Artist> artists = artistRepository.findAll();
         List<Location> locations = locationRepository.findAll();
 
@@ -48,7 +53,7 @@ public class PerformanceDataGenerator {
             return;
         }
 
-        for (int i = 1; i <= 90; i++) {
+        for (int i = 1; i <= 30; i++) {
             Artist artist = artists.get(random.nextInt(artists.size()));
             Location location = locations.get(random.nextInt(locations.size()));
 
@@ -56,7 +61,7 @@ public class PerformanceDataGenerator {
             LocalDateTime date = generateRandomFutureDate();
             BigDecimal price = generateRandomPrice();
             String hall = generateRandomHall();
-            Long ticketNumber = getTicketNumberByHall(hall); // Hier wird die feste Ticketanzahl bestimmt
+            Long ticketNumber = getTicketNumberByHall(hall);
             int duration = generateRandomDuration();
 
             createPerformanceIfNotExists(name, artist, location, date, price, ticketNumber, hall, duration);
@@ -83,14 +88,13 @@ public class PerformanceDataGenerator {
     }
 
     private LocalDateTime generateRandomFutureDate() {
-        int year = 2023 + random.nextInt(3); // Jahre zwischen 2025 und 2027
+        int year = 2023 + random.nextInt(3);
         int month = random.nextInt(12) + 1;
         int day = random.nextInt(28) + 1;
         int hour = random.nextInt(24);
         int minute = random.nextInt(60);
         LocalDateTime date = LocalDateTime.of(year, month, day, hour, minute);
 
-        // Sicherstellen, dass das Datum nach dem 01.03.2025 liegt
         LocalDateTime minDate = LocalDateTime.of(2022, 3, 1, 0, 0);
         return date.isBefore(minDate) ? minDate.plusDays(random.nextInt(365)) : date;
     }
@@ -102,11 +106,11 @@ public class PerformanceDataGenerator {
 
     private Long getTicketNumberByHall(String hall) {
         if ("A".equals(hall)) {
-            return 660L; // 660 Tickets für Halle A
+            return 660L;
         } else if ("B".equals(hall)) {
-            return 353L; // 353 Tickets für Halle B
+            return 353L;
         }
-        return 0L; // Standardwert (sollte nicht vorkommen)
+        return 0L;
     }
 
     private String generateRandomHall() {
@@ -115,6 +119,7 @@ public class PerformanceDataGenerator {
     }
 
     private int generateRandomDuration() {
-        return 60 + random.nextInt(120); // Dauer zwischen 60 und 180 Minuten
+        return 60 + random.nextInt(120);
     }
+
 }

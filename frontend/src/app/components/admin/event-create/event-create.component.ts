@@ -80,7 +80,7 @@ export class EventCreateComponent implements OnInit {
         console.log("Date To:", this.eventData.dateTo);
       },
       onReady: (selectedDates, dateStr, instance) => {
-        this.flatpickrInstance = instance; // Speichere die Instanz
+        this.flatpickrInstance = instance;
       }
     });
   }
@@ -233,7 +233,6 @@ export class EventCreateComponent implements OnInit {
     const tickets: Ticket[] = [];
 
     if (hall === 'A') {
-      // Sitzplätze in Sektor B
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -252,7 +251,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C
       for (let row = 1; row <= 12; row++) {
         for (let seat = 1; seat <= 20; seat++) {
           tickets.push({
@@ -303,7 +301,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     } else if (hall === 'B') {
-      // Sitzplätze in Sektor B (3 x 14)
       for (let row = 1; row <= 3; row++) {
         for (let seat = 1; seat <= 14; seat++) {
           tickets.push({
@@ -322,9 +319,8 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Sitzplätze in Sektor C (Reihe 1: 15 Sitze, Reihe 2: 16 Sitze, ... Reihe 9: 23 Sitze)
       for (let row = 1; row <= 9; row++) {
-        let seatsInRow = 14 + row; // Reihe 1 hat 15 Sitze, Reihe 2 hat 16 Sitze, usw.
+        let seatsInRow = 14 + row;
         for (let seat = 1; seat <= seatsInRow; seat++) {
           tickets.push({
             rowNumber: row,
@@ -342,7 +338,6 @@ export class EventCreateComponent implements OnInit {
         }
       }
 
-      // Standing tickets (Standard: 80)
       for (let i = 1; i <= 80; i++) {
         tickets.push({
           rowNumber: 0,
@@ -359,7 +354,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
 
-      // Standing tickets (VIP: 60)
       for (let i = 1; i <= 60; i++) {
         tickets.push({
           rowNumber: 0,
@@ -376,8 +370,6 @@ export class EventCreateComponent implements OnInit {
         });
       }
     }
-
-    // Add logic for other halls (if needed)
     this.createTicketsInBackend(tickets);
   }
 
@@ -444,38 +436,39 @@ export class EventCreateComponent implements OnInit {
       A: 660,
       B: 353,
     };
-    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
+    this.newPerformance.ticketNumber = hallCapacity[this.newPerformance.hall] || 0;
   }
 
-  sendPerformancesToBackend(): Promise<void> {
+  async sendPerformancesToBackend(): Promise<void> {
     if (this.performances.length === 0) {
       this.toastr.warning('No performances to send.', 'Warning');
-      return Promise.resolve(); // Direkt gelöstes Promise
+      return Promise.resolve();
     }
 
-    const performancePromises = this.performances.map(performance =>
-      this.performanceService.createPerformance(performance).toPromise()
-        .then((createdPerformance: PerformanceListDto) => {
-          if (createdPerformance.performanceId) {
-            this.eventData.performanceIds.push(createdPerformance.performanceId);
-            console.log("Performance ID hinzugefügt:", createdPerformance.performanceId);
-          }
-          this.toastr.success('Performance saved to backend.', 'Success');
-        })
-        .catch((err) => {
-          console.error('Error saving performance:', err);
-          this.toastr.error('Error saving performance.', 'Error');
-          throw err; // Fehler weiterwerfen
-        })
-    );
-
-    return Promise.all(performancePromises)
-      .then(() => {
-        this.toastr.success('All performances successfully saved to backend!', 'Success');
-        this.performances = [];
-      })
-      .catch(() => {
-        this.toastr.error('Failed to save all performances.', 'Error');
-      });
+    try {
+      const performancePromises = this.performances.map(performance =>
+        this.performanceService.createPerformance(performance).toPromise()
+          .then((createdPerformance: PerformanceListDto) => {
+            if (createdPerformance.performanceId) {
+              this.eventData.performanceIds.push(createdPerformance.performanceId);
+              return this.generateTicketsForPerformance(
+                createdPerformance.performanceId,
+                createdPerformance.hall,
+                createdPerformance.date
+              );
+            }
+          })
+          .then(() => {
+            this.toastr.success('Performance and tickets saved to backend.', 'Success');
+          })
+          .catch((err) => {
+            this.toastr.error('Error saving performance or generating tickets.', 'Error');
+            throw err; // Fehler weiterwerfen
+          })
+      );
+      await Promise.all(performancePromises);
+    } catch (err) {
+      this.toastr.error('Failed to process all performances.', 'Error');
+    }
   }
 }
