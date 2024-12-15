@@ -102,3 +102,16 @@ form {
 .delete-user:hover {
   background-color: #c0392b;
 }
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper .bi {
+  position: absolute;
+  top: 12px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #A7A3FF
+}
