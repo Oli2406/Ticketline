@@ -211,7 +211,6 @@
 </div>
 
 <!-- Hidden invoice html for creating the receipt -->
-<!--
 <div class="invoice-div">
   <!DOCTYPE html>
   <html lang="de">
@@ -263,7 +262,9 @@
       <tbody>
         @for (item of cartItems; track item) {
           <tr>
-            <td>{{ item.item.name }}</td>
+            <td>
+              <span>{{ getItemDisplayName(item.item) }}</span>
+            </td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.item.price }}</td>
             <td>{{ item.item.price * item.quantity }} €</td>
@@ -298,4 +299,4 @@
 
 
 </div>
--->
+
