@@ -87,12 +87,7 @@ export class PerformanceService {
     return throwError(() => new Error(cleanedError));
   }
 
-  getPerformanceById(id: number): Observable<PerformanceListDto> {
-    const url = `${this.apiUrl}/${id}`;
-    return this.http.get<PerformanceListDto>(url).pipe(
-      catchError(this.handleError)
-    );
-  }
+
 
   updateTicketNumber(performanceId: number, ticketNumber: number): Observable<PerformanceDetailDto> {
     const url = `${this.apiUrl}/${performanceId}`;
