@@ -52,6 +52,7 @@ public class EventDataGenerator {
         eventRepository.saveAll(events);
         LOGGER.info("Generated {} events.", events.size());
     }
+
     private List<Event> createEvents(List<Performance> performances) {
         List<Event> events = new ArrayList<>();
 

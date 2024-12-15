@@ -1,11 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.datagenerator;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class PurchaseDataGenerator {
     public void loadInitialData() {
         int userCount = 7;
 
-        if(purchaseRepository.count() > 0) {
+        if (purchaseRepository.count() > 0) {
             return;
         }
 
