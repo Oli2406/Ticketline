@@ -18,7 +18,6 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -101,7 +100,6 @@ public class CustomEventServiceTest {
         when(eventMapper.eventToEventDetailDto(event1)).thenReturn(event1DetailDto);
 
         EventSearchDto searchDto = new EventSearchDto("Matching", null, null, null, null, null);
-        searchDto.setTitle("Matching");
 
         List<EventDetailDto> result = eventService.search(searchDto).toList();
 
@@ -109,5 +107,20 @@ public class CustomEventServiceTest {
         verify(eventRepository, times(1)).findAll();
         verify(eventMapper, times(1)).eventToEventDetailDto(event1);
         verify(eventMapper, never()).eventToEventDetailDto(event2);
+    }
+
+    @Test
+    void searchEventByTitleReturnsNoEventsWhenNoMatch() {
+        Event event1 = new Event("Some Title", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L));
+        Event event2 = new Event("Other Title", "Description2", LocalDate.now(), LocalDate.now().plusDays(1), "Category2", List.of(1L));
+        when(eventRepository.findAll()).thenReturn(List.of(event1, event2));
+
+        EventSearchDto searchDto = new EventSearchDto(null, null, null, LocalDate.of(1900, 1, 1), null, null);
+
+        List<EventDetailDto> result = eventService.search(searchDto).toList();
+
+        assertEquals(0, result.size(), "Should return no events");
+        verify(eventRepository, times(1)).findAll();
+        verify(eventMapper, never()).eventToEventDetailDto(any(Event.class));
     }
 }
