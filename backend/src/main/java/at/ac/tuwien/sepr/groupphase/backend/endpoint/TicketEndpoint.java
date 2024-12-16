@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
