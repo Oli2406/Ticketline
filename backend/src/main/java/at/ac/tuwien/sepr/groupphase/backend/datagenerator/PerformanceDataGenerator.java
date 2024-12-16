@@ -191,15 +191,13 @@ public class PerformanceDataGenerator {
     }
 
     private LocalDateTime generateRandomFutureDate() {
-        int year = 2023 + random.nextInt(3);
-        int month = random.nextInt(12) + 1;
-        int day = random.nextInt(28) + 1;
-        int hour = random.nextInt(24);
-        int minute = random.nextInt(60);
-        LocalDateTime date = LocalDateTime.of(year, month, day, hour, minute);
+        LocalDateTime now = LocalDateTime.now();
 
-        LocalDateTime minDate = LocalDateTime.of(2022, 3, 1, 0, 0);
-        return date.isBefore(minDate) ? minDate.plusDays(random.nextInt(365)) : date;
+        int daysToAdd = random.nextInt(365 * 3);
+        int hoursToAdd = random.nextInt(24);
+        int minutesToAdd = random.nextInt(60);
+
+        return now.plusDays(daysToAdd).plusHours(hoursToAdd).plusMinutes(minutesToAdd);
     }
 
     private BigDecimal generateRandomPrice() {
