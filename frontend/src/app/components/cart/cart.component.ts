@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { CartService } from '../../services/cart.service';
-import { Merchandise } from "../../dtos/merchandise";
-import { TicketDto } from "../../dtos/ticket";
-import { PerformanceListDto } from "../../dtos/performance";
-import { FormsModule } from "@angular/forms";
-import { CommonModule, DecimalPipe, NgOptimizedImage } from "@angular/common";
-import { AuthService } from "../../services/auth.service";
-import { ToastrService } from "ngx-toastr";
-import { Router } from "@angular/router";
-import { Globals } from "../../global/globals";
-import { ReceiptService } from "../../services/receipt.service";
-import { HttpErrorResponse } from "@angular/common/http";
-import { PerformanceService } from 'src/app/services/performance.service';
+import {Component, OnInit} from '@angular/core';
+import {CartService} from '../../services/cart.service';
+import {Merchandise} from "../../dtos/merchandise";
+import {TicketDto} from "../../dtos/ticket";
+import {PerformanceListDto} from "../../dtos/performance";
+import {FormsModule} from "@angular/forms";
+import {CommonModule, DecimalPipe, NgOptimizedImage} from "@angular/common";
+import {AuthService} from "../../services/auth.service";
+import {ToastrService} from "ngx-toastr";
+import {Router} from "@angular/router";
+import {Globals} from "../../global/globals";
+import {ReceiptService} from "../../services/receipt.service";
+import {HttpErrorResponse} from "@angular/common/http";
+import {PerformanceService} from 'src/app/services/performance.service';
+import {forEach} from "lodash";
+import {count} from "rxjs";
 
 @Component({
   selector: 'app-cart',
@@ -33,6 +35,7 @@ export class CartComponent implements OnInit {
 
   selectedPaymentOption: string = 'creditCard';
   protected accountPoints: number;
+  invoiceCounter: number = 1;
 
   imageLocation: string = this.global.backendRessourceUri + '/merchandise/';
 
@@ -70,6 +73,7 @@ export class CartComponent implements OnInit {
     this.fetchAccountPoints();
     this.fetchUser();
     this.fetchAllPerformanceNames();
+    this.loadInvoiceCounter();
     this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
   }
 
@@ -96,8 +100,8 @@ export class CartComponent implements OnInit {
   private fetchAllPerformanceNames(): void {
     const performanceIds = new Set(
       this.cartItems
-        .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
-        .filter((id) => id !== null)
+      .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
+      .filter((id) => id !== null)
     );
 
     const fetchRequests = Array.from(performanceIds).map((id) =>
@@ -105,18 +109,18 @@ export class CartComponent implements OnInit {
     );
 
     Promise.all(fetchRequests)
-      .then((performances) => {
-        performances.forEach((performance) => {
-          this.performanceCache[performance.performanceId] = performance.name;
-        });
-      })
-      .catch((error) => {
-        console.error('Error fetching performances:', error);
-        this.toastr.error('Failed to load performance names.');
-      })
-      .finally(() => {
-        this.isLoading = false;
+    .then((performances) => {
+      performances.forEach((performance) => {
+        this.performanceCache[performance.performanceId] = performance.name;
       });
+    })
+    .catch((error) => {
+      console.error('Error fetching performances:', error);
+      this.toastr.error('Failed to load performance names.');
+    })
+    .finally(() => {
+      this.isLoading = false;
+    });
   }
 
   updateQuantity(item: Merchandise | TicketDto, quantity: number): void {
@@ -154,6 +158,25 @@ export class CartComponent implements OnInit {
 
   public setInvoiceDate(): Date {
     return new Date();
+  }
+
+  loadInvoiceCounter(): void {
+    const savedCounter = localStorage.getItem('invoiceCounter');
+    if (savedCounter) {
+      this.invoiceCounter = parseInt(savedCounter, 10);
+    }
+  }
+
+  saveInvoiceCounter(): void {
+    localStorage.setItem('invoiceCounter', this.invoiceCounter.toString());
+  }
+
+  setInvoiceNumber(): string {
+    return new Date().getFullYear().toString() + '-00' + this.invoiceCounter;
+  }
+
+  isMerchandise(item: Merchandise | TicketDto): item is Merchandise {
+    return (item as Merchandise).merchandiseId !== undefined;
   }
 
   getItemDisplayName(item: Merchandise | TicketDto): string {
@@ -221,10 +244,13 @@ export class CartComponent implements OnInit {
         itemId: 'merchandiseId' in cartItem.item ? cartItem.item.merchandiseId : cartItem.item.ticketId,
         quantity: cartItem.quantity,
       }));
-
+      this.invoiceCounter++;
+      this.saveInvoiceCounter();
       await this.cartService.purchaseItems(purchasePayload);
       this.toastr.success('Thank you for your purchase.');
-      this.cartService.deductPoints(this.getTotalPoints());
+      if (this.selectedPaymentOption == 'points'){
+        this.cartService.deductPoints(this.getTotalPoints());
+      }
       this.cartService.clearCart();
       this.receiptService.exportToPDF();
       await this.router.navigate(['merchandise']);
