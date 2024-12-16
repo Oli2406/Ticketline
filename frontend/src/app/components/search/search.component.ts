@@ -199,5 +199,13 @@ export class SearchComponent {
     this.searchChanged();
   }
 
+  truncate(text: string, maxLength: number): string {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    } else {
+      return text;
+    }
+  }
+
   protected readonly SearchType = SearchType;
 }

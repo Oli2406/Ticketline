@@ -15,8 +15,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Component
@@ -58,22 +56,78 @@ public class EventDataGenerator {
     private List<Event> createEvents(List<Performance> performances) {
         List<Event> events = new ArrayList<>();
 
-        for (int i = 0; i < performances.size(); i++) {
-            Performance performance = performances.get(i);
-            LocalDate performanceDate = performance.getDate().toLocalDate();
-            LocalDate dateFrom = performanceDate.minusDays(2); // Datum des Events anpassen, falls es nicht passt
-            LocalDate dateTo = performanceDate.plusDays(7);
+        String[] eventTitleFormats = {
+            "The Ultimate %s Festival",
+            "%s: A Weekend to Remember",
+            "An Extravaganza of %s",
+            "%s Festival at Its Best",
+            "Discover the World of %s",
+            "Exclusive %s Showcase",
+            "The Spectacular %s Event",
+            "Experience the Best of %s",
+            "A Celebration of %s",
+            "The Grand %s Affair"
+        };
 
-            // IDs direkt aus der Performance nehmen
-            List<Long> performanceIds = List.of(performance.getPerformanceId());
+        String[] eventDescriptionFormats = {
+            "Get ready for an amazing weekend with '%s' and others, featuring renowned artists at the stunning %s. This extraordinary event is filled with energy and excitement.",
+            "Step into a world of wonder with '%s' and others, an unforgettable event with various artists. Hosted at %s, this experience will captivate you.",
+            "Don't miss '%s' and others at %s! This event promises unmatched entertainment and a lively atmosphere.",
+            "'%s' and others are your ticket to an enchanting experience. Held at %s, immerse yourself in the magic.",
+            "Mark your calendar for '%s', and others, a sensational event with multiple artists. Happening at %s, this is entertainment at its finest.",
+            "Prepare to be amazed by '%s' and others at the incredible %s. This event will be a night to remember.",
+            "Join us for an unforgettable evening with '%s' and others at the spectacular %s. Get ready for a show like no other!",
+            "Experience the thrill of '%s' and others live at %s! This is one event you won't want to miss.",
+            "Immerse yourself in the sounds of '%s' and others at the iconic %s. It's a celebration of music and entertainment.",
+            "Get your tickets now for '%s' and others at the renowned %s. This event will leave you breathless."
+        };
+
+        for (int i = 0; i < performances.size(); i += 3) { // Increment by 3 to get groups of 3
+            List<Performance> selectedPerformances = performances.subList(i, Math.min(i + 3, performances.size()));
+
+            // Handle the case where there are less than 3 performances left
+            String performance1 = !selectedPerformances.isEmpty() ? selectedPerformances.get(0).getName() : "Amazing Act";
+            String performance2 = selectedPerformances.size() > 1 ? selectedPerformances.get(1).getName() : "Another Great Show";
+            String performance3 = selectedPerformances.size() > 2 ? selectedPerformances.get(2).getName() : "Fantastic Performance";
+            String location = !selectedPerformances.isEmpty() ? selectedPerformances.get(0).getLocation() : "Our Main Stage";
+
+            // Determine date range based on selected performances
+            LocalDate minDate = selectedPerformances.stream()
+                .map(p -> p.getDate().toLocalDate())
+                .min(LocalDate::compareTo)
+                .orElse(getRandomFutureDate());
+            LocalDate maxDate = selectedPerformances.stream()
+                .map(p -> p.getDate().toLocalDate())
+                .max(LocalDate::compareTo)
+                .orElse(getRandomFutureDate());
+            LocalDate dateFrom = minDate.minusDays(2);
+            LocalDate dateTo = maxDate.plusDays(2);
+
+            String titleFormat = eventTitleFormats[random.nextInt(eventTitleFormats.length)];
+            String descriptionFormat = eventDescriptionFormats[random.nextInt(eventDescriptionFormats.length)];
+
+            // Generate title and description with the selected formats
+            String title = String.format(titleFormat, getRandomCategory()); // Use category in title
+            String description = String.format(
+                descriptionFormat,
+                performance1,
+                location,
+                dateFrom,
+                dateTo
+            );
+
+            // Collect performance IDs
+            List<Long> performanceIds = selectedPerformances.stream()
+                .map(Performance::getPerformanceId)
+                .collect(Collectors.toList());
 
             Event event = new Event(
-                    "Event " + (i + 1),
-                    "Description for Event " + (i + 1),
-                    dateFrom,
-                    dateTo,
-                    getRandomCategory(),
-                    performanceIds
+                title,
+                description,
+                dateFrom,
+                dateTo,
+                getRandomCategory(),
+                performanceIds
             );
 
             events.add(event);
@@ -87,7 +141,38 @@ public class EventDataGenerator {
     }
 
     private String getRandomCategory() {
-        String[] categories = {"Music", "Theater", "Dance", "Comedy", "Film"};
+        String[] categories = {
+            "Music",
+            "Theater",
+            "Dance",
+            "Comedy",
+            "Film",
+            "Art Exhibition",
+            "Opera",
+            "Literature",
+            "Photography",
+            "Circus",
+            "Magic Show",
+            "Stand-up Comedy",
+            "Jazz",
+            "Rock",
+            "Classical",
+            "Pop",
+            "Folk",
+            "Hip-hop",
+            "Workshops",
+            "Cultural Festival",
+            "Food Festival",
+            "Technology Expo",
+            "Gaming",
+            "Sports",
+            "Meditation and Yoga",
+            "Adventure",
+            "Charity Event",
+            "Historical Reenactment",
+            "Science Fair",
+            "Nature Walk"
+        };
         return categories[random.nextInt(categories.length)];
     }
 }

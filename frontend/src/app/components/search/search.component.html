@@ -268,7 +268,7 @@
   <tr *ngFor="let event of events">
     <td>{{ event.title }}</td>
     <td>{{ event.category }}</td>
-    <td>{{ event.description }}</td>
+    <td>{{ truncate(event.description, 164) }}</td>
     <td>{{ event.dateFrom }}</td>
     <td>{{ event.dateTo }}</td>
     <!--<td>{{ event.duration }}</td>-->
