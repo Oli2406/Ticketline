@@ -1,13 +1,15 @@
 <div class="container mt-5">
   <!-- Header -->
   <div class="text-center mt-3">
-    <h2>{{ performanceDetails.name }}</h2>
-    <p *ngIf="performanceDetails">
-      <strong>Hall:</strong> {{ performanceDetails.hall }}<br />
-      <strong>Band:</strong> {{ artistDetails.artistName }}<br />
-      <strong>Location:</strong> {{ locationDetails.name }}<br />
-      <strong>Date:</strong> {{ performanceDetails.date | date: 'yyyy-MM-dd hh:mm' }}
-    </p>
+    <div *ngIf="performanceDetails">
+      <h2>{{ performanceDetails?.name }}</h2>
+      <p>
+        <strong>Hall:</strong> {{ performanceDetails?.hall }}<br />
+        <strong>Band:</strong> {{ artistDetails?.artistName }}<br />
+        <strong>Location:</strong> {{ locationDetails?.name }}<br />
+        <strong>Date:</strong> {{ performanceDetails?.date | date: 'yyyy-MM-dd hh:mm' }}
+      </p>
+    </div>
     <p *ngIf="!performanceDetails">Loading performance details...</p>
   </div>
 

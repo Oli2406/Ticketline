@@ -140,8 +140,6 @@ export class SearchComponent {
           this.ticketService.getTicketsByPerformanceId(performance.performanceId).pipe(
             map((tickets) => {
               const availableTickets = tickets.filter(ticket => ticket.status === 'AVAILABLE').length;
-              console.log(performance.ticketNumber);
-              console.log(availableTickets);
               return this.performanceService.updateTicketNumber(performance.performanceId, availableTickets).subscribe();
 
             })
