@@ -92,12 +92,7 @@ public class CustomEventService implements EventService {
         if (dto.getDateLatest() != null) {
             query = query.filter(event -> event.getDateTo().isBefore(dto.getDateLatest()));
         }
-        /*if (dto.getMinDuration() != null) {
-            query = query.filter(event -> event.getDuration() >= dto.getMinDuration() - 30);
-        }
-        if (dto.getMaxDuration() != null) {
-            query = query.filter(event -> event.getDuration() <= dto.getMaxDuration() + 30);
-        }*/
+
 
         return query.map(this.eventMapper::eventToEventDetailDto);
     }

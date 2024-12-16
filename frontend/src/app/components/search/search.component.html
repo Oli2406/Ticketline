@@ -67,23 +67,6 @@
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateLatest" class="form-control"
                id="eventDateLatest" name="eventDateLatest" type="date"/>
       </div>
-
-      <!-- Min duration
-      <div class="col-md-3 mb-3">
-        <label class="form-label" for="eventMinDuration">Minimum Duration [min]</label>
-        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.minDuration" class="form-control"
-               id="eventMinDuration"
-               name="eventMinDuration" placeholder="Enter minimum duration" type="number"/>
-      </div>
-
-
-      <div class="col-md-3 mb-3">
-        <label class="form-label" for="eventMaxDuration">Maximum Duration [min]</label>
-        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.maxDuration" class="form-control"
-               id="eventMaxDuration"
-               name="eventMaxDuration" placeholder="Enter maximum duration" type="number"/>
-      </div>-->
-
       <div class="col-md-3 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
@@ -260,7 +243,6 @@
     <th>Description</th>
     <th>Startdate</th>
     <th>Enddate</th>
-    <!--<th>Duration</th>-->
     <th>Actions</th>
   </tr>
   </thead>
@@ -271,7 +253,6 @@
     <td>{{ truncate(event.description, 164) }}</td>
     <td>{{ event.dateFrom }}</td>
     <td>{{ event.dateTo }}</td>
-    <!--<td>{{ event.duration }}</td>-->
     <td>
       <button [routerLink]="['/event', event.eventId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i>
       </button>

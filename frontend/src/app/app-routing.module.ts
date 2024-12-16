@@ -42,7 +42,6 @@ const routes: Routes = [
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'news/details/:id', component: NewsDetailComponent },
-  {path: 'order-overview', component: OrderOverviewComponent },
   {path: '', children: [
       {path: 'admin', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: AdminComponent},
       {path: 'admin/createUser', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: CreateUserComponent},
