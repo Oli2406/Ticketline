@@ -88,24 +88,17 @@ button.active {
   text-align: center;
 }
 
-.admin-button {
+.dropdown-button {
   background-color: #4D47C3;
   border: none;
   padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 500;
-  color: #fff;
-  border-radius: 8px;
-  cursor: pointer;
   transition: background 0.3s, box-shadow 0.3s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 120px;
-  text-align: center;
-  margin-right: 8px; /* Ensure spacing from Logout */
+  font-size: 1.25rem;
 }
 
-.admin-button:hover {
-  background-color: #514dc7;
+.dropdown-button:hover {
+  background-color: #6059e5;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -127,30 +120,6 @@ button.active {
   background: #2e3d9a;
 }
 
-.cart-button {
-  background: #FFC107;
-  color: #000000;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 120px;
-  text-align: center;
-  margin-right: 8px; /* Ensure spacing from Logout */
-}
-
-.cart-button i {
-  font-size: 18px;
-}
-
-.cart-button:hover {
-  background: #FFD54F;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-}
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {

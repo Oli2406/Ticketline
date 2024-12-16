@@ -182,7 +182,6 @@ public class CustomPerformanceService implements PerformanceService {
         }
 
         existingPerformance.setTicketNumber(ticketNumber);
-        System.out.println(ticketNumber);
 
         // Save the new performance to the database
         Performance savedPerformance = performanceRepository.save(existingPerformance);

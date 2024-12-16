@@ -113,7 +113,6 @@ public class PerformanceEndpoint {
         @PathVariable Long id,
         @RequestBody Long ticketNumber) throws NotFoundException {
         LOGGER.info("Received request to update ticket number for performance with ID {}", id);
-        System.out.println(ticketNumber);
 
         PerformanceDetailDto updatedPerformance = performanceService.updateTicketNumberById(id, ticketNumber);
         LOGGER.debug("Performance updated successfully: {}", updatedPerformance);

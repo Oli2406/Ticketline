@@ -21,7 +21,6 @@ import {CartComponent} from "./components/cart/cart.component";
 import {SearchComponent} from "./components/search/search.component";
 import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
 import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
-import {OrderOverviewComponent} from "./components/order-overview/order-overview.component";
 import {ArtistComponent} from "./components/artist/artist.component";
 import {EventComponent} from "./components/event/event.component";
 import {LocationComponent} from "./components/location/location.component";
@@ -42,7 +41,6 @@ const routes: Routes = [
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'news/details/:id', component: NewsDetailComponent },
-  {path: 'order-overview', component: OrderOverviewComponent },
   {path: '', children: [
       {path: 'admin', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: AdminComponent},
       {path: 'admin/createUser', canActivate: mapToCanActivate([AuthGuard, AdminGuard]), component: CreateUserComponent},

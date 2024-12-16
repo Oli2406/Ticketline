@@ -67,23 +67,6 @@
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateLatest" class="form-control"
                id="eventDateLatest" name="eventDateLatest" type="date"/>
       </div>
-
-      <!-- Min duration
-      <div class="col-md-3 mb-3">
-        <label class="form-label" for="eventMinDuration">Minimum Duration [min]</label>
-        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.minDuration" class="form-control"
-               id="eventMinDuration"
-               name="eventMinDuration" placeholder="Enter minimum duration" type="number"/>
-      </div>
-
-
-      <div class="col-md-3 mb-3">
-        <label class="form-label" for="eventMaxDuration">Maximum Duration [min]</label>
-        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.maxDuration" class="form-control"
-               id="eventMaxDuration"
-               name="eventMaxDuration" placeholder="Enter maximum duration" type="number"/>
-      </div>-->
-
       <div class="col-md-3 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
@@ -260,7 +243,6 @@
     <th>Description</th>
     <th>Startdate</th>
     <th>Enddate</th>
-    <!--<th>Duration</th>-->
     <th>Actions</th>
   </tr>
   </thead>
@@ -271,9 +253,9 @@
     <td>{{ truncate(event.description, 164) }}</td>
     <td>{{ event.dateFrom }}</td>
     <td>{{ event.dateTo }}</td>
-    <!--<td>{{ event.duration }}</td>-->
     <td>
-      <button [routerLink]="['/event', event.eventId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></button>
+      <button [routerLink]="['/event', event.eventId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i>
+      </button>
     </td>
   </tr>
   </tbody>
@@ -297,7 +279,7 @@
     <td>{{ artist.lastName }}</td>
     <td>{{ artist.artistName }}</td>
     <td>
-      <a [routerLink]="['/artist', artist.artistId]" class="btn btn-secondary bg-purp" ><i class="bi bi-info-lg"></i></a>
+      <a [routerLink]="['/artist', artist.artistId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></a>
     </td>
   </tr>
   </tbody>
@@ -319,7 +301,8 @@
     <td>{{ location.name }}</td>
     <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
     <td>
-      <button [routerLink]="['/location', location.locationId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></button>
+      <button [routerLink]="['/location', location.locationId]" class="btn btn-secondary bg-purp"><i
+        class="bi bi-info-lg"></i></button>
     </td>
   </tr>
   </tbody>
@@ -334,9 +317,18 @@
       [(ngModel)]="searchQuery"
       (ngModelChange)="performAdvancedSearch()"/>
     <button class="btn btn-primary" (click)="performAdvancedSearch()">Search</button>
-    <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+    <button type="button" (click)="clearSearch()" class="btn btn-secondary">
       <i class="bi bi-x-circle"></i> Clear
     </button>
+    <span
+      class="btn btn-light"
+      style="cursor: default;"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="Search for performances by the event in which they take place, the artist performing or the performance
+      venue. Separate search terms with spaces (e.g., 2025-04-23 Opera SingerName).">
+      <i class="bi bi-question-lg"></i>
+    </span>
   </div>
 </div>
 
@@ -346,9 +338,12 @@
     <thead class="th-purp">
     <tr>
       <th>Name</th>
-      <th>Date</th>
+      <th>Location</th>
+      <th>Time & Date</th>
+      <th>Duration</th>
       <th>Price</th>
-      <th>Number of Tickets</th>
+      <th>Artist</th>
+      <th>Ticket Number</th>
       <th>Hall</th>
       <th>Actions</th>
     </tr>
@@ -356,8 +351,11 @@
     <tbody>
     <tr *ngFor="let performance of advancedSearchPerformances">
       <td>{{ performance.name }}</td>
+      <td>{{ performance.location.name }}</td>
       <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
+      <td>{{ performance.duration | duration }}</td>
       <td>{{ performance.price | currency: 'EUR' }}</td>
+      <td>{{ performance.artist.artistName }}</td>
       <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
       <td>
@@ -368,6 +366,7 @@
           <i class="bi bi-ticket-fill"></i> Tickets
         </button>
       </td>
+
     </tr>
     </tbody>
   </table>
@@ -381,12 +380,14 @@
 <!-- Search Results for performance -->
 <p *ngIf="curSearchType === SearchType.performance && performances.length === 0">No performances were found.</p>
 
-<table *ngIf="curSearchType === SearchType.performance && performances.length > 0" class="table table-hover text-center mt-3">
+<table *ngIf="curSearchType === SearchType.performance && performances.length > 0"
+       class="table table-hover text-center mt-3">
   <thead class="th-purp">
   <tr>
     <th>Name</th>
     <th>Location</th>
     <th>Time & Date</th>
+    <th>Duration</th>
     <th>Price</th>
     <th>Artist</th>
     <th>Ticket Number</th>
@@ -399,6 +400,7 @@
     <td>{{ performance.name }}</td>
     <td>{{ performance.location.name }}</td>
     <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
+    <td>{{ performance.duration | duration }}</td>
     <td>{{ performance.price | currency: 'EUR' }}</td>
     <td>{{ performance.artist.artistName }}</td>
     <td>{{ performance.ticketNumber }}</td>

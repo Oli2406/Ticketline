@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {AfterViewInit, Component, Pipe, PipeTransform} from '@angular/core';
 import {EventListDto, EventSearch} from "../../dtos/event";
 import {EventService} from "../../services/event.service";
 import {CurrencyPipe, DatePipe, KeyValuePipe, NgClass, NgForOf, NgIf} from "@angular/common";
@@ -7,7 +7,7 @@ import {ArtistService} from "../../services/artist.service";
 import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto, LocationSearch} from "../../dtos/location";
-import {PerformanceListDto, PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
+import {PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
 import {debounceTime, forkJoin, map, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
@@ -21,6 +21,18 @@ export enum SearchType {
   advanced
 }
 
+@Pipe({standalone: true, name: 'duration'})
+export class DurationPipe implements PipeTransform {
+  transform(value: number): string {
+    const hours = Math.floor(value / 60);
+    const minutes = value % 60;
+
+    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+  }
+}
+
+declare var bootstrap: any;
+
 @Component({
   selector: 'app-events',
   standalone: true,
@@ -32,17 +44,18 @@ export enum SearchType {
     FormsModule,
     KeyValuePipe,
     RouterLink,
-    CurrencyPipe
+    CurrencyPipe,
+    DurationPipe
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
 })
-export class SearchComponent {
+export class SearchComponent implements AfterViewInit {
   events: EventListDto[] = [];
   artists: ArtistListDto[] = [];
   performances: PerformanceDetailDto[] = [];
   locations: LocationListDto[] = [];
-  advancedSearchPerformances: PerformanceListDto[] = [];
+  advancedSearchPerformances: PerformanceDetailDto[] = [];
 
   searchQuery: string = '';
 
@@ -66,6 +79,11 @@ export class SearchComponent {
     this.setupSearchListener();
     this.loadSearchType();
     this.updateData();
+  }
+
+  ngAfterViewInit() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
   }
 
   changeSearchType(type: SearchType) {

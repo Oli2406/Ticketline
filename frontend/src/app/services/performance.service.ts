@@ -46,9 +46,9 @@ export class PerformanceService {
     return this.http.get<PerformanceDetailDto[]>(this.apiUrl + "/search", {params});
   }
 
-  advancedSearchPerformances(query: string): Observable<PerformanceListDto[]> {
+  advancedSearchPerformances(query: string): Observable<PerformanceDetailDto[]> {
     const url = `${this.apiUrl}/advanced-search?query=${query}`;
-    return this.http.get<PerformanceListDto[]>(url);
+    return this.http.get<PerformanceDetailDto[]>(url);
   }
 
   createPerformance(performance: Performance): Observable<PerformanceListDto> {

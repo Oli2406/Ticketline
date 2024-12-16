@@ -52,7 +52,7 @@ public class TicketEndpoint {
         return ResponseEntity.ok(tickets);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<TicketDetailDto> getTicketById(@PathVariable Long id) {
         LOGGER.info("Fetching ticket with ID: {}", id);
@@ -79,7 +79,7 @@ public class TicketEndpoint {
         return ResponseEntity.noContent().build();
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @PutMapping("/{id}")
     public ResponseEntity<TicketDetailDto> updateTicket(
         @PathVariable Long id,

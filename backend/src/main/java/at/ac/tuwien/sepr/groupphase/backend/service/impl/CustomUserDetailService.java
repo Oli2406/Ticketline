@@ -226,7 +226,6 @@ public class CustomUserDetailService implements UserService {
             .orElseThrow(() -> new RuntimeException("User not found for the given ID"));
 
         user.setPoints(user.getPoints() + pointsToAdd);
-        System.out.println("new point amount: " + user.getPoints() + pointsToAdd);
         userRepository.save(user);
     }
 }
