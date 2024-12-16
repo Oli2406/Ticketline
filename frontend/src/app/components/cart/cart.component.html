@@ -217,35 +217,35 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rechnung</title>
+    <title>Invoice</title>
   </head>
   <body>
   <div class="invoice-container">
     <div class="invoice-header">
-      <h1>Rechnung</h1>
+      <h1>Invoice</h1>
       <div>
-        <p>Rechnungsdatum: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
-        <p>Rechnungsnummer: <strong>2024-001</strong></p>
+        <p>Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
+        <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
       </div>
     </div>
 
     <table class="invoice-details">
       <tr>
         <td>
-          <strong>Rechnungssteller:</strong> <br>
-          Ticketline- GmbH<br>
+          <strong>Issuer:</strong> <br>
+          Ticketline - GmbH<br>
           Wiedner Hautpstrasse 76/2/2<br>
           1040 Wien <br>
           E-Mail: info&#64;ticketline-website.at<br>
           UID: ATU12345678
         </td>
         <td>
-          <strong>Rechnung an:</strong><br>
+          <strong>Recipient:</strong><br>
           {{ userFirstName }} {{ userLastName }}<br>
           {{ address.street }}<br>
-          {{ address.postalCode }} {{address.city}}<br>
+          {{ address.postalCode }} {{ address.city }}<br>
           E-Mail: {{ userEmail }} <br>
-          Zahlungsmethode: {{ selectedPaymentOption }}
+          Payment method: {{ selectedPaymentOption }}
         </td>
       </tr>
     </table>
@@ -253,10 +253,10 @@
     <table class="invoice-items">
       <thead>
       <tr>
-        <th>Beschreibung</th>
-        <th>Menge</th>
-        <th>Einzelpreis</th>
-        <th>Gesamtpreis</th>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total Price</th>
       </tr>
       </thead>
       <tbody>
@@ -266,33 +266,48 @@
               <span>{{ getItemDisplayName(item.item) }}</span>
             </td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.item.price }}</td>
-            <td>{{ item.item.price * item.quantity }} €</td>
+            <td *ngIf="selectedPaymentOption === 'points'">
+              @if (isMerchandise(item.item)){
+                {{ item.item.points }}
+              }
+
+            </td>
+            <td *ngIf="selectedPaymentOption === 'points'">
+              @if (isMerchandise(item.item)){
+                {{item.item.points * item.quantity }}
+              }
+            </td>
+            <td *ngIf="selectedPaymentOption !== 'points'">{{ item.item.price }} €</td>
+            <td *ngIf="selectedPaymentOption !== 'points'">{{ item.item.price * item.quantity }} €</td>
           </tr>
         }
       </tbody>
     </table>
-
     <table class="invoice-footer">
-      <tr>
-        <td><strong>Gesamtbetrag:</strong></td>
+      <tr *ngIf="selectedPaymentOption === 'points'">
+        <td><strong>Total Price in Points</strong></td>
+        <td><strong>{{ getTotalPoints() }}</strong></td>
+      </tr>
+      <tr *ngIf="selectedPaymentOption !== 'points'">
+        <td><strong>Total Price excl. tax.:</strong></td>
         <td><strong>{{ (getTotalPrice() / 120) * 100 | number: '1.2-2' }} €</strong></td>
       </tr>
-      <tr>
-        <td><strong>Umsatzsteuer (20%):</strong></td>
+      <tr *ngIf="selectedPaymentOption !== 'points'">
+        <td><strong>sales Tax (20%):</strong></td>
         <td><strong>{{ ((getTotalPrice() / 120) * 100) * 0.2 | number: '1.2-2' }} €</strong></td>
       </tr>
-      <tr>
-        <td><strong>Gesamtbetrag inkl. USt:</strong></td>
+      <tr *ngIf="selectedPaymentOption !== 'points'">
+        <td><strong>Total Price incl. tax:</strong></td>
         <td><strong>{{ getTotalPrice()| number: '1.2-2' }} €</strong></td>
       </tr>
     </table>
 
     <div class="invoice-bank">
-      <p>Vielen Dank für Ihren Einkauf bei Ticket-Line!</p>
-      <p>Bankverbindung: IBAN: AT08 1750 2024 8558 1234, BIC: BAWAATWW</p>
+      <p>Thank you for your purchase at Ticket-Line!</p>
+      <p> Your merchandise items will be delivered within the next 14 business days.</p>
+      <p *ngIf="selectedPaymentOption !== 'points'">Banking information: IBAN: AT08 1750 2024 8558 1234, BIC: BAWAATWW</p>
+      <p *ngIf="selectedPaymentOption === 'points'"> Your current points after this purchase : {{ accountPoints - getTotalPoints() }}</p>
     </div>
-
   </div>
   </body>
   </html>
