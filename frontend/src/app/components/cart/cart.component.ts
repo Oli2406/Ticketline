@@ -136,6 +136,13 @@ export class CartComponent implements OnInit {
     return this.cartItems.reduce((sum, cartItem) => sum + ('points' in cartItem.item ? cartItem.item.points : 0) * cartItem.quantity, 0);
   }
 
+  getTotalPointsToAdd(): number {
+    const total = this.cartItems.reduce((sum, cartItem) => {
+      return sum + cartItem.item.price * cartItem.quantity;
+    }, 0);
+
+    return Math.round(total);
+  }
   formatCreditCardNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1-').replace(/-$/, '');
@@ -224,7 +231,11 @@ export class CartComponent implements OnInit {
 
       await this.cartService.purchaseItems(purchasePayload);
       this.toastr.success('Thank you for your purchase.');
-      this.cartService.deductPoints(this.getTotalPoints());
+      if(this.selectedPaymentOption === 'points') {
+        await this.cartService.deductPoints(this.getTotalPoints());
+      } else {
+        await this.cartService.addPoints(this.getTotalPointsToAdd());
+      }
       this.cartService.clearCart();
       this.receiptService.exportToPDF();
       await this.router.navigate(['merchandise']);
