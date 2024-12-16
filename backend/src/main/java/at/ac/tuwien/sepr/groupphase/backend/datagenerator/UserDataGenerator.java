@@ -28,7 +28,7 @@ public class UserDataGenerator {
     public void loadInitialData() {
         LOGGER.debug("generating users");
 
-        createUserIfNotExists("Max", "Mustermann", "anna.simhofer@hotmail.com", "password", false,
+        createUserIfNotExists("Max", "Mustermann", "max.mustermann@email.com", "password", false,
             77777);
         createUserIfNotExists("Lena", "Müller", "lena.mueller@email.com", "password", false, 6666);
         createUserIfNotExists("Tom", "Schmidt", "tom.schmidt@email.com", "password", false, 555);
