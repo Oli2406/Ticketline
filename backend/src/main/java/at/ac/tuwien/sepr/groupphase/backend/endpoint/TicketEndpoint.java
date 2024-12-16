@@ -62,7 +62,7 @@ public class TicketEndpoint {
         return ResponseEntity.ok(ticket);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/performance/{performanceId}")
     public ResponseEntity<List<TicketDetailDto>> getTicketsByPerformanceId(@PathVariable Long performanceId) {
         LOGGER.info("Fetching tickets for performance ID: {}", performanceId);
