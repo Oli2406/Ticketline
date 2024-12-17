@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
-import {UserUpdateReadNewsDto} from "../dtos/user-data";
+import {DeleteUserDto, UserUpdateReadNewsDto} from "../dtos/user-data";
 import {ToastrService} from "ngx-toastr";
 import {Observable} from "rxjs";
 import {RegisterData, UserRegistrationDto, UserToUpdateDto} from "../dtos/register-data";
@@ -24,5 +24,9 @@ export class UserService {
 
   updateUser(userDto: UserToUpdateDto): Observable<string> {
     return this.httpClient.put(`${this.baseUri}/update-user`, userDto, {responseType: 'text'});
+  }
+
+  deleteUser(userToDelete: DeleteUserDto) {
+    return this.httpClient.delete(`${this.baseUri}`, {body:userToDelete});
   }
 }

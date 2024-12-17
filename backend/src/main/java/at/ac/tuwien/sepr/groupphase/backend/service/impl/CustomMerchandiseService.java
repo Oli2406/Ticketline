@@ -27,13 +27,15 @@ public class CustomMerchandiseService implements MerchandiseService {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public CustomMerchandiseService(MerchandiseRepository merchandiseRepository, MerchandiseValidator merchandiseValidator) {
+    public CustomMerchandiseService(MerchandiseRepository merchandiseRepository,
+        MerchandiseValidator merchandiseValidator) {
         this.merchandiseRepository = merchandiseRepository;
         this.merchandiseValidator = merchandiseValidator;
     }
 
     @Override
-    public MerchandiseCreateDto createMerchandise(MerchandiseCreateDto merchandiseCreateDto) throws ValidationException, ConflictException {
+    public MerchandiseCreateDto createMerchandise(MerchandiseCreateDto merchandiseCreateDto)
+        throws ValidationException, ConflictException {
         merchandiseValidator.validateCreate(merchandiseCreateDto);
 
         LOGGER.info("Save merchandise {}", merchandiseCreateDto);
@@ -42,7 +44,9 @@ public class CustomMerchandiseService implements MerchandiseService {
         toAdd.setName(merchandiseCreateDto.getName());
         toAdd.setCategory(merchandiseCreateDto.getCategory());
         toAdd.setImageUrl(merchandiseCreateDto.getImageUrl());
-        toAdd.setPoints(merchandiseCreateDto.getPrice().multiply(BigDecimal.valueOf(10)).intValue());
+        toAdd.setPoints(
+            merchandiseCreateDto.getPrice().multiply(BigDecimal.valueOf(10)).intValue());
+        toAdd.setStock(merchandiseCreateDto.getStock());
         merchandiseRepository.save(toAdd);
 
         return merchandiseCreateDto;
@@ -65,12 +69,15 @@ public class CustomMerchandiseService implements MerchandiseService {
     }
 
     @Transactional
-    public void processPurchase(List<PurchaseItemDto> purchaseItems) throws InsufficientStockException {
+    public void processPurchase(List<PurchaseItemDto> purchaseItems)
+        throws InsufficientStockException {
         for (PurchaseItemDto item : purchaseItems) {
             Merchandise merchandise = merchandiseRepository.findById(item.getItemId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid item ID: " + item.getItemId()));
+                .orElseThrow(
+                    () -> new IllegalArgumentException("Invalid item ID: " + item.getItemId()));
             if (merchandise.getStock() < item.getQuantity()) {
-                throw new InsufficientStockException("Not enough stock for item: " + merchandise.getName());
+                throw new InsufficientStockException(
+                    "Not enough stock for item: " + merchandise.getName());
             }
             merchandise.setStock(merchandise.getStock() - item.getQuantity());
             merchandiseRepository.save(merchandise);
