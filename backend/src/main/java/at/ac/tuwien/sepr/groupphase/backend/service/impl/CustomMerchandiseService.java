@@ -44,7 +44,7 @@ public class CustomMerchandiseService implements MerchandiseService {
         toAdd.setName(merchandiseCreateDto.getName());
         toAdd.setCategory(merchandiseCreateDto.getCategory());
         toAdd.setImageUrl(merchandiseCreateDto.getImageUrl());
-        if(merchandiseCreateDto.getPrice().compareTo(new BigDecimal(1)) < 0) {
+        if (merchandiseCreateDto.getPrice().compareTo(new BigDecimal(1)) < 0) {
             toAdd.setPoints(1);
         } else {
             toAdd.setPoints(
