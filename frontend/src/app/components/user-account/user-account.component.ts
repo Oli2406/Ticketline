@@ -5,6 +5,8 @@ import {UserService} from "../../services/user.service";
 import {UserToUpdateDto} from "../../dtos/register-data";
 import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
+import {DeleteUserDto} from "../../dtos/user-data";
+import {ConfirmationDialogMode} from "../confirm-dialog/confirm-dialog.component";
 
 @Component({
   selector: 'app-user-account',
@@ -17,6 +19,10 @@ export class UserAccountComponent implements OnInit {
 
   showNewPassword: boolean = false;
   showConfirmPassword: boolean = false;
+
+  ConfirmationDialogMode = ConfirmationDialogMode;
+  showConfirmDeletionDialog = false;
+  deleteMessage = 'Do you really want to delete this customer?';
 
   constructor(private fb: UntypedFormBuilder,
               private authService: AuthService,
@@ -95,5 +101,33 @@ export class UserAccountComponent implements OnInit {
 
   reset() {
     this.fillForm();
+  }
+
+  deleteUser(){
+    const userToDelete: DeleteUserDto = {
+      email: this.authService.getUserEmailFromToken(),
+      authToken: this.authService.getAuthToken()
+    }
+
+    this.userService.deleteUser(userToDelete).subscribe({
+      next: () => {
+        this.authService.clearAuthToken();
+        this.toastr.success("Successfully deleted account.", "Success");
+
+        this.showConfirmDeletionDialog = false;
+
+        this.router.navigate(['/home']);
+      },
+      error: err => {
+        const status = err.error.status;
+        const message = err.error.errors;
+
+        this.toastr.error(message, status);
+      }
+    });
+  }
+
+  showDeleteMessage(){
+    this.showConfirmDeletionDialog = true;
   }
 }

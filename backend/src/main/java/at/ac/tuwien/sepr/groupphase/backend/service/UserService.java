@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
@@ -91,4 +92,6 @@ public interface UserService extends UserDetailsService {
     void addUserPoints(String encryptedId, int pointsToAdd) throws Exception;
 
     String updateUser(UserUpdateDto user) throws ValidationException, ConflictException;
+
+    void deleteUser(DeleteUserDto userDto) throws ValidationException;
 }

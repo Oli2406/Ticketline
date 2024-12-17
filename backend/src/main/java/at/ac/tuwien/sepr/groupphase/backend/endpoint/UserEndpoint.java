@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -101,5 +103,12 @@ public class UserEndpoint {
         throws ValidationException, ConflictException {
         LOGGER.trace("PUT " + BASE_PATH + "/update-user/{}", user);
         return userService.updateUser(user);
+    }
+
+    @PermitAll
+    @DeleteMapping
+    public void deleteUser(@RequestBody DeleteUserDto userDto) throws ValidationException {
+        LOGGER.trace("DELETE " + BASE_PATH + " {}", userDto);
+        userService.deleteUser(userDto);
     }
 }
