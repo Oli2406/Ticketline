@@ -118,11 +118,18 @@ export class UserAccountComponent implements OnInit {
 
         this.router.navigate(['/home']);
       },
-      error: err => {
-        const status = err.error.status;
-        const message = err.error.errors;
+      error: (err) => {
+        const errors = Array.isArray(err.error.errors)
+          ? err.error.errors
+          : err.error.errors.split(/\n/);
+        const errorList = errors
+        .map((error) => `<li>${error.trim().replace("[", "").replace("]", "")}</li>`)
+        .join('');
+        this.toastr.error(`<ul>${errorList}</ul>`, "Error", {
+          enableHtml: true,
+        });
 
-        this.toastr.error(message, status);
+        this.showConfirmDeletionDialog = false;
       }
     });
   }
