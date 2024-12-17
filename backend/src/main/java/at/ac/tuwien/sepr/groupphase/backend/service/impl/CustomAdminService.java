@@ -8,18 +8,16 @@ import at.ac.tuwien.sepr.groupphase.backend.service.AdminService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomAdminService implements AdminService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public CustomAdminService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+
+    public CustomAdminService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class CustomAdminService implements AdminService {
             .map(
                 user -> new UserDetailDto(user.getId(), user.getFirstName(), user.getLastName(),
                     user.getEmail(),
-                    user.isLocked(), user.isLoggedIn()))
+                    user.isLocked(), user.isLoggedIn(), user.getPoints(), user.isAdmin()))
             .collect(Collectors.toList());
     }
 

@@ -10,18 +10,16 @@ public class EventDetailDto {
     private String title;
     private String description;
     private String category;
-    private LocalDate dateOfEvent;
-    private int duration;
-    private List<Long> performanceIds; // List of associated Performance IDs
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
 
-    public EventDetailDto(Long eventId, String title, String description, String category, LocalDate dateOfEvent, int duration, List<Long> performanceIds) {
+    public EventDetailDto(Long eventId, String title, String description, String category, LocalDate dateFrom, LocalDate dateTo) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
         this.category = category;
-        this.dateOfEvent = dateOfEvent;
-        this.duration = duration;
-        this.performanceIds = performanceIds;
+        this.dateFrom = dateFrom;
+        this.dateTo = dateTo;
     }
 
     public Long getEventId() {
@@ -56,27 +54,19 @@ public class EventDetailDto {
         this.category = category;
     }
 
-    public LocalDate getDateOfEvent() {
-        return dateOfEvent;
+    public LocalDate getDateFrom() {
+        return dateFrom;
     }
 
-    public void setDateOfEvent(LocalDate dateOfEvent) {
-        this.dateOfEvent = dateOfEvent;
+    public void setDateFrom(LocalDate dateFrom) {
+        this.dateFrom = dateFrom;
     }
 
-    public int getDuration() {
-        return duration;
+    public LocalDate getDateTo() {
+        return dateTo;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public List<Long> getPerformanceIds() {
-        return performanceIds;
-    }
-
-    public void setPerformanceIds(List<Long> performanceIds) {
-        this.performanceIds = performanceIds;
+    public void setDateTo(LocalDate dateTo) {
+        this.dateTo = dateTo;
     }
 }

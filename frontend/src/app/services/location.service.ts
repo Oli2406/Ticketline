@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Location, LocationListDto } from 'src/app/dtos/location';
+import {Location, LocationListDto, LocationSearch} from 'src/app/dtos/location';
+import {EventListDto, EventSearch} from "../dtos/event";
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,33 @@ export class LocationService {
 
   constructor(private http: HttpClient, private globals: Globals) {}
 
+  getById(id: number): Observable<LocationListDto> {
+    return this.http.get<LocationListDto>(`${(this.apiUrl)}/${id}`);
+  }
+
   getLocations(): Observable<LocationListDto[]> {
     return this.http.get<LocationListDto[]>(this.apiUrl);
+  }
+
+  getAllByFilter(filter: LocationSearch): Observable<LocationListDto[]> {
+    let params = new HttpParams();
+    if (filter.name?.trim()) {
+      params = params.append('name', filter.name);
+    }
+    if (filter.street?.trim()) {
+      params = params.append('street', filter.street);
+    }
+    if (filter.city?.trim()) {
+      params = params.append('city', filter.city);
+    }
+    if (filter.country?.trim()) {
+      params = params.append('country', filter.country);
+    }
+    if (filter.postalCode != null) {
+      params = params.append('postalCode', filter.postalCode);
+    }
+
+    return this.http.get<LocationListDto[]>(this.apiUrl + "/search", {params});
   }
 
   createLocation(location: Location): Observable<Location> {

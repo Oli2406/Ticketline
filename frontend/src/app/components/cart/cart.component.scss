@@ -1,0 +1,266 @@
+
+.cart-container {
+  .points-header h3 {
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #4D47C3 !important;
+    color: white !important;
+    padding: 10px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3e3e3e;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .cart-content {
+    display: flex;
+    gap: 20px;
+  }
+
+  .payment-options {
+    flex: 1;
+    background-color: #f9f9ff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #4D47C3;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      .payment-option {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #eef;
+        }
+
+        &.selected {
+          border-color: #4D47C3;
+          background-color: #F0EFFF;
+        }
+
+        input[type='radio'] {
+          display: none;
+        }
+
+        i {
+          margin-right: 10px;
+          font-size: 1.5rem;
+          color: #4D47C3;
+        }
+      }
+    }
+
+    .payment-buttons {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .btn {
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+
+        &.btn-primary {
+          background-color: #4D47C3;
+          color: white;
+          border: none;
+
+          &:hover {
+            background-color: #514dc7;
+          }
+        }
+
+        &.btn-secondary {
+          background-color: #ccc;
+          color: #333;
+          border: none;
+
+          &:hover {
+            background-color: #bbb;
+          }
+
+          &:disabled {
+            background-color: #eee;
+            color: #999;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+  }
+
+  .cart-table {
+    flex: 2;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      border-radius: 8px;
+
+      th,
+      td {
+        vertical-align: middle;
+        text-align: center;
+        padding: 12px;
+      }
+
+      th {
+        background-color: #F0EFFF;
+        color: #333;
+        font-size: 1.1rem;
+        font-weight: bold;
+      }
+
+      td {
+        font-size: 1rem;
+        color: #555;
+      }
+
+      tbody tr:nth-of-type(odd) {
+        background-color: #F9F9FF;
+      }
+
+      tbody tr:nth-of-type(even) {
+        background-color: #F0EFFF;
+      }
+
+      td img {
+        border-radius: 5px;
+      }
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #3e3e3e;
+      text-align: right;
+    }
+  }
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+.invoice-div{
+  content-visibility: hidden;
+}
+
+.invoice-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: auto;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.invoice-header h1 {
+  margin: 0;
+  font-size: 2em;
+  color: #333333;
+}
+
+.invoice-details,
+.invoice-items {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.invoice-details td,
+.invoice-items th,
+.invoice-items td {
+  padding: 10px;
+  border: 1px solid #dddddd;
+}
+
+.invoice-items th {
+  background-color: #f4f4f4;
+  text-align: left;
+}
+
+.invoice-footer {
+  text-align: right;
+}
+
+.invoice-footer td {
+  padding: 10px;
+  border-top: 2px solid #333333;
+  font-size: 15px;
+}
+
+.invoice-bank{
+  font-size: 15px;
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.btn-download {
+  padding: 10px 20px;
+  background-color: #4d47c3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  align-self: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #514dc7;
+  }
+}
+
+.quantity-text {
+  text-align: left;
+  margin-left: 13px;
+}
+
+
+

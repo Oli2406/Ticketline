@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.ArtistMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -28,10 +29,13 @@ public class CustomArtistServiceTest {
     @Mock
     private ArtistValidator artistValidator;
 
+    @Mock
+    private ArtistMapper artistMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        artistService = new CustomArtistService(artistRepository, artistValidator);
+        artistService = new CustomArtistService(artistRepository, artistValidator, artistMapper);
     }
 
     @Test
@@ -44,13 +48,13 @@ public class CustomArtistServiceTest {
             return a;
         });
 
-        ArtistDetailDto created = artistService.createOrUpdateArtist(dto);
+        ArtistDetailDto created = artistService.createArtist(dto);
 
         assertNotNull(created, "Created artist DTO should not be null");
         assertAll(
             () -> assertNotNull(created.getArtistId(), "Artist ID should not be null"),
             () -> assertEquals(dto.getFirstName(), created.getFirstName(), "First name should match"),
-            () -> assertEquals(dto.getSurname(), created.getSurname(), "Surname should match"),
+            () -> assertEquals(dto.getLastName(), created.getLastName(), "Surname should match"),
             () -> assertEquals(dto.getArtistName(), created.getArtistName(), "Artist name should match")
         );
 
@@ -67,7 +71,7 @@ public class CustomArtistServiceTest {
 
         assertFalse(result.isEmpty(), "Resulting artist list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("JohnDoe", result.get(0).getArtistName(), "Artist name should match");
+        assertEquals("JohnDoe", result.getFirst().getArtistName(), "Artist name should match");
 
         verify(artistRepository, times(1)).findAll();
     }
@@ -82,5 +86,38 @@ public class CustomArtistServiceTest {
 
         assertEquals("Artist not found with ID: 1", exception.getMessage(), "Exception message should match");
         verify(artistRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void searchArtistByNameReturnsMatchingEvent() {
+        ArtistDetailDto artist1DetailDto = new ArtistDetailDto(1L, "Name1", "Last1", "Artist1");
+        Artist artist1 = new Artist("Name1", "Last1", "Artist1");
+        Artist artist2 = new Artist("Name2", "Last2", "Artist2");
+        when(artistRepository.findAll()).thenReturn(List.of(artist1, artist2));
+        when(artistMapper.artistToArtistDetailDto(artist1)).thenReturn(artist1DetailDto);
+
+        ArtistSearchDto searchDto = new ArtistSearchDto("1", null, null);
+
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return only one event");
+        verify(artistRepository, times(1)).findAll();
+        verify(artistMapper, times(1)).artistToArtistDetailDto(artist1);
+        verify(artistMapper, never()).artistToArtistDetailDto(artist2);
+    }
+
+    @Test
+    void searchArtistByNameReturnsNoEventsWhenNoMatch() {
+        Artist artist1 = new Artist("Name1", "Last1", "Artist1");
+        Artist artist2 = new Artist("Name2", "Last2", "Artist2");
+        when(artistRepository.findAll()).thenReturn(List.of(artist1, artist2));
+
+        ArtistSearchDto searchDto = new ArtistSearchDto("3", null, null);
+
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(0, result.size(), "Should return no events");
+        verify(artistRepository, times(1)).findAll();
+        verify(artistMapper, never()).artistToArtistDetailDto(any(Artist.class));
     }
 }

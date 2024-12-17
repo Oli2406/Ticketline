@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
-import {UserUpdateReadNewsDto} from "../dtos/user-data";
+import {DeleteUserDto, UserUpdateReadNewsDto} from "../dtos/user-data";
 import {ToastrService} from "ngx-toastr";
 import {Observable} from "rxjs";
+import {RegisterData, UserRegistrationDto, UserToUpdateDto} from "../dtos/register-data";
 
 
 @Injectable({
@@ -14,27 +15,18 @@ export class UserService {
   private baseUri: string = this.globals.backendUri + '/users' //globals.backendUri = http://localhost:8080/api/v1
 
   constructor(private httpClient: HttpClient,
-              private globals: Globals,
-              private notification: ToastrService) {
+              private globals: Globals) {
   }
 
-  updateReadNews(dto: UserUpdateReadNewsDto):Observable<boolean> {
+  updateReadNews(dto: UserUpdateReadNewsDto): Observable<boolean> {
     return this.httpClient.put<boolean>(`${this.baseUri}`, dto);
   }
 
-  /*updateReadNews(dto: UserUpdateReadNewsDto): Observable<string> {
+  updateUser(userDto: UserToUpdateDto): Observable<string> {
+    return this.httpClient.put(`${this.baseUri}/update-user`, userDto, {responseType: 'text'});
+  }
 
-
-    this.notification.success(this.baseUri); // Verifies the URL is correct
-
-    const dtoTest: UserUpdateReadNewsDto = {
-      newsId: 2,
-      email: 'karl.admin@email.com',
-    }
-    console.log('DTO being sent:', dto);
-    console.log('Endpoint being hit:', this.baseUri);
-    return this.httpClient.put<string>(`${this.baseUri}`, dto, {
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }*/
+  deleteUser(userToDelete: DeleteUserDto) {
+    return this.httpClient.delete(`${this.baseUri}`, {body:userToDelete});
+  }
 }

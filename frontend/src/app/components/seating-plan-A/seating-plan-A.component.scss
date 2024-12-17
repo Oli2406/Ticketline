@@ -1,0 +1,155 @@
+.seating-plan-box {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  position: relative;
+  height: 500px; /* Adjusted height */
+  width: 90%; /* Adjusted width */
+  margin: 0 auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Stage */
+.row .bg-black {
+  width: 85%; /* Stage width aligned with the hall width */
+  margin: 0 auto;
+}
+
+/* VIP Standing */
+.vip-standing {
+  width: 80%;
+  top: 80px;
+  left: 10%;
+  border: 1px solid #6c757d;
+  padding: 10px;
+  background-color: #fff9e6;
+
+}
+
+/* Standing */
+.standing {
+  width: 80%; /* Match the width of the hall */
+  height: 20%; /* Adjusted for better alignment */
+  top: 163px;
+  left: 10%; /* Center align */
+  border: 1px solid #6c757d;
+  padding: 20px;
+  background-color: #f9f3fc;
+}
+
+/* Selected Section (Purple) */
+.selected-sector,
+.seat-box.selected-seat {
+  background-color: #514dc7 !important;
+  color: #fff;
+}
+
+/* Seated Back (Sectors A and B) */
+.seated-back {
+  display: flex;
+  //justify-content: space-evenly; /* Space between Sector A and Sector B */
+  align-items: center;
+  width: 100%;
+  height: 35%; /* Proportional height for sectors */
+  position: absolute;
+  top: 290px; /* Positioned below the standing section */
+  left: 10px;
+}
+
+/* Sector A and B Grids */
+.seating-grid {
+  display: grid;
+  grid-template-columns: repeat(20, 15px); /* 20 seats per row */
+  grid-template-rows: repeat(12, 15px); /* 12 rows */
+  gap: 3px; /* Space between seats */
+}
+
+
+.seating-divider {
+  width: 20px; /* Adjust width to increase or decrease the space */
+  height: 121%; /* Full height of the container */
+}
+
+/* Seat Box Styling */
+.seat-box {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.seat-box.available {
+  background-color: #f0f8ff;
+
+}
+
+.seat-box.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box.selected-seat {
+  background-color: #514dc7 !important;
+  color: #fff;
+}
+.seat-box-b {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ced4da;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.seat-box-b.available {
+  background-color: #e6f9e6;
+}
+
+.seat-box-b.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box-b.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box-b.selected-seat {
+  background-color: #514dc7 !important;
+  color: #fff;
+}
+
+/* Button Styling */
+button.btn-secondary {
+  background-color: gray;
+  border: none;
+  color: white;
+}
+
+.btn-gray {
+  background-color: gray;
+  border: none;
+  color: white;
+}
+
+.btn-purple {
+  background-color: #514dc7; /* Dark Purple */
+  border: none;
+  color: white;
+}
+
+.btn-light-purple {
+  background-color: #8573d1; /* Lighter Purple */
+  border: none;
+  color: white;
+}
+
+/* Icons inside buttons */
+button i {
+  margin-right: 0.5rem;
+}

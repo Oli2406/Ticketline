@@ -8,15 +8,20 @@ public class UserDetailDto {
     private String email;
     private boolean isLocked;
     private boolean isLoggedIn;
+    private int points;
+
+    private boolean isAdmin;
 
     public UserDetailDto(Long id, String firstName, String lastName, String email, boolean isLocked,
-        boolean isLoggedIn) {
+        boolean isLoggedIn, int points, boolean isAdmin) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.isLocked = isLocked;
         this.isLoggedIn = isLoggedIn;
+        this.points = points;
+        this.isAdmin = isAdmin;
     }
 
     public Long getId() {
@@ -61,5 +66,21 @@ public class UserDetailDto {
 
     public boolean isLoggedIn() {
         return isLoggedIn;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public boolean isAdmin() {
+        return this.isAdmin;
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

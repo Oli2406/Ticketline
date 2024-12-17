@@ -10,12 +10,15 @@ export interface Location {
 export interface LocationListDto {
   locationId: number;
   name: string;
-  address: string; // Combination of street, city, and postalCode
+  street: string;
+  city: string;
+  postalCode: string;
   country: string;
 }
 
 export interface LocationSearch {
   name?: string;
+  street?: string;
   city?: string;
   postalCode?: string;
   country?: string;

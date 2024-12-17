@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.*;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.LocationMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -28,10 +29,13 @@ public class CustomLocationServiceTest {
     @Mock
     private LocationValidator locationValidator;
 
+    @Mock
+    private LocationMapper locationMapper;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        locationService = new CustomLocationService(locationRepository, locationValidator);
+        locationService = new CustomLocationService(locationRepository, locationValidator, locationMapper);
     }
 
     @Test
@@ -44,7 +48,7 @@ public class CustomLocationServiceTest {
             return l;
         });
 
-        LocationDetailDto created = locationService.createOrUpdateLocation(dto);
+        LocationDetailDto created = locationService.createLocation(dto);
 
         assertNotNull(created, "Created location DTO should not be null");
         assertAll(
@@ -66,7 +70,7 @@ public class CustomLocationServiceTest {
 
         assertFalse(result.isEmpty(), "Resulting location list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("LocationName", result.get(0).getName(), "Location name should match");
+        assertEquals("LocationName", result.getFirst().getName(), "Location name should match");
 
         verify(locationRepository, times(1)).findAll();
     }
@@ -81,5 +85,38 @@ public class CustomLocationServiceTest {
 
         assertEquals("Location not found", exception.getMessage(), "Exception message should match");
         verify(locationRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void searchLocationByNameReturnsMatchingEvent() {
+        LocationDetailDto location1DetailDto = new LocationDetailDto(1L, "Matching Name", "Street1", "City1", "12345", "Country1");
+        Location location1 = new Location("Matching Name", "Street1", "City1", "12345", "Country1");
+        Location location2 = new Location("Name", "Street2", "City2", "12345", "Country2");
+        when(locationRepository.findAll()).thenReturn(List.of(location1, location2));
+        when(locationMapper.locationToLocationDetailDto(location1)).thenReturn(location1DetailDto);
+
+        LocationSearchDto searchDto = new LocationSearchDto("Matching", null, null, null, null);
+
+        List<LocationDetailDto> result = locationService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return only one event");
+        verify(locationRepository, times(1)).findAll();
+        verify(locationMapper, times(1)).locationToLocationDetailDto(location1);
+        verify(locationMapper, never()).locationToLocationDetailDto(location2);
+    }
+
+    @Test
+    void searchLocationByNameReturnsNoEventsWhenNoMatch() {
+        Location location1 = new Location("Matching Name", "Street1", "City1", "12345", "Country1");
+        Location location2 = new Location("Matching Name", "Street2", "City2", "12345", "Country2");
+        when(locationRepository.findAll()).thenReturn(List.of(location1, location2));
+
+        LocationSearchDto searchDto = new LocationSearchDto("Non-matching", null, null, null, null);
+
+        List<LocationDetailDto> result = locationService.search(searchDto).toList();
+
+        assertEquals(0, result.size(), "Should return no events");
+        verify(locationRepository, times(1)).findAll();
+        verify(locationMapper, never()).locationToLocationDetailDto(any(Location.class));
     }
 }

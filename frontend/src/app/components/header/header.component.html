@@ -1,3 +1,8 @@
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+
 <body>
 <!-- Header -->
 <div class="header-container">
@@ -16,9 +21,9 @@
             (click)="setActivePage('merchandise')">
       Merchandise
     </button>
-    <button class="v76_373" [class.active]="currentPage === 'events'"
-            (click)="setActivePage('events')">
-      Events
+    <button class="v76_373" [class.active]="currentPage === 'search'"
+            (click)="setActivePage('search')">
+      Search
     </button>
   </div>
 
@@ -38,19 +43,42 @@
         </button>
       </div>
     } @else {
-      @if (authService.isUserAdmin()) {
-        <div class="button-container">
-          <button class="admin-button" [class.active]="currentPage === 'admin'" (click)="setActivePage('admin')">
-            <i class="bi bi-file-text me-1"></i>
-            Admin
-          </button>
-        </div>
-      }
-      <div class="button-container">
-        <button class="login-button" [class.active]="currentPage === 'logout'"
-                (click)="logoutUser()">
-          Logout
+      <div class="dropdown">
+        <!-- Dropdown toggle button -->
+        <button
+          class="btn btn-primary dropdown-toggle dropdown-button"
+          type="button"
+          id="menuDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false">
+          <i class="fas bi-person-square"></i>
         </button>
+
+        <!-- Dropdown menu -->
+        <ul class="dropdown-menu" aria-labelledby="menuDropdown">
+          <li>
+            <button class="dropdown-item" [class.active]="currentPage === 'cart'" (click)="routeToUserCart('cart/')">
+              <i class="fas fa-shopping-cart"></i> Cart
+            </button>
+          </li>
+          @if (authService.isUserAdmin()) {
+            <li>
+              <button class="dropdown-item" [class.active]="currentPage === 'admin'" (click)="setActivePage('admin')">
+                <i class="bi bi-file-text me-1"></i> Admin
+              </button>
+            </li>
+          }
+          <li>
+            <button class="dropdown-item" [class.active]="currentPage === 'user-account'" (click)="setActivePage('user-account')">
+              <i class="bi bi-person"></i> My Account
+            </button>
+          </li>
+          <li>
+            <button class="dropdown-item" [class.active]="currentPage === 'logout'" (click)="logoutUser()">
+              Logout
+            </button>
+          </li>
+        </ul>
       </div>
     }
   </div>

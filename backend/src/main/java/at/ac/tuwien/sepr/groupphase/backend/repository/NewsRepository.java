@@ -17,6 +17,15 @@ public interface NewsRepository extends JpaRepository<News, Long> {
      * @param readNewsIds A list of IDs of news items that have already been read.
      * @return A list of news items that have not been read.
      */
-    @Query("SELECT n FROM News n WHERE n.newsId NOT IN :readNewsIds")
+    @Query("SELECT n FROM News n WHERE n.newsId NOT IN :readNewsIds ORDER BY n.dateOfNews DESC")
     List<News> findUnreadNews(@Param("readNewsIds") List<Long> readNewsIds);
+
+    /**
+     * Finds all news items with {@code title} as title.
+     *
+     * @param title The title to find the news by.
+     * @return A list of news items that have the desired title.
+     */
+    @Query("SELECT n FROM News n WHERE n.title = :title")
+    List<News> findByTitle(String title);
 }

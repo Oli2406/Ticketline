@@ -17,17 +17,20 @@
         <div class="form-group">
           <textarea placeholder="Description" [(ngModel)]="eventData.description" name="description"></textarea>
         </div>
-        <label class="custom-label fw-bold">Date</label>
-        <div class="form-group">
-          <input type="date" placeholder="Date of Event" [(ngModel)]="eventData.dateOfEvent" name="dateOfEvent" />
+        <label for="dateRange" class="custom-label fw-bold">Date</label>
+        <div class="form-group position-relative">
+          <input
+            id="dateRange"
+            type="text"
+            placeholder="Select date"
+            class="form-control pe-5"
+          />
+          <i class="bi bi-calendar calendar-icon"></i>
         </div>
+
         <label class="custom-label fw-bold">Category</label>
         <div class="form-group">
           <input type="text" placeholder="Category" [(ngModel)]="eventData.category" name="category" />
-        </div>
-        <label class="custom-label fw-bold">Duration (minutes)</label>
-        <div class="form-group">
-          <input type="number" placeholder="Duration (minutes)" [(ngModel)]="eventData.duration" name="duration" />
         </div>
       </form>
     </div>
@@ -38,8 +41,11 @@
 
       <!-- List of Created Performances -->
       <ul class="performance-list">
-        <li *ngFor="let performance of performances">
+        <li *ngFor="let performance of performances; let i = index" class="performance-item">
           <span>{{ performance.name }}</span>
+          <button (click)="deletePerformance(i)" class="delete-button" aria-label="Delete performance">
+            <i class="bi bi-trash"></i>
+          </button>
         </li>
       </ul>
 
@@ -53,6 +59,14 @@
           <div class="form-group">
             <label class="custom-label fw-bold">Performance name</label>
             <input type="text" placeholder="Performance name" [(ngModel)]="newPerformance.name" name="performanceName" />
+          </div>
+          <div class="form-group">
+            <label class="custom-label fw-bold">Basic price</label>
+            <input type="number" placeholder="Basic price" [(ngModel)]="newPerformance.price" name="performancePrice" />
+          </div>
+          <label class="custom-label fw-bold">Duration (minutes)</label>
+          <div class="form-group">
+            <input type="number" placeholder="Duration (minutes)" [(ngModel)]="newPerformance.duration" name="duration" />
           </div>
           <!-- Select Artist -->
           <div class="form-group artist-select">
@@ -74,9 +88,9 @@
               <div class="form-group">
                 <input type="text" placeholder="First Name" [(ngModel)]="newArtist.firstName" name="firstName" />
               </div>
-              <label class="custom-label fw-bold">Surname</label>
+              <label class="custom-label fw-bold">Last name</label>
               <div class="form-group">
-                <input type="text" placeholder="Surname" [(ngModel)]="newArtist.surname" name="surname" />
+                <input type="text" placeholder="Last name" [(ngModel)]="newArtist.lastName" name="lastName" />
               </div>
               <label class="custom-label fw-bold">Artist/ Band name</label>
               <div class="form-group">
@@ -124,23 +138,21 @@
               <button type="button" class="btn-save" (click)="createLocation()">Create Location</button>
             </form>
           </div>
-          <label class="custom-label fw-bold">Date</label>
+          <label class="custom-label fw-bold">Date and Time</label>
           <div class="form-group">
-            <input type="date" placeholder="Performance Date" [(ngModel)]="newPerformance.date" name="performanceDate" />
-          </div>
-          <label class="custom-label fw-bold">Price per ticket</label>
-
-          <div class="form-group">
-            <input type="number" placeholder="Price per ticket" [(ngModel)]="newPerformance.price" name="pricePerTicket" />
-          </div>
-          <label class="custom-label fw-bold">Number of tickets</label>
-
-          <div class="form-group">
-            <input type="number" placeholder="Number of tickets" [(ngModel)]="newPerformance.ticketNumber" name="ticketNumber" />
+            <input type="datetime-local" placeholder="Performance Date and Time" [(ngModel)]="newPerformance.date" name="performanceDate" />
           </div>
           <label class="custom-label fw-bold">Hall</label>
           <div class="form-group">
-            <input type="text" placeholder="Hall" [(ngModel)]="newPerformance.hall" name="Hall" />
+            <select [(ngModel)]="newPerformance.hall" (change)="updateTicketNumber()" name="Hall">
+              <option value="" disabled selected>Select Hall</option>
+              <option value="A">Hall A</option>
+              <option value="B">Hall B</option>
+            </select>
+          </div>
+          <label class="custom-label fw-bold">Number of tickets</label>
+          <div class="form-group">
+            <input type="number" placeholder="Number of tickets" [value]="newPerformance.ticketNumber" disabled name="ticketNumber" /> <!-- readonly -->
           </div>
           <button type="button" class="btn-save-performance" (click)="createPerformance()">Save Performance</button>
         </form>

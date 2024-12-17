@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {AuthService} from "./services/auth.service";
 import {Router} from "@angular/router";
 
@@ -8,16 +8,38 @@ import {Router} from "@angular/router";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'SE PR Group Phase';
+  title = 'Ticketline';
 
-  constructor(private authService: AuthService, public router: Router) {}
-  ngOnInit(): void {
-    this.authService.validateToken().subscribe((isValid) => {
-      if (!isValid) {
-        this.authService.logoutUser();
-        this.router.navigate(['/home']);
-      }
-    });
+  constructor(private authService: AuthService, public router: Router) {
   }
 
+  ngOnInit(): void {
+    if (this.authService.getAuthToken()) {
+      this.authService.validateTokenInBackend().subscribe((isValid) => {
+        if (!isValid) {
+          this.authService.logoutUser();
+          //this.router.navigate(['/home']);
+        }
+      }, error => {
+        this.authService.clearAuthToken();
+      });
+    }
+
+    this.authService.isCurrentUserLoggedInInBackend().subscribe((isLoggedIn) => {
+      if(!isLoggedIn){
+        this.authService.clearAuthToken();
+        this.router.navigate(['/login'])
+      }
+    });
+
+    if (this.authService.getResetToken()) {
+      this.authService.validateResetTokenInBackend().subscribe((isValid) => {
+        if (!isValid) {
+          this.authService.clearResetToken();
+        }
+      }, error => {
+        this.authService.clearResetToken();
+      });
+    }
+  }
 }

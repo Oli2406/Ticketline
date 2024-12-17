@@ -1,8 +1,10 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -10,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface UserService extends UserDetailsService {
 
@@ -29,7 +32,7 @@ public interface UserService extends UserDetailsService {
      * Find an application user based on the email address.
      *
      * @param email the email address
-     * @return a application user
+     * @return an application user
      */
     ApplicationUser findApplicationUserByEmail(String email);
 
@@ -49,6 +52,15 @@ public interface UserService extends UserDetailsService {
      * @param userLogoutDto logout credentials
      */
     void logout(UserLogoutDto userLogoutDto);
+
+    /**
+     * Checks if a given User is logged in. In case user is not logged in the authToken will be
+     * blocked.
+     *
+     * @param userLogoutDto credentials to check
+     * @return true in case user is logged in, otherwise false
+     */
+    boolean isUserLoggedIn(UserLogoutDto userLogoutDto);
 
     /**
      * Registers a new user using the provided UserRegistrationDto.
@@ -72,4 +84,14 @@ public interface UserService extends UserDetailsService {
      *                              and the email address of the user who read the article.
      */
     void updateReadNews(UserUpdateReadNewsDto userUpdateReadNewsDto);
+
+    @Transactional
+    String updateUserPoints(String encryptedId, int pointsToDeduct) throws Exception;
+
+    @Transactional
+    void addUserPoints(String encryptedId, int pointsToAdd) throws Exception;
+
+    String updateUser(UserUpdateDto user) throws ValidationException, ConflictException;
+
+    void deleteUser(DeleteUserDto userDto) throws ValidationException;
 }

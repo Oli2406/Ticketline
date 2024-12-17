@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
     this.authService.loginUser(authRequest).subscribe({
       next: () => {
         this.toastr.success('Login successful!', 'Success');
-        this.router.navigate(['/message']);
+        this.router.navigate(['/home']);
       },
       error: error => {
         if (typeof error.error === 'object') {
@@ -71,5 +71,9 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  forgotPassword() {
+    this.router.navigate(['/send-email']);
   }
 }

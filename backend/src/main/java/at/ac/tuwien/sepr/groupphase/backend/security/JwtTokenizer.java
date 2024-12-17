@@ -25,7 +25,8 @@ public class JwtTokenizer {
         this.secretKey = Keys.hmacShaKeyFor(securityProperties.getJwtSecret().getBytes());
     }
 
-    public String getAuthToken(String user, List<String> roles) {
+    public String getAuthToken(String user, List<String> roles, String encryptedId, int points,
+        String firstName, String lastName) {
         String token =
             Jwts.builder()
                 .header()
@@ -40,6 +41,10 @@ public class JwtTokenizer {
                     new Date(
                         System.currentTimeMillis() + securityProperties.getJwtExpirationTime()))
                 .claim("rol", roles)
+                .claim("id", encryptedId)
+                .claim("points", points)
+                .claim("firstName", firstName)
+                .claim("lastName", lastName)
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
 
@@ -74,6 +79,16 @@ public class JwtTokenizer {
             .build()
             .parseSignedClaims(strippedToken)
             .getPayload();
+    }
+
+    public String getResetToken(String email) {
+        return Jwts.builder()
+            .subject(email)
+            .claim("purpose", "reset_password")
+            .expiration(
+                new Date(System.currentTimeMillis() + 2 * 60 * 1000))
+            .signWith(secretKey, SignatureAlgorithm.HS512)
+            .compact();
     }
 
     private String stripTokenPrefix(String token) {

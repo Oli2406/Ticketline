@@ -22,8 +22,27 @@ export class HeaderComponent implements OnInit {
     this.router.navigate([page]);
   }
 
+  routeToUserCart(page: string): void {
+    this.currentPage = page;
+    const userId = this.authService.getUserIdFromToken();
+    this.router.navigate([`/cart/${userId}`]);
+  }
+
   logoutUser(): void {
-    this.authService.logoutUser();
-    this.setActivePage('home');
+    this.authService.isCurrentUserLoggedInInBackend().subscribe((isLoggedIn) => {
+      if(!isLoggedIn){
+        this.authService.clearAuthToken();
+        this.router.navigate(['/login'])
+      } else {
+        this.authService.logoutUser();
+        this.setActivePage('home');
+      }
+    });
+  }
+
+  isDropdownOpen: boolean = false;
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
   }
 }

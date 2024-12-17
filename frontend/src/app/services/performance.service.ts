@@ -1,8 +1,14 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
+import {
+  Performance,
+  PerformanceDetailDto,
+  PerformanceListDto,
+  PerformanceSearch
+} from 'src/app/dtos/performance';
+
 
 @Injectable({
   providedIn: 'root',
@@ -10,10 +16,39 @@ import { Performance, PerformanceListDto } from 'src/app/dtos/performance';
 export class PerformanceService {
   private apiUrl: string = this.globals.backendUri + '/performance';
 
-  constructor(private http: HttpClient, private globals: Globals) {}
+  constructor(private http: HttpClient, private globals: Globals) {
+  }
 
-  getPerformances(): Observable<PerformanceListDto[]> {
+  get(): Observable<PerformanceListDto[]> {
     return this.http.get<PerformanceListDto[]>(this.apiUrl);
+  }
+
+  getByEventId(id: number): Observable<PerformanceDetailDto[]> {
+    return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/event/${id}`);
+  }
+
+  getByLocationId(id: number): Observable<PerformanceDetailDto[]> {
+    return this.http.get<PerformanceDetailDto[]>(`${(this.apiUrl)}/location/${id}`);
+  }
+
+  getAllByFilter(filter: PerformanceSearch): Observable<PerformanceDetailDto[]> {
+    let params = new HttpParams();
+    if (filter.date?.trim()) {
+      params = params.append('date', filter.date);
+    }
+    if (filter.price != null) {
+      params = params.append('price', filter.price);
+    }
+    if (filter.hall?.trim()) {
+      params = params.append('hall', filter.hall);
+    }
+
+    return this.http.get<PerformanceDetailDto[]>(this.apiUrl + "/search", {params});
+  }
+
+  advancedSearchPerformances(query: string): Observable<PerformanceDetailDto[]> {
+    const url = `${this.apiUrl}/advanced-search?query=${query}`;
+    return this.http.get<PerformanceDetailDto[]>(url);
   }
 
   createPerformance(performance: Performance): Observable<PerformanceListDto> {
@@ -21,6 +56,13 @@ export class PerformanceService {
       catchError(this.handleError)
     );
   }
+
+  getPerformanceById(id: number): Observable<PerformanceListDto> {
+    return this.http.get<PerformanceListDto>(`${(this.apiUrl)}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
@@ -44,4 +86,14 @@ export class PerformanceService {
     }
     return throwError(() => new Error(cleanedError));
   }
+
+
+
+  updateTicketNumber(performanceId: number, ticketNumber: number): Observable<PerformanceDetailDto> {
+    const url = `${this.apiUrl}/${performanceId}`;
+    return this.http.put<PerformanceDetailDto>(url, ticketNumber).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 }

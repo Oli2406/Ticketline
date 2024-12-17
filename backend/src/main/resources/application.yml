@@ -21,13 +21,27 @@ spring:
     # is disabled since it breaks the principle of least astonishment and leads to bad performance. To learn more,
     # follow this link: https://bit.ly/2LaX9ku
     open-in-view: false
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ticketline.inso8@gmail.com
+    password: hljt zyqi lvcs yowz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 security:
   auth:
     header: Authorization
     prefix: "Bearer "
     login-uri: /api/v1/authentication
     max-login-attempts: 5
+    max-reset-code-attempts: 5
+    max-reset-token-requests: 5
+    reset-token-resend-interval: 4
+    expiration-time-reset-token: 5
   jwt:
     secret: ?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9
     type: JWT
