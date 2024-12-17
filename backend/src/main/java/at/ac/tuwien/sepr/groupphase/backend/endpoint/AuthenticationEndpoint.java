@@ -39,7 +39,7 @@ public class AuthenticationEndpoint {
 
     @PermitAll
     @PostMapping
-    public String login(@RequestBody UserLoginDto userLoginDto) throws NoSuchAlgorithmException {
+    public String login(@RequestBody UserLoginDto userLoginDto) {
         LOGGER.trace("POST " + BASE_PATH + "{}", userLoginDto);
         return userService.login(userLoginDto);
     }

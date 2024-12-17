@@ -1,0 +1,115 @@
+<div class="container-fluid d-flex flex-column mt-5">
+  <div class="row flex-grow-1 align-items-center justify-content-center">
+    <div class="col-md-4">
+      <h1 class="custom-heading">Edit personal information</h1>
+      <form [formGroup]="editUser" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="inputEmail" class="custom-label fw-bold">Email</label>
+          <input
+              type="text"
+              id="inputEmail"
+              name="username"
+              formControlName="username"
+          />
+          <div *ngIf="submitted && editUser.controls.username.errors" class="text-danger mt-1">
+            <small *ngIf="editUser.controls.username.errors.required">
+              Your email is required!
+            </small>
+            <small *ngIf="editUser.controls.username.errors.email">
+              Please enter a valid email!
+            </small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputFirstName" class="custom-label fw-bold">First Name</label>
+          <input
+              type="text"
+              id="inputFirstName"
+              name="firstName"
+              formControlName="firstName"
+          />
+          <div *ngIf="submitted && editUser.controls.firstName.errors" class="text-danger mt-1">
+            <small *ngIf="editUser.controls.firstName.errors.required">
+              Your first name is required!
+            </small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="inputLastName" class="custom-label fw-bold">Last Name</label>
+          <input
+              type="text"
+              id="inputLastName"
+              name="lastName"
+              formControlName="lastName"
+          />
+          <div *ngIf="submitted && editUser.controls.lastName.errors" class="text-danger mt-1">
+            <small *ngIf="editUser.controls.lastName.errors.required">
+              Your last name is required!
+            </small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newPassword" class="custom-label fw-bold">New Password</label>
+          <div class="password-input-wrapper">
+            <input
+              [type]="showNewPassword ? 'text' : 'password'"
+              id="newPassword"
+              class="form-control custom-input"
+              placeholder="New password"
+              formControlName="newPassword"
+            />
+            <i
+              class="bi bi-eye"
+              [class.bi-eye-slash]="showNewPassword"
+              [class.bi-eye]="!showNewPassword"
+              (click)="toggleNewPasswordVisibility()"
+            ></i>
+          </div>
+          <div *ngIf="submitted && editUser.controls.newPassword.errors"
+               class="text-danger mt-1">
+            <small *ngIf="editUser.controls.newPassword.errors.minlength">
+              Password must be at least 8 characters long!
+            </small>
+          </div>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <label for="confirmPassword" class="custom-label fw-bold">Confirm Password</label>
+          <div class="password-input-wrapper">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword"
+              class="form-control custom-input"
+              placeholder="Confirm password"
+              formControlName="confirmPassword"
+            />
+            <i
+              class="bi bi-eye"
+              [class.bi-eye-slash]="showConfirmPassword"
+              [class.bi-eye]="!showConfirmPassword"
+              (click)="toggleConfirmPasswordVisibility()"
+            ></i>
+          </div>
+          <div *ngIf="submitted && editUser.controls.confirmPassword.errors"
+               class="text-danger mt-1">
+            <small *ngIf="editUser.errors?.passwordMismatch">
+              Passwords do not match!
+            </small>
+          </div>
+        </div>
+        <div class="d-flex justify-content-center">
+          <button type="button" class="btn btn-delete delete-user me-2">
+            <i class="bi bi-trash"></i> Delete account
+          </button>
+          <button type="button" class="btn custom-button me-2" (click)="reset()">
+            <i class="bi bi-x-lg"></i> Reset
+          </button>
+          <button type="submit" class="btn custom-button">
+            <i class="bi bi-floppy"></i> Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
@@ -30,33 +31,43 @@ public class UserValidator {
 
         isEmailUnique(registerDto.getEmail());
 
-        if (registerDto.getFirstName() == null || registerDto.getFirstName().trim().isEmpty()) {
-            validationErrors.add("First name is required");
-        } else if (registerDto.getFirstName().length() > 255) {
-            validationErrors.add("First name must be less than 255 characters");
-        } else if (!registerDto.getFirstName().matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
-            validationErrors.add(
-                "First name contains illegal characters");
-        }
+        validateName(registerDto.getFirstName(), validationErrors, "First name is required",
+            "First name must be less than 255 characters",
+            "First name contains illegal characters");
 
-        if (registerDto.getLastName() == null || registerDto.getLastName().trim().isEmpty()) {
-            validationErrors.add("Last name is required");
-        } else if (registerDto.getLastName().length() > 255) {
-            validationErrors.add("Last name must be less than 255 characters");
-        } else if (!registerDto.getLastName().matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
-            validationErrors.add(
-                "Last name contains illegal characters");
-        }
+        validateName(registerDto.getLastName(), validationErrors, "Last name is required",
+            "Last name must be less than 255 characters", "Last name contains illegal characters");
 
-        if (registerDto.getEmail() == null || registerDto.getEmail().trim().isEmpty()) {
-            validationErrors.add("Email must not be empty");
-        } else if (!registerDto
-            .getEmail()
-            .matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
-            validationErrors.add("Invalid email format");
-        }
+        validateEmail(registerDto.getEmail(), validationErrors);
 
         validationErrors.addAll(validatePassword(registerDto.getPassword()));
+
+        if (!validationErrors.isEmpty()) {
+            LOGGER.warn("User data validation failed");
+            throw new ValidationException("User data validation registration failed: ",
+                validationErrors);
+        }
+    }
+
+    public void validateUserForUpdate(UserUpdateDto user)
+        throws ValidationException, ConflictException {
+        LOGGER.trace("validateUserForUpdate({})", user);
+        List<String> validationErrors = new ArrayList<>();
+
+        isEmailUnique(user.getEmail());
+
+        validateName(user.getFirstName(), validationErrors, "First name is required",
+            "First name must be less than 255 characters",
+            "First name contains illegal characters");
+
+        validateName(user.getLastName(), validationErrors, "Last name is required",
+            "Last name must be less than 255 characters", "Last name contains illegal characters");
+
+        validateEmail(user.getEmail(), validationErrors);
+
+        if (!user.getPassword().isEmpty() && !user.getConfirmedPassword().isEmpty()) {
+            validateNewPasswords(user.getPassword(), user.getConfirmedPassword());
+        }
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("User data validation failed");
@@ -71,6 +82,27 @@ public class UserValidator {
             error.add("email is already registered");
             LOGGER.warn("conflict error in create : {}", error);
             throw new ConflictException("Update for customer has a conflict: ", error);
+        }
+    }
+
+    private static void validateEmail(String email, List<String> validationErrors) {
+        if (email == null || email.trim().isEmpty()) {
+            validationErrors.add("Email must not be empty");
+        } else if (!email
+            .matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
+            validationErrors.add("Invalid email format");
+        }
+    }
+
+    private static void validateName(String registerDto, List<String> validationErrors,
+        String requiredErrorMessage, String e, String containsIllegalCharacters) {
+        if (registerDto == null || registerDto.trim().isEmpty()) {
+            validationErrors.add(requiredErrorMessage);
+        } else if (registerDto.length() > 255) {
+            validationErrors.add(e);
+        } else if (!registerDto.matches("^[\\p{L}]+(?:[' -][\\p{L}]+)*$")) {
+            validationErrors.add(
+                containsIllegalCharacters);
         }
     }
 

@@ -22,6 +22,16 @@ export interface AdminRegisterData {
   isAdmin: boolean;
 }
 
+export interface UserToUpdateDto {
+  id:String;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmedPassword: string;
+  currentAuthToken: string;
+}
+
 export interface AdminUserRegistrationDto {
   firstName: string;
   lastName: string;
