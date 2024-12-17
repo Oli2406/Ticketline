@@ -64,7 +64,7 @@
                 <i class="bi bi-lock-fill"></i>
               </button>
             }
-            <button class="btn btn-danger btn-sm delete-user"><i class="bi bi-trash"></i></button>
+            <button class="btn btn-danger btn-sm delete-user" (click)="showDeleteMessage(user.email)"><i class="bi bi-trash"></i></button>
             <button class="btn btn-secondary btn-sm reset-password" (click)="resetPassword(user.email)">
               reset password
             </button>
@@ -78,3 +78,12 @@
   <!-- Render child components -->
   <router-outlet></router-outlet>
 </div>
+
+@if (showConfirmDeletionDialog) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.delete"
+    [message]="deleteMessage"
+    (confirm)="deleteUser()"
+    (cancel)="showConfirmDeletionDialog = false">
+  </app-confirm-dialog>
+}

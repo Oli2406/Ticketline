@@ -1,5 +1,5 @@
 export interface UserDetailDto {
-  id:number;
+  id:string;
   firstName: string;
   lastName: string;
   email: string;
@@ -18,4 +18,9 @@ export interface UserResetPasswordDto {
   tokenToResetPassword: string;
   newPassword: string;
   newConfirmedPassword: string;
+}
+
+export interface DeleteUserDto {
+  email: string;
+  authToken: string;
 }

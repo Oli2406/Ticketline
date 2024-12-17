@@ -43,8 +43,6 @@ export class MerchandiseCreateComponent {
       this.imageFile = file;
 
       this.imagePreview = URL.createObjectURL(file);
-
-      console.log('Selected file:', file.name, file.size, file.type);
     } else {
       this.imageFile = null;
       this.imagePreview = null;

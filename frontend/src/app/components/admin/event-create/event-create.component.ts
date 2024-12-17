@@ -63,7 +63,7 @@ export class EventCreateComponent implements OnInit {
     private toastr: ToastrService,
     private localStorageService: LocalStorageService,
     private ticketService: TicketService,
-  private purchaseService: PurchaseService
+    private purchaseService: PurchaseService
   ) {}
 
   ngOnInit() {
@@ -78,8 +78,6 @@ export class EventCreateComponent implements OnInit {
         const [dateFrom, dateTo] = selectedDates;
         this.eventData.dateFrom = dateFrom;
         this.eventData.dateTo = dateTo;
-        console.log("Date From:", this.eventData.dateFrom);
-        console.log("Date To:", this.eventData.dateTo);
       },
       onReady: (selectedDates, dateStr, instance) => {
         this.flatpickrInstance = instance;
@@ -253,7 +251,25 @@ export class EventCreateComponent implements OnInit {
             });
           }
         }
-        // Weitere Schleifen für 'A' wie bisher
+
+        for (let row = 1; row <= 12; row++) {
+          for (let seat = 1; seat <= 20; seat++) {
+            tickets.push({
+              rowNumber: row,
+              seatNumber: seat,
+              priceCategory: PriceCategory.PREMIUM,
+              ticketType: TicketType.SEATED,
+              sectorType: SectorType.C,
+              price: 120,
+              status: 'AVAILABLE',
+              performanceId,
+              reservationNumber: 0,
+              hall: Hall.A,
+              date: date,
+            });
+          }
+        }
+
         for (let i = 1; i <= 80; i++) {
           tickets.push({
             rowNumber: 0,
@@ -262,6 +278,22 @@ export class EventCreateComponent implements OnInit {
             ticketType: TicketType.STANDING,
             sectorType: SectorType.A,
             price: 150,
+            status: 'AVAILABLE',
+            performanceId,
+            reservationNumber: 0,
+            hall: Hall.A,
+            date: date,
+          });
+        }
+
+        for (let i = 1; i <= 100; i++) {
+          tickets.push({
+            rowNumber: 0,
+            seatNumber: 0,
+            priceCategory: PriceCategory.STANDARD,
+            ticketType: TicketType.STANDING,
+            sectorType: SectorType.A,
+            price: 80,
             status: 'AVAILABLE',
             performanceId,
             reservationNumber: 0,
@@ -287,7 +319,26 @@ export class EventCreateComponent implements OnInit {
             });
           }
         }
-        // Weitere Schleifen für 'B' wie bisher
+
+        for (let row = 1; row <= 9; row++) {
+          let seatsInRow = 14 + row;
+          for (let seat = 1; seat <= seatsInRow; seat++) {
+            tickets.push({
+              rowNumber: row,
+              seatNumber: seat,
+              priceCategory: PriceCategory.STANDARD,
+              ticketType: TicketType.SEATED,
+              sectorType: SectorType.C,
+              price: 60,
+              status: 'AVAILABLE',
+              performanceId,
+              reservationNumber: 0,
+              hall: Hall.B,
+              date: date,
+            });
+          }
+        }
+
         for (let i = 1; i <= 80; i++) {
           tickets.push({
             rowNumber: 0,
@@ -303,12 +354,25 @@ export class EventCreateComponent implements OnInit {
             date: date,
           });
         }
-      }
 
-      // Tickets in Backend erstellen und Promise lösen oder ablehnen
+        for (let i = 1; i <= 60; i++) {
+          tickets.push({
+            rowNumber: 0,
+            seatNumber: 0,
+            priceCategory: PriceCategory.VIP,
+            ticketType: TicketType.STANDING,
+            sectorType: SectorType.A,
+            price: 100,
+            status: 'AVAILABLE',
+            performanceId,
+            reservationNumber: 0,
+            hall: Hall.B,
+            date: date,
+          });
+        }
+      }
       this.createTicketsInBackend(tickets).subscribe({
         next: () => {
-          console.log('Tickets successfully created in backend.');
           resolve();
         },
         error: (err) => {
@@ -326,9 +390,6 @@ export class EventCreateComponent implements OnInit {
     );
 
     return forkJoin(createRequests).pipe(
-      tap(() => {
-        this.toastr.success('All tickets created successfully!', 'Success');
-      }),
       catchError((error) => {
         this.toastr.error('Error creating some tickets.', 'Error');
         console.error('Ticket creation errors:', error);
@@ -341,10 +402,8 @@ export class EventCreateComponent implements OnInit {
   onSubmit() {
     this.sendPerformancesToBackend()
       .then(() => {
-        console.log('Finale Performance IDs:', this.eventData.performanceIds); // Garantiert vorhanden
         this.eventService.createEvent(this.eventData).subscribe({
           next: (event: Event) => {
-            console.log('Event wurde erstellt mit IDs:', this.eventData.performanceIds);
             this.toastr.success('Event created successfully!', 'Success');
             this.eventData = { title: '', description: '', dateFrom: null, dateTo: null, category: '', performanceIds: [] };
             this.performances = [];
@@ -407,10 +466,7 @@ export class EventCreateComponent implements OnInit {
                 createdPerformance.hall,
                 createdPerformance.date
               ).then(() => {
-                this.toastr.success(
-                  `Performance ID ${createdPerformance.performanceId} and tickets saved.`,
-                  'Success'
-                );
+
                 resolve();
               }).catch((ticketError) => {
                 this.toastr.error('Error generating tickets.', 'Error');
@@ -434,7 +490,6 @@ export class EventCreateComponent implements OnInit {
 
     try {
       await Promise.all(performancePromises);
-      this.toastr.success('All performances and tickets processed successfully.', 'Success');
     } catch (error) {
       this.toastr.error(
         'One or more performances failed to process. Check errors for details.',
@@ -446,7 +501,6 @@ export class EventCreateComponent implements OnInit {
   deletePerformance(index: number): void {
     this.performances = this.performances.filter((_, i) => i !== index);
     this.eventData.performanceIds.splice(index, 1);
-    console.log('Deleted performance at index:', index);
-    console.log(this.performances);
   }
 }
+

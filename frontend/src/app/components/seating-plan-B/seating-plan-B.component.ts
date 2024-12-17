@@ -273,12 +273,8 @@ export class SeatingPlanBComponent {
 
    resetSelections(): void {
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
-    if (totalSelected === 0){
-      console.log("AHAAAAAA")
-    }
     this.selectedTickets = [];
     this.selectedStanding = { vip: 0, premium: 0 };
-    console.log("meow")
     this.totalTickets = 0;
     this.totalPrice = 0;
   }

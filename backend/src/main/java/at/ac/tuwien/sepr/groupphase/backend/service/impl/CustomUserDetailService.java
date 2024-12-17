@@ -1,9 +1,11 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLoginDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserLogoutDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -16,6 +18,7 @@ import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,5 +230,79 @@ public class CustomUserDetailService implements UserService {
 
         user.setPoints(user.getPoints() + pointsToAdd);
         userRepository.save(user);
+    }
+
+    @Override
+    public String updateUser(UserUpdateDto user) throws ValidationException, ConflictException {
+        LOGGER.info("update user: {}", user);
+        userValidator.validateUserForUpdate(user);
+
+        Long originalId = randomStringGenerator.retrieveOriginalId(user.getId())
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser userToUpdate = userRepository.findById(originalId).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the email address %s",
+                    user.getEmail())));
+
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+        userToUpdate.setEmail(user.getEmail());
+
+        if (!user.getPassword().isEmpty()) {
+            userToUpdate.setPassword(user.getPassword());
+        }
+
+        userRepository.save(userToUpdate);
+
+        String authToken = user.getCurrentAuthToken();
+        if (!jwtTokenizer.validateToken(authToken)) {
+            throw new SecurityException("Invalid authentication token");
+        }
+
+        jwtTokenizer.blockToken(authToken);
+
+        List<String> roles =
+            userToUpdate.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+
+        return jwtTokenizer.getAuthToken(userToUpdate.getEmail(), roles,
+            randomStringGenerator.generateRandomString(userToUpdate.getId()),
+            userToUpdate.getPoints(), userToUpdate.getFirstName(), userToUpdate.getLastName());
+    }
+
+    @Override
+    public void deleteUser(DeleteUserDto userDto) throws ValidationException {
+        LOGGER.info("delete user: {}", userDto);
+
+        ApplicationUser userToDelete = userRepository.findUserByEmail(userDto.getEmail())
+            .orElseThrow(
+                () -> new NotFoundException(
+                    String.format("Could not find the user with the id %s",
+                        userDto.getEmail())));
+
+        if (userToDelete.isAdmin()) {
+            List<ApplicationUser> admins = userRepository.findAllByAdmin(true);
+
+            if (admins.size() <= 1) {
+                List<String> errors = new ArrayList<>();
+                errors.add("Can not delete user because at least one admin has to exist.");
+                throw new ValidationException("Error during deletion", errors);
+            }
+        }
+
+        userRepository.delete(userToDelete);
+
+        String authToken = userDto.getAuthToken();
+
+        // In case an admin deletes a user authToken should be null
+        if (authToken != null && !authToken.isEmpty()) {
+            if (!jwtTokenizer.validateToken(authToken)) {
+                throw new SecurityException("Invalid authentication token");
+            }
+
+            jwtTokenizer.blockToken(authToken);
+        }
+
+        LOGGER.info("deleted user: {}", userDto);
     }
 }

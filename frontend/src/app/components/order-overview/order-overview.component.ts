@@ -35,7 +35,6 @@ export class OrderOverviewComponent implements OnInit {
     const userId = this.authService.getUserIdFromToken();
     if (userId) {
       this.loadUserPurchases(userId);
-      console.log('User ID:', userId);
     } else {
       this.toastr.error('Unable to identify the user.', 'Error');
     }

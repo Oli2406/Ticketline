@@ -25,6 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import {SeatingPlanAComponent} from "./components/seating-plan-A/seating-plan-A.component";
 import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.component";
+import {UserAccountComponent} from "./components/user-account/user-account.component";
+import {ConfirmDialogComponent} from "./components/confirm-dialog/confirm-dialog.component";
 
 @NgModule({
   declarations: [
@@ -41,6 +43,7 @@ import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.
     SendEmailComponent,
     SeatingPlanAComponent,
     SeatingPlanBComponent,
+    UserAccountComponent,
   ],
   bootstrap: [AppComponent],
   imports: [BrowserModule,
@@ -58,7 +61,7 @@ import {SeatingPlanBComponent} from "./components/seating-plan-B/seating-plan-B.
       progressBar: true,
       easing: 'ease-in-out',
       easeTime: 300,
-    })
+    }), ConfirmDialogComponent
   ],
   providers: [httpInterceptorProviders, provideHttpClient(withInterceptorsFromDi())]
 })

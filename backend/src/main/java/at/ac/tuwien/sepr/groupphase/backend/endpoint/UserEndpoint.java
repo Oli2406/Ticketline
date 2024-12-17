@@ -1,8 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
@@ -11,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,13 +31,15 @@ import java.util.Map;
 @RequestMapping(UserEndpoint.BASE_PATH)
 public class UserEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     public static final String BASE_PATH = "/api/v1/users";
     private final UserService userService;
     private final RandomStringGenerator randomStringGenerator;
     private final MerchandiseService merchandiseService;
 
-    public UserEndpoint(UserService userService, RandomStringGenerator randomStringGenerator, MerchandiseService merchandiseService) {
+    public UserEndpoint(UserService userService, RandomStringGenerator randomStringGenerator,
+        MerchandiseService merchandiseService) {
         this.userService = userService;
         this.randomStringGenerator = randomStringGenerator;
         this.merchandiseService = merchandiseService;
@@ -50,7 +57,8 @@ public class UserEndpoint {
 
     @PermitAll
     @PostMapping("/deduct-points")
-    public ResponseEntity<?> deductPoints(@RequestParam String encryptedId, @RequestParam int points) {
+    public ResponseEntity<?> deductPoints(@RequestParam String encryptedId,
+        @RequestParam int points) {
         try {
             userService.updateUserPoints(encryptedId, points);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -74,7 +82,8 @@ public class UserEndpoint {
     @PostMapping("/purchase")
     public ResponseEntity<?> purchaseItems(@RequestBody List<PurchaseItemDto> purchaseItems) {
         if (purchaseItems == null || purchaseItems.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Purchase items cannot be empty"));
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Purchase items cannot be empty"));
         }
         try {
             merchandiseService.processPurchase(purchaseItems);
@@ -86,5 +95,20 @@ public class UserEndpoint {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "An unexpected error occurred"));
         }
+    }
+
+    @PermitAll
+    @PutMapping("/update-user")
+    public String updateUser(@RequestBody UserUpdateDto user)
+        throws ValidationException, ConflictException {
+        LOGGER.trace("PUT " + BASE_PATH + "/update-user/{}", user);
+        return userService.updateUser(user);
+    }
+
+    @PermitAll
+    @DeleteMapping
+    public void deleteUser(@RequestBody DeleteUserDto userDto) throws ValidationException {
+        LOGGER.trace("DELETE " + BASE_PATH + " {}", userDto);
+        userService.deleteUser(userDto);
     }
 }
