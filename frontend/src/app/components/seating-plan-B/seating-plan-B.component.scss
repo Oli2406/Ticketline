@@ -6,13 +6,18 @@
   width: 90%;
   margin: 0 auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Stage */
 .row .bg-black {
-  width: 70%;
-  margin: 0 auto;
+  width: 400px;
+  height: 55px;
 }
+
 
 /* VIP Standing */
 .vip-standing {
@@ -21,7 +26,19 @@
   left: 20%;
   border: 1px solid #6c757d;
   padding: 10px;
-  background-color: transparent;
+  background-color: #fff9e6;
+}
+
+/* Standing */
+.standing {
+  width: 60%;
+  height: 18%;
+  top: 163px;
+  left: 20%;
+  border: 1px solid #6c757d;
+  padding: 20px;
+  z-index:10;
+  background-color: #f9f3fc;
 }
 
 /* Selected Section (Purple) */
@@ -31,72 +48,98 @@
   color: #fff;
 }
 
-
-/* Standing */
-.standing {
-  width: 60%;
-  height: 20%;
-  top: 163px;
-  left: 20%;
-  border: 1px solid #6c757d;
-  padding: 20px;
-  background-color: transparent;
-}
-
-/* Seated Front (Sector A) */
-.seated-front {
+/* Seated Back (Sectors B and C) */
+.seated-back-b {
   display: flex;
-  justify-content: center;
   align-items: center;
   width: 100%;
-  height: 20%;
+  height: 35%;
   position: absolute;
-  top: 250px;
-  left: 10px;
+  top: 170px;
+  left: 24%;
 }
 
-/* Seated Back (Sector B) */
-.seated-back {
+.seated-back-c {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 20%;
-  position: absolute;
-  top: 365px;
-  left: 10px;
-}
-/* Base grid styling for Sector A */
-.seating-grid.sector-a {
-  display: grid;
-  grid-template-columns: repeat(14, 15px); /* Fixed seats for Sector A */
-  grid-template-rows: repeat(4, 15px); /* 4 rows */
-  row-gap: 3px; /* Adjust the gap between rows */
-  column-gap: 13px; /* Keep the existing column spacing */
-}
-
-
-/* Dynamic grid styling for Sector B */
-.seating-grid.sector-b {
-  display: grid;
-  grid-template-rows: repeat(4, 15px);
-  justify-content: center;
+  flex-direction: column; /* Stack rows vertically */
   gap: 3px;
+  width: auto;
+  justify-content: center;
 }
 
-.seating-grid.sector-b .row {
-  //display: flex;
-  //flex-wrap: wrap; /* Allows rows to wrap dynamically if they grow too large */
-  justify-content: center; /* Centers content horizontally */
-  align-items: center; /* Centers content vertically */
-  gap: 3px; /* Space between seats */
+.seating-grid-b {
+  display: grid;
+  grid-template-columns: repeat(14, 13px);
+  grid-template-rows: repeat(3, 15px);
+  column-gap: 15px;
+  row-gap: 3px;
+}
+
+/* General styling for all Sector C grids */
+.seating-grid-c {
+  display: grid;
+  row-gap: 10px;
+  column-gap: 10px;
+  margin: 0 auto;
+  z-index:10;
+}
+
+.seating-grid-c1 {
+  grid-template-columns: repeat(15, 15px);
+  column-gap: 15px;
+}
+
+.seating-grid-c2 {
+  grid-template-columns: repeat(16, 15px);
+  column-gap: 15px;
+}
+
+.seating-grid-c3 {
+  grid-template-columns: repeat(17, 15px);
+  column-gap: 15px;
+}
+
+.seating-grid-c4 {
+  grid-template-columns: repeat(18, 15px);
+  column-gap: 15px;
 }
 
 
+.seating-grid-c5 {
+  grid-template-columns: repeat(19, 15px);
+  column-gap: 15px;
+}
 
 
+.seating-grid-c6 {
+  grid-template-columns: repeat(20, 15px);
+  column-gap: 15px;
+}
 
-/* Seat Box Styling */
+
+.seating-grid-c7 {
+  grid-template-columns: repeat(21, 15px);
+  column-gap: 15px;
+}
+
+
+.seating-grid-c8 {
+  grid-template-columns: repeat(22, 15px);
+  column-gap: 15px;
+}
+
+
+.seating-grid-c9 {
+  grid-template-columns: repeat(23, 15px);
+  column-gap: 15px;
+}
+
+.seating-divider {
+  width: 20px;
+  height: 121%;
+}
+
+
 .seat-box {
   width: 25px;
   height: 15px;
@@ -106,10 +149,15 @@
 }
 
 .seat-box.available {
-  background-color: white;
+  background-color: #f0f8ff;
 }
 
-.seat-box.reserved {
+  .seat-box.reserved {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.seat-box.sold {
   background-color: #e0e0e0;
   cursor: not-allowed;
 }
@@ -120,9 +168,8 @@
 }
 
 
-/* Seat Box Styling for Sector B */
 .seat-box-sector-b {
-  width: 15px;
+  width: 25px;
   height: 15px;
   border: 1px solid #ced4da;
   cursor: pointer;
@@ -130,7 +177,9 @@
 }
 
 .seat-box-sector-b.available {
-  background-color: white;
+  background-color: #e6f9e6;
+
+
 }
 
 .seat-box-sector-b.reserved {
@@ -144,9 +193,6 @@
 }
 
 
-
-
-
 /* Button Styling */
 button.btn-secondary {
   background-color: gray;
@@ -158,6 +204,7 @@ button.btn-secondary {
   background-color: gray;
   border: none;
   color: white;
+  z-index:10;
 }
 
 .btn-purple {

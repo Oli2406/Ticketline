@@ -235,3 +235,43 @@
 .custom-label {
   color: #333;
 }
+
+.performance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4d47c3; /* Rotes Icon */
+  font-size: 1.2rem;
+}
+
+.delete-button:hover {
+  color: #7d77e0; /* Dunkleres Rot beim Hovern */
+}
+
+.calendar-icon {
+  color: #4d47c3; /* Normales Lila */
+  position: absolute;
+  right: 14rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1.1rem;
+  transition: color 0.2s ease; /* Sanfter Übergang */
+}
+
+.calendar-icon:hover {
+  color: #7d77e0; /* Helleres Lila beim Hover */
+}
+
+.bi-trash {
+  font-size: 1.2rem; /* Größe des Icons */
+}
+

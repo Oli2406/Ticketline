@@ -26,7 +26,6 @@ import {EventComponent} from "./components/event/event.component";
 import {LocationComponent} from "./components/location/location.component";
 import {UserAccountComponent} from "./components/user-account/user-account.component";
 
-
 const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
@@ -36,8 +35,8 @@ const routes: Routes = [
   {path: 'cart/:id', canActivate: mapToCanActivate([AuthGuard]), component: CartComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'merchandise', canActivate: mapToCanActivate([AuthGuard]), component: MerchandiseComponent},
-  {path: 'seatingPlanA', component: SeatingPlanAComponent},
-  {path: 'seatingPlanB', component: SeatingPlanBComponent},
+  {path: 'seatingPlanA', canActivate: mapToCanActivate([AuthGuard]), component: SeatingPlanAComponent},
+  {path: 'seatingPlanB', canActivate: mapToCanActivate([AuthGuard]), component: SeatingPlanBComponent},
   {path: 'search', canActivate: mapToCanActivate([AuthGuard]), component: SearchComponent},
   {path: 'news', canActivate: mapToCanActivate([AuthGuard]), component: NewsComponent},
   {path: 'register', component: RegisterComponent},

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/ticket")
@@ -53,7 +52,7 @@ public class TicketEndpoint {
         return ResponseEntity.ok(tickets);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/{id}")
     public ResponseEntity<TicketDetailDto> getTicketById(@PathVariable Long id) {
         LOGGER.info("Fetching ticket with ID: {}", id);
@@ -62,7 +61,7 @@ public class TicketEndpoint {
         return ResponseEntity.ok(ticket);
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @GetMapping("/performance/{performanceId}")
     public ResponseEntity<List<TicketDetailDto>> getTicketsByPerformanceId(@PathVariable Long performanceId) {
         LOGGER.info("Fetching tickets for performance ID: {}", performanceId);
@@ -80,7 +79,7 @@ public class TicketEndpoint {
         return ResponseEntity.noContent().build();
     }
 
-    @Secured("ROLE_ADMIN")
+    @PermitAll
     @PutMapping("/{id}")
     public ResponseEntity<TicketDetailDto> updateTicket(
         @PathVariable Long id,

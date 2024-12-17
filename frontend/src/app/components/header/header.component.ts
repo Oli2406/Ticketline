@@ -39,4 +39,10 @@ export class HeaderComponent implements OnInit {
       }
     });
   }
+
+  isDropdownOpen: boolean = false;
+
+  toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
 }

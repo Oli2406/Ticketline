@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
@@ -166,4 +167,39 @@ public class CustomPerformanceService implements PerformanceService {
             })
             .collect(Collectors.toList());
     }
+
+    @Override
+    public PerformanceDetailDto updateTicketNumberById(Long id, Long ticketNumber) throws NotFoundException {
+        LOGGER.info("Creating a new performance with an updated ticket number for performance ID: {}", id);
+
+        // Fetch the existing performance
+        Performance existingPerformance = performanceRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Performance with ID " + id + " not found."));
+
+        // Validate the ticket number
+        if (ticketNumber < 0) {
+            throw new IllegalArgumentException("Ticket number cannot be negative.");
+        }
+
+        existingPerformance.setTicketNumber(ticketNumber);
+
+        // Save the new performance to the database
+        Performance savedPerformance = performanceRepository.save(existingPerformance);
+
+        // Retrieve associated artist and location for the DTO
+        Artist artist = artistRepository.findArtistByArtistId(savedPerformance.getArtistId());
+        Location location = locationRepository.findByLocationId(savedPerformance.getLocationId());
+
+        // Map the new performance to a PerformanceDetailDto
+        PerformanceDetailDto newPerformanceDto = performanceMapper.toPerformanceDetailDto(
+            savedPerformance, artist, location);
+
+        LOGGER.debug("New performance created successfully: {}", newPerformanceDto);
+
+        // Return the DTO of the new performance
+        return newPerformanceDto;
+    }
+
+
+
 }

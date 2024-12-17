@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
@@ -95,6 +96,25 @@ public class PerformanceValidator {
         if (performanceCreateDto.getDuration() >= 600) {
             validationErrors.add("Event duration must be less than 600 minutes or 10 hours");
         }
+
+        LocalDateTime start = performanceCreateDto.getDate();
+        LocalDateTime end = performanceCreateDto.getDate().plusMinutes(performanceCreateDto.getDuration());
+
+        if (performanceCreateDto.getLocationId() != null && performanceCreateDto.getDate() != null && performanceCreateDto.getHall() != null) {
+            List<Performance> performances = performanceRepository.findByLocationIdAndHall(performanceCreateDto.getLocationId(), performanceCreateDto.getHall());
+            for (Performance performance : performances) {
+                LocalDateTime start2 = performance.getDate();
+                LocalDateTime end2 = performance.getDate().plusMinutes(performanceCreateDto.getDuration());
+                if (start.isBefore(end2) && end.isAfter(start2)) {
+                    validationErrors.add("A performance already exists in hall '"
+                        + performanceCreateDto.getHall()
+                        + "' at the same location and overlapping time range: "
+                        + "Existing performance from " + start2 + " to " + end2);
+                    break;
+                }
+            }
+        }
+
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Performance validation failed with errors: {}", validationErrors);

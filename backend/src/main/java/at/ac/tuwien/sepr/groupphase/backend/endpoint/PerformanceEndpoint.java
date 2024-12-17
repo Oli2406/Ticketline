@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 import jakarta.annotation.security.PermitAll;
@@ -105,4 +106,18 @@ public class PerformanceEndpoint {
         List<PerformanceDetailDto> events = performanceService.performAdvancedSearch(query);
         return new ResponseEntity<>(events, HttpStatus.CREATED);
     }
+
+    @PermitAll
+    @PutMapping("/{id}")
+    public ResponseEntity<PerformanceDetailDto> updatePerformance(
+        @PathVariable Long id,
+        @RequestBody Long ticketNumber) throws NotFoundException {
+        LOGGER.info("Received request to update ticket number for performance with ID {}", id);
+
+        PerformanceDetailDto updatedPerformance = performanceService.updateTicketNumberById(id, ticketNumber);
+        LOGGER.debug("Performance updated successfully: {}", updatedPerformance);
+        return ResponseEntity.ok(updatedPerformance);
+    }
+
+
 }

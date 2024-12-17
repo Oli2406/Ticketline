@@ -71,7 +71,7 @@ public class CustomArtistServiceTest {
 
         assertFalse(result.isEmpty(), "Resulting artist list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("JohnDoe", result.get(0).getArtistName(), "Artist name should match");
+        assertEquals("JohnDoe", result.getFirst().getArtistName(), "Artist name should match");
 
         verify(artistRepository, times(1)).findAll();
     }
@@ -86,5 +86,38 @@ public class CustomArtistServiceTest {
 
         assertEquals("Artist not found with ID: 1", exception.getMessage(), "Exception message should match");
         verify(artistRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void searchArtistByNameReturnsMatchingEvent() {
+        ArtistDetailDto artist1DetailDto = new ArtistDetailDto(1L, "Name1", "Last1", "Artist1");
+        Artist artist1 = new Artist("Name1", "Last1", "Artist1");
+        Artist artist2 = new Artist("Name2", "Last2", "Artist2");
+        when(artistRepository.findAll()).thenReturn(List.of(artist1, artist2));
+        when(artistMapper.artistToArtistDetailDto(artist1)).thenReturn(artist1DetailDto);
+
+        ArtistSearchDto searchDto = new ArtistSearchDto("1", null, null);
+
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return only one event");
+        verify(artistRepository, times(1)).findAll();
+        verify(artistMapper, times(1)).artistToArtistDetailDto(artist1);
+        verify(artistMapper, never()).artistToArtistDetailDto(artist2);
+    }
+
+    @Test
+    void searchArtistByNameReturnsNoEventsWhenNoMatch() {
+        Artist artist1 = new Artist("Name1", "Last1", "Artist1");
+        Artist artist2 = new Artist("Name2", "Last2", "Artist2");
+        when(artistRepository.findAll()).thenReturn(List.of(artist1, artist2));
+
+        ArtistSearchDto searchDto = new ArtistSearchDto("3", null, null);
+
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(0, result.size(), "Should return no events");
+        verify(artistRepository, times(1)).findAll();
+        verify(artistMapper, never()).artistToArtistDetailDto(any(Artist.class));
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,6 +31,15 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
     boolean existsByNameAndLocationIdAndDate(String name, Long locationId, LocalDateTime date);
 
     /**
+     * Checks if a performance with the specified name and date exists.
+     *
+     * @param name the name of the performance to check for existence
+     * @param date the date of the performance to be checked
+     * @return true if a performance with the specified name and date exists, false otherwise
+     */
+    boolean existsByNameAndDate(String name, LocalDateTime date);
+
+    /**
      * Finds all performances assoicated with event {@code eventId}.
      *
      * @param eventId the event to find the performances by
@@ -46,4 +56,13 @@ public interface PerformanceRepository extends JpaRepository<Performance, Long> 
      */
     @Query("SELECT p from Performance p WHERE p.locationId = :locationId")
     List<Performance> findByLocationId(Long locationId);
+
+    /**
+     * Checks if a performance with the specified location, date and hall exists.
+     *
+     * @param locationId the location to find the performances by
+     * @param hall the hall to find the performances by
+     * @return list of performances associated with the location, date and hall
+     */
+    List<Performance> findByLocationIdAndHall(Long locationId, String hall);
 }
