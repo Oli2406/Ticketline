@@ -70,7 +70,6 @@ export class EventCreateComponent implements OnInit {
     this.loadFromLocalStorage();
     this.loadArtists();
     this.loadLocations();
-
     /*flatpickr("#dateRange", {
       mode: "range",
       dateFormat: "Y-m-d",
