@@ -99,10 +99,13 @@
           </div>
         </div>
         <div class="d-flex justify-content-center">
-          <button class="btn btn-delete delete-user me-3">
+          <button type="button" class="btn btn-delete delete-user me-2">
             <i class="bi bi-trash"></i> Delete account
           </button>
-          <button type="submit" class="btn btn-primary custom-button">
+          <button type="button" class="btn custom-button me-2" (click)="reset()">
+            <i class="bi bi-x-lg"></i> Reset
+          </button>
+          <button type="submit" class="btn custom-button">
             <i class="bi bi-floppy"></i> Save
           </button>
         </div>

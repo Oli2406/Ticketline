@@ -25,23 +25,28 @@ export class UserAccountComponent implements OnInit {
               private toastr: ToastrService) {}
 
   ngOnInit(): void {
+    this.fillForm();
+  }
+
+  private fillForm() {
     const email = this.authService.getUserEmailFromToken();
     const firstName = this.authService.getUserFirstNameFromToken();
     const lastName = this.authService.getUserLastNameFromToken();
 
     this.editUser = this.fb.group(
       {
-      username: [email, [Validators.required, Validators.email]],
-      firstName: [firstName, Validators.required],
-      lastName: [lastName, Validators.required],
-      newPassword: ['', [Validators.minLength(8)]],
-      confirmPassword: ['']
-    },
+        username: [email, [Validators.required, Validators.email]],
+        firstName: [firstName, Validators.required],
+        lastName: [lastName, Validators.required],
+        newPassword: ['', [Validators.minLength(8)]],
+        confirmPassword: ['']
+      },
       {
         validators: this.passwordsMatchValidator
       }
     );
   }
+
   private passwordsMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
     return group.get('newPassword')?.value === group.get('confirmPassword')?.value
       ? null
@@ -86,5 +91,9 @@ export class UserAccountComponent implements OnInit {
 
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  reset() {
+    this.fillForm();
   }
 }
