@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 public class CustomResetPasswordService implements ResetPasswordService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomResetPasswordService.class);
-
+    private static final String deployUrl = "https://24ws-se-pr-inso-08-acf05sgmk6doonfn65ksq.apps.student.inso-w.at";
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
@@ -146,7 +146,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
     }
 
     private String generateResetLink(String resetToken) {
-        return "http://localhost:4200/reset-password?token=" + resetToken;
+        return deployUrl + "/reset-password?token=" + resetToken;
     }
 
     private PasswordResetToken validateAndGetResetToken(String token) {
@@ -167,7 +167,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
 
         return resetToken;
     }
-    
+
     private void validateResetCode(PasswordResetToken resetToken, String code) {
         if (!resetToken.getCode().equals(code)) {
             resetToken.setFailedAttempts(resetToken.getFailedAttempts() + 1);
