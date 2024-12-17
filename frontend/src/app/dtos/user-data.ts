@@ -5,7 +5,8 @@ export interface UserDetailDto {
   email: string;
   isLocked: boolean;
   isLoggedIn: boolean;
-  points: number
+  points: number;
+  admin: boolean;
 }
 
 export interface UserUpdateReadNewsDto {
