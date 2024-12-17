@@ -33,15 +33,21 @@
           <th>First name</th>
           <th>Last name</th>
           <th>Email</th>
+          <th>Role</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let user of users" [ngClass]="{'table-danger': user.locked}">
+        <tr *ngFor="let user of users" [ngClass]="{'table-danger': user.locked, 'table-warning': user.admin}">
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
+          <td>@if (user.admin) {
+            Admin
+          } @else {
+            User
+          }</td>
           <td>@if(user.locked){
             <i class="bi bi-lock-fill"></i> Locked
           } @else {

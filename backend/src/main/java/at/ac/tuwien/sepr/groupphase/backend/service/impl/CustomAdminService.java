@@ -52,7 +52,7 @@ public class CustomAdminService implements AdminService {
             .map(
                 user -> new UserDetailDto(user.getId(), user.getFirstName(), user.getLastName(),
                     user.getEmail(),
-                    user.isLocked(), user.isLoggedIn(), user.getPoints()))
+                    user.isLocked(), user.isLoggedIn(), user.getPoints(), user.isAdmin()))
             .collect(Collectors.toList());
     }
 
