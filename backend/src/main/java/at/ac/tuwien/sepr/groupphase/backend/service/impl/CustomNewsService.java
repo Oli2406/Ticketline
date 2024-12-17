@@ -16,25 +16,25 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class CustomNewsService implements NewsService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final Path imageDir = Paths.get("./newsImages").toAbsolutePath().normalize();
     private final UserService userService;
     private final NewsRepository newsRepository;
     private final NewsValidator newsValidator;
@@ -101,7 +101,7 @@ public class CustomNewsService implements NewsService {
 
     private String uploadImagePath(Long id, MultipartFile image) throws IOException {
         if (id == null && image != null) {
-            return saveImageLocally(image);
+            return saveImageToFileSystem(image);
         } else if (id == null) {
             return null;
         }
@@ -109,30 +109,23 @@ public class CustomNewsService implements NewsService {
         if (image == null) {
             // Todo get img url
             String pictureUrl = "";
-            if (pictureUrl != null && !pictureUrl.isEmpty()) {
-                return pictureUrl;
-            }
             return null;
         }
-        return saveImageLocally(image);
+        return saveImageToFileSystem(image);
     }
 
-    private String saveImageLocally(MultipartFile image) throws IOException {
-        LOGGER.trace("saveImageLocally({})", image.getOriginalFilename());
+    private String saveImageToFileSystem(MultipartFile imageFile) throws IOException {
+        String imageFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
-        if (!Files.exists(imageDir)) {
-            Files.createDirectories(imageDir);
-        }
+        Resource resourceDir = new ClassPathResource("newsImages");
+        Path uploadPath = Paths.get(resourceDir.getFile().getAbsolutePath());
 
-        String imageName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-        Path imagePath = imageDir.resolve(imageName);
-        Files.copy(image.getInputStream(), imagePath);
+        Files.createDirectories(uploadPath);
 
-        return imageName;
-    }
+        Path imagePath = uploadPath.resolve(imageFileName);
 
-    private void deleteImageLocally(String imageName) throws IOException {
-        LOGGER.trace("deleteImageLocally({})", imageName);
-        Files.delete(imageDir.resolve(imageName));
+        Files.write(imagePath, imageFile.getBytes());
+
+        return imageFileName;
     }
 }

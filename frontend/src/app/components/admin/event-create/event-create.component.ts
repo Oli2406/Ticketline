@@ -14,9 +14,9 @@ import {LocalStorageService} from "../../../services/LocalStorageService";
 import {Hall, PriceCategory, SectorType, Ticket, TicketType} from 'src/app/dtos/ticket';
 import {TicketService} from 'src/app/services/ticket.service';
 import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.css'; // Standard-Theme
+import 'flatpickr/dist/flatpickr.css';
 import 'flatpickr/dist/themes/material_blue.css';
-import {Purchase} from "../../../dtos/purchase"; // Material Blue Theme
+import {Purchase} from "../../../dtos/purchase";
 import {PurchaseService} from 'src/app/services/purchase.service';
 import {catchError, forkJoin, lastValueFrom, map, Observable} from "rxjs";
 import {tap} from "rxjs/operators";
@@ -70,8 +70,7 @@ export class EventCreateComponent implements OnInit {
     this.loadFromLocalStorage();
     this.loadArtists();
     this.loadLocations();
-
-    flatpickr("#dateRange", {
+    /*flatpickr("#dateRange", {
       mode: "range",
       dateFormat: "Y-m-d",
       onClose: (selectedDates: Date[], dateStr: string, instance: any) => {
@@ -82,7 +81,7 @@ export class EventCreateComponent implements OnInit {
       onReady: (selectedDates, dateStr, instance) => {
         this.flatpickrInstance = instance;
       }
-    });
+    });*/
   }
 
   saveToLocalStorage() {
@@ -393,9 +392,9 @@ export class EventCreateComponent implements OnInit {
       catchError((error) => {
         this.toastr.error('Error creating some tickets.', 'Error');
         console.error('Ticket creation errors:', error);
-        throw error; // Fehler propagieren
+        throw error;
       }),
-      map(() => void 0) // Konvertiert das Ergebnis zu 'void'
+      map(() => void 0)
     );
   }
 

@@ -25,12 +25,18 @@ export class AppComponent {
       });
     }
 
-    this.authService.isCurrentUserLoggedInInBackend().subscribe((isLoggedIn) => {
-      if(!isLoggedIn){
-        this.authService.clearAuthToken();
-        this.router.navigate(['/login'])
+    this.authService.isCurrentUserLoggedInInBackend().subscribe({
+        next: isLoggedIn => {
+          if (!isLoggedIn) {
+            this.authService.clearAuthToken();
+            this.router.navigate(['/login'])
+          }
+        }, error: () => {
+          this.authService.clearAuthToken();
+          this.router.navigate(['/login'])
+        },
       }
-    });
+    );
 
     if (this.authService.getResetToken()) {
       this.authService.validateResetTokenInBackend().subscribe((isValid) => {
@@ -42,4 +48,4 @@ export class AppComponent {
       });
     }
   }
-}
+  }

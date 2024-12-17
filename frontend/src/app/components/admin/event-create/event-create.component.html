@@ -17,17 +17,15 @@
         <div class="form-group">
           <textarea placeholder="Description" [(ngModel)]="eventData.description" name="description"></textarea>
         </div>
-        <label for="dateRange" class="custom-label fw-bold">Date</label>
-        <div class="form-group position-relative">
-          <input
-            id="dateRange"
-            type="text"
-            placeholder="Select date"
-            class="form-control pe-5"
-          />
-          <i class="bi bi-calendar calendar-icon"></i>
-        </div>
+        <form>
+          <div class="form-group">
+            <label class="custom-label fw-bold">Start Date</label>
+            <input type="date" id="dateFrom" [(ngModel)]="eventData.dateFrom" name="dateFrom" required />
 
+            <label class="custom-label fw-bold">End Date</label>
+            <input type="date" id="dateTo" [(ngModel)]="eventData.dateTo" name="dateTo" required />
+          </div>
+        </form>
         <label class="custom-label fw-bold">Category</label>
         <div class="form-group">
           <input type="text" placeholder="Category" [(ngModel)]="eventData.category" name="category" />
