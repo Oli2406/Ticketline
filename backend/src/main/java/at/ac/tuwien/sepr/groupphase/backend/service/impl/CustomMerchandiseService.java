@@ -44,11 +44,14 @@ public class CustomMerchandiseService implements MerchandiseService {
         toAdd.setName(merchandiseCreateDto.getName());
         toAdd.setCategory(merchandiseCreateDto.getCategory());
         toAdd.setImageUrl(merchandiseCreateDto.getImageUrl());
-        toAdd.setPoints(
-            merchandiseCreateDto.getPrice().multiply(BigDecimal.valueOf(10)).intValue());
+        if(merchandiseCreateDto.getPrice().compareTo(new BigDecimal(1)) < 0) {
+            toAdd.setPoints(1);
+        } else {
+            toAdd.setPoints(
+                merchandiseCreateDto.getPrice().multiply(BigDecimal.valueOf(10)).intValue());
+        }
         toAdd.setStock(merchandiseCreateDto.getStock());
         merchandiseRepository.save(toAdd);
-
         return merchandiseCreateDto;
     }
 
