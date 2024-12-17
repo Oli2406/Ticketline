@@ -119,9 +119,10 @@ class AdminEndpointTest {
         List<UserDetailDto> users = new ArrayList<>();
         users.add(
             new UserDetailDto(1L, "Herta", "Testfrau", "herta.testfrau@email.com", false, false,
-                123));
+                123, true));
         users.add(
-            new UserDetailDto(2L, "Max", "Testmann", "max.testmann@email.com", false, false, 1234));
+            new UserDetailDto(2L, "Max", "Testmann", "max.testmann@email.com", false, false, 1234,
+                false));
 
         when(adminService.getAllUsers()).thenReturn(users);
 
