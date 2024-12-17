@@ -68,7 +68,6 @@ export class NewsDetailComponent {
           email: this.authService.getUserEmailFromToken()
         };
         this.userService.updateReadNews(dto).subscribe({
-          next: () => console.log('Successfully marked as read'),
           error: () => console.error('Error marking news as read')
         });
       }

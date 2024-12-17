@@ -163,9 +163,7 @@ export class SearchComponent implements AfterViewInit {
             })
           )
         );
-
         forkJoin(updateRequests).subscribe({
-          next: () => console.log('All ticket numbers updated successfully'),
           error: (err) => console.error('Error updating ticket numbers:', err),
         });
       },
