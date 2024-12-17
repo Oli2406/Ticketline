@@ -8,12 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +20,6 @@ import java.util.List;
 public class NewsDataGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Path SOURCE_DIR = Paths.get("./src/test/resources/testImages/").toAbsolutePath().normalize();
-    private static final Path TARGET_DIR = Paths.get("./newsImages").toAbsolutePath().normalize();
     private final NewsRepository newsRepository;
 
     public NewsDataGenerator(NewsRepository newsRepository) {
@@ -146,8 +142,6 @@ public class NewsDataGenerator {
             "The annual holiday craft fair is coming to [Venue Name] on [Date]. Find handcrafted gifts, decorations, and treats from local artisans. This is the perfect place to find unique gifts for everyone on your list.",
             LocalDate.of(2024, 12, 10),
             null);
-
-        copyTestImages();
     }
 
     private void createNewsIfNotExists(String title, String summary, String content,
@@ -156,32 +150,4 @@ public class NewsDataGenerator {
             newsRepository.save(new News(title, summary, content, date, images));
         }
     }
-
-    private void copyTestImages() {
-        LOGGER.debug("Copying test images…");
-
-        try {
-            if (Files.notExists(TARGET_DIR)) {
-                Files.createDirectories(TARGET_DIR);
-            }
-            Files.walk(SOURCE_DIR)
-                .filter(Files::isRegularFile)
-                .forEach(this::copyFile);
-
-            LOGGER.debug("Finished copying test images.");
-        } catch (IOException e) {
-            LOGGER.debug("Error occurred while copying test images: {}", e.getMessage());
-        }
-    }
-
-    private void copyFile(Path sourcePath) {
-        Path targetPath = TARGET_DIR.resolve(SOURCE_DIR.relativize(sourcePath));
-        try {
-            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            LOGGER.debug("Copied {} to {}", sourcePath, targetPath);
-        } catch (IOException e) {
-            LOGGER.debug("Failed to copy file: {} to {}. Error: {}", sourcePath, targetPath, e.getMessage());
-        }
-    }
-
 }

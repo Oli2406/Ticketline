@@ -8,6 +8,8 @@ import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,7 +35,6 @@ public class MerchandiseEndpoint {
 
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final String IMAGE_UPLOAD_DIR = "merchandise/";
     public MerchandiseService merchandiseService;
 
     public MerchandiseEndpoint(MerchandiseService merchandiseService) {
@@ -76,9 +77,16 @@ public class MerchandiseEndpoint {
 
     private String saveImageToFileSystem(MultipartFile imageFile) throws IOException {
         String imageFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        Path imagePath = Paths.get(IMAGE_UPLOAD_DIR, imageFileName);
-        Files.createDirectories(imagePath.getParent());
+
+        Resource resourceDir = new ClassPathResource("merchandise");
+        Path uploadPath = Paths.get(resourceDir.getFile().getAbsolutePath());
+
+        Files.createDirectories(uploadPath);
+
+        Path imagePath = uploadPath.resolve(imageFileName);
+
         Files.write(imagePath, imageFile.getBytes());
+
         return imageFileName;
     }
 }
