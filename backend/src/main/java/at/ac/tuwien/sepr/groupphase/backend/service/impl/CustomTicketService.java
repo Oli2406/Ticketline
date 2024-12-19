@@ -205,4 +205,21 @@ public class CustomTicketService implements TicketService {
         ticketRepository.deleteById(id);
         LOGGER.debug("Deleted ticket with ID: {}", id);
     }
+
+    @Override
+    public void updateTicketStatusList(List<Long> ticketIds, String status) {
+        if (!List.of("SOLD", "RESERVED", "AVAILABLE").contains(status)) {
+            throw new IllegalArgumentException("Status is invalid");
+        }
+        ticketIds.stream()
+            .map(ticketRepository::findByTicketId)
+            .forEach(ticket -> {
+                if (ticket != null) {
+                    ticket.setStatus(status);
+                    ticketRepository.save(ticket);
+                } else {
+                    LOGGER.error("Ticket with ID {} not found", ticket);
+                }
+            });
+    }
 }

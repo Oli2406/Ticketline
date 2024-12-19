@@ -6,7 +6,9 @@ export interface Purchase {
   userId: String;
   ticketIds: number[];
   merchandiseIds: number[];
+  merchandiseQuantities: number[];
   totalPrice: number;
+  purchaseDate: string;
 }
 
 export interface PurchaseListDto {

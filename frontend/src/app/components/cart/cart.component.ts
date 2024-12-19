@@ -241,50 +241,55 @@ export class CartComponent implements OnInit {
 
     const tickets: number[] = [];
     const merchandise: number[] = [];
+    const merchandiseQuantities: number[] = [];
 
     this.cartItems.forEach(cartItem => {
       if ('ticketId' in cartItem.item) {
         tickets.push(cartItem.item.ticketId);
       } else if ('merchandiseId' in cartItem.item) {
         merchandise.push(cartItem.item.merchandiseId);
+        merchandiseQuantities.push(cartItem.quantity);
       }
     });
 
     const totalPrice = this.getTotalPrice();
-
     const today = new Date();
-    const purchaseDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
     const purchasePayload: Purchase = {
       userId: this.authService.getUserIdFromToken(),
       ticketIds: tickets,
       merchandiseIds: merchandise,
+      merchandiseQuantities: merchandiseQuantities,
       totalPrice: totalPrice,
+      purchaseDate: today.toISOString().split('T')[0],
     };
 
     console.log('Purchase Payload:', JSON.stringify(purchasePayload));
 
-    try {
-      this.purchaseService.createPurchase(purchasePayload);
-      if(this.selectedPaymentOption === 'points') {
-        await this.cartService.deductPoints(this.getTotalPoints());
-      } else {
-        await this.cartService.addPoints(this.getTotalPointsToAdd());
-      }
+    this.purchaseService.createPurchase(purchasePayload).subscribe({
+      next: async () => {
+        try {
+          if (this.selectedPaymentOption === 'points') {
+            await this.cartService.deductPoints(this.getTotalPoints());
+          } else {
+            await this.cartService.addPoints(this.getTotalPointsToAdd());
+          }
 
-      this.cartService.clearCart();
-      this.toastr.success('Thank you for your purchase.');
-      await this.router.navigate(['merchandise']);
-    } catch (error) {
-      console.error('Purchase Error:', error);
-
-      if (error instanceof HttpErrorResponse) {
-        console.error('Backend Response:', error.error);
-        this.toastr.error(`Error: ${error.message}`);
-      } else {
-        this.toastr.error('An unexpected error occurred. Please try again.');
-      }
-    }
+          this.cartService.clearCart();
+          this.toastr.success('Thank you for your purchase.');
+          await this.router.navigate(['merchandise']);
+        } catch (error) {
+          console.error('Post-Purchase Error:', error);
+          this.toastr.error('An unexpected error occurred. Please try again.');
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Purchase Error:', error);
+        if (error.error) {
+          this.toastr.error(`Error: ${error.error.message || error.message}`);
+        } else {
+          this.toastr.error('An unexpected error occurred. Please try again.');
+        }
+      },
+    });
   }
-
 }

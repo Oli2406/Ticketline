@@ -10,17 +10,21 @@ public class PurchaseDetailDto {
     private Long userId;
     private List<Ticket> tickets;
     private List<Merchandise> merchandises;
+    private List<Long> merchandiseQuantities;
     private Long totalPrice;
     private LocalDate purchaseDate;
     private Long purchaseId;
 
-    public PurchaseDetailDto(Long purchaseId, Long userId, List<Ticket> tickets, List<Merchandise> merchandises, Long totalPrice, LocalDate purchaseDate) {
+    public PurchaseDetailDto(Long purchaseId, Long userId, List<Ticket> tickets,
+                             List<Merchandise> merchandises, Long totalPrice, LocalDate purchaseDate,
+                             List<Long> merchandiseQuantities) {
         this.purchaseId = purchaseId;
         this.userId = userId;
         this.tickets = tickets;
         this.merchandises = merchandises;
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+        this.merchandiseQuantities = merchandiseQuantities;
     }
 
     public PurchaseDetailDto() {
@@ -72,5 +76,13 @@ public class PurchaseDetailDto {
 
     public void setPurchaseDate(LocalDate purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public List<Long> getMerchandiseQuantities() {
+        return merchandiseQuantities;
+    }
+
+    public void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+        this.merchandiseQuantities = merchandiseQuantities;
     }
 }

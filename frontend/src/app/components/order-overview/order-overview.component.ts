@@ -69,10 +69,10 @@ export class OrderOverviewComponent implements OnInit {
           }
           if (ticket.status === 'RESERVED') {
             currentMap[purchaseDate].reserved.push(ticket);
-          } else if (ticket.status === 'PURCHASED') {
+          } else if (ticket.status === 'SOLD') {
             currentMap[purchaseDate].purchased.push(ticket);
           }
-        } else if (ticket.status === 'PURCHASED') {
+        } else if (ticket.status === 'SOLD') {
           // Vergangene Käufe (nur gekaufte Tickets)
           if (!pastMap[purchaseDate]) {
             pastMap[purchaseDate] = { purchased: [] };

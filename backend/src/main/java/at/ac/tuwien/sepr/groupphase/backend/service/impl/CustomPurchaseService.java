@@ -48,7 +48,8 @@ public class CustomPurchaseService implements PurchaseService {
             purchaseCreateDto.getTicketIds(),
             purchaseCreateDto.getMerchandiseIds(),
             purchaseCreateDto.getTotalPrice(),
-            purchaseCreateDto.getPurchaseDate()
+            purchaseCreateDto.getPurchaseDate(),
+            purchaseCreateDto.getMerchandiseQuantities()
         );
 
         logger.debug("Mapped Purchase entity: {}", purchase);
@@ -66,7 +67,8 @@ public class CustomPurchaseService implements PurchaseService {
             tickets,
             merchandise,
             purchase.getTotalPrice(),
-            purchase.getPurchaseDate()
+            purchase.getPurchaseDate(),
+            purchase.getMerchandiseQuantities()
         );
     }
 
@@ -86,7 +88,8 @@ public class CustomPurchaseService implements PurchaseService {
                 tickets,
                 merchandise,
                 purchase.getTotalPrice(),
-                purchase.getPurchaseDate()
+                purchase.getPurchaseDate(),
+                purchase.getMerchandiseQuantities()
             );
         }).collect(Collectors.toList());
     }
@@ -112,7 +115,8 @@ public class CustomPurchaseService implements PurchaseService {
             tickets,
             merchandise,
             purchase.getTotalPrice(),
-            purchase.getPurchaseDate()
+            purchase.getPurchaseDate(),
+            purchase.getMerchandiseQuantities()
         );
     }
 

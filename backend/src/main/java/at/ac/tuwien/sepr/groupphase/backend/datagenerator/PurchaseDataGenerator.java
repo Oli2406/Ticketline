@@ -75,6 +75,10 @@ public class PurchaseDataGenerator {
             // 2 Merchandise-Artikel je Kauf
             List<Long> merchandiseIds = getRandomIds(allMerchandise, 2);
 
+            List<Long> merchandiseQuantities = new ArrayList<>();
+            merchandiseQuantities.add(4L);
+            merchandiseQuantities.add(10L);
+
             // Berechnung des Gesamtpreises
             Long totalPrice = calculateTotalPrice(ticketIds, merchandiseIds);
 
@@ -84,7 +88,8 @@ public class PurchaseDataGenerator {
                 ticketIds,
                 merchandiseIds,
                 totalPrice,
-                getRandomPastDate()
+                getRandomPastDate(),
+                merchandiseQuantities
             );
 
             purchaseRepository.save(purchase);

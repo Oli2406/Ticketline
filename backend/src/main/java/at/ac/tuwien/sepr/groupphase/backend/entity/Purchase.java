@@ -26,6 +26,9 @@ public class Purchase {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String merchandiseIds;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String merchandiseQuantities;
+
     @Column(nullable = false)
     private Long totalPrice;
 
@@ -35,12 +38,22 @@ public class Purchase {
     public Purchase() {
     }
 
-    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
+    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate,
+                    List<Long> merchandiseQuantities) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
         this.setMerchandiseIds(merchandiseIds);
+        this.setMerchandiseQuantities(merchandiseQuantities);
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+    }
+
+    private void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+        this.merchandiseQuantities = convertListToCsv(merchandiseQuantities);
+    }
+
+    public List<Long> getMerchandiseQuantities() {
+        return convertCsvToList(this.merchandiseQuantities);
     }
 
     public Long getPurchaseId() {
