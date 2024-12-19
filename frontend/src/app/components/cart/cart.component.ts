@@ -12,8 +12,9 @@ import {Globals} from "../../global/globals";
 import {ReceiptService} from "../../services/receipt.service";
 import {HttpErrorResponse} from "@angular/common/http";
 import {PerformanceService} from 'src/app/services/performance.service';
-import {forEach} from "lodash";
-import {count} from "rxjs";
+import {Purchase} from "../../dtos/purchase";
+import {PurchaseService} from "../../services/purchase.service";
+import {DatePipe} from "@angular/common";
 
 @Component({
   selector: 'app-cart',
@@ -32,6 +33,7 @@ export class CartComponent implements OnInit {
   userFirstName: string;
   userLastName: string;
   userEmail: string;
+
 
   selectedPaymentOption: string = 'creditCard';
   protected accountPoints: number;
@@ -64,6 +66,7 @@ export class CartComponent implements OnInit {
               private toastr: ToastrService,
               private receiptService: ReceiptService,
               private performanceService: PerformanceService,
+              private purchaseService: PurchaseService,
               private router: Router,
               private global: Globals) {
   }
@@ -227,49 +230,61 @@ export class CartComponent implements OnInit {
       this.toastr.error('Please fill in all address fields.');
       return;
     }
-    if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
-      this.toastr.error('You do not have enough points.');
-      return;
-    }
-    if (this.showPaymentDetails) {
-      if (
-        (this.selectedPaymentOption === 'creditCard' && !this.paymentDetails.creditCardNumber) ||
-        (this.selectedPaymentOption === 'paypal' && !this.paymentDetails.paypalEmail) ||
-        (this.selectedPaymentOption === 'bankTransfer' && !this.paymentDetails.bankAccount)
-      ) {
-        this.toastr.error('Please fill in the required payment details.');
-        return;
-      }
-    }
     if (this.cartItems.length === 0) {
       this.toastr.error('Your cart is empty.');
       return;
     }
+    if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
+      this.toastr.error('You do not have enough points.');
+      return;
+    }
+
+    const tickets: number[] = [];
+    const merchandise: number[] = [];
+
+    this.cartItems.forEach(cartItem => {
+      if ('ticketId' in cartItem.item) {
+        tickets.push(cartItem.item.ticketId);
+      } else if ('merchandiseId' in cartItem.item) {
+        merchandise.push(cartItem.item.merchandiseId);
+      }
+    });
+
+    const totalPrice = this.getTotalPrice();
+
+    const today = new Date();
+    const purchaseDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const purchasePayload: Purchase = {
+      userId: this.authService.getUserIdFromToken(),
+      ticketIds: tickets,
+      merchandiseIds: merchandise,
+      totalPrice: totalPrice,
+    };
+
+    console.log('Purchase Payload:', JSON.stringify(purchasePayload));
 
     try {
-      const purchasePayload = this.cartItems.map(cartItem => ({
-        itemId: 'merchandiseId' in cartItem.item ? cartItem.item.merchandiseId : cartItem.item.ticketId,
-        quantity: cartItem.quantity,
-      }));
-      this.invoiceCounter++;
-      this.saveInvoiceCounter();
-      await this.cartService.purchaseItems(purchasePayload);
-      this.toastr.success('Thank you for your purchase.');
+      this.purchaseService.createPurchase(purchasePayload);
       if(this.selectedPaymentOption === 'points') {
         await this.cartService.deductPoints(this.getTotalPoints());
       } else {
         await this.cartService.addPoints(this.getTotalPointsToAdd());
       }
+
       this.cartService.clearCart();
-      this.receiptService.exportToPDF();
+      this.toastr.success('Thank you for your purchase.');
       await this.router.navigate(['merchandise']);
     } catch (error) {
-      if (error instanceof HttpErrorResponse && error.status === 409) {
-        const backendMessage = error.error?.error || 'Error processing your purchase.';
-        this.toastr.error(backendMessage);
+      console.error('Purchase Error:', error);
+
+      if (error instanceof HttpErrorResponse) {
+        console.error('Backend Response:', error.error);
+        this.toastr.error(`Error: ${error.message}`);
       } else {
         this.toastr.error('An unexpected error occurred. Please try again.');
       }
     }
   }
+
 }

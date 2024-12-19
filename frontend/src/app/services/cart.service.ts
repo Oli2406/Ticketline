@@ -4,6 +4,7 @@ import { TicketDto } from '../dtos/ticket';
 import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Globals } from '../global/globals';
+import {Purchase} from "../dtos/purchase";
 
 @Injectable({
   providedIn: 'root',
@@ -129,12 +130,13 @@ export class CartService {
       .toPromise();
   }
 
-  purchaseItems(purchasePayload: { itemId: number; quantity: number }[]): Promise<void> {
-    this.API_URL = this.globals.backendUri + '/users/purchase';
+  purchase(purchasePayload: Purchase): Promise<void> {
+    const API_URL = this.globals.backendUri + '/purchase';
     return this.http
-      .post<void>(`${this.API_URL}`, purchasePayload, {
+      .post<void>(API_URL, purchasePayload, {
         headers: { 'Content-Type': 'application/json' },
       })
       .toPromise();
   }
+
 }

@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class PurchaseCreateDto {
-    private Long userId;
+    private String userId;
     private List<Long> ticketIds;
     private List<Long> merchandiseIds;
     private Long totalPrice;
     private LocalDate purchaseDate;
 
-    public PurchaseCreateDto(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
+    public PurchaseCreateDto(String userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
         this.userId = userId;
         this.ticketIds = ticketIds;
         this.merchandiseIds = merchandiseIds;
@@ -21,11 +21,11 @@ public class PurchaseCreateDto {
     public PurchaseCreateDto() {
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

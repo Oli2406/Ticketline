@@ -5,7 +5,6 @@ public class PurchaseItemDto {
     private Long itemId;
     private int quantity;
 
-    // Getters and Setters
     public Long getItemId() {
         return itemId;
     }

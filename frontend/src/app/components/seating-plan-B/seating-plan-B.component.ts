@@ -342,13 +342,11 @@ export class SeatingPlanBComponent {
 
     const updateRequests = [];
 
-    // Handle seated tickets
     this.selectedTickets.forEach(ticket => {
       ticket.status = 'SOLD';
       updateRequests.push(this.ticketService.updateTicket(ticket));
     });
 
-    // Handle standing tickets (VIP and Standard)
     forkJoin([
       this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
       this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
@@ -415,7 +413,7 @@ export class SeatingPlanBComponent {
     };
   }
 
-  /*addToCart(): void {
+  addToCart(): void {
     if (this.totalTickets === 0) {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
       return;
@@ -454,6 +452,5 @@ export class SeatingPlanBComponent {
 
     this.toastr.success("Successfully added selected tickets to the cart.", "Success");
     this.resetSelections();
-  }*/
-
+  }
 }
