@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
 import io.jsonwebtoken.Claims;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +129,9 @@ public class CustomResetPasswordService implements ResetPasswordService {
     }
 
     private String generateResetCode() {
-        return String.valueOf((int) (Math.random() * 90000000) + 10000000);
+        SecureRandom secureRandom = new SecureRandom();
+        int resetCode = secureRandom.nextInt(90000000) + 10000000;
+        return String.valueOf(resetCode);
     }
 
     private void saveResetToken(String email, String resetCode, String resetToken) {
