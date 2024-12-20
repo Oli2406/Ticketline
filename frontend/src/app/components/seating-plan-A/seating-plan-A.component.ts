@@ -435,7 +435,7 @@ export class SeatingPlanAComponent {
       next: () => {
         this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
         this.resetSelections();
-        this.loadTicketsByPerformance(this.performanceID); // Reload tickets
+        this.loadTicketsByPerformance(this.performanceID);
       },
       error: err => {
         console.error('Error reserving tickets:', err);
@@ -459,13 +459,9 @@ export class SeatingPlanAComponent {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
       return;
     }
-
-
     this.selectedTickets.forEach(ticket => {
       this.cartService.addToCart(ticket);
     });
-
-
     if (this.selectedStanding.vip > 0) {
       this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
         next: vipTickets => {
@@ -477,8 +473,6 @@ export class SeatingPlanAComponent {
         }
       });
     }
-
-
     if (this.selectedStanding.standard > 0) {
       this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
         next: standardTickets => {
@@ -490,7 +484,6 @@ export class SeatingPlanAComponent {
         }
       });
     }
-
     this.toastr.success("Successfully added selected tickets to the cart.", "Success");
     this.resetSelections();
   }

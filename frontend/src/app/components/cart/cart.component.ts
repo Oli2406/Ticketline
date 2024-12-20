@@ -34,7 +34,6 @@ export class CartComponent implements OnInit {
   userLastName: string;
   userEmail: string;
 
-
   selectedPaymentOption: string = 'creditCard';
   protected accountPoints: number;
   invoiceCounter: number = 1;
@@ -80,6 +79,14 @@ export class CartComponent implements OnInit {
     this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
   }
 
+  get hasTicketsInCart(): boolean {
+    return this.cartItems.some(cartItem => this.isTicket(cartItem.item));
+  }
+
+  get hasMerchInCart(): boolean {
+    return this.cartItems.some(cartItem => this.isMerchandise(cartItem.item));
+  }
+
   fetchAccountPoints(): void {
     const email = this.authService.getUserEmailFromToken();
     if (email) {
@@ -103,8 +110,8 @@ export class CartComponent implements OnInit {
   private fetchAllPerformanceNames(): void {
     const performanceIds = new Set(
       this.cartItems
-      .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
-      .filter((id) => id !== null)
+        .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
+        .filter((id) => id !== null)
     );
 
     const fetchRequests = Array.from(performanceIds).map((id) =>
@@ -112,18 +119,18 @@ export class CartComponent implements OnInit {
     );
 
     Promise.all(fetchRequests)
-    .then((performances) => {
-      performances.forEach((performance) => {
-        this.performanceCache[performance.performanceId] = performance.name;
+      .then((performances) => {
+        performances.forEach((performance) => {
+          this.performanceCache[performance.performanceId] = performance.name;
+        });
+      })
+      .catch((error) => {
+        console.error('Error fetching performances:', error);
+        this.toastr.error('Failed to load performance names.');
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
-    })
-    .catch((error) => {
-      console.error('Error fetching performances:', error);
-      this.toastr.error('Failed to load performance names.');
-    })
-    .finally(() => {
-      this.isLoading = false;
-    });
   }
 
   updateQuantity(item: Merchandise | TicketDto, quantity: number): void {
@@ -150,6 +157,7 @@ export class CartComponent implements OnInit {
 
     return Math.round(total);
   }
+
   formatCreditCardNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1-').replace(/-$/, '');
@@ -239,6 +247,13 @@ export class CartComponent implements OnInit {
       return;
     }
 
+    const hasTickets = this.cartItems.some(cartItem => 'performanceId' in cartItem.item);
+    if (this.selectedPaymentOption === 'points' && hasTickets) {
+      this.toastr.error('You cannot buy tickets with points.');
+      this.selectedPaymentOption = '';
+      return;
+    }
+
     const tickets: number[] = [];
     const merchandise: number[] = [];
     const merchandiseQuantities: number[] = [];
@@ -268,6 +283,7 @@ export class CartComponent implements OnInit {
     this.purchaseService.createPurchase(purchasePayload).subscribe({
       next: async () => {
         try {
+          this.generatePDF();
           if (this.selectedPaymentOption === 'points') {
             await this.cartService.deductPoints(this.getTotalPoints());
           } else {
@@ -291,5 +307,14 @@ export class CartComponent implements OnInit {
         }
       },
     });
+  }
+
+  updatePaymentOption(option: string): void {
+    const hasTickets = this.cartItems.some(cartItem => 'performanceId' in cartItem.item);
+    if (option === 'points' && hasTickets) {
+      this.toastr.error('You cannot select points as a payment option when tickets are in the cart.');
+      return;
+    }
+    this.selectedPaymentOption = option;
   }
 }
