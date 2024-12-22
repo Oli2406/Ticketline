@@ -34,6 +34,7 @@ export interface TicketDto {
   reservationNumber?: number;
   hall: Hall;
   date: Date;
+  reservedUntil?: string;
 }
 
 export interface Ticket {

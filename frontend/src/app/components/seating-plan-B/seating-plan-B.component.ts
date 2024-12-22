@@ -334,49 +334,6 @@ export class SeatingPlanBComponent {
     });
   }
 
-  buyTickets(): void {
-    if (this.totalTickets === 0) {
-      this.toastr.error('No tickets selected to buy!', 'Cannot buy tickets:');
-      return;
-    }
-
-    const updateRequests = [];
-
-    this.selectedTickets.forEach(ticket => {
-      ticket.status = 'SOLD';
-      updateRequests.push(this.ticketService.updateTicket(ticket));
-    });
-
-    forkJoin([
-      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
-      this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
-    ]).subscribe({
-      next: ([vipTickets, standardTickets]) => {
-        [...vipTickets, ...standardTickets].forEach(ticket => {
-          ticket.status = 'SOLD';
-          updateRequests.push(this.ticketService.updateTicket(ticket));
-        });
-
-        forkJoin(updateRequests).subscribe({
-          next: () => {
-            this.toastr.success(`Successfully purchased ${this.totalTickets} tickets for ${this.totalPrice}€!`, 'Purchase Successful');
-            this.resetSelections();
-            this.loadTicketsByPerformance(this.performanceID);
-          },
-          error: (err) => {
-            console.error('Error purchasing tickets:', err);
-            this.toastr.error('Failed to purchase tickets. Please try again.', 'Error');
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error fetching standing tickets:', err);
-        this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
-      }
-    });
-  }
-
-
   getAvailableStandingTickets(category: PriceCategory, count: number): Observable<TicketDto[]> {
     return this.ticketService.getTicketsByPerformanceId(this.performanceID).pipe(
       map(tickets => {
@@ -399,7 +356,7 @@ export class SeatingPlanBComponent {
           }
         }
 
-        return result; // Return the filtered tickets
+        return result;
       })
     );
   }
@@ -419,38 +376,75 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    // Add seated tickets to the cart
+    const updateRequests = [];
+
     this.selectedTickets.forEach(ticket => {
+      ticket.status = 'RESERVED';
       this.cartService.addToCart(ticket);
+      updateRequests.push(this.ticketService.updateTicket(ticket));
     });
 
-    // Add VIP standing tickets to the cart
     if (this.selectedStanding.vip > 0) {
-      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
-        next: vipTickets => {
-          vipTickets.forEach(ticket => this.cartService.addToCart(ticket));
-        },
-        error: err => {
-          console.error('Error fetching VIP standing tickets:', err);
-          this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
-        }
-      });
+      const remainingVipTickets = this.vipStandingTickets - this.selectedStanding.vip;
+
+      if (remainingVipTickets >= 0) {
+        this.vipStandingTickets = remainingVipTickets;
+
+        this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
+          next: vipTickets => {
+            vipTickets.forEach(ticket => {
+              ticket.status = 'RESERVED';
+              this.cartService.addToCart(ticket);
+              updateRequests.push(this.ticketService.updateTicket(ticket));
+            });
+            this.toastr.success(`${this.selectedStanding.vip} VIP standing tickets added to cart!`, "Success");
+          },
+          error: err => {
+            console.error('Error fetching VIP standing tickets:', err);
+            this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
+            this.vipStandingTickets += this.selectedStanding.vip;
+          }
+        });
+      } else {
+        this.toastr.error('Not enough VIP standing tickets available.', 'Error');
+      }
     }
 
-    // Add Premium standing tickets to the cart
     if (this.selectedStanding.premium > 0) {
-      this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium).subscribe({
-        next: premiumTickets => {
-          premiumTickets.forEach(ticket => this.cartService.addToCart(ticket));
-        },
-        error: err => {
-          console.error('Error fetching Premium standing tickets:', err);
-          this.toastr.error('Failed to add Premium standing tickets to the cart.', 'Error');
-        }
-      });
+      const remainingPremiumTickets = this.standingTickets - this.selectedStanding.premium;
+
+      if (remainingPremiumTickets >= 0) {
+        this.standingTickets = remainingPremiumTickets;
+
+        this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium).subscribe({
+          next: premiumTickets => {
+            premiumTickets.forEach(ticket => {
+              ticket.status = 'RESERVED';
+              this.cartService.addToCart(ticket);
+              updateRequests.push(this.ticketService.updateTicket(ticket));
+            });
+            this.toastr.success(`${this.selectedStanding.premium} Premium standing tickets added to cart!`, "Success");
+          },
+          error: err => {
+            console.error('Error fetching Premium standing tickets:', err);
+            this.toastr.error('Failed to add Premium standing tickets to the cart.', 'Error');
+            this.standingTickets += this.selectedStanding.premium;
+          }
+        });
+      } else {
+        this.toastr.error('Not enough Premium standing tickets available.', 'Error');
+      }
     }
 
-    this.toastr.success("Successfully added selected tickets to the cart.", "Success");
-    this.resetSelections();
+    forkJoin(updateRequests).subscribe({
+      next: () => {
+        this.toastr.success("Successfully added and reserved selected tickets to the cart.", "Success");
+        this.resetSelections();
+      },
+      error: err => {
+        console.error('Error reserving tickets while adding to cart:', err);
+        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+      }
+    });
   }
 }

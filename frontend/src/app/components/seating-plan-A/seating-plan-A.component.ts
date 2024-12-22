@@ -330,80 +330,6 @@ export class SeatingPlanAComponent {
     }
   }
 
-
-  buyTickets(): void {
-    if (this.totalTickets === 0) {
-      this.toastr.error('No tickets selected to buy!', 'Cannot buy tickets:');
-      return;
-    }
-
-    const updateRequests = [];
-
-    // Handle seated tickets
-    this.selectedTickets.forEach(ticket => {
-      ticket.status = 'SOLD';
-      updateRequests.push(this.ticketService.updateTicket(ticket));
-    });
-
-    // Handle standing tickets (VIP)
-    if (this.selectedStanding.vip > 0) {
-      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
-        next: vipTickets => {
-          vipTickets.forEach(ticket => {
-            ticket.status = 'SOLD';
-            updateRequests.push(this.ticketService.updateTicket(ticket));
-          });
-
-          // Handle standing tickets (Regular) after VIP tickets are handled
-          if (this.selectedStanding.standard > 0) {
-            this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
-              next: standardTickets => {
-                standardTickets.forEach(ticket => {
-                  ticket.status = 'SOLD';
-                  updateRequests.push(this.ticketService.updateTicket(ticket));
-                });
-
-                // Perform the updates
-                this.executeUpdates(updateRequests);
-              },
-              error: err => {
-                console.error('Error fetching regular standing tickets:', err);
-                this.toastr.error('Failed to purchase regular standing tickets. Please try again.', 'Error');
-              }
-            });
-          } else {
-            // Perform the updates if no regular standing tickets are selected
-            this.executeUpdates(updateRequests);
-          }
-        },
-        error: err => {
-          console.error('Error fetching VIP standing tickets:', err);
-          this.toastr.error('Failed to purchase VIP standing tickets. Please try again.', 'Error');
-        }
-      });
-    } else if (this.selectedStanding.standard > 0) {
-      // Handle only regular standing tickets if no VIP tickets are selected
-      this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
-        next: standardTickets => {
-          standardTickets.forEach(ticket => {
-            ticket.status = 'SOLD';
-            updateRequests.push(this.ticketService.updateTicket(ticket));
-          });
-
-          // Perform the updates
-          this.executeUpdates(updateRequests);
-        },
-        error: err => {
-          console.error('Error fetching regular standing tickets:', err);
-          this.toastr.error('Failed to purchase regular standing tickets. Please try again.', 'Error');
-        }
-      });
-    } else {
-      // Perform the updates if no standing tickets are selected
-      this.executeUpdates(updateRequests);
-    }
-  }
-
   getAvailableStandingTickets(category: PriceCategory, count: number): Observable<TicketDto[]> {
     return this.ticketService.getTicketsByPerformanceId(this.performanceID).pipe(
       map(tickets => {
@@ -459,32 +385,51 @@ export class SeatingPlanAComponent {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
       return;
     }
+
+    const updateRequests = [];
+
     this.selectedTickets.forEach(ticket => {
+      ticket.status = 'RESERVED';
       this.cartService.addToCart(ticket);
+      updateRequests.push(this.ticketService.updateTicket(ticket));
     });
+
     if (this.selectedStanding.vip > 0) {
-      this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
-        next: vipTickets => {
-          vipTickets.forEach(ticket => this.cartService.addToCart(ticket));
-        },
-        error: err => {
-          console.error('Error fetching VIP standing tickets:', err);
-          this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
-        }
-      });
+      const remainingVipTickets = this.vipStandingTickets - this.selectedStanding.vip;
+
+      if (remainingVipTickets >= 0) {
+        this.vipStandingTickets = remainingVipTickets;
+
+        this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
+          next: vipTickets => {
+            vipTickets.forEach(ticket => {
+              ticket.status = 'RESERVED';
+              this.cartService.addToCart(ticket);
+              updateRequests.push(this.ticketService.updateTicket(ticket));
+            });
+            this.toastr.success(`${this.selectedStanding.vip} VIP standing tickets added to cart!`, "Success");
+          },
+          error: err => {
+            console.error('Error fetching VIP standing tickets:', err);
+            this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
+            this.vipStandingTickets += this.selectedStanding.vip;
+          }
+        });
+      } else {
+        this.toastr.error('Not enough VIP standing tickets available.', 'Error');
+      }
     }
-    if (this.selectedStanding.standard > 0) {
-      this.getAvailableStandingTickets(PriceCategory.STANDARD, this.selectedStanding.standard).subscribe({
-        next: standardTickets => {
-          standardTickets.forEach(ticket => this.cartService.addToCart(ticket));
-        },
-        error: err => {
-          console.error('Error fetching regular standing tickets:', err);
-          this.toastr.error('Failed to add regular standing tickets to the cart.', 'Error');
-        }
-      });
-    }
-    this.toastr.success("Successfully added selected tickets to the cart.", "Success");
-    this.resetSelections();
+
+    forkJoin(updateRequests).subscribe({
+      next: () => {
+        this.toastr.success("Successfully added and reserved selected tickets to the cart.", "Success");
+        this.resetSelections();
+      },
+      error: err => {
+        console.error('Error reserving tickets while adding to cart:', err);
+        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+      }
+    });
   }
+
 }
