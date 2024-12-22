@@ -30,7 +30,7 @@ export class CartService {
     return storedCart ? JSON.parse(storedCart) : [];
   }
 
-  private saveCart(cartItems: { item: Merchandise | TicketDto; quantity: number }[]): void {
+  saveCart(cartItems: { item: Merchandise | TicketDto; quantity: number }[]): void {
     localStorage.setItem(this.getCartKey(), JSON.stringify(cartItems));
   }
 
@@ -55,12 +55,15 @@ export class CartService {
     if (existingItem) {
       existingItem.quantity++;
     } else {
-      cartItems.push({ item, quantity: 1 });
+      const reservedUntil = "performanceId" in item
+        ? new Date(Date.now() + 10 * 60 * 1000).toISOString()
+        : null;
+
+      cartItems.push({ item: { ...item, reservedUntil }, quantity: 1 });
     }
 
     this.saveCart(cartItems);
   }
-
 
   updateCartItem(item: Merchandise | TicketDto, quantity: number): void {
     const cartItems = this.getCart();

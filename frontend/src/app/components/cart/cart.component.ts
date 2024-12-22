@@ -15,6 +15,7 @@ import {PerformanceService} from 'src/app/services/performance.service';
 import {Purchase} from "../../dtos/purchase";
 import {PurchaseService} from "../../services/purchase.service";
 import {DatePipe} from "@angular/common";
+import {TicketService} from "../../services/ticket.service";
 
 @Component({
   selector: 'app-cart',
@@ -67,16 +68,53 @@ export class CartComponent implements OnInit {
               private performanceService: PerformanceService,
               private purchaseService: PurchaseService,
               private router: Router,
-              private global: Globals) {
+              private global: Globals,
+              private ticketService: TicketService) {
   }
 
   ngOnInit(): void {
+    this.checkAndRemoveExpiredItems()
     this.cartItems = this.cartService.getCart();
     this.fetchAccountPoints();
     this.fetchUser();
     this.fetchAllPerformanceNames();
     this.loadInvoiceCounter();
     this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
+    this.startPeriodicExpirationCheck();
+    this.startPeriodicCountdown();
+  }
+
+  startPeriodicCountdown(): void {
+    setInterval(() => {
+      this.cartItems.forEach(cartItem => {
+        if (this.isTicket(cartItem.item)) {
+          const remainingTime = this.getTimeRemaining(cartItem.item as TicketDto);
+          if (remainingTime === 'Expired') {
+            this.removeFromCart(cartItem.item);
+          }
+        }
+      });
+    }, 1000);
+  }
+
+  getTimeRemaining(item: TicketDto): string {
+    if (!item.reservedUntil) return 'N/A';
+    const now = new Date().getTime();
+    const timeUntil = new Date(item.reservedUntil).getTime();
+    const diff = timeUntil - now;
+    if (diff <= 0) {
+      return 'Expired';
+    }
+    const minutes = Math.floor(diff / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return `${minutes}m ${seconds}s`;
+  }
+
+
+  startPeriodicExpirationCheck(): void {
+    setInterval(() => {
+      this.checkAndRemoveExpiredItems();
+    }, 60000);
   }
 
   get hasTicketsInCart(): boolean {
@@ -139,7 +177,22 @@ export class CartComponent implements OnInit {
 
   removeFromCart(item: Merchandise | TicketDto): void {
     this.cartService.removeFromCart(item);
+    this.checkAndRemoveExpiredItems();
     this.cartItems = this.cartService.getCart();
+
+    if (this.isTicket(item)) {
+      const ticket = item as TicketDto;
+      ticket.status = 'AVAILABLE';
+      this.ticketService.updateTicket(ticket).subscribe({
+        next: () => {
+          this.toastr.success('Ticket successfully removed and marked as available.', 'Success');
+        },
+        error: (err) => {
+          console.error('Error updating ticket status to AVAILABLE:', err);
+          this.toastr.error('Failed to mark ticket as available. Please try again.', 'Error');
+        }
+      });
+    }
   }
 
   getTotalPrice(): number {
@@ -199,31 +252,21 @@ export class CartComponent implements OnInit {
 
   getItemDisplayName(item: Merchandise | TicketDto): string {
     if ('name' in item && item.name) {
-      // Merchandise item - return its name
       return item.name;
     } else if ('performanceId' in item) {
-      // Ticket item - build ticket description
       const performanceId = item.performanceId;
       const performanceName = this.performanceCache[performanceId] || 'Loading...';
-
       if (item.ticketType === 'SEATED') {
-        // Seated ticket - include row and seat details
         return `Ticket for ${performanceName} - Row ${item.rowNumber}, Seat ${item.seatNumber}`;
       } else if (item.ticketType === 'STANDING') {
-        // Standing ticket - include standing type
         const standingType =
           item.priceCategory === 'VIP' ? 'VIP Standing' : 'Regular Standing';
         return `Ticket for ${performanceName} - ${standingType}`;
       }
-
-      // Fallback for tickets without specific type
       return `Ticket for ${performanceName}`;
     }
-
-    // Fallback for unknown item type
     return 'Unknown Item';
   }
-
 
   isTicket(item: Merchandise | TicketDto): boolean {
     return 'performanceId' in item;
@@ -316,5 +359,25 @@ export class CartComponent implements OnInit {
       return;
     }
     this.selectedPaymentOption = option;
+  }
+
+  checkAndRemoveExpiredItems(): void {
+    const cart = this.cartService.getCart();
+    const now = new Date();
+
+    const validCartItems = cart.filter(cartItem => {
+      if (cartItem.item.reservedUntil) {
+        const reservedUntil = new Date(cartItem.item.reservedUntil);
+        return reservedUntil > now;
+      }
+      return true;
+    });
+
+    if (validCartItems.length !== cart.length) {
+      this.cartService.saveCart(validCartItems);
+      this.toastr.warning('Expired tickets have been removed from your cart.', 'Warning');
+    }
+
+    this.cartItems = validCartItems;
   }
 }
