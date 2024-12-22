@@ -11,6 +11,8 @@ import { TicketService } from 'src/app/services/ticket.service';
 import {forkJoin, map, Observable} from "rxjs";
 import { CartService } from "../../services/cart.service";
 import { ActivatedRoute } from '@angular/router';
+import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-seating-plan-A',
@@ -55,7 +57,8 @@ export class SeatingPlanAComponent {
     private artistService: ArtistService,
     private ticketService: TicketService,
     private cartService: CartService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -386,20 +389,23 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    const updateRequests = [];
-
-    this.selectedTickets.forEach(ticket => {
-      ticket.status = 'RESERVED';
-      this.cartService.addToCart(ticket);
-      updateRequests.push(this.ticketService.updateTicket(ticket));
+    const dialogRef = this.dialog.open(TicketExpirationDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      panelClass: 'custom-dialog-container',
+      backdropClass: 'custom-dialog-backdrop',
     });
 
-    if (this.selectedStanding.vip > 0) {
-      const remainingVipTickets = this.vipStandingTickets - this.selectedStanding.vip;
+    dialogRef.afterClosed().subscribe(() => {
+      const updateRequests = [];
 
-      if (remainingVipTickets >= 0) {
-        this.vipStandingTickets = remainingVipTickets;
+      this.selectedTickets.forEach(ticket => {
+        ticket.status = 'RESERVED';
+        this.cartService.addToCart(ticket);
+        updateRequests.push(this.ticketService.updateTicket(ticket));
+      });
 
+      if (this.selectedStanding.vip > 0) {
         this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe({
           next: vipTickets => {
             vipTickets.forEach(ticket => {
@@ -412,24 +418,20 @@ export class SeatingPlanAComponent {
           error: err => {
             console.error('Error fetching VIP standing tickets:', err);
             this.toastr.error('Failed to add VIP standing tickets to the cart.', 'Error');
-            this.vipStandingTickets += this.selectedStanding.vip;
           }
         });
-      } else {
-        this.toastr.error('Not enough VIP standing tickets available.', 'Error');
       }
-    }
 
-    forkJoin(updateRequests).subscribe({
-      next: () => {
-        this.toastr.success("Successfully added and reserved selected tickets to the cart.", "Success");
-        this.resetSelections();
-      },
-      error: err => {
-        console.error('Error reserving tickets while adding to cart:', err);
-        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
-      }
+      forkJoin(updateRequests).subscribe({
+        next: () => {
+          this.toastr.success("Successfully added and reserved selected tickets to the cart.", "Success");
+          this.resetSelections();
+        },
+        error: err => {
+          console.error('Error reserving tickets while adding to cart:', err);
+          this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+        }
+      });
     });
   }
-
 }
