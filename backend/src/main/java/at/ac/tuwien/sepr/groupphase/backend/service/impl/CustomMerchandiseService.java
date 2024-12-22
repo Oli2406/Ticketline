@@ -18,6 +18,7 @@ import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class CustomMerchandiseService implements MerchandiseService {
@@ -86,4 +87,23 @@ public class CustomMerchandiseService implements MerchandiseService {
             merchandiseRepository.save(merchandise);
         }
     }
+
+    @Override
+    public void reduceStockOfMerchandiseList(List<Long> merchandiseIds, List<Long> quantityList) {
+        if (merchandiseIds.size() != quantityList.size()) {
+            throw new IllegalArgumentException("Merchandise IDs and quantity lists must have the same size.");
+        }
+        IntStream.range(0, merchandiseIds.size()).forEach(idx -> {
+            Long merchandiseId = merchandiseIds.get(idx);
+            Long quantity = quantityList.get(idx);
+            Merchandise merch = merchandiseRepository.findById(merchandiseId)
+                .orElseThrow(() -> new IllegalArgumentException("Merchandise not found: " + merchandiseId));
+            if (merch.getStock() < quantity) {
+                throw new InsufficientStockException("Not enough stock for item: " + merch.getName());
+            }
+            merch.setStock(merch.getStock() - quantity.intValue());
+            merchandiseRepository.save(merch);
+        });
+    }
+
 }

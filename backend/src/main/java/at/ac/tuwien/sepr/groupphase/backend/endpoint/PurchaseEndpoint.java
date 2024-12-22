@@ -4,13 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
+import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +29,15 @@ public class PurchaseEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PurchaseService purchaseService;
     private final RandomStringGenerator randomStringGenerator;
+    private final MerchandiseService merchandiseService;
+    private final TicketService ticketService;
 
-    public PurchaseEndpoint(PurchaseService purchaseService, RandomStringGenerator randomStringGenerator) {
+    public PurchaseEndpoint(PurchaseService purchaseService, RandomStringGenerator randomStringGenerator,
+                            MerchandiseService merchandiseService, TicketService ticketService) {
         this.purchaseService = purchaseService;
         this.randomStringGenerator = randomStringGenerator;
+        this.merchandiseService = merchandiseService;
+        this.ticketService = ticketService;
     }
 
     @PermitAll
@@ -60,6 +65,8 @@ public class PurchaseEndpoint {
     @PostMapping
     public ResponseEntity<PurchaseDetailDto> createPurchase(@RequestBody PurchaseCreateDto purchaseCreateDto) throws ValidationException {
         LOG.info("Received request to create or update Purchase: {}", purchaseCreateDto);
+        merchandiseService.reduceStockOfMerchandiseList(purchaseCreateDto.getMerchandiseIds(), purchaseCreateDto.getMerchandiseQuantities());
+        ticketService.updateTicketStatusList(purchaseCreateDto.getTicketIds(), "SOLD");
         PurchaseDetailDto createdPurchase = purchaseService.createPurchase(purchaseCreateDto);
         LOG.info("Successfully created/updated Purchase: {}", createdPurchase);
         return ResponseEntity.ok(createdPurchase);

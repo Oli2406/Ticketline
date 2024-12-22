@@ -76,9 +76,15 @@
           </label>
         </div>
 
-        <label class="payment-option" [class.selected]="selectedPaymentOption === 'points'">
-          <input type="radio" name="paymentOption" value="points"
-                 [(ngModel)]="selectedPaymentOption"/>
+        <label class="payment-option"
+               [class.selected]="selectedPaymentOption === 'points'"
+               [class.disabled]="hasTicketsInCart">
+          <input
+            type="radio"
+            name="paymentOption"
+            value="points"
+            [(ngModel)]="selectedPaymentOption"
+            [disabled]="hasTicketsInCart" />
           <i class="fas fa-coins"></i>
           Pay with Points
         </label>
@@ -138,62 +144,99 @@
     </div>
 
     <!-- Cart Table -->
-    <div class="cart-table">
+    <div class="cart-table flex-fill bg-white shadow-sm p-4 rounded">
       <div *ngIf="cartItems.length > 0; else emptyCart">
-        <table class="table">
+        <h3 class="text-center text-secondary">Tickets</h3>
+        <table class="table table-bordered table-striped align-middle">
           <thead>
           <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Price per item</th>
-            <th>Quantity</th>
-            <th>Actions</th>
+            <th style="width: 15%;">Image</th>
+            <th style="width: 25%;">Name</th>
+            <th style="width: 15%;">Price</th>
+            <th style="width: 15%;">Quantity</th>
+            <th style="width: 15%;">Actions</th>
           </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let cartItem of cartItems">
-            <td>
-              <img
-                [src]="isTicket(cartItem.item) ? null : imageLocation + cartItem.item.imageUrl"
-                alt="Item Image"
-                width="50"
-              />
-            </td>
-            <td>
-              <span>{{ getItemDisplayName(cartItem.item) }}</span>
-            </td>
-            <td>
-              <span *ngIf="selectedPaymentOption !== 'points'">
-                {{ cartItem.item.price | number: '1.2-2' }} €
-              </span>
-              <span *ngIf="selectedPaymentOption === 'points'">
-                {{ cartItem.item.points || 0 }} Points
-              </span>
-            </td>
-            <td>
-              <ng-container *ngIf="!isTicket(cartItem.item); else quantityAsText">
-                <input
-                  type="number"
-                  [(ngModel)]="cartItem.quantity"
-                  (change)="updateQuantity(cartItem.item, cartItem.quantity)"
-                  min="1"
-                />
-              </ng-container>
-              <ng-template #quantityAsText>
-                <div class="quantity-text">{{ cartItem.quantity }}</div>
-              </ng-template>
-            </td>
-            <td>
-              <button class="btn btn-danger" (click)="removeFromCart(cartItem.item)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
+          <ng-container *ngFor="let cartItem of cartItems">
+            <tr *ngIf="isTicket(cartItem.item)" class="align-items-stretch">
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <i class="bi bi-ticket-perforated fs-4"></i>
+                </div>
+              </td>
+              <td>{{ getItemDisplayName(cartItem.item) }}</td>
+              <td>
+                  <span *ngIf="selectedPaymentOption !== 'points'">
+                    {{ cartItem.item.price | number: '1.2-2' }} €
+                  </span>
+                <span *ngIf="selectedPaymentOption === 'points'">
+                    {{ cartItem.item.points || 0 }} Points
+                  </span>
+              </td>
+              <td class="text-center">{{ cartItem.quantity }}</td>
+              <td class="text-center">
+                <button class="btn btn-danger btn-sm" (click)="removeFromCart(cartItem.item)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
           </tbody>
         </table>
 
-        <!-- Conditionally Render Totals -->
-        <div class="totals">
+        <h3 class="text-center text-secondary mt-4">Merchandise</h3>
+        <table class="table table-bordered table-striped align-middle">
+          <thead>
+          <tr>
+            <th style="width: 15%;">Image</th>
+            <th style="width: 25%;">Name</th>
+            <th style="width: 15%;">Price</th>
+            <th style="width: 15%;">Quantity</th>
+            <th style="width: 15%;">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-container *ngFor="let cartItem of cartItems">
+            <tr *ngIf="!isTicket(cartItem.item)" class="align-items-stretch">
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <img [src]="imageLocation + cartItem.item.imageUrl" alt="Item Image" class="img-fluid" style="width: 50px; max-height: 50px;" />
+                </div>
+              </td>
+              <td>{{ getItemDisplayName(cartItem.item) }}</td>
+              <td>
+                  <span *ngIf="selectedPaymentOption !== 'points'">
+                    {{ cartItem.item.price | number: '1.2-2' }} €
+                  </span>
+                <span *ngIf="selectedPaymentOption === 'points'">
+                    {{ cartItem.item.points || 0 }} Points
+                  </span>
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <input
+                    type="number"
+                    [(ngModel)]="cartItem.quantity"
+                    (change)="updateQuantity(cartItem.item, cartItem.quantity)"
+                    class="form-control form-control-sm"
+                    min="1"
+                  />
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                  <button class="btn btn-danger btn-sm" (click)="removeFromCart(cartItem.item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+          </tbody>
+        </table>
+
+        <div class="totals text-end mt-4">
           <h3 *ngIf="selectedPaymentOption === 'points'">
             Points Total: {{ getTotalPoints() }}
           </h3>
@@ -204,7 +247,7 @@
       </div>
 
       <ng-template #emptyCart>
-        <p>Your cart is empty.</p>
+        <p class="text-center">Your cart is empty.</p>
       </ng-template>
     </div>
   </div>
