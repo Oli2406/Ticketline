@@ -142,6 +142,7 @@ public class NewsDataGenerator {
             "The annual holiday craft fair is coming to [Venue Name] on [Date]. Find handcrafted gifts, decorations, and treats from local artisans. This is the perfect place to find unique gifts for everyone on your list.",
             LocalDate.of(2024, 12, 10),
             null);
+        LOGGER.info("All news were created!");
     }
 
     private void createNewsIfNotExists(String title, String summary, String content,

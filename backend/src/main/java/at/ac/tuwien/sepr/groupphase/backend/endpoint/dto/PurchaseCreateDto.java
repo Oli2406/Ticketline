@@ -1,6 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PurchaseCreateDto {
@@ -9,10 +10,10 @@ public class PurchaseCreateDto {
     private List<Long> merchandiseIds;
     private List<Long> merchandiseQuantities;
     private Long totalPrice;
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
 
     public PurchaseCreateDto(String userId, List<Long> ticketIds, List<Long> merchandiseIds,
-                             Long totalPrice, LocalDate purchaseDate, List<Long> merchandiseQuantities) {
+                             Long totalPrice, LocalDateTime purchaseDate, List<Long> merchandiseQuantities) {
         this.userId = userId;
         this.ticketIds = ticketIds;
         this.merchandiseIds = merchandiseIds;
@@ -56,11 +57,11 @@ public class PurchaseCreateDto {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 

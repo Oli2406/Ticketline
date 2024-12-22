@@ -14,14 +14,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Component
 @Profile("generateData")
-@DependsOn({"ticketDataGenerator", "performanceDataGenerator", "merchandiseDataGenerator"})
+@DependsOn({"ticketDataGenerator"})
 public class PurchaseDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseDataGenerator.class);
@@ -51,33 +53,51 @@ public class PurchaseDataGenerator {
     }
 
     private void createPurchasesForUser(Long userId) {
-        List<Ticket> reservedTickets = ticketRepository.findAll().stream()
-            .filter(ticket -> ticket.getStatus().equals("RESERVED"))
-            .collect(Collectors.toList());
-
-        /*List<Ticket> purchasedTickets = ticketRepository.findAll().stream()
+        List<Ticket> purchasedTickets = ticketRepository.findAll().stream()
             .filter(ticket -> ticket.getStatus().equals("SOLD"))
-            .collect(Collectors.toList());*/
+            .collect(Collectors.toList());
 
         List<Merchandise> allMerchandise = merchandiseRepository.findAll();
 
-        if (reservedTickets.size() < 2 || /*purchasedTickets.size() < 2 ||*/ allMerchandise.isEmpty()) {
-            LOGGER.warn("Not enough reserved or purchased tickets or merchandise to create purchases.");
+        if (purchasedTickets.size() < 2 || allMerchandise.isEmpty()) {
+            LOGGER.warn("Not enough purchased tickets or merchandise to create purchases.");
             return;
         }
 
-        for (int i = 0; i < 2; i++) { // 2 purchases per user
+        for (int i = 0; i < 4; i++) { // 2 purchases per user
             // Je 2 gekaufte und reservierte Tickets
+            LocalDate cutoffDate = LocalDate.of(2024, 12, 21);
+            boolean validSelection = false;
+
             List<Long> ticketIds = new ArrayList<>();
-            //ticketIds.addAll(getRandomIds(purchasedTickets, 2));
-            ticketIds.addAll(getRandomIds(reservedTickets, 2));
+            int attempts = 0;
+            while (!validSelection && attempts < 30) {
+                ticketIds.clear();
+                ticketIds.addAll(getRandomIds(purchasedTickets, 2));
+
+                boolean allAfterCutoff = ticketIds.stream()
+                    .map(ticketRepository::findByTicketId)
+                    .allMatch(ticket -> ticket.getDate().isAfter(cutoffDate.atStartOfDay()));
+
+                boolean allBeforeCutoff = ticketIds.stream()
+                    .map(ticketRepository::findByTicketId)
+                    .allMatch(ticket -> ticket.getDate().isBefore(cutoffDate.atStartOfDay()));
+
+                validSelection = allAfterCutoff || allBeforeCutoff;
+                attempts++;
+            }
+
+            if (!validSelection) {
+                LOGGER.info("Could not find valid tickets for user {} after 10 attempts.", userId);
+                return; // Überspringe diesen Benutzer
+            }
 
             // 2 Merchandise-Artikel je Kauf
             List<Long> merchandiseIds = getRandomIds(allMerchandise, 2);
 
             List<Long> merchandiseQuantities = new ArrayList<>();
-            merchandiseQuantities.add(4L);
-            merchandiseQuantities.add(10L);
+            merchandiseQuantities.add(ThreadLocalRandom.current().nextLong(1, 6));
+            merchandiseQuantities.add(ThreadLocalRandom.current().nextLong(1, 6));
 
             // Berechnung des Gesamtpreises
             Long totalPrice = calculateTotalPrice(ticketIds, merchandiseIds);
@@ -93,7 +113,7 @@ public class PurchaseDataGenerator {
             );
 
             purchaseRepository.save(purchase);
-            LOGGER.debug("Created purchase for user {}: {}", userId, purchase);
+            LOGGER.info("Created purchase for user {}: {}", userId, purchase);
         }
     }
 
@@ -103,12 +123,12 @@ public class PurchaseDataGenerator {
             .distinct()
             .limit(count)
             .mapToObj(i -> {
-                if (items.getFirst() instanceof Ticket) {
+                if (items.get(0) instanceof Ticket) { // Prüfe das erste Element
                     return ((Ticket) items.get(i)).getTicketId();
-                } else if (items.getFirst() instanceof Merchandise) {
+                } else if (items.get(0) instanceof Merchandise) {
                     return ((Merchandise) items.get(i)).getMerchandiseId();
                 }
-                return null;
+                throw new IllegalArgumentException("Unsupported item type in list.");
             })
             .collect(Collectors.toList());
     }
@@ -123,7 +143,7 @@ public class PurchaseDataGenerator {
         return ticketTotal + merchandiseTotal;
     }
 
-    private LocalDate getRandomPastDate() {
-        return LocalDate.now().minusDays(random.nextInt(1000));
+    private LocalDateTime getRandomPastDate() {
+        return LocalDateTime.now().minusDays(random.nextInt(365 * 3)).minusHours(random.nextInt(24 * 60 * 60)).minusMinutes(random.nextInt(60 * 60));
     }
 }

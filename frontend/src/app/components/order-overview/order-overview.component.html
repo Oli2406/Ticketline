@@ -9,7 +9,7 @@
     <h2>Current Purchases and Reservations</h2>
     <div *ngFor="let group of sortedTickets" class="ticket-group">
       <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
-        <h3>{{ group.date | date: 'yyyy-MM-dd hh:mm' }}</h3>
+        <h3>{{ group.date | date: 'yyyy-MM-dd HH:mm' }}</h3>
         <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
       </div>
 
@@ -21,6 +21,7 @@
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
@@ -38,6 +39,7 @@
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
@@ -68,6 +70,7 @@
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd hh:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>

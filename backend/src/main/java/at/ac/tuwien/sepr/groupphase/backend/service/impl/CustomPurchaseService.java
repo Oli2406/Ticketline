@@ -41,7 +41,10 @@ public class CustomPurchaseService implements PurchaseService {
     public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto) throws ValidationException {
         logger.info("Creating or updating purchase: {}", purchaseCreateDto);
         Optional<Long> optionalL = generator.retrieveOriginalId(purchaseCreateDto.getUserId());
-        Long value = optionalL.orElse(0L);
+        Long value = optionalL.orElseThrow(() -> new ValidationException("Invalid user ID", List.of(
+            "User ID could not be resolved.",
+            "Ensure that the encrypted ID is correct."
+        )));
 
         Purchase purchase = new Purchase(
             value,

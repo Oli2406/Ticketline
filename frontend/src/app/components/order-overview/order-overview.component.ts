@@ -7,6 +7,8 @@ import { TicketDto } from '../../dtos/ticket';
 import { PurchaseListDto } from '../../dtos/purchase';
 import { PerformanceService } from 'src/app/services/performance.service';
 import {LocationService} from "../../services/location.service";
+import {PerformanceDetailDto, PerformanceListDto} from "../../dtos/performance";
+import {ArtistService} from "../../services/artist.service";
 
 @Component({
   selector: 'app-order-overview',
@@ -20,7 +22,8 @@ export class OrderOverviewComponent implements OnInit {
   purchasedTickets: TicketDto[] = [];
   sortedTickets: { date: Date; reserved: TicketDto[]; purchased: TicketDto[]; showDetails: boolean }[] = [];
   pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
-  performanceNames: { [performanceId: number]: string } = {};
+  performanceNames: { [performanceId: number]: PerformanceListDto } = {};
+  artistCache: { [artistId: number]: string } = {};
   performanceLocations: { [locationId: number]: string } = {};
 
   constructor(
@@ -28,7 +31,8 @@ export class OrderOverviewComponent implements OnInit {
     private purchaseService: PurchaseService,
     private toastr: ToastrService,
     private performanceService: PerformanceService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private artistService: ArtistService
   ) {}
 
   ngOnInit(): void {
@@ -58,26 +62,31 @@ export class OrderOverviewComponent implements OnInit {
     const pastMap: { [key: string]: { purchased: TicketDto[] } } = {};
 
     purchases.forEach((purchase) => {
-      const purchaseDate = new Date(purchase.purchaseDate).toDateString();
+      // Konvertiere das purchaseDate korrekt in ein JavaScript Date-Objekt
+      const purchaseDate = new Date(purchase.purchaseDate);
 
       purchase.tickets.forEach((ticket) => {
+        // Konvertiere das Datum des Tickets in ein Date-Objekt
         const eventDate = new Date(ticket.date);
+
         if (eventDate >= today) {
           // Aktuelle Käufe (zukünftige Veranstaltungen)
-          if (!currentMap[purchaseDate]) {
-            currentMap[purchaseDate] = { reserved: [], purchased: [] };
+          const key = purchaseDate.toISOString(); // Verwende ISO-String als Schlüssel
+          if (!currentMap[key]) {
+            currentMap[key] = { reserved: [], purchased: [] };
           }
           if (ticket.status === 'RESERVED') {
-            currentMap[purchaseDate].reserved.push(ticket);
+            currentMap[key].reserved.push(ticket);
           } else if (ticket.status === 'SOLD') {
-            currentMap[purchaseDate].purchased.push(ticket);
+            currentMap[key].purchased.push(ticket);
           }
         } else if (ticket.status === 'SOLD') {
           // Vergangene Käufe (nur gekaufte Tickets)
-          if (!pastMap[purchaseDate]) {
-            pastMap[purchaseDate] = { purchased: [] };
+          const key = purchaseDate.toISOString();
+          if (!pastMap[key]) {
+            pastMap[key] = { purchased: [] };
           }
-          pastMap[purchaseDate].purchased.push(ticket);
+          pastMap[key].purchased.push(ticket);
         }
       });
     });
@@ -85,7 +94,7 @@ export class OrderOverviewComponent implements OnInit {
     // Convert currentMap to sorted array (by date descending)
     this.sortedTickets = Object.entries(currentMap)
       .map(([date, tickets]) => ({
-        date: new Date(date), // Purchase date
+        date: new Date(date), // Konvertiere den Schlüssel (purchaseDate) zurück in ein Date-Objekt
         reserved: tickets.reserved,
         purchased: tickets.purchased,
         showDetails: false,
@@ -95,7 +104,7 @@ export class OrderOverviewComponent implements OnInit {
     // Convert pastMap to sorted array (by date descending)
     this.pastTickets = Object.entries(pastMap)
       .map(([date, tickets]) => ({
-        date: new Date(date), // Purchase date
+        date: new Date(date), // Konvertiere den Schlüssel (purchaseDate) zurück in ein Date-Objekt
         purchased: tickets.purchased,
         showDetails: false,
       }))
@@ -106,17 +115,63 @@ export class OrderOverviewComponent implements OnInit {
     if (!this.performanceNames[performanceId]) {
       this.performanceService.getPerformanceById(performanceId).subscribe({
         next: (performance) => {
-          this.performanceNames[performanceId] = performance.name;
+          this.performanceNames[performanceId] = performance;
         },
         error: (err) => {
           console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-          this.performanceNames[performanceId] = 'Error loading name'; // Setze einen Fallback
+          this.performanceNames[performanceId].name = 'Error loading name'; // Setze einen Fallback
         },
       });
       return 'Loading...'; // Platzhalter, während der Name geladen wird
     }
 
-    return this.performanceNames[performanceId]; // Gibt den Namen zurück, wenn er schon geladen wurde
+    return this.performanceNames[performanceId].name; // Gibt den Namen zurück, wenn er schon geladen wurde
+  }
+
+  getArtistName(performanceId: number): string {
+    if (!this.performanceNames[performanceId]) {
+      // Lade die Performance und speichere sie im Cache
+      this.performanceService.getPerformanceById(performanceId).subscribe({
+        next: (performance) => {
+          this.performanceNames[performanceId] = performance;
+
+          // Wenn Artist-ID vorhanden und nicht im Cache, lade den Künstlernamen
+          if (!this.artistCache[performance.artistId]) {
+            this.loadArtistName(performance.artistId);
+          }
+        },
+        error: (err) => {
+          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
+        },
+      });
+      return 'Loading...'; // Platzhalter, während die Performance geladen wird
+    }
+
+    const artistId = this.performanceNames[performanceId].artistId;
+
+    if (!this.artistCache[artistId]) {
+      // Lade den Künstlernamen, wenn er nicht im Cache ist
+      this.loadArtistName(artistId);
+      return 'Loading artist...'; // Platzhalter, während der Künstlername geladen wird
+    }
+
+    return this.artistCache[artistId]; // Gibt den Künstlernamen zurück, wenn er im Cache ist
+  }
+
+  private loadArtistName(artistId: number): void {
+    this.artistService.getById(artistId).subscribe({
+      next: (artist) => {
+        if(artist.artistName != null) {
+          this.artistCache[artistId] = artist.artistName;
+        } else {
+          this.artistCache[artistId] = artist.firstName + " " + artist.lastName;
+        }
+      },
+      error: (err) => {
+        console.error(`Failed to fetch artist with ID ${artistId}:`, err);
+        this.artistCache[artistId] = 'Unknown Artist';
+      },
+    });
   }
 
   getPerformanceLocation(performanceId: number): string {
