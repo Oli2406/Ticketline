@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,12 +33,12 @@ public class Purchase {
     private Long totalPrice;
 
     @Column(nullable = false)
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
 
     public Purchase() {
     }
 
-    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate,
+    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDateTime purchaseDate,
                     List<Long> merchandiseQuantities) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
@@ -97,11 +97,11 @@ public class Purchase {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 

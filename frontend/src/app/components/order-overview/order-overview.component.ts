@@ -2,11 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { PurchaseService } from '../../services/purchase.service';
+import { ReservationService } from '../../services/reservation.service';
 import { ToastrService } from 'ngx-toastr';
 import { TicketDto } from '../../dtos/ticket';
 import { PurchaseListDto } from '../../dtos/purchase';
+import { ReservationListDto } from '../../dtos/reservation';
 import { PerformanceService } from 'src/app/services/performance.service';
-import {LocationService} from "../../services/location.service";
+import { LocationService } from '../../services/location.service';
+import { PerformanceDetailDto, PerformanceListDto } from '../../dtos/performance';
+import { ArtistService } from '../../services/artist.service';
 
 @Component({
   selector: 'app-order-overview',
@@ -16,25 +20,28 @@ import {LocationService} from "../../services/location.service";
   styleUrls: ['./order-overview.component.scss'],
 })
 export class OrderOverviewComponent implements OnInit {
-  reservedTickets: TicketDto[] = [];
-  purchasedTickets: TicketDto[] = [];
-  sortedTickets: { date: Date; reserved: TicketDto[]; purchased: TicketDto[]; showDetails: boolean }[] = [];
+  reservedTickets: { date: Date; reserved: TicketDto[]; showDetails: boolean }[] = [];
+  purchasedTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
-  performanceNames: { [performanceId: number]: string } = {};
+  performanceNames: { [performanceId: number]: PerformanceListDto } = {};
+  artistCache: { [artistId: number]: string } = {};
   performanceLocations: { [locationId: number]: string } = {};
 
   constructor(
     private authService: AuthService,
     private purchaseService: PurchaseService,
+    private reservationService: ReservationService,
     private toastr: ToastrService,
     private performanceService: PerformanceService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private artistService: ArtistService
   ) {}
 
   ngOnInit(): void {
     const userId = this.authService.getUserIdFromToken();
     if (userId) {
       this.loadUserPurchases(userId);
+      this.loadUserReservations(userId);
     } else {
       this.toastr.error('Unable to identify the user.', 'Error');
     }
@@ -52,51 +59,77 @@ export class OrderOverviewComponent implements OnInit {
     });
   }
 
+  loadUserReservations(userId: string): void {
+    this.reservationService.getReservationsByUser(userId).subscribe({
+      next: (reservations: ReservationListDto[]) => {
+        this.processReservations(reservations);
+      },
+      error: (err) => {
+        console.error('Error fetching reservations:', err.message);
+        this.toastr.error('Failed to load your reservations. Please try again.', 'Error');
+      },
+    });
+  }
+
   private processPurchases(purchases: PurchaseListDto[]): void {
     const today = new Date();
-    const currentMap: { [key: string]: { reserved: TicketDto[]; purchased: TicketDto[] } } = {};
-    const pastMap: { [key: string]: { purchased: TicketDto[] } } = {};
+    const currentMap: { [key: string]: TicketDto[] } = {};
+    const pastMap: { [key: string]: TicketDto[] } = {};
 
     purchases.forEach((purchase) => {
-      const purchaseDate = new Date(purchase.purchaseDate).toDateString();
+      const purchaseDate = new Date(purchase.purchaseDate);
 
       purchase.tickets.forEach((ticket) => {
         const eventDate = new Date(ticket.date);
+
         if (eventDate >= today) {
-          // Aktuelle Käufe (zukünftige Veranstaltungen)
-          if (!currentMap[purchaseDate]) {
-            currentMap[purchaseDate] = { reserved: [], purchased: [] };
+          const key = purchaseDate.toISOString();
+          if (!currentMap[key]) {
+            currentMap[key] = [];
           }
-          if (ticket.status === 'RESERVED') {
-            currentMap[purchaseDate].reserved.push(ticket);
-          } else if (ticket.status === 'SOLD') {
-            currentMap[purchaseDate].purchased.push(ticket);
+          if (ticket.status === 'SOLD') {
+            currentMap[key].push(ticket);
           }
         } else if (ticket.status === 'SOLD') {
-          // Vergangene Käufe (nur gekaufte Tickets)
-          if (!pastMap[purchaseDate]) {
-            pastMap[purchaseDate] = { purchased: [] };
+          const key = purchaseDate.toISOString();
+          if (!pastMap[key]) {
+            pastMap[key] = [];
           }
-          pastMap[purchaseDate].purchased.push(ticket);
+          pastMap[key].push(ticket);
         }
       });
     });
 
-    // Convert currentMap to sorted array (by date descending)
-    this.sortedTickets = Object.entries(currentMap)
+    this.purchasedTickets = Object.entries(currentMap)
       .map(([date, tickets]) => ({
-        date: new Date(date), // Purchase date
-        reserved: tickets.reserved,
-        purchased: tickets.purchased,
+        date: new Date(date),
+        purchased: tickets,
         showDetails: false,
       }))
       .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-    // Convert pastMap to sorted array (by date descending)
     this.pastTickets = Object.entries(pastMap)
       .map(([date, tickets]) => ({
-        date: new Date(date), // Purchase date
-        purchased: tickets.purchased,
+        date: new Date(date),
+        purchased: tickets,
+        showDetails: false,
+      }))
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }
+
+  private processReservations(reservations: ReservationListDto[]): void {
+    const today = new Date();
+    // Setze die Zeit auf Mitternacht, um nur das Datum zu vergleichen
+
+    console.log(reservations);
+
+    this.reservedTickets = reservations
+      .filter((reservation) =>
+        reservation.tickets.every((ticket) => new Date(ticket.date) >= today) // Alle Tickets müssen ab heute sein
+      )
+      .map((reservation) => ({
+        date: new Date(reservation.reservedDate),
+        reserved: reservation.tickets,
         showDetails: false,
       }))
       .sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -106,17 +139,60 @@ export class OrderOverviewComponent implements OnInit {
     if (!this.performanceNames[performanceId]) {
       this.performanceService.getPerformanceById(performanceId).subscribe({
         next: (performance) => {
-          this.performanceNames[performanceId] = performance.name;
+          this.performanceNames[performanceId] = performance;
         },
         error: (err) => {
           console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-          this.performanceNames[performanceId] = 'Error loading name'; // Setze einen Fallback
+          this.performanceNames[performanceId].name = 'Error loading name';
         },
       });
-      return 'Loading...'; // Platzhalter, während der Name geladen wird
+      return 'Loading...';
     }
 
-    return this.performanceNames[performanceId]; // Gibt den Namen zurück, wenn er schon geladen wurde
+    return this.performanceNames[performanceId].name;
+  }
+
+  getArtistName(performanceId: number): string {
+    if (!this.performanceNames[performanceId]) {
+      this.performanceService.getPerformanceById(performanceId).subscribe({
+        next: (performance) => {
+          this.performanceNames[performanceId] = performance;
+
+          if (!this.artistCache[performance.artistId]) {
+            this.loadArtistName(performance.artistId);
+          }
+        },
+        error: (err) => {
+          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
+        },
+      });
+      return 'Loading...';
+    }
+
+    const artistId = this.performanceNames[performanceId].artistId;
+
+    if (!this.artistCache[artistId]) {
+      this.loadArtistName(artistId);
+      return 'Loading artist...';
+    }
+
+    return this.artistCache[artistId];
+  }
+
+  private loadArtistName(artistId: number): void {
+    this.artistService.getById(artistId).subscribe({
+      next: (artist) => {
+        if (artist.artistName != null) {
+          this.artistCache[artistId] = artist.artistName;
+        } else {
+          this.artistCache[artistId] = artist.firstName + ' ' + artist.lastName;
+        }
+      },
+      error: (err) => {
+        console.error(`Failed to fetch artist with ID ${artistId}:`, err);
+        this.artistCache[artistId] = 'Unknown Artist';
+      },
+    });
   }
 
   getPerformanceLocation(performanceId: number): string {

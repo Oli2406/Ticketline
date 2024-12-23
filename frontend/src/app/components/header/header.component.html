@@ -69,6 +69,11 @@
             </li>
           }
           <li>
+            <button class="dropdown-item" [class.active]="currentPage === 'order-overview'" (click)="setActivePage('order-overview')">
+              <i class="bi bi-ticket-perforated"></i> My Tickets
+            </button>
+          </li>
+          <li>
             <button class="dropdown-item" [class.active]="currentPage === 'user-account'" (click)="setActivePage('user-account')">
               <i class="bi bi-person"></i> My Account
             </button>

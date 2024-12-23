@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PurchaseDetailDto {
@@ -12,11 +13,11 @@ public class PurchaseDetailDto {
     private List<Merchandise> merchandises;
     private List<Long> merchandiseQuantities;
     private Long totalPrice;
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
     private Long purchaseId;
 
     public PurchaseDetailDto(Long purchaseId, Long userId, List<Ticket> tickets,
-                             List<Merchandise> merchandises, Long totalPrice, LocalDate purchaseDate,
+                             List<Merchandise> merchandises, Long totalPrice, LocalDateTime purchaseDate,
                              List<Long> merchandiseQuantities) {
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -70,11 +71,11 @@ public class PurchaseDetailDto {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 

@@ -318,7 +318,7 @@ export class CartComponent implements OnInit {
       merchandiseIds: merchandise,
       merchandiseQuantities: merchandiseQuantities,
       totalPrice: totalPrice,
-      purchaseDate: today.toISOString().split('T')[0],
+      purchaseDate: today.toISOString(),
     };
 
     console.log('Purchase Payload:', JSON.stringify(purchasePayload));
