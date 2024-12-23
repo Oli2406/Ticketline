@@ -51,7 +51,7 @@ public class CustomPurchaseService implements PurchaseService {
             purchaseCreateDto.getTicketIds(),
             purchaseCreateDto.getMerchandiseIds(),
             purchaseCreateDto.getTotalPrice(),
-            purchaseCreateDto.getPurchaseDate(),
+            purchaseCreateDto.getPurchaseDate().plusHours(1),
             purchaseCreateDto.getMerchandiseQuantities()
         );
 

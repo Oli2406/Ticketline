@@ -13,6 +13,9 @@ import {CartService} from "../../services/cart.service";
 import {ActivatedRoute} from "@angular/router";
 import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
+import {Reservation} from "../../dtos/reservation";
+import { AuthService } from "../../services/auth.service";
+import {ReservationService} from "../../services/reservation.service";
 
 @Component({
   selector: 'app-seating-plan-B',
@@ -68,6 +71,8 @@ export class SeatingPlanBComponent {
     private cartService: CartService,
     private route: ActivatedRoute,
     private dialog: MatDialog,
+    private authService: AuthService,
+    private reservedService: ReservationService,
   ) {}
 
   ngOnInit(): void {
@@ -298,12 +303,15 @@ export class SeatingPlanBComponent {
       }
     );
 
-    const updateRequests = [];
+    const reservationDto: Reservation = {
+      userId: this.authService.getUserIdFromToken(),
+      ticketIds: [],
+      reservedDate: new Date().toISOString()
+    };
 
     // Handle seated tickets
     this.selectedTickets.forEach(ticket => {
-      ticket.status = 'RESERVED';
-      updateRequests.push(this.ticketService.updateTicket(ticket));
+      reservationDto.ticketIds.push(ticket.ticketId);
     });
 
     // Handle standing tickets (VIP and Standard)
@@ -313,25 +321,32 @@ export class SeatingPlanBComponent {
     ]).subscribe({
       next: ([vipTickets, standardTickets]) => {
         [...vipTickets, ...standardTickets].forEach(ticket => {
-          ticket.status = 'RESERVED';
-          updateRequests.push(this.ticketService.updateTicket(ticket));
+          reservationDto.ticketIds.push(ticket.ticketId);
         });
 
-        forkJoin(updateRequests).subscribe({
-          next: () => {
-            this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
-            this.resetSelections();
-            this.loadTicketsByPerformance(this.performanceID);
-          },
-          error: (err) => {
-            console.error('Error reserving tickets:', err);
-            this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
-          }
-        });
+        // Send the reservation to the backend
+        this.sendReservation(reservationDto);
       },
       error: (err) => {
         console.error('Error fetching standing tickets:', err);
         this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
+      }
+    });
+  }
+
+  private sendReservation(reservationDto: Reservation): void {
+    this.reservedService.createReservation(reservationDto).subscribe({
+      next: (response) => {
+        this.toastr.success('Tickets successfully reserved!', 'Success');
+        console.log('Reservation response:', response);
+        // Clear the local reservation DTO
+        reservationDto.ticketIds = [];
+        this.resetSelections();
+        this.loadTicketsByPerformance(this.performanceID);
+      },
+      error: (err) => {
+        console.error('Error creating reservation:', err);
+        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
       }
     });
   }
@@ -402,6 +417,7 @@ export class SeatingPlanBComponent {
               this.cartService.addToCart(ticket);
               updateRequests.push(this.ticketService.updateTicket(ticket));
             });
+            this.resetSelections();
             this.toastr.success(`${this.selectedStanding.vip} VIP standing tickets added to cart!`, "Success");
           },
           error: err => {
@@ -419,6 +435,7 @@ export class SeatingPlanBComponent {
               this.cartService.addToCart(ticket);
               updateRequests.push(this.ticketService.updateTicket(ticket));
             });
+            this.resetSelections();
             this.toastr.success(`${this.selectedStanding.premium} Premium standing tickets added to cart!`, "Success");
           },
           error: err => {

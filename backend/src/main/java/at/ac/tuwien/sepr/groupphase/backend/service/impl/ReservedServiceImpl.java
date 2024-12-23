@@ -2,6 +2,8 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ReservedRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
@@ -42,14 +44,12 @@ public class ReservedServiceImpl implements ReservedService {
 
         logger.debug("Fetched reservation: {}", reservation);
 
-        List<Long> ticketIds = ticketRepository.findAllById(reservation.getTicketIds()).stream()
-            .map(Ticket::getTicketId) // Extrahiere die IDs der Tickets
-            .collect(Collectors.toList());
+        List<Ticket> tickets = ticketRepository.findAllById(reservation.getTicketIds());
 
         return new ReservedDetailDto(
             reservation.getUserId(),
             reservation.getReservationDate(),
-            ticketIds,
+            tickets,
             reservation.getUserId()
         );
     }
@@ -61,14 +61,12 @@ public class ReservedServiceImpl implements ReservedService {
         List<Reservation> reservations = reservedRepository.findByUserId(userId);
 
         return reservations.stream().map(reservation -> {
-            List<Long> ticketIds = ticketRepository.findAllById(reservation.getTicketIds()).stream()
-                .map(Ticket::getTicketId)
-                .collect(Collectors.toList());
+            List<Ticket> tickets = ticketRepository.findAllById(reservation.getTicketIds());
 
             return new ReservedDetailDto(
                 reservation.getUserId(),
                 reservation.getReservationDate(),
-                ticketIds,
+                tickets,
                 reservation.getUserId()
             );
         }).collect(Collectors.toList());
@@ -87,23 +85,21 @@ public class ReservedServiceImpl implements ReservedService {
         Reservation reservation = new Reservation(
             userId,
             reservedCreateDto.getTicketIds(),
-            reservedCreateDto.getReservedDate()
+            reservedCreateDto.getReservedDate().plusHours(1)
         );
 
         logger.debug("Mapped Reservation entity: {}", reservation);
 
         reservation = reservedRepository.save(reservation);
 
-        List<Long> ticketIds = ticketRepository.findAllById(reservation.getTicketIds()).stream()
-            .map(Ticket::getTicketId) // Extrahiere die IDs der Tickets
-            .collect(Collectors.toList());
+        List<Ticket> tickets = ticketRepository.findAllById(reservation.getTicketIds());
 
         logger.info("Saved reservation to database: {}", reservation);
 
         return new ReservedDetailDto(
             reservation.getUserId(),
             reservation.getReservationDate(),
-            ticketIds,
+            tickets,
             reservation.getUserId()
         );
     }

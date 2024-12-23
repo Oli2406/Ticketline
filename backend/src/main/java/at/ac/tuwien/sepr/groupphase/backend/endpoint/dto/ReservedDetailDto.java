@@ -1,18 +1,20 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class ReservedDetailDto {
     private Long userId;
-    private List<Long> ticketIds;
+    private List<Ticket> tickets;
     private LocalDateTime reservedDate;
     private Long reservedId;
 
-    public ReservedDetailDto(Long userId, LocalDateTime reservedDate, List<Long> ticketIds, Long reservedId) {
+    public ReservedDetailDto(Long userId, LocalDateTime reservedDate, List<Ticket> tickets, Long reservedId) {
         this.userId = userId;
         this.reservedDate = reservedDate;
-        this.ticketIds = ticketIds;
+        this.tickets = tickets;
         this.reservedId = reservedId;
     }
 
@@ -27,12 +29,12 @@ public class ReservedDetailDto {
         this.userId = userId;
     }
 
-    public List<Long> getTicketIds() {
-        return ticketIds;
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
-    public void setTicketIds(List<Long> ticketIds) {
-        this.ticketIds = ticketIds;
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
     public LocalDateTime getReservedDate() {
