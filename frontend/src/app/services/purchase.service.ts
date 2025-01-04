@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
 import { Purchase, PurchaseListDto } from '../dtos/purchase';
+import {TicketDto} from "../dtos/ticket";
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,18 @@ export class PurchaseService {
    */
   createPurchase(purchase: Purchase): Observable<Purchase> {
     console.log(this.apiUrl);
-    return this.http.post<Purchase>(this.apiUrl, purchase).pipe(
+    return this.http.put<Purchase>(this.apiUrl, purchase).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Update a purchase after cancelling a ticket
+   */
+  updatePurchase(purchase: PurchaseListDto): Observable<PurchaseListDto> {
+    console.log(this.apiUrl);
+    const url = `${this.apiUrl}/${purchase.purchaseId}`;
+    return this.http.put<PurchaseListDto>(url, purchase).pipe(
       catchError(this.handleError)
     );
   }

@@ -46,6 +46,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             "/api/v1/register",
             "/api/v1/public",
             "/api/v1/news",
+            "/api/v1/purchase",
             "/api/v1/authentication/send-email",
             "/api/v1/authentication/reset-password.*",
             "/api/v1/authentication/verify-reset-code"

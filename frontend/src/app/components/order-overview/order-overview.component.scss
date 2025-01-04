@@ -55,6 +55,8 @@
 }
 
 
+
+
 h1, h2, h3, h4 {
   color: #3e3e3e;;
 }
@@ -118,5 +120,42 @@ li {
 
 .ticket-details {
   padding: 1rem 0;
+}
+
+.cancel-button {
+
+  .btn {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+
+    &.btn-primary {
+      background-color: #4D47C3;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #514dc7;
+      }
+    }
+
+    &.btn-secondary {
+      background-color: #ccc;
+      color: #333;
+      border: none;
+
+      &:hover {
+        background-color: #bbb;
+      }
+
+      &:disabled {
+        background-color: #eee;
+        color: #999;
+        cursor: not-allowed;
+      }
+    }
+  }
 }
 

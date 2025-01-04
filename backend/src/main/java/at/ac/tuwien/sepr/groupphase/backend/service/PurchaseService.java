@@ -42,4 +42,6 @@ public interface PurchaseService {
      * @param id the ID of the purchase to delete
      */
     void deletePurchase(Long id);
+
+    void updatePurchase(PurchaseDetailDto purchaseDetailDto);
 }

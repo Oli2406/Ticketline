@@ -28,6 +28,11 @@
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
+              <div class="cancel-button">
+                <button class="btn btn-primary">  <!-- add click here -->
+                  <i>Cancel Ticket</i>
+                </button>
+              </div>
             </li>
           </ul>
         </div>
@@ -58,6 +63,11 @@
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+              <div class="cancel-button">
+                <button class="btn btn-primary" (click)="cancelPurchase(ticket)"> <!-- add click here -->
+                  <i>Cancel Ticket</i>
+                </button>
               </div>
             </li>
           </ul>

@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
-import { PurchaseService } from '../../services/purchase.service';
-import { ReservationService } from '../../services/reservation.service';
-import { ToastrService } from 'ngx-toastr';
-import { TicketDto } from '../../dtos/ticket';
-import { PurchaseListDto } from '../../dtos/purchase';
-import { ReservationListDto } from '../../dtos/reservation';
-import { PerformanceService } from 'src/app/services/performance.service';
-import { LocationService } from '../../services/location.service';
-import { PerformanceDetailDto, PerformanceListDto } from '../../dtos/performance';
-import { ArtistService } from '../../services/artist.service';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {AuthService} from '../../services/auth.service';
+import {PurchaseService} from '../../services/purchase.service';
+import {ReservationService} from '../../services/reservation.service';
+import {ToastrService} from 'ngx-toastr';
+import {TicketDto} from '../../dtos/ticket';
+import {Purchase, PurchaseListDto} from '../../dtos/purchase';
+import {Reservation, ReservationListDto} from '../../dtos/reservation';
+import {PerformanceService} from 'src/app/services/performance.service';
+import {LocationService} from '../../services/location.service';
+import {PerformanceDetailDto, PerformanceListDto} from '../../dtos/performance';
+import {ArtistService} from '../../services/artist.service';
+import {forEach} from "lodash";
 
 @Component({
   selector: 'app-order-overview',
@@ -26,6 +27,9 @@ export class OrderOverviewComponent implements OnInit {
   performanceNames: { [performanceId: number]: PerformanceListDto } = {};
   artistCache: { [artistId: number]: string } = {};
   performanceLocations: { [locationId: number]: string } = {};
+  userPurchases: PurchaseListDto[];
+  userReservations: ReservationListDto[];
+  cancelledPurchase: PurchaseListDto;
 
   constructor(
     private authService: AuthService,
@@ -35,7 +39,8 @@ export class OrderOverviewComponent implements OnInit {
     private performanceService: PerformanceService,
     private locationService: LocationService,
     private artistService: ArtistService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     const userId = this.authService.getUserIdFromToken();
@@ -50,6 +55,7 @@ export class OrderOverviewComponent implements OnInit {
   loadUserPurchases(userId: string): void {
     this.purchaseService.getPurchasesByUser(userId).subscribe({
       next: (purchases: PurchaseListDto[]) => {
+        this.userPurchases = purchases;
         this.processPurchases(purchases);
       },
       error: (err) => {
@@ -62,6 +68,7 @@ export class OrderOverviewComponent implements OnInit {
   loadUserReservations(userId: string): void {
     this.reservationService.getReservationsByUser(userId).subscribe({
       next: (reservations: ReservationListDto[]) => {
+        this.userReservations = reservations;
         this.processReservations(reservations);
       },
       error: (err) => {
@@ -101,20 +108,20 @@ export class OrderOverviewComponent implements OnInit {
     });
 
     this.purchasedTickets = Object.entries(currentMap)
-      .map(([date, tickets]) => ({
-        date: new Date(date),
-        purchased: tickets,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .map(([date, tickets]) => ({
+      date: new Date(date),
+      purchased: tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     this.pastTickets = Object.entries(pastMap)
-      .map(([date, tickets]) => ({
-        date: new Date(date),
-        purchased: tickets,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .map(([date, tickets]) => ({
+      date: new Date(date),
+      purchased: tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   private processReservations(reservations: ReservationListDto[]): void {
@@ -124,16 +131,127 @@ export class OrderOverviewComponent implements OnInit {
     console.log(reservations);
 
     this.reservedTickets = reservations
-      .filter((reservation) =>
-        reservation.tickets.every((ticket) => new Date(ticket.date) >= today) // Alle Tickets müssen ab heute sein
-      )
-      .map((reservation) => ({
-        date: new Date(reservation.reservedDate),
-        reserved: reservation.tickets,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .filter((reservation) =>
+      reservation.tickets.every((ticket) => new Date(ticket.date) >= today) // Alle Tickets müssen ab heute sein
+    )
+    .map((reservation) => ({
+      date: new Date(reservation.reservedDate),
+      reserved: reservation.tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
+
+  //TODO cancel tickets
+
+  /*/!*New Methods for cancelling tickets*!/
+  cancelPurchase(ticket: TicketDto) {
+    console.log('cancel purchase' + ticket.ticketId);
+    let cancelledPurchaseId;
+
+    let updatedPurchase;
+    for (let i = 0; i < this.userPurchases.length; i++) {
+      for (let j = 0; j < this.userPurchases[i].tickets.length; j++) {
+        if (this.userPurchases[i].tickets[j].ticketId == ticket.ticketId) {
+          cancelledPurchaseId = this.userPurchases[i].purchaseId;
+          console.log(cancelledPurchaseId);
+
+          this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
+            next: (purchase: PurchaseListDto) => {
+              this.cancelledPurchase = purchase;
+            }
+          });
+
+          console.log(this.cancelledPurchase, "not updated");
+
+          let ticketIds;
+          let merchandiseIds;
+
+          for (let k = 0; k < this.cancelledPurchase.tickets.length; k++) {
+            if (this.cancelledPurchase.tickets[k].ticketId != ticket.ticketId) {
+              ticketIds.add(this.cancelledPurchase.tickets[k].ticketId);
+            }
+          }
+
+          for (let k = 0; k < this.cancelledPurchase.merchandises.length; k++) {
+            merchandiseIds.add(this.cancelledPurchase.merchandises[k].merchandiseId);
+          }
+
+
+          updatedPurchase = {
+            purchaseId: cancelledPurchaseId,
+            userId: this.cancelledPurchase.userId,
+            ticketIds: ticketIds,
+            merchandiseIds: merchandiseIds,
+            merchandiseQuantities: null,
+            totalPrice: this.cancelledPurchase.totalPrice,
+            purchaseDate: this.cancelledPurchase.purchaseDate
+          };
+
+          console.log(this.cancelledPurchase, "updated")
+          this.purchaseService.createPurchase(updatedPurchase);
+          this.loadUserPurchases(this.authService.getUserIdFromToken());
+          break;
+        }
+      }
+    }
+
+    //TODO load the purchases afterwards
+  }*/
+  cancelPurchase(ticket: TicketDto) {
+    console.log('cancel purchase ticket id ' + ticket.ticketId);
+    let cancelledPurchaseId: number;
+
+    this.userPurchases.forEach((purchase) => {
+      purchase.tickets.forEach((purchaseTicket) => {
+        if (purchaseTicket.ticketId === ticket.ticketId) {
+          cancelledPurchaseId = purchase.purchaseId;
+          console.log(cancelledPurchaseId);
+
+          // Fetch the purchase details
+          this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
+            next: (purchase: PurchaseListDto) => {
+              this.cancelledPurchase = purchase;
+              console.log(this.cancelledPurchase, "not updated")
+
+              const updatedPurchase: PurchaseListDto = {
+                purchaseId: cancelledPurchaseId,
+                userId: this.cancelledPurchase.userId,
+                tickets: this.cancelledPurchase.tickets.filter(item => item.ticketId !== ticket.ticketId),
+                merchandises: this.cancelledPurchase.merchandises,
+                totalPrice: this.cancelledPurchase.totalPrice,
+                purchaseDate: this.cancelledPurchase.purchaseDate
+              };
+
+              console.log(updatedPurchase, 'updated');
+
+              // Update the purchase
+              this.purchaseService.updatePurchase(updatedPurchase).subscribe({
+                next: () => {
+                  this.toastr.success('Purchase cancelled successfully.', 'Success');
+                  this.loadUserPurchases(this.authService.getUserIdFromToken());
+                },
+                error: (err) => {
+                  console.error('Error updating purchase:', err.message);
+                  this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+                },
+              });
+            },
+            error: (err) => {
+              console.error('Error fetching purchase:', err.message);
+              this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
+            },
+          });
+        }
+      });
+    });
+  }
+
+  cancelReservation(ticketId: number) {
+    console.log('cancel reservation' + ticketId);
+  }
+
+  /*---------------------*/
 
   getPerformanceName(performanceId: number): string {
     if (!this.performanceNames[performanceId]) {

@@ -48,7 +48,7 @@ public class Purchase {
         this.purchaseDate = purchaseDate;
     }
 
-    private void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+    public void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
         this.merchandiseQuantities = convertListToCsv(merchandiseQuantities);
     }
 

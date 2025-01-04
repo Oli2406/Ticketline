@@ -23,14 +23,16 @@ import java.util.stream.Collectors;
 @Service
 public class CustomPurchaseService implements PurchaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger logger = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final PurchaseRepository purchaseRepository;
     private final TicketRepository ticketRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final RandomStringGenerator generator;
 
-    public CustomPurchaseService(PurchaseRepository purchaseRepository, TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
-                                 RandomStringGenerator generator) {
+    public CustomPurchaseService(PurchaseRepository purchaseRepository,
+        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
+        RandomStringGenerator generator) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
@@ -38,7 +40,8 @@ public class CustomPurchaseService implements PurchaseService {
     }
 
     @Override
-    public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto) throws ValidationException {
+    public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto)
+        throws ValidationException {
         logger.info("Creating or updating purchase: {}", purchaseCreateDto);
         Optional<Long> optionalL = generator.retrieveOriginalId(purchaseCreateDto.getUserId());
         Long value = optionalL.orElseThrow(() -> new ValidationException("Invalid user ID", List.of(
@@ -60,7 +63,8 @@ public class CustomPurchaseService implements PurchaseService {
         purchase = purchaseRepository.save(purchase);
 
         List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+        List<Merchandise> merchandise = merchandiseRepository.findAllById(
+            purchase.getMerchandiseIds());
 
         logger.info("Saved purchase to database: {}", purchase);
 
@@ -83,7 +87,8 @@ public class CustomPurchaseService implements PurchaseService {
 
         return purchases.stream().map(purchase -> {
             List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-            List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+            List<Merchandise> merchandise = merchandiseRepository.findAllById(
+                purchase.getMerchandiseIds());
 
             return new PurchaseDetailDto(
                 purchase.getPurchaseId(),
@@ -109,7 +114,8 @@ public class CustomPurchaseService implements PurchaseService {
 
         // Lade die Tickets und Merchandise-Objekte basierend auf den IDs
         List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+        List<Merchandise> merchandise = merchandiseRepository.findAllById(
+            purchase.getMerchandiseIds());
 
         // Erstelle und gebe ein PurchaseDetailDto zurück
         return new PurchaseDetailDto(
@@ -133,4 +139,22 @@ public class CustomPurchaseService implements PurchaseService {
         purchaseRepository.deleteById(id);
         logger.debug("Deleted purchase with ID: {}", id);
     }
+
+    @Override
+    public void updatePurchase(PurchaseDetailDto purchaseDetailDto) {
+        // Fetch the existing purchase
+        Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
+            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+        List<Long> ticketIds = new java.util.ArrayList<>(List.of());
+        List<Ticket> tickets = purchaseDetailDto.getTickets();
+
+        for(Ticket ticket : tickets) {
+            ticketIds.add(ticket.getTicketId());
+        }
+
+        existingPurchase.setTicketIds(ticketIds);
+        purchaseRepository.save(existingPurchase);
+        logger.info("Updated purchase: {}", existingPurchase);
+    }
+
 }
