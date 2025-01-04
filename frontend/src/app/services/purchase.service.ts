@@ -4,7 +4,6 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
 import { Purchase, PurchaseListDto } from '../dtos/purchase';
-import {TicketDto} from "../dtos/ticket";
 
 @Injectable({
   providedIn: 'root',

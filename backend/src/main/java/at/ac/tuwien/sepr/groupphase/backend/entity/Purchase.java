@@ -38,8 +38,9 @@ public class Purchase {
     public Purchase() {
     }
 
-    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDateTime purchaseDate,
-                    List<Long> merchandiseQuantities) {
+    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice,
+        LocalDateTime purchaseDate,
+        List<Long> merchandiseQuantities) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
         this.setMerchandiseIds(merchandiseIds);

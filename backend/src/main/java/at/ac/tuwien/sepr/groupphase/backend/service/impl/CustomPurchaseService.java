@@ -148,7 +148,7 @@ public class CustomPurchaseService implements PurchaseService {
         List<Long> ticketIds = new java.util.ArrayList<>(List.of());
         List<Ticket> tickets = purchaseDetailDto.getTickets();
 
-        for(Ticket ticket : tickets) {
+        for (Ticket ticket : tickets) {
             ticketIds.add(ticket.getTicketId());
         }
 

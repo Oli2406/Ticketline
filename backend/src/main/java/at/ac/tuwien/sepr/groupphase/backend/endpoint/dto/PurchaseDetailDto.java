@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class PurchaseDetailDto {
+
     private Long userId;
     private List<Ticket> tickets;
     private List<Merchandise> merchandises;
@@ -17,8 +18,8 @@ public class PurchaseDetailDto {
     private Long purchaseId;
 
     public PurchaseDetailDto(Long purchaseId, Long userId, List<Ticket> tickets,
-                             List<Merchandise> merchandises, Long totalPrice, LocalDateTime purchaseDate,
-                             List<Long> merchandiseQuantities) {
+        List<Merchandise> merchandises, Long totalPrice, LocalDateTime purchaseDate,
+        List<Long> merchandiseQuantities) {
         this.purchaseId = purchaseId;
         this.userId = userId;
         this.tickets = tickets;

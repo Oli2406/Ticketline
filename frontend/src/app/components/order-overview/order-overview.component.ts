@@ -5,13 +5,12 @@ import {PurchaseService} from '../../services/purchase.service';
 import {ReservationService} from '../../services/reservation.service';
 import {ToastrService} from 'ngx-toastr';
 import {TicketDto} from '../../dtos/ticket';
-import {Purchase, PurchaseListDto} from '../../dtos/purchase';
-import {Reservation, ReservationListDto} from '../../dtos/reservation';
+import {PurchaseListDto} from '../../dtos/purchase';
+import {ReservationListDto} from '../../dtos/reservation';
 import {PerformanceService} from 'src/app/services/performance.service';
 import {LocationService} from '../../services/location.service';
-import {PerformanceDetailDto, PerformanceListDto} from '../../dtos/performance';
+import {PerformanceListDto} from '../../dtos/performance';
 import {ArtistService} from '../../services/artist.service';
-import {forEach} from "lodash";
 
 @Component({
   selector: 'app-order-overview',
@@ -142,62 +141,6 @@ export class OrderOverviewComponent implements OnInit {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
-  //TODO cancel tickets
-
-  /*/!*New Methods for cancelling tickets*!/
-  cancelPurchase(ticket: TicketDto) {
-    console.log('cancel purchase' + ticket.ticketId);
-    let cancelledPurchaseId;
-
-    let updatedPurchase;
-    for (let i = 0; i < this.userPurchases.length; i++) {
-      for (let j = 0; j < this.userPurchases[i].tickets.length; j++) {
-        if (this.userPurchases[i].tickets[j].ticketId == ticket.ticketId) {
-          cancelledPurchaseId = this.userPurchases[i].purchaseId;
-          console.log(cancelledPurchaseId);
-
-          this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
-            next: (purchase: PurchaseListDto) => {
-              this.cancelledPurchase = purchase;
-            }
-          });
-
-          console.log(this.cancelledPurchase, "not updated");
-
-          let ticketIds;
-          let merchandiseIds;
-
-          for (let k = 0; k < this.cancelledPurchase.tickets.length; k++) {
-            if (this.cancelledPurchase.tickets[k].ticketId != ticket.ticketId) {
-              ticketIds.add(this.cancelledPurchase.tickets[k].ticketId);
-            }
-          }
-
-          for (let k = 0; k < this.cancelledPurchase.merchandises.length; k++) {
-            merchandiseIds.add(this.cancelledPurchase.merchandises[k].merchandiseId);
-          }
-
-
-          updatedPurchase = {
-            purchaseId: cancelledPurchaseId,
-            userId: this.cancelledPurchase.userId,
-            ticketIds: ticketIds,
-            merchandiseIds: merchandiseIds,
-            merchandiseQuantities: null,
-            totalPrice: this.cancelledPurchase.totalPrice,
-            purchaseDate: this.cancelledPurchase.purchaseDate
-          };
-
-          console.log(this.cancelledPurchase, "updated")
-          this.purchaseService.createPurchase(updatedPurchase);
-          this.loadUserPurchases(this.authService.getUserIdFromToken());
-          break;
-        }
-      }
-    }
-
-    //TODO load the purchases afterwards
-  }*/
   cancelPurchase(ticket: TicketDto) {
     console.log('cancel purchase ticket id ' + ticket.ticketId);
     let cancelledPurchaseId: number;
@@ -247,11 +190,11 @@ export class OrderOverviewComponent implements OnInit {
     });
   }
 
+  //TODO cancel reservations like purchased tickets
   cancelReservation(ticketId: number) {
     console.log('cancel reservation' + ticketId);
   }
 
-  /*---------------------*/
 
   getPerformanceName(performanceId: number): string {
     if (!this.performanceNames[performanceId]) {
