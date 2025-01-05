@@ -153,6 +153,7 @@ public class CustomPurchaseService implements PurchaseService {
         }
 
         existingPurchase.setTicketIds(ticketIds);
+        existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
         purchaseRepository.save(existingPurchase);
         logger.info("Updated purchase: {}", existingPurchase);
     }

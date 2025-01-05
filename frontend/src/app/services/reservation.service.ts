@@ -44,6 +44,17 @@ export class ReservationService {
   }
 
   /**
+   * Update a reservation after cancelling a ticket
+   */
+  updateReservation(reservation: ReservationListDto): Observable<ReservationListDto> {
+    console.log(this.apiUrl);
+    const url = `${this.apiUrl}/${reservation.reservedId}`;
+    return this.http.put<ReservationListDto>(url, reservation).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * Handle HTTP errors
    */
   private handleError(error: HttpErrorResponse): Observable<never> {

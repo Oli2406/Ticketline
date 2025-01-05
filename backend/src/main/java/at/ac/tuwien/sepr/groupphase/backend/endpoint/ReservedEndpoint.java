@@ -71,18 +71,21 @@ public class ReservedEndpoint {
         return ResponseEntity.ok(createdReservation);
     }
 
-    //TODO implement the cancel reservation method / update the whole purchase and only get the ticket id from the frontend??
+
 
     @PermitAll
-    @PutMapping
-    public void cancelReservation(@RequestBody ReservedDetailDto reservedDetailDto) throws ValidationException {
-        LOG.info("Received request to cancel reservation: {}", reservedDetailDto);
-        List<Long> ticketIds = new java.util.ArrayList<>(List.of());
-        for (Ticket ticket : reservedDetailDto.getTickets()) {
-            ticketIds.add(ticket.getTicketId());
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateReservation(@PathVariable Long id,
+        @RequestBody ReservedDetailDto reservedDetailDto) throws ValidationException {
+        LOG.info("Received request to update Reservation with ID: {}{}", id, reservedDetailDto);
+
+        if (!id.equals(reservedDetailDto.getReservedId())) {
+            throw new ValidationException("ID mismatch",
+                List.of("URL ID does not match the body ID."));
         }
-        ticketService.updateTicketStatusList(ticketIds, "AVAILABLE");
-        LOG.info("Successfully cancelled Purchase: {}", reservedDetailDto);
+        reservedService.updateReservation(reservedDetailDto);
+        LOG.info("Successfully updated Purchase: {}", reservedDetailDto);
+        return ResponseEntity.noContent().build();
     }
 }
 

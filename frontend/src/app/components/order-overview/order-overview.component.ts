@@ -29,6 +29,7 @@ export class OrderOverviewComponent implements OnInit {
   userPurchases: PurchaseListDto[];
   userReservations: ReservationListDto[];
   cancelledPurchase: PurchaseListDto;
+  cancelledReservation: ReservationListDto;
 
   constructor(
     private authService: AuthService,
@@ -190,9 +191,51 @@ export class OrderOverviewComponent implements OnInit {
     });
   }
 
-  //TODO cancel reservations like purchased tickets
-  cancelReservation(ticketId: number) {
-    console.log('cancel reservation' + ticketId);
+  cancelReservation(reservedTicket: TicketDto) {
+    console.log('cancel reservation ' + reservedTicket.ticketId);
+    let cancelledReservationId: number;
+
+    this.userReservations.forEach((reservation) => {
+      reservation.tickets.forEach((reservedTicket) => {
+        if (reservedTicket.ticketId === reservedTicket.ticketId) {
+          cancelledReservationId = reservation.reservedId;
+          console.log(cancelledReservationId);
+
+          // Fetch the reservation details
+          this.reservationService.getReservationById(cancelledReservationId).subscribe({
+            next: (reservation: ReservationListDto) => {
+              this.cancelledReservation = reservation;
+              console.log(this.cancelledReservation, "not updated")
+
+              const updatedReservation: ReservationListDto = {
+                reservedId: cancelledReservationId,
+                userId: this.cancelledReservation.userId,
+                tickets: this.cancelledReservation.tickets.filter(item => item.ticketId !== reservedTicket.ticketId),
+                reservedDate: this.cancelledReservation.reservedDate
+              };
+
+              console.log(updatedReservation, 'updated');
+
+              // Update the reservation
+              this.reservationService.updateReservation(updatedReservation).subscribe({
+                next: () => {
+                  this.toastr.success('Purchase cancelled successfully.', 'Success');
+                  this.loadUserReservations(this.authService.getUserIdFromToken());
+                },
+                error: (err) => {
+                  console.error('Error updating reservation:', err.message);
+                  this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
+                },
+              });
+            },
+            error: (err) => {
+              console.error('Error fetching reservation:', err.message);
+              this.toastr.error('Failed to load reservation details. Please try again.', 'Error');
+            },
+          });
+        }
+      });
+    });
   }
 
 

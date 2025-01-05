@@ -104,6 +104,23 @@ public class ReservedServiceImpl implements ReservedService {
         );
     }
 
+    @Override
+    public void updateReservation(ReservedDetailDto reservedDetailDto) {
+        // Fetch the existing purchase
+        Reservation existingReservation = reservedRepository.findById(reservedDetailDto.getReservedId())
+            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+        List<Long> ticketIds = new java.util.ArrayList<>(List.of());
+        List<Ticket> tickets = reservedDetailDto.getTickets();
+
+        for (Ticket ticket : tickets) {
+            ticketIds.add(ticket.getTicketId());
+        }
+
+        existingReservation.setTicketIds(ticketIds);
+        reservedRepository.save(existingReservation);
+        logger.info("Updated reservation: {}", existingReservation);
+    }
+
     /*
     @Override
     public void deleteReservation(Long reservationId) {

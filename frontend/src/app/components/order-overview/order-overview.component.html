@@ -29,7 +29,7 @@
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
               <div class="cancel-button">
-                <button class="btn btn-primary">  <!-- add click here -->
+                <button class="btn btn-primary" (click)="cancelReservation(ticket)">
                   <i>Cancel Ticket</i>
                 </button>
               </div>
@@ -65,7 +65,7 @@
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
               <div class="cancel-button">
-                <button class="btn btn-primary" (click)="cancelPurchase(ticket)"> <!-- add click here -->
+                <button class="btn btn-primary" (click)="cancelPurchase(ticket)">
                   <i>Cancel Ticket</i>
                 </button>
               </div>

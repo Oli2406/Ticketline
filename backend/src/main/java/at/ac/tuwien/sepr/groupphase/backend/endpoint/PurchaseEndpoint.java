@@ -82,7 +82,6 @@ public class PurchaseEndpoint {
     public ResponseEntity<Void> updatePurchase(@PathVariable Long id,
         @RequestBody PurchaseDetailDto purchaseDetailDto) throws ValidationException {
         LOG.info("Received request to update Purchase with ID: {}{}", id, purchaseDetailDto);
-        System.out.println("update Purchase endpoint here");
         if (!id.equals(purchaseDetailDto.getPurchaseId())) {
             throw new ValidationException("ID mismatch",
                 List.of("URL ID does not match the body ID."));
