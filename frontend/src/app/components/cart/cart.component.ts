@@ -16,6 +16,7 @@ import {Purchase} from "../../dtos/purchase";
 import {PurchaseService} from "../../services/purchase.service";
 import {DatePipe} from "@angular/common";
 import {TicketService} from "../../services/ticket.service";
+import {forEach} from "lodash";
 
 @Component({
   selector: 'app-cart',
@@ -38,6 +39,10 @@ export class CartComponent implements OnInit {
   selectedPaymentOption: string = 'creditCard';
   protected accountPoints: number;
   invoiceCounter: number = 1;
+  merchandiseCounter = 0;
+  ticketCounter = 0;
+  ticketTaxAmount = 0;
+  merchandiseTaxAmount = 0;
 
   imageLocation: string = this.global.backendRessourceUri + '/merchandise/';
 
@@ -82,6 +87,33 @@ export class CartComponent implements OnInit {
     this.imageLocation = this.global.backendRessourceUri + '/merchandise/';
     this.startPeriodicExpirationCheck();
     this.startPeriodicCountdown();
+  }
+
+  calculateTaxAmounts() {
+    for (let i = 0; i < this.cartItems.length; i++) {
+      if (this.isMerchandise(this.cartItems[i].item)) {
+        const mTax = ((this.cartItems[i].item.price / 120) * 100) * 0.2;
+        this.merchandiseTaxAmount = this.merchandiseTaxAmount + (mTax*this.cartItems[i].quantity);
+      } else if (this.isTicket(this.cartItems[i].item)) {
+        const tTax = ((this.cartItems[i].item.price / 113) * 100) * 0.13;
+        this.ticketTaxAmount = this.ticketTaxAmount + tTax;
+      }
+    }
+
+    console.log(this.merchandiseTaxAmount + ' Merch tax');
+    console.log(this.ticketTaxAmount + ' Ticket tax');
+  }
+
+  countTicketMerchandiseInCart() {
+    for (let i = 0; i < this.cartItems.length; i++) {
+      if (this.isMerchandise(this.cartItems[i].item)) {
+        this.merchandiseCounter = this.merchandiseCounter + 1;
+      } else if (this.isTicket(this.cartItems[i].item)) {
+        this.ticketCounter = this.ticketCounter + 1;
+      }
+    }
+    console.log(this.merchandiseCounter + 'merchandise');
+    console.log(this.ticketCounter + 'tickets');
   }
 
   startPeriodicCountdown(): void {
@@ -148,8 +180,8 @@ export class CartComponent implements OnInit {
   private fetchAllPerformanceNames(): void {
     const performanceIds = new Set(
       this.cartItems
-        .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
-        .filter((id) => id !== null)
+      .map((item) => ('performanceId' in item.item ? item.item.performanceId : null))
+      .filter((id) => id !== null)
     );
 
     const fetchRequests = Array.from(performanceIds).map((id) =>
@@ -157,18 +189,18 @@ export class CartComponent implements OnInit {
     );
 
     Promise.all(fetchRequests)
-      .then((performances) => {
-        performances.forEach((performance) => {
-          this.performanceCache[performance.performanceId] = performance.name;
-        });
-      })
-      .catch((error) => {
-        console.error('Error fetching performances:', error);
-        this.toastr.error('Failed to load performance names.');
-      })
-      .finally(() => {
-        this.isLoading = false;
+    .then((performances) => {
+      performances.forEach((performance) => {
+        this.performanceCache[performance.performanceId] = performance.name;
       });
+    })
+    .catch((error) => {
+      console.error('Error fetching performances:', error);
+      this.toastr.error('Failed to load performance names.');
+    })
+    .finally(() => {
+      this.isLoading = false;
+    });
   }
 
   updateQuantity(item: Merchandise | TicketDto, quantity: number): void {
@@ -273,6 +305,8 @@ export class CartComponent implements OnInit {
   }
 
   async buy(): Promise<void> {
+    this.countTicketMerchandiseInCart();
+    this.calculateTaxAmounts();
     if (!this.selectedPaymentOption) {
       this.toastr.error('Please select a payment option.');
       return;
