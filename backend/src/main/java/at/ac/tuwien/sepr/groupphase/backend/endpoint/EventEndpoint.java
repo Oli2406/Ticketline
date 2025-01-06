@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -86,6 +87,14 @@ public class EventEndpoint {
     public ResponseEntity<List<EventDetailDto>> getEventsByArtistId(@PathVariable Long id) {
         LOGGER.info("Fetching events containing performances with artistId: {}", id);
         List<EventDetailDto> result = eventService.getEventsByArtistId(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/top10")
+    public ResponseEntity<List<EventSalesDto>> getTop10Events() {
+        LOGGER.info("Fetching top 10 events");
+        List<EventSalesDto> result = eventService.getTop10Events();
         return ResponseEntity.ok(result);
     }
 }

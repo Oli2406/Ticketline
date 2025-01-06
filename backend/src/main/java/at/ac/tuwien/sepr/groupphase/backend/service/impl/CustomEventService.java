@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
@@ -103,6 +104,18 @@ public class CustomEventService implements EventService {
         return eventRepository.findEventsByArtistId(id)
             .stream()
             .map(this.eventMapper::eventToEventDetailDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<EventSalesDto> getTop10Events() {
+        List<Object[]> results = eventRepository.findTop10EventsAsObjects();
+        return results.stream()
+            .map(record -> new EventSalesDto(
+                ((Number) record[0]).longValue(),    // eventId
+                ((Number) record[1]).longValue(),    // soldTickets
+                ((Number) record[2]).longValue(),    // totalTickets
+                ((Number) record[3]).doubleValue()   // soldPercentage
+            ))
             .collect(Collectors.toList());
     }
 }
