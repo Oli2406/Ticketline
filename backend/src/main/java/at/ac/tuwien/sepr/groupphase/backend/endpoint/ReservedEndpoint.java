@@ -71,8 +71,6 @@ public class ReservedEndpoint {
         return ResponseEntity.ok(createdReservation);
     }
 
-
-
     @PermitAll
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateReservation(@PathVariable Long id,
