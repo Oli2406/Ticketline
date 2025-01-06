@@ -38,7 +38,7 @@ export class PurchaseService {
    */
   createPurchase(purchase: Purchase): Observable<Purchase> {
     console.log(this.apiUrl);
-    return this.http.put<Purchase>(this.apiUrl, purchase).pipe(
+    return this.http.post<Purchase>(this.apiUrl, purchase).pipe(
       catchError(this.handleError)
     );
   }
