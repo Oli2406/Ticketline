@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {Event, EventListDto, EventSearch} from 'src/app/dtos/event';
+import {Event, EventListDto, EventSalesDto, EventSearch} from 'src/app/dtos/event';
 
 @Injectable({
   providedIn: 'root',
@@ -49,6 +49,10 @@ export class EventService {
 
   getEventsByArtistId(id: number): Observable<EventListDto[]> {
     return this.http.get<EventListDto[]>(`${(this.apiUrl)}/artist/${id}`);
+  }
+
+  getTop10Events() {
+    return this.http.get<EventSalesDto[]>(`${(this.apiUrl)}/top10`);
   }
 
   public handleError(error: HttpErrorResponse): Observable<never> {

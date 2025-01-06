@@ -50,14 +50,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * Results are sorted by sold percentage in descending order.
      *
      * @return A list of object arrays, where each array contains:
-     *         - eventId (Long): The ID of the event.
-     *         - soldTickets (Long): The number of tickets sold.
-     *         - totalTickets (Long): The total number of tickets available.
-     *         - soldPercentage (Double): The percentage of tickets sold.
+     *         - eventId (Long): ID of the event
+     *         - eventTitle (String): name of the event
+     *         - soldTickets (Long): number of tickets sold
+     *         - totalTickets (Long): total number of tickets available
+     *         - soldPercentage (Double): percentage of tickets sold
      */
     @Query(value = """
         SELECT
             ep.EVENT_ID AS eventId,
+            e.TITLE AS eventTitle,
             SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets,
             COUNT(t.TICKET_ID) AS totalTickets,
             (SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) * 1.0 / COUNT(t.TICKET_ID)) AS soldPercentage
@@ -65,8 +67,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             EVENT_PERFORMANCE_IDS ep
         JOIN
             TICKET t ON ep.PERFORMANCE_ID = t.PERFORMANCE_ID
+        JOIN
+            EVENT e ON ep.EVENT_ID = e.EVENT_ID
         GROUP BY
-            ep.EVENT_ID
+            ep.EVENT_ID, e.TITLE
         ORDER BY
             soldPercentage DESC
         LIMIT 10

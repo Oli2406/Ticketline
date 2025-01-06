@@ -109,12 +109,14 @@ public class CustomEventService implements EventService {
 
     public List<EventSalesDto> getTop10Events() {
         List<Object[]> results = eventRepository.findTop10EventsAsObjects();
+
         return results.stream()
-            .map(record -> new EventSalesDto(
-                ((Number) record[0]).longValue(),    // eventId
-                ((Number) record[1]).longValue(),    // soldTickets
-                ((Number) record[2]).longValue(),    // totalTickets
-                ((Number) record[3]).doubleValue()   // soldPercentage
+            .map(e -> new EventSalesDto(
+                ((Number) e[0]).longValue(),
+                e[1].toString(),
+                ((Number) e[2]).longValue(),
+                ((Number) e[3]).longValue(),
+                ((Number) e[4]).doubleValue()
             ))
             .collect(Collectors.toList());
     }
