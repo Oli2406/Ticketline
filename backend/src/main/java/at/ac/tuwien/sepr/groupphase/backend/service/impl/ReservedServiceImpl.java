@@ -23,13 +23,15 @@ import java.util.stream.Collectors;
 @Service
 public class ReservedServiceImpl implements ReservedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger logger = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final ReservedRepository reservedRepository;
     private final TicketRepository ticketRepository;
     private final RandomStringGenerator generator;
 
-    public ReservedServiceImpl(ReservedRepository reservedRepository, TicketRepository ticketRepository,
-                                 RandomStringGenerator generator) {
+    public ReservedServiceImpl(ReservedRepository reservedRepository,
+        TicketRepository ticketRepository,
+        RandomStringGenerator generator) {
         this.reservedRepository = reservedRepository;
         this.ticketRepository = ticketRepository;
         this.generator = generator;
@@ -50,7 +52,7 @@ public class ReservedServiceImpl implements ReservedService {
             reservation.getUserId(),
             reservation.getReservationDate(),
             tickets,
-            reservation.getUserId()
+            reservationId
         );
     }
 
@@ -67,20 +69,22 @@ public class ReservedServiceImpl implements ReservedService {
                 reservation.getUserId(),
                 reservation.getReservationDate(),
                 tickets,
-                reservation.getUserId()
+                reservation.getReservationId()
             );
         }).collect(Collectors.toList());
     }
 
     @Override
-    public ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException {
+    public ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto)
+        throws ValidationException {
         logger.info("Creating reservation: {}", reservedCreateDto);
 
         Optional<Long> optionalUserId = generator.retrieveOriginalId(reservedCreateDto.getUserId());
-        Long userId = optionalUserId.orElseThrow(() -> new ValidationException("Invalid user ID", List.of(
-            "User ID could not be resolved.",
-            "Ensure that the encrypted ID is correct."
-        )));
+        Long userId = optionalUserId.orElseThrow(
+            () -> new ValidationException("Invalid user ID", List.of(
+                "User ID could not be resolved.",
+                "Ensure that the encrypted ID is correct."
+            )));
 
         Reservation reservation = new Reservation(
             userId,
@@ -107,7 +111,8 @@ public class ReservedServiceImpl implements ReservedService {
     @Override
     public void updateReservation(ReservedDetailDto reservedDetailDto) {
         // Fetch the existing purchase
-        Reservation existingReservation = reservedRepository.findById(reservedDetailDto.getReservedId())
+        Reservation existingReservation = reservedRepository.findById(
+                reservedDetailDto.getReservedId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
         List<Long> ticketIds = new java.util.ArrayList<>(List.of());
         List<Ticket> tickets = reservedDetailDto.getTickets();
