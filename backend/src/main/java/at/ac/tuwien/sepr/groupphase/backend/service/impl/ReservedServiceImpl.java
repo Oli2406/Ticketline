@@ -2,8 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ReservedRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
