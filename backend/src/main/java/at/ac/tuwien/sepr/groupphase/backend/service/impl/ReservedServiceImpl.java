@@ -102,7 +102,7 @@ public class ReservedServiceImpl implements ReservedService {
             reservation.getUserId(),
             reservation.getReservationDate(),
             tickets,
-            reservation.getUserId()
+            reservation.getReservationId()
         );
     }
 
