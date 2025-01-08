@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomMerchandiseService implements MerchandiseService {
+public class MerchandiseServiceImpl implements MerchandiseService {
 
     MerchandiseRepository merchandiseRepository;
     MerchandiseValidator merchandiseValidator;
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public CustomMerchandiseService(MerchandiseRepository merchandiseRepository,
+    public MerchandiseServiceImpl(MerchandiseRepository merchandiseRepository,
         MerchandiseValidator merchandiseValidator) {
         this.merchandiseRepository = merchandiseRepository;
         this.merchandiseValidator = merchandiseValidator;

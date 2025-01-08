@@ -1,7 +1,5 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.LocationSearchDto;
@@ -23,22 +21,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class CustomLocationService implements LocationService {
+public class LocationServiceImpl implements LocationService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final LocationRepository locationRepository;
     private final LocationValidator locationValidator;
     private final LocationMapper locationMapper;
 
 
-    public CustomLocationService(LocationRepository locationRepository, LocationValidator locationValidator, LocationMapper locationMapper) {
+    public LocationServiceImpl(LocationRepository locationRepository,
+        LocationValidator locationValidator, LocationMapper locationMapper) {
         this.locationRepository = locationRepository;
         this.locationValidator = locationValidator;
         this.locationMapper = locationMapper;
     }
 
     @Override
-    public LocationDetailDto createLocation(LocationCreateDto locationCreateDto) throws ValidationException, ConflictException {
+    public LocationDetailDto createLocation(LocationCreateDto locationCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.info("Creating or updating location: {}", locationCreateDto);
         locationValidator.validateLocation(locationCreateDto);
         Location location = new Location(
@@ -50,14 +51,18 @@ public class CustomLocationService implements LocationService {
         );
         location = locationRepository.save(location);
         LOGGER.debug("Saved location to database: {}", location);
-        return new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry());
+        return new LocationDetailDto(location.getLocationId(), location.getName(),
+            location.getStreet(), location.getCity(), location.getPostalCode(),
+            location.getCountry());
     }
 
     @Override
     public List<LocationDetailDto> getAllLocations() {
         LOGGER.info("Fetching all locations");
         List<LocationDetailDto> locations = locationRepository.findAll().stream()
-            .map(location -> new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry()))
+            .map(location -> new LocationDetailDto(location.getLocationId(), location.getName(),
+                location.getStreet(), location.getCity(), location.getPostalCode(),
+                location.getCountry()))
             .collect(Collectors.toList());
         LOGGER.debug("Fetched {} locations: {}", locations.size(), locations);
         return locations;
@@ -66,9 +71,12 @@ public class CustomLocationService implements LocationService {
     @Override
     public LocationDetailDto getLocationById(Long id) {
         LOGGER.info("Fetching location with ID: {}", id);
-        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found"));
+        Location location = locationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Location not found"));
         LOGGER.debug("Fetched location: {}", location);
-        return new LocationDetailDto(location.getLocationId(), location.getName(), location.getStreet(), location.getCity(), location.getPostalCode(), location.getCountry());
+        return new LocationDetailDto(location.getLocationId(), location.getName(),
+            location.getStreet(), location.getCity(), location.getPostalCode(),
+            location.getCountry());
     }
 
     @Override
@@ -83,19 +91,24 @@ public class CustomLocationService implements LocationService {
         LOGGER.info("Searching artists with data: {}", dto);
         var query = locationRepository.findAll().stream();
         if (dto.getName() != null) {
-            query = query.filter(location -> location.getName().toLowerCase().contains(dto.getName().toLowerCase()));
+            query = query.filter(
+                location -> location.getName().toLowerCase().contains(dto.getName().toLowerCase()));
         }
         if (dto.getStreet() != null) {
-            query = query.filter(location -> location.getStreet().toLowerCase().contains(dto.getStreet().toLowerCase()));
+            query = query.filter(location -> location.getStreet().toLowerCase()
+                .contains(dto.getStreet().toLowerCase()));
         }
         if (dto.getCity() != null) {
-            query = query.filter(location -> location.getCity().toLowerCase().contains(dto.getCity().toLowerCase()));
+            query = query.filter(
+                location -> location.getCity().toLowerCase().contains(dto.getCity().toLowerCase()));
         }
         if (dto.getCountry() != null) {
-            query = query.filter(location -> location.getCountry().toLowerCase().contains(dto.getCountry().toLowerCase()));
+            query = query.filter(location -> location.getCountry().toLowerCase()
+                .contains(dto.getCountry().toLowerCase()));
         }
         if (dto.getPostalCode() != null) {
-            query = query.filter(location -> location.getPostalCode().toLowerCase().contains(dto.getPostalCode().toLowerCase()));
+            query = query.filter(location -> location.getPostalCode().toLowerCase()
+                .contains(dto.getPostalCode().toLowerCase()));
         }
 
         return query.map(this.locationMapper::locationToLocationDetailDto);

@@ -22,9 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomResetPasswordService implements ResetPasswordService {
+public class ResetPasswordServiceImpl implements ResetPasswordService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomResetPasswordService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResetPasswordServiceImpl.class);
     private static final String deployUrl = "https://24ws-se-pr-inso-08-acf05sgmk6doonfn65ksq.apps.student.inso-w.at";
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
@@ -34,7 +34,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
     private final JwtTokenizer jwtTokenizer;
     private final SecurityPropertiesConfig.Auth auth;
 
-    public CustomResetPasswordService(PasswordResetRepository passwordResetRepository,
+    public ResetPasswordServiceImpl(PasswordResetRepository passwordResetRepository,
         UserRepository userRepository, EmailService emailService, UserValidator userValidator,
         PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
         SecurityPropertiesConfig.Auth auth) {

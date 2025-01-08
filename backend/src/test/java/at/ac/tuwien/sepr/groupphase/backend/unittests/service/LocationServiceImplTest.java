@@ -19,9 +19,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-public class CustomLocationServiceTest {
+public class LocationServiceImplTest {
 
-    private CustomLocationService locationService;
+    private LocationServiceImpl locationService;
 
     @Mock
     private LocationRepository locationRepository;
@@ -35,12 +35,15 @@ public class CustomLocationServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        locationService = new CustomLocationService(locationRepository, locationValidator, locationMapper);
+        locationService = new LocationServiceImpl(locationRepository, locationValidator,
+            locationMapper);
     }
 
     @Test
-    void createOrUpdateLocation_ShouldSaveLocation_WhenValidInput() throws ValidationException, ConflictException {
-        LocationCreateDto dto = new LocationCreateDto("LocationName", "Street", "City", "12345", "Country");
+    void createOrUpdateLocation_ShouldSaveLocation_WhenValidInput()
+        throws ValidationException, ConflictException {
+        LocationCreateDto dto = new LocationCreateDto("LocationName", "Street", "City", "12345",
+            "Country");
 
         when(locationRepository.save(any(Location.class))).thenAnswer(invocation -> {
             Location l = invocation.getArgument(0);
@@ -63,7 +66,8 @@ public class CustomLocationServiceTest {
 
     @Test
     void getAllLocations_ShouldReturnLocationList() {
-        List<Location> locations = List.of(new Location("LocationName", "Street", "City", "12345", "Country"));
+        List<Location> locations = List.of(
+            new Location("LocationName", "Street", "City", "12345", "Country"));
         when(locationRepository.findAll()).thenReturn(locations);
 
         List<LocationDetailDto> result = locationService.getAllLocations();
@@ -83,13 +87,15 @@ public class CustomLocationServiceTest {
             () -> locationService.getLocationById(1L),
             "Should throw exception for non-existent ID");
 
-        assertEquals("Location not found", exception.getMessage(), "Exception message should match");
+        assertEquals("Location not found", exception.getMessage(),
+            "Exception message should match");
         verify(locationRepository, times(1)).findById(1L);
     }
 
     @Test
     void searchLocationByNameReturnsMatchingEvent() {
-        LocationDetailDto location1DetailDto = new LocationDetailDto(1L, "Matching Name", "Street1", "City1", "12345", "Country1");
+        LocationDetailDto location1DetailDto = new LocationDetailDto(1L, "Matching Name", "Street1",
+            "City1", "12345", "Country1");
         Location location1 = new Location("Matching Name", "Street1", "City1", "12345", "Country1");
         Location location2 = new Location("Name", "Street2", "City2", "12345", "Country2");
         when(locationRepository.findAll()).thenReturn(List.of(location1, location2));

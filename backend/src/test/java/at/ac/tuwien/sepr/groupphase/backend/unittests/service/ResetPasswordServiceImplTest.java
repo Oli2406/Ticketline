@@ -14,7 +14,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.PasswordResetRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomResetPasswordService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.ResetPasswordServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +25,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-class CustomResetPasswordServiceTest {
+class ResetPasswordServiceImplTest {
 
     @Mock
     private PasswordResetRepository passwordResetRepository;
@@ -52,7 +51,7 @@ class CustomResetPasswordServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private CustomResetPasswordService customResetPasswordService;
+    private ResetPasswordServiceImpl resetPasswordServiceImpl;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +69,7 @@ class CustomResetPasswordServiceTest {
         when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
         when(jwtTokenizer.getResetToken(email)).thenReturn("ResetToken");
 
-        String response = customResetPasswordService.sendEmailToResetPassword(email);
+        String response = resetPasswordServiceImpl.sendEmailToResetPassword(email);
 
         assertNotNull(response);
         verify(emailService, times(1)).sendPasswordResetEmail(anyString(), anyString(),
@@ -84,7 +83,7 @@ class CustomResetPasswordServiceTest {
         when(userRepository.findUserByEmail(email)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-            () -> customResetPasswordService.sendEmailToResetPassword(email));
+            () -> resetPasswordServiceImpl.sendEmailToResetPassword(email));
     }
 
     @Test
@@ -108,7 +107,7 @@ class CustomResetPasswordServiceTest {
         tokenDto.setTokenFromStorage(token);
         tokenDto.setCode(code);
 
-        customResetPasswordService.verifyResetCode(tokenDto);
+        resetPasswordServiceImpl.verifyResetCode(tokenDto);
 
         verify(passwordResetRepository, never()).save(any());
     }
@@ -136,7 +135,7 @@ class CustomResetPasswordServiceTest {
         tokenDto.setCode(code);
 
         assertThrows(IllegalArgumentException.class,
-            () -> customResetPasswordService.verifyResetCode(tokenDto));
+            () -> resetPasswordServiceImpl.verifyResetCode(tokenDto));
         verify(passwordResetRepository, times(1)).findByEmail(userEmail);
     }
 
@@ -166,7 +165,7 @@ class CustomResetPasswordServiceTest {
         doNothing().when(userValidator).validateNewPasswords(newPassword, newPassword);
         when(passwordEncoder.encode(anyString())).thenReturn("encoded" + newPassword);
 
-        customResetPasswordService.resetPassword(resetPasswordDto);
+        resetPasswordServiceImpl.resetPassword(resetPasswordDto);
 
         verify(userRepository, times(1)).save(user);
         verify(passwordResetRepository, times(1)).delete(resetPasswordToken);
@@ -186,6 +185,6 @@ class CustomResetPasswordServiceTest {
         when(passwordResetRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-            () -> customResetPasswordService.resetPassword(resetPasswordDto));
+            () -> resetPasswordServiceImpl.resetPassword(resetPasswordDto));
     }
 }

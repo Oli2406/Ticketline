@@ -19,21 +19,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class CustomPurchaseService implements PurchaseService {
+public class PurchaseServiceImpl implements PurchaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger logger = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final PurchaseRepository purchaseRepository;
     private final TicketRepository ticketRepository;
     private final MerchandiseRepository merchandiseRepository;
 
-    public CustomPurchaseService(PurchaseRepository purchaseRepository, TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
+    public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
+        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
     }
 
     @Override
-    public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto) throws ValidationException {
+    public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto)
+        throws ValidationException {
         logger.info("Creating or updating purchase: {}", purchaseCreateDto);
 
         Purchase purchase = new Purchase(
@@ -49,7 +52,8 @@ public class CustomPurchaseService implements PurchaseService {
         purchase = purchaseRepository.save(purchase);
 
         List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+        List<Merchandise> merchandise = merchandiseRepository.findAllById(
+            purchase.getMerchandiseIds());
 
         logger.info("Saved purchase to database: {}", purchase);
 
@@ -71,7 +75,8 @@ public class CustomPurchaseService implements PurchaseService {
 
         return purchases.stream().map(purchase -> {
             List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-            List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+            List<Merchandise> merchandise = merchandiseRepository.findAllById(
+                purchase.getMerchandiseIds());
 
             return new PurchaseDetailDto(
                 purchase.getPurchaseId(),
@@ -96,7 +101,8 @@ public class CustomPurchaseService implements PurchaseService {
 
         // Lade die Tickets und Merchandise-Objekte basierend auf den IDs
         List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+        List<Merchandise> merchandise = merchandiseRepository.findAllById(
+            purchase.getMerchandiseIds());
 
         // Erstelle und gebe ein PurchaseDetailDto zurück
         return new PurchaseDetailDto(

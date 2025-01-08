@@ -11,12 +11,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomAdminService implements AdminService {
+public class AdminServiceImpl implements AdminService {
 
     private final UserRepository userRepository;
 
 
-    public CustomAdminService(UserRepository userRepository) {
+    public AdminServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

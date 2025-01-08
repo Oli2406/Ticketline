@@ -8,7 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomEventService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +22,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class CustomEventServiceTest {
+public class EventServiceImplTest {
 
-    private CustomEventService eventService;
+    private EventServiceImpl eventService;
 
     @Mock
     private EventRepository eventRepository;
@@ -38,12 +38,14 @@ public class CustomEventServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        eventService = new CustomEventService(eventRepository, eventValidator, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, eventValidator, eventMapper);
     }
 
     @Test
-    void createOrUpdateEvent_ShouldSaveEvent_WhenValidInput() throws ValidationException, ConflictException {
-        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(), LocalDate.now().plusDays(1), List.of(1L));
+    void createOrUpdateEvent_ShouldSaveEvent_WhenValidInput()
+        throws ValidationException, ConflictException {
+        EventCreateDto dto = new EventCreateDto("Title", "Description", "Category", LocalDate.now(),
+            LocalDate.now().plusDays(1), List.of(1L));
 
         when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> {
             Event e = invocation.getArgument(0);
@@ -57,7 +59,8 @@ public class CustomEventServiceTest {
         assertAll(
             () -> assertNotNull(created.getEventId(), "Event ID should not be null"),
             () -> assertEquals(dto.getTitle(), created.getTitle(), "Title should match"),
-            () -> assertEquals(dto.getDescription(), created.getDescription(), "Description should match"),
+            () -> assertEquals(dto.getDescription(), created.getDescription(),
+                "Description should match"),
             () -> assertEquals(dto.getCategory(), created.getCategory(), "Category should match")
         );
 
@@ -67,14 +70,17 @@ public class CustomEventServiceTest {
 
     @Test
     void getAllEvents_ShouldReturnEventList() {
-        List<Event> events = List.of(new Event("Title1", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L)));
+        List<Event> events = List.of(
+            new Event("Title1", "Description1", LocalDate.now(), LocalDate.now().plusDays(1),
+                "Category1", List.of(1L)));
         when(eventRepository.findAll()).thenReturn(events);
 
         List<EventDetailDto> result = eventService.getAllEvents();
 
         assertFalse(result.isEmpty(), "Resulting event list should not be empty");
         assertEquals(1, result.size(), "Result list size should match");
-        assertEquals("Title1", result.getFirst().getTitle(), "Title of the first event should match");
+        assertEquals("Title1", result.getFirst().getTitle(),
+            "Title of the first event should match");
 
         verify(eventRepository, times(1)).findAll();
     }
@@ -93,9 +99,12 @@ public class CustomEventServiceTest {
 
     @Test
     void searchEventByTitleReturnsMatchingEvent() {
-        EventDetailDto event1DetailDto = new EventDetailDto(1L, "Matching Title", "Description1", "Category1", LocalDate.now(), LocalDate.now().plusDays(1));
-        Event event1 = new Event("Matching Title", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L));
-        Event event2 = new Event("Other Title", "Description2", LocalDate.now(), LocalDate.now().plusDays(1), "Category2", List.of(1L));
+        EventDetailDto event1DetailDto = new EventDetailDto(1L, "Matching Title", "Description1",
+            "Category1", LocalDate.now(), LocalDate.now().plusDays(1));
+        Event event1 = new Event("Matching Title", "Description1", LocalDate.now(),
+            LocalDate.now().plusDays(1), "Category1", List.of(1L));
+        Event event2 = new Event("Other Title", "Description2", LocalDate.now(),
+            LocalDate.now().plusDays(1), "Category2", List.of(1L));
         when(eventRepository.findAll()).thenReturn(List.of(event1, event2));
         when(eventMapper.eventToEventDetailDto(event1)).thenReturn(event1DetailDto);
 
@@ -111,11 +120,14 @@ public class CustomEventServiceTest {
 
     @Test
     void searchEventByTitleReturnsNoEventsWhenNoMatch() {
-        Event event1 = new Event("Some Title", "Description1", LocalDate.now(), LocalDate.now().plusDays(1), "Category1", List.of(1L));
-        Event event2 = new Event("Other Title", "Description2", LocalDate.now(), LocalDate.now().plusDays(1), "Category2", List.of(1L));
+        Event event1 = new Event("Some Title", "Description1", LocalDate.now(),
+            LocalDate.now().plusDays(1), "Category1", List.of(1L));
+        Event event2 = new Event("Other Title", "Description2", LocalDate.now(),
+            LocalDate.now().plusDays(1), "Category2", List.of(1L));
         when(eventRepository.findAll()).thenReturn(List.of(event1, event2));
 
-        EventSearchDto searchDto = new EventSearchDto(null, null, null, LocalDate.of(1900, 1, 1), null, null);
+        EventSearchDto searchDto = new EventSearchDto(null, null, null, LocalDate.of(1900, 1, 1),
+            null, null);
 
         List<EventDetailDto> result = eventService.search(searchDto).toList();
 

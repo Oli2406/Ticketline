@@ -2,7 +2,6 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -20,15 +19,13 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomUserDetailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserDetailServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
 import java.util.ArrayList;
 import java.util.List;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,9 +35,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CustomUserDetailServiceTest {
+class UserDetailServiceImplTest {
 
-    private CustomUserDetailService userService;
+    private UserDetailServiceImpl userService;
 
     @Mock
     private UserRepository userRepository;
@@ -72,7 +69,7 @@ class CustomUserDetailServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userService =
-            new CustomUserDetailService(
+            new UserDetailServiceImpl(
                 userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator,
                 jwt, auth, randomStringGenerator);
     }

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserDetailService implements UserService {
+public class UserDetailServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(
         MethodHandles.lookup().lookupClass());
@@ -48,7 +48,7 @@ public class CustomUserDetailService implements UserService {
     private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+    public UserDetailServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
         JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
         UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
         SecurityPropertiesConfig.Auth auth, RandomStringGenerator randomStringGenerator) {

@@ -9,7 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomMerchandiseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.MerchandiseServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.MerchandiseValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class CustomMerchandiseServiceTest {
+class MerchandiseServiceImplTest {
 
     @Mock
     private MerchandiseRepository merchandiseRepository;
@@ -35,7 +35,7 @@ class CustomMerchandiseServiceTest {
     private MerchandiseValidator merchandiseValidator;
 
     @InjectMocks
-    private CustomMerchandiseService customMerchandiseService;
+    private MerchandiseServiceImpl merchandiseServiceImpl;
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,7 @@ class CustomMerchandiseServiceTest {
 
         ArgumentCaptor<Merchandise> captor = ArgumentCaptor.forClass(Merchandise.class);
 
-        MerchandiseCreateDto result = customMerchandiseService.createMerchandise(createDto);
+        MerchandiseCreateDto result = merchandiseServiceImpl.createMerchandise(createDto);
 
         verify(merchandiseRepository).save(captor.capture());
         Merchandise savedEntity = captor.getValue();
@@ -88,7 +88,7 @@ class CustomMerchandiseServiceTest {
 
         when(merchandiseRepository.findAll()).thenReturn(Arrays.asList(merchandise1, merchandise2));
 
-        List<MerchandiseDetailDto> result = customMerchandiseService.getAllMerchandise();
+        List<MerchandiseDetailDto> result = merchandiseServiceImpl.getAllMerchandise();
 
         assertEquals(2, result.size());
         assertEquals("T-Shirt", result.get(0).getName());
@@ -109,7 +109,7 @@ class CustomMerchandiseServiceTest {
 
         when(merchandiseRepository.findById(1L)).thenReturn(Optional.of(merchandise));
 
-        customMerchandiseService.processPurchase(List.of(purchaseItem));
+        merchandiseServiceImpl.processPurchase(List.of(purchaseItem));
 
         verify(merchandiseRepository).save(merchandise);
         assertEquals(5, merchandise.getStock());
@@ -129,7 +129,7 @@ class CustomMerchandiseServiceTest {
         when(merchandiseRepository.findById(1L)).thenReturn(Optional.of(merchandise));
 
         assertThrows(InsufficientStockException.class, () ->
-            customMerchandiseService.processPurchase(List.of(purchaseItem))
+            merchandiseServiceImpl.processPurchase(List.of(purchaseItem))
         );
 
         verify(merchandiseRepository, never()).save(merchandise);

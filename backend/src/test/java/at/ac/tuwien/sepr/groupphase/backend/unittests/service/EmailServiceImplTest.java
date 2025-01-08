@@ -3,7 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomEmailService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.EmailServiceImpl;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,15 +12,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
-class CustomEmailServiceTest {
+class EmailServiceImplTest {
 
     @Mock
     private JavaMailSender mailSender;
 
     @InjectMocks
-    private CustomEmailService customEmailService;
+    private EmailServiceImpl emailServiceImpl;
 
     @BeforeEach
     void setUp() {
@@ -36,7 +35,7 @@ class CustomEmailServiceTest {
         MimeMessage message = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(message);
 
-        customEmailService.sendPasswordResetEmail(email, resetCode, resetLink);
+        emailServiceImpl.sendPasswordResetEmail(email, resetCode, resetLink);
 
         verify(mailSender, times(1)).send(message);
     }
@@ -54,7 +53,7 @@ class CustomEmailServiceTest {
         }).when(mailSender).send(any(MimeMessage.class));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            customEmailService.sendPasswordResetEmail(email, resetCode, resetLink);
+            emailServiceImpl.sendPasswordResetEmail(email, resetCode, resetLink);
         });
 
         assertEquals("Failed to send email", exception.getMessage());
@@ -69,7 +68,7 @@ class CustomEmailServiceTest {
         MimeMessage message = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(message);
 
-        customEmailService.sendHtmlEmail(email, subject, htmlContent);
+        emailServiceImpl.sendHtmlEmail(email, subject, htmlContent);
 
         verify(mailSender, times(1)).send(message);
     }
@@ -87,7 +86,7 @@ class CustomEmailServiceTest {
         }).when(mailSender).send(any(MimeMessage.class));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            customEmailService.sendHtmlEmail(email, subject, htmlContent);
+            emailServiceImpl.sendHtmlEmail(email, subject, htmlContent);
         });
 
         assertEquals("Failed to send email", exception.getMessage());
