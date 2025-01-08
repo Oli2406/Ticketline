@@ -208,8 +208,8 @@ export class SeatingPlanBComponent {
 
     // Check if the max ticket limit is reached
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
-    if (totalSelected >= 5) {
-      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+    if (totalSelected >= 8) {
+      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
       return;
     }
 
@@ -226,8 +226,8 @@ export class SeatingPlanBComponent {
       if (this.selectedStanding.vip > 0) {
         this.selectedStanding.vip = 0;
       } else {
-        if (totalSelected >= 5) {
-          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+        if (totalSelected >= 8) {
+          this.toastr.error('You cannot select more than 8 tickets.', 'Error');
           return;
         }
         if (this.vipStandingTickets <= 0) {
@@ -240,8 +240,8 @@ export class SeatingPlanBComponent {
       if (this.selectedStanding.premium > 0) {
         this.selectedStanding.premium = 0;
       } else {
-        if (totalSelected >= 5) {
-          this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+        if (totalSelected >= 8) {
+          this.toastr.error('You cannot select more than 8 tickets.', 'Error');
           return;
         }
         if (this.standingTickets <= 0) {
@@ -257,12 +257,12 @@ export class SeatingPlanBComponent {
   validateStandingTickets(type: 'vip' | 'premium'): void {
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
 
-    if (totalSelected > 5) {
-      this.toastr.error('You cannot select more than 5 tickets.', 'Error');
+    if (totalSelected > 8) {
+      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
       if (type === 'vip') {
-        this.selectedStanding.vip = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.premium);
+        this.selectedStanding.vip = Math.max(0, 8 - this.selectedTickets.length - this.selectedStanding.premium);
       } else if (type === 'premium') {
-        this.selectedStanding.premium = Math.max(0, 5 - this.selectedTickets.length - this.selectedStanding.vip);
+        this.selectedStanding.premium = Math.max(0, 8 - this.selectedTickets.length - this.selectedStanding.vip);
       }
     }
 
