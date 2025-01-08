@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.NewsValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

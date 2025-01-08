@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service.validators;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.NewsCreateMpfDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -15,7 +15,8 @@ import java.util.List;
 @Component
 public class NewsValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
 
     /**
      * Method for validating a NewsCreateMpfDto.

@@ -20,7 +20,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserDetailServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import java.util.ArrayList;
 import java.util.List;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;

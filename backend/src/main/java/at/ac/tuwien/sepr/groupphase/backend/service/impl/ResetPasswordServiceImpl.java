@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import io.jsonwebtoken.Claims;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;

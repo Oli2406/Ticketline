@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service.validators;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;

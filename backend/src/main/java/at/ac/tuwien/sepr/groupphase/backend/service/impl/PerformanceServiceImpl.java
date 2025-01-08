@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.SearchPerformanceRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.PerformanceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

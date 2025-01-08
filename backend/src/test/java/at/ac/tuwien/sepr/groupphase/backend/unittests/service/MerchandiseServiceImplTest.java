@@ -10,7 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.MerchandiseServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.MerchandiseValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.MerchandiseValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

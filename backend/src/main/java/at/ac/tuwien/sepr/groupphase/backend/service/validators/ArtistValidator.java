@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service.validators;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ArtistCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
@@ -23,18 +23,21 @@ public class ArtistValidator {
         this.artistRepository = artistRepository;
     }
 
-    public void validateArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
+    public void validateArtist(ArtistCreateDto artistCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.trace("Validating artist: {}", artistCreateDto);
         List<String> validationErrors = new ArrayList<>();
 
-        if (artistCreateDto.getArtistName() == null || artistCreateDto.getArtistName().trim().isEmpty()) {
+        if (artistCreateDto.getArtistName() == null || artistCreateDto.getArtistName().trim()
+            .isEmpty()) {
             validationErrors.add("Artist name is required");
         }
         if (artistCreateDto.getArtistName().length() > 64) {
             validationErrors.add("Artist name must be less than 64 characters");
         }
 
-        if (artistCreateDto.getFirstName() != null && artistCreateDto.getFirstName().length() > 64) {
+        if (artistCreateDto.getFirstName() != null
+            && artistCreateDto.getFirstName().length() > 64) {
             validationErrors.add("First name must be less than 64 characters");
         }
 

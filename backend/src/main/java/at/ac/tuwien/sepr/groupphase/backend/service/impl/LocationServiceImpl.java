@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.LocationService;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.LocationValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

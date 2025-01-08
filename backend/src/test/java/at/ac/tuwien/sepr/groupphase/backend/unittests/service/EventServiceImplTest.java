@@ -9,7 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

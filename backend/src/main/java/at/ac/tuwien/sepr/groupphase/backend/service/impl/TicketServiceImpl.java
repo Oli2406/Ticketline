@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.TicketValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

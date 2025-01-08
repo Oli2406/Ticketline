@@ -15,7 +15,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.ResetPasswordServiceImpl;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserValidator;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

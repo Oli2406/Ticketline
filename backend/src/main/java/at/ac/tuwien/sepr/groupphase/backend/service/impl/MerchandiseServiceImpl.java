@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.MerchandiseValidator;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

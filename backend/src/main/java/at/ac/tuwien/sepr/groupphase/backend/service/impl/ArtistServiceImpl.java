@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.ArtistValidator;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;

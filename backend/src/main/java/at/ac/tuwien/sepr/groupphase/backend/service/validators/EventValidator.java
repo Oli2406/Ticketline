@@ -1,4 +1,4 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service.validators;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
@@ -22,12 +22,14 @@ public class EventValidator {
     private final EventRepository eventRepository;
     private final PerformanceRepository performanceRepository;
 
-    public EventValidator(EventRepository eventRepository, PerformanceRepository performanceRepository) {
+    public EventValidator(EventRepository eventRepository,
+        PerformanceRepository performanceRepository) {
         this.eventRepository = eventRepository;
         this.performanceRepository = performanceRepository;
     }
 
-    public void validateEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
+    public void validateEvent(EventCreateDto eventCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.trace("Validating event: {}", eventCreateDto);
         List<String> validationErrors = new ArrayList<>();
 
@@ -39,7 +41,8 @@ public class EventValidator {
             validationErrors.add("Event title must be less than 255 characters");
         }
 
-        if (eventCreateDto.getDescription() == null || eventCreateDto.getDescription().trim().isEmpty()) {
+        if (eventCreateDto.getDescription() == null || eventCreateDto.getDescription().trim()
+            .isEmpty()) {
             validationErrors.add("Event description is required");
         }
 
@@ -67,24 +70,29 @@ public class EventValidator {
             validationErrors.add("Event end date cannot be before start date");
         }
 
-        if (eventCreateDto.getPerformanceIds() == null || eventCreateDto.getPerformanceIds().isEmpty()) {
+        if (eventCreateDto.getPerformanceIds() == null || eventCreateDto.getPerformanceIds()
+            .isEmpty()) {
             validationErrors.add("At least one performance must be provided");
         }
 
-        if (eventCreateDto.getPerformanceIds() != null && !eventCreateDto.getPerformanceIds().isEmpty()) {
-            List<Performance> performances = performanceRepository.findAllById(eventCreateDto.getPerformanceIds());
+        if (eventCreateDto.getPerformanceIds() != null && !eventCreateDto.getPerformanceIds()
+            .isEmpty()) {
+            List<Performance> performances = performanceRepository.findAllById(
+                eventCreateDto.getPerformanceIds());
 
             for (Performance performance : performances) {
-                if (performance.getDate().toLocalDate().isBefore(eventCreateDto.getDateFrom().plusDays(1))
-                    || performance.getDate().toLocalDate().isAfter(eventCreateDto.getDateTo().plusDays(1))) {
+                if (performance.getDate().toLocalDate()
+                    .isBefore(eventCreateDto.getDateFrom().plusDays(1))
+                    || performance.getDate().toLocalDate()
+                    .isAfter(eventCreateDto.getDateTo().plusDays(1))) {
                     validationErrors.add("Performance date " + performance.getDate().toLocalDate()
                         + " for performance " + performance.getName()
                         + " must be within the event date range from "
-                        + eventCreateDto.getDateFrom().plusDays(1) + " to " + eventCreateDto.getDateTo().plusDays(1) + "");
+                        + eventCreateDto.getDateFrom().plusDays(1) + " to "
+                        + eventCreateDto.getDateTo().plusDays(1) + "");
                 }
             }
         }
-
 
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Event validation failed with errors: {}", validationErrors);
@@ -95,11 +103,15 @@ public class EventValidator {
         LOGGER.info("Event validation passed for: {}", eventCreateDto);
     }
 
-    public void checkEventUnique(String title, LocalDate dateFrom, LocalDate dateTo) throws ConflictException {
+    public void checkEventUnique(String title, LocalDate dateFrom, LocalDate dateTo)
+        throws ConflictException {
         if (eventRepository.existsByTitleAndDateFromAndDateTo(title, dateFrom, dateTo)) {
             List<String> conflictErrors = new ArrayList<>();
-            conflictErrors.add("Event with the title '" + title + "' already exists on the start date '" + dateFrom + "'" + "' or already exists on the end date '" + dateTo + "'");
-            LOGGER.warn("Conflict detected for event: {}, dateFrom: {}, dateTo: {}", title, dateFrom, dateTo);
+            conflictErrors.add(
+                "Event with the title '" + title + "' already exists on the start date '" + dateFrom
+                    + "'" + "' or already exists on the end date '" + dateTo + "'");
+            LOGGER.warn("Conflict detected for event: {}, dateFrom: {}, dateTo: {}", title,
+                dateFrom, dateTo);
             throw new ConflictException("Event creation conflict detected", conflictErrors);
         }
     }
