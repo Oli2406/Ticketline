@@ -26,7 +26,7 @@
   left: 20%;
   border: 1px solid #6c757d;
   padding: 10px;
-  background-color: #fff9e6;
+  background-color: #ffe066;
 }
 
 /* Standing */
@@ -38,7 +38,7 @@
   border: 1px solid #6c757d;
   padding: 20px;
   z-index:10;
-  background-color: #f9f3fc;
+  background-color: white;
 }
 
 /* Selected Section (Purple) */
@@ -149,7 +149,7 @@
 }
 
 .seat-box.available {
-  background-color: #f0f8ff;
+  background-color: #0096ff;
 }
 
   .seat-box.reserved {
@@ -177,7 +177,7 @@
 }
 
 .seat-box-sector-b.available {
-  background-color: #e6f9e6;
+  background-color: #28a745;
 
 
 }
@@ -190,6 +190,11 @@
 .seat-box-sector-b.selected-seat {
   background-color: #514dc7 ;
   color: #fff;
+}
+
+.seat-box-sector-b.sold {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
 }
 
 
