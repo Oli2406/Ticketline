@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.ArtistService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.ArtistValidator;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
@@ -20,22 +21,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
-public class CustomArtistService implements ArtistService {
+public class ArtistServiceImpl implements ArtistService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
 
     private final ArtistRepository artistRepository;
     private final ArtistValidator artistValidator;
     private final ArtistMapper artistMapper;
 
-    public CustomArtistService(ArtistRepository artistRepository, ArtistValidator artistValidator, ArtistMapper artistMapper) {
+    public ArtistServiceImpl(ArtistRepository artistRepository, ArtistValidator artistValidator,
+        ArtistMapper artistMapper) {
         this.artistRepository = artistRepository;
         this.artistValidator = artistValidator;
         this.artistMapper = artistMapper;
     }
 
     @Override
-    public ArtistDetailDto createArtist(ArtistCreateDto artistCreateDto) throws ValidationException, ConflictException {
+    public ArtistDetailDto createArtist(ArtistCreateDto artistCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.info("Creating/Updating Artist with data: {}", artistCreateDto);
 
         artistValidator.validateArtist(artistCreateDto);
@@ -124,13 +128,16 @@ public class CustomArtistService implements ArtistService {
         LOGGER.info("Searching artists with data: {}", dto);
         var query = artistRepository.findAll().stream();
         if (dto.getFirstName() != null) {
-            query = query.filter(artist -> artist.getFirstName().toLowerCase().contains(dto.getFirstName().toLowerCase()));
+            query = query.filter(artist -> artist.getFirstName().toLowerCase()
+                .contains(dto.getFirstName().toLowerCase()));
         }
         if (dto.getLastName() != null) {
-            query = query.filter(artist -> artist.getLastName().toLowerCase().contains(dto.getLastName().toLowerCase()));
+            query = query.filter(artist -> artist.getLastName().toLowerCase()
+                .contains(dto.getLastName().toLowerCase()));
         }
         if (dto.getArtistName() != null) {
-            query = query.filter(artist -> artist.getArtistName().toLowerCase().contains(dto.getArtistName().toLowerCase()));
+            query = query.filter(artist -> artist.getArtistName().toLowerCase()
+                .contains(dto.getArtistName().toLowerCase()));
         }
 
         return query.map(this.artistMapper::artistToArtistDetailDto);

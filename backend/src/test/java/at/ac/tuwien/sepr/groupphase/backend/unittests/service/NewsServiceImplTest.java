@@ -6,7 +6,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.News;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.NewsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.CustomNewsService;
+import at.ac.tuwien.sepr.groupphase.backend.service.impl.NewsServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.NewsMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,10 +21,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class CustomNewsServiceTest {
+public class NewsServiceImplTest {
 
     @InjectMocks
-    private CustomNewsService customNewsService;
+    private NewsServiceImpl newsServiceImpl;
 
     @Mock
     private UserService userService;
@@ -49,8 +49,10 @@ public class CustomNewsServiceTest {
         user.setEmail("test@example.com");
         news1 = new News();
         news2 = new News();
-        newsDto1 = new NewsDetailDto(1L, "News 1", "Summary 1", "Content 1", null, LocalDate.of(2024, 1, 1));
-        newsDto2 = new NewsDetailDto(2L, "News 2", "Summary 2", "Content 2", null, LocalDate.of(2024, 1, 1));
+        newsDto1 = new NewsDetailDto(1L, "News 1", "Summary 1", "Content 1", null,
+            LocalDate.of(2024, 1, 1));
+        newsDto2 = new NewsDetailDto(2L, "News 2", "Summary 2", "Content 2", null,
+            LocalDate.of(2024, 1, 1));
 
         news1.setNewsId(1L);
         news1.setTitle("News 1");
@@ -72,7 +74,7 @@ public class CustomNewsServiceTest {
         when(newsMapper.entityToDetailDto(news1)).thenReturn(newsDto1);
         when(newsMapper.entityToDetailDto(news2)).thenReturn(newsDto2);
 
-        List<NewsDetailDto> result = customNewsService.getNews();
+        List<NewsDetailDto> result = newsServiceImpl.getNews();
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -92,7 +94,7 @@ public class CustomNewsServiceTest {
         when(newsRepository.findUnreadNews(user.getReadNewsIds())).thenReturn(List.of(news2));
         when(newsMapper.entityToDetailDto(news2)).thenReturn(newsDto2);
 
-        List<NewsDetailDto> result = customNewsService.getUnreadNews(user.getEmail());
+        List<NewsDetailDto> result = newsServiceImpl.getUnreadNews(user.getEmail());
 
         assertEquals(1, result.size());
         assertEquals(newsDto2, result.get(0));
@@ -109,7 +111,7 @@ public class CustomNewsServiceTest {
         when(userService.findApplicationUserByEmail(user.getEmail())).thenReturn(user);
         when(newsRepository.findUnreadNews(user.getReadNewsIds())).thenReturn(List.of());
 
-        List<NewsDetailDto> result = customNewsService.getUnreadNews(user.getEmail());
+        List<NewsDetailDto> result = newsServiceImpl.getUnreadNews(user.getEmail());
 
         assertEquals(0, result.size());
 
@@ -123,11 +125,12 @@ public class CustomNewsServiceTest {
         user.setReadNewsIds(List.of());
 
         when(userService.findApplicationUserByEmail(user.getEmail())).thenReturn(user);
-        when(newsRepository.findUnreadNews(user.getReadNewsIds())).thenReturn(List.of(news1, news2));
+        when(newsRepository.findUnreadNews(user.getReadNewsIds())).thenReturn(
+            List.of(news1, news2));
         when(newsMapper.entityToDetailDto(news1)).thenReturn(newsDto1);
         when(newsMapper.entityToDetailDto(news2)).thenReturn(newsDto2);
 
-        List<NewsDetailDto> result = customNewsService.getUnreadNews(user.getEmail());
+        List<NewsDetailDto> result = newsServiceImpl.getUnreadNews(user.getEmail());
 
         assertEquals(2, result.size());
         assertEquals(newsDto1, result.get(0));
@@ -144,7 +147,7 @@ public class CustomNewsServiceTest {
         when(newsRepository.findById(1L)).thenReturn(Optional.ofNullable(news1));
         when(newsMapper.entityToDetailDto(news1)).thenReturn(newsDto1);
 
-        NewsDetailDto retrievedNews = customNewsService.getById(1L);
+        NewsDetailDto retrievedNews = newsServiceImpl.getById(1L);
 
         assertEquals(newsDto1, retrievedNews);
         verify(newsRepository, times(1)).findById(1L);
@@ -159,7 +162,7 @@ public class CustomNewsServiceTest {
 
         assertThrows(
             NotFoundException.class,
-            () -> customNewsService.getById(nonExistentId)
+            () -> newsServiceImpl.getById(nonExistentId)
         );
 
         verify(newsRepository, times(1)).findById(nonExistentId);

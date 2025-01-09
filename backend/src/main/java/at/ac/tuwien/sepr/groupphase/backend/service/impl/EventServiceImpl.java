@@ -10,6 +10,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,21 +22,24 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class CustomEventService implements EventService {
+public class EventServiceImpl implements EventService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
 
-    public CustomEventService(EventRepository eventRepository, EventValidator eventValidator, EventMapper eventMapper) {
+    public EventServiceImpl(EventRepository eventRepository, EventValidator eventValidator,
+        EventMapper eventMapper) {
         this.eventRepository = eventRepository;
         this.eventValidator = eventValidator;
         this.eventMapper = eventMapper;
     }
 
     @Override
-    public EventDetailDto createEvent(EventCreateDto eventCreateDto) throws ValidationException, ConflictException {
+    public EventDetailDto createEvent(EventCreateDto eventCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.info("Creating or updating event: {}", eventCreateDto);
         eventValidator.validateEvent(eventCreateDto);
         Event event = new Event(
@@ -48,14 +52,17 @@ public class CustomEventService implements EventService {
         );
         event = eventRepository.save(event);
         LOGGER.debug("Saved event to database: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(),
+            event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
     public List<EventDetailDto> getAllEvents() {
         LOGGER.info("Fetching all events");
         List<EventDetailDto> events = eventRepository.findAll().stream()
-            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo()))
+            .map(event -> new EventDetailDto(event.getEventId(), event.getTitle(),
+                event.getDescription(), event.getCategory(), event.getDateFrom(),
+                event.getDateTo()))
             .collect(Collectors.toList());
         LOGGER.debug("Fetched {} events: {}", events.size(), events);
         return events;
@@ -64,9 +71,11 @@ public class CustomEventService implements EventService {
     @Override
     public EventDetailDto getEventById(Long id) {
         LOGGER.info("Fetching event with ID: {}", id);
-        Event event = eventRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Event not found"));
+        Event event = eventRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Event not found"));
         LOGGER.debug("Fetched event: {}", event);
-        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(), event.getCategory(), event.getDateFrom(), event.getDateTo());
+        return new EventDetailDto(event.getEventId(), event.getTitle(), event.getDescription(),
+            event.getCategory(), event.getDateFrom(), event.getDateTo());
     }
 
     @Override
@@ -81,10 +90,12 @@ public class CustomEventService implements EventService {
         LOGGER.info("Searching events with data: {}", dto);
         var query = eventRepository.findAll().stream();
         if (dto.getTitle() != null) {
-            query = query.filter(event -> event.getTitle().toLowerCase().contains(dto.getTitle().toLowerCase()));
+            query = query.filter(
+                event -> event.getTitle().toLowerCase().contains(dto.getTitle().toLowerCase()));
         }
         if (dto.getCategory() != null) {
-            query = query.filter(event -> event.getCategory().toLowerCase().contains(dto.getCategory().toLowerCase()));
+            query = query.filter(event -> event.getCategory().toLowerCase()
+                .contains(dto.getCategory().toLowerCase()));
         }
         if (dto.getDateEarliest() != null) {
             query = query.filter(event -> event.getDateFrom().isAfter(dto.getDateEarliest()));
@@ -92,7 +103,6 @@ public class CustomEventService implements EventService {
         if (dto.getDateLatest() != null) {
             query = query.filter(event -> event.getDateTo().isBefore(dto.getDateLatest()));
         }
-
 
         return query.map(this.eventMapper::eventToEventDetailDto);
     }

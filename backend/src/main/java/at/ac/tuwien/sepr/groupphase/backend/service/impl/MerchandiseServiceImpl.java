@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.MerchandiseValidator;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +22,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
-public class CustomMerchandiseService implements MerchandiseService {
+public class MerchandiseServiceImpl implements MerchandiseService {
 
     MerchandiseRepository merchandiseRepository;
     MerchandiseValidator merchandiseValidator;
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public CustomMerchandiseService(MerchandiseRepository merchandiseRepository,
+    public MerchandiseServiceImpl(MerchandiseRepository merchandiseRepository,
         MerchandiseValidator merchandiseValidator) {
         this.merchandiseRepository = merchandiseRepository;
         this.merchandiseValidator = merchandiseValidator;

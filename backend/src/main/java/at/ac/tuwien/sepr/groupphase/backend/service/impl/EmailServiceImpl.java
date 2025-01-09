@@ -8,12 +8,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomEmailService implements EmailService {
+public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
     private final String senderEmail = "ticketline.inso8@gmail.com";
 
-    public CustomEmailService(JavaMailSender mailSender) {
+    public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
@@ -24,8 +24,8 @@ public class CustomEmailService implements EmailService {
             "Hello,\n\nYou requested a password reset. Here is your reset code: %s\n\n"
                 + "Alternatively, click the link below to reset your password:\n%s\n\n"
                 + "If you did not request this, please ignore this email.\n\n"
-                + "The Code expires in five Minutes! The reset will not work when the token expired. \n\n"
-                + "Regards,\nYour Team",
+                + "The Code expires in 25 Minutes! The reset will not work when the token expired. \n\n"
+                + "Regards,\nYour Ticketline-Team",
             resetCode, resetLink);
 
         sendEmail(email, subject, message);

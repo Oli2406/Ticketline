@@ -12,6 +12,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.service.EmailService;
 import at.ac.tuwien.sepr.groupphase.backend.service.ResetPasswordService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import io.jsonwebtoken.Claims;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -22,9 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomResetPasswordService implements ResetPasswordService {
+public class ResetPasswordServiceImpl implements ResetPasswordService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomResetPasswordService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResetPasswordServiceImpl.class);
     private static final String deployUrl = "https://24ws-se-pr-inso-08-acf05sgmk6doonfn65ksq.apps.student.inso-w.at";
     private final PasswordResetRepository passwordResetRepository;
     private final UserRepository userRepository;
@@ -34,7 +35,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
     private final JwtTokenizer jwtTokenizer;
     private final SecurityPropertiesConfig.Auth auth;
 
-    public CustomResetPasswordService(PasswordResetRepository passwordResetRepository,
+    public ResetPasswordServiceImpl(PasswordResetRepository passwordResetRepository,
         UserRepository userRepository, EmailService emailService, UserValidator userValidator,
         PasswordEncoder passwordEncoder, JwtTokenizer jwtTokenizer,
         SecurityPropertiesConfig.Auth auth) {
@@ -149,7 +150,7 @@ public class CustomResetPasswordService implements ResetPasswordService {
     }
 
     private String generateResetLink(String resetToken) {
-        return deployUrl + "/reset-password?token=" + resetToken;
+        return deployUrl + "/?reset-password=true&token=" + resetToken;
     }
 
     private PasswordResetToken validateAndGetResetToken(String token) {

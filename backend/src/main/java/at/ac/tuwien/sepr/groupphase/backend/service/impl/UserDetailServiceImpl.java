@@ -16,6 +16,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class CustomUserDetailService implements UserService {
+public class UserDetailServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(
         MethodHandles.lookup().lookupClass());
@@ -48,7 +49,7 @@ public class CustomUserDetailService implements UserService {
     private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
-    public CustomUserDetailService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+    public UserDetailServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
         JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
         UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
         SecurityPropertiesConfig.Auth auth, RandomStringGenerator randomStringGenerator) {

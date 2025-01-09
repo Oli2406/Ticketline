@@ -1,20 +1,16 @@
-package at.ac.tuwien.sepr.groupphase.backend.service.impl;
+package at.ac.tuwien.sepr.groupphase.backend.service.validators;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
-import org.springframework.stereotype.Component;
-
 import org.springframework.stereotype.Component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +26,13 @@ public class PerformanceValidator {
         this.performanceRepository = performanceRepository;
     }
 
-    public void validatePerformance(PerformanceCreateDto performanceCreateDto) throws ValidationException, ConflictException {
+    public void validatePerformance(PerformanceCreateDto performanceCreateDto)
+        throws ValidationException, ConflictException {
         LOGGER.trace("Validating performance: {}", performanceCreateDto);
         List<String> validationErrors = new ArrayList<>();
 
-        if (performanceCreateDto.getName() == null || performanceCreateDto.getName().trim().isEmpty()) {
+        if (performanceCreateDto.getName() == null || performanceCreateDto.getName().trim()
+            .isEmpty()) {
             validationErrors.add("Performance name is required");
         }
 
@@ -60,11 +58,13 @@ public class PerformanceValidator {
             validationErrors.add("Price must not be null");
         }
 
-        if (performanceCreateDto.getPrice() != null && !(performanceCreateDto.getPrice() instanceof BigDecimal)) {
+        if (performanceCreateDto.getPrice() != null
+            && !(performanceCreateDto.getPrice() instanceof BigDecimal)) {
             validationErrors.add("Price must be a valid number");
         }
 
-        if (performanceCreateDto.getPrice() != null && performanceCreateDto.getPrice() instanceof BigDecimal) {
+        if (performanceCreateDto.getPrice() != null
+            && performanceCreateDto.getPrice() instanceof BigDecimal) {
             BigDecimal price = performanceCreateDto.getPrice();
 
             if (price.compareTo(BigDecimal.ZERO) <= 0) {
@@ -76,12 +76,13 @@ public class PerformanceValidator {
             }
         }
 
-
-        if (performanceCreateDto.getTicketNumber() == null || performanceCreateDto.getTicketNumber() <= 0) {
+        if (performanceCreateDto.getTicketNumber() == null
+            || performanceCreateDto.getTicketNumber() <= 0) {
             validationErrors.add("Number of tickets must be greater than 0");
         }
 
-        if (performanceCreateDto.getHall() == null || performanceCreateDto.getHall().trim().isEmpty()) {
+        if (performanceCreateDto.getHall() == null || performanceCreateDto.getHall().trim()
+            .isEmpty()) {
             validationErrors.add("Hall is required");
         }
 
@@ -98,13 +99,17 @@ public class PerformanceValidator {
         }
 
         LocalDateTime start = performanceCreateDto.getDate();
-        LocalDateTime end = performanceCreateDto.getDate().plusMinutes(performanceCreateDto.getDuration());
+        LocalDateTime end = performanceCreateDto.getDate()
+            .plusMinutes(performanceCreateDto.getDuration());
 
-        if (performanceCreateDto.getLocationId() != null && performanceCreateDto.getDate() != null && performanceCreateDto.getHall() != null) {
-            List<Performance> performances = performanceRepository.findByLocationIdAndHall(performanceCreateDto.getLocationId(), performanceCreateDto.getHall());
+        if (performanceCreateDto.getLocationId() != null && performanceCreateDto.getDate() != null
+            && performanceCreateDto.getHall() != null) {
+            List<Performance> performances = performanceRepository.findByLocationIdAndHall(
+                performanceCreateDto.getLocationId(), performanceCreateDto.getHall());
             for (Performance performance : performances) {
                 LocalDateTime start2 = performance.getDate();
-                LocalDateTime end2 = performance.getDate().plusMinutes(performanceCreateDto.getDuration());
+                LocalDateTime end2 = performance.getDate()
+                    .plusMinutes(performanceCreateDto.getDuration());
                 if (start.isBefore(end2) && end.isAfter(start2)) {
                     validationErrors.add("A performance already exists in hall '"
                         + performanceCreateDto.getHall()
@@ -115,21 +120,24 @@ public class PerformanceValidator {
             }
         }
 
-
         if (!validationErrors.isEmpty()) {
             LOGGER.warn("Performance validation failed with errors: {}", validationErrors);
             throw new ValidationException("Performance validation failed", validationErrors);
         }
-        checkPerformanceUnique(performanceCreateDto.getName(), performanceCreateDto.getLocationId(), performanceCreateDto.getDate());
+        checkPerformanceUnique(performanceCreateDto.getName(), performanceCreateDto.getLocationId(),
+            performanceCreateDto.getDate());
 
         LOGGER.info("Performance validation passed for: {}", performanceCreateDto);
     }
 
-    public void checkPerformanceUnique(String name, Long locationId, LocalDateTime date) throws ConflictException {
+    public void checkPerformanceUnique(String name, Long locationId, LocalDateTime date)
+        throws ConflictException {
         if (performanceRepository.existsByNameAndLocationIdAndDate(name, locationId, date)) {
             List<String> conflictErrors = new ArrayList<>();
-            conflictErrors.add("Performance with the name '" + name + "' already exists at this location on the given date");
-            LOGGER.warn("Conflict detected for performance: {}, locationId: {}, date: {}", name, locationId, date);
+            conflictErrors.add("Performance with the name '" + name
+                + "' already exists at this location on the given date");
+            LOGGER.warn("Conflict detected for performance: {}, locationId: {}, date: {}", name,
+                locationId, date);
             throw new ConflictException("Performance creation conflict detected", conflictErrors);
         }
     }

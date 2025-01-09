@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.*;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.PerformanceValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,9 +23,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class CustomPerformanceServiceTest {
+public class PerformanceServiceImplTest {
 
-    private CustomPerformanceService performanceService;
+    private PerformanceServiceImpl performanceService;
 
     @Mock
     private PerformanceRepository performanceRepository;
@@ -47,21 +48,25 @@ public class CustomPerformanceServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        performanceService = new CustomPerformanceService(performanceRepository, performanceValidator, searchPerformanceRepository, artistRepository, locationRepository, performanceMapper);
+        performanceService = new PerformanceServiceImpl(performanceRepository, performanceValidator,
+            searchPerformanceRepository, artistRepository, locationRepository, performanceMapper);
     }
 
     @Test
-    void createOrUpdatePerformance_ShouldSavePerformance_WhenValidInput() throws ValidationException, ConflictException {
+    void createOrUpdatePerformance_ShouldSavePerformance_WhenValidInput()
+        throws ValidationException, ConflictException {
 
         Artist artist = new Artist("John", "Doe", "ArtistName");
         artist.setArtistId(1L);
-        Location location = new Location("VenueName", "Main Street 123", "Cityville", "12345", "Countryland");
+        Location location = new Location("VenueName", "Main Street 123", "Cityville", "12345",
+            "Countryland");
         location.setLocationId(1L);
 
         when(artistRepository.findArtistByArtistId(1L)).thenReturn(artist);
         when(locationRepository.findByLocationId(1L)).thenReturn(location);
 
-        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L, LocalDateTime.now(), new BigDecimal("50.00"), 100L, "Main Hall", artist, location, 300);
+        PerformanceCreateDto dto = new PerformanceCreateDto("PerformanceName", 1L, 1L,
+            LocalDateTime.now(), new BigDecimal("50.00"), 100L, "Main Hall", artist, location, 300);
 
         when(performanceRepository.save(any(Performance.class))).thenAnswer(invocation -> {
             Performance p = invocation.getArgument(0);
@@ -90,7 +95,8 @@ public class CustomPerformanceServiceTest {
             () -> performanceService.getPerformanceById(1L),
             "Should throw exception for non-existent ID");
 
-        assertEquals("Performance not found", exception.getMessage(), "Exception message should match");
+        assertEquals("Performance not found", exception.getMessage(),
+            "Exception message should match");
         verify(performanceRepository, times(1)).findById(1L);
     }
 
@@ -98,18 +104,22 @@ public class CustomPerformanceServiceTest {
     void searchPerformanceByNameReturnsMatchingEvent() {
         Artist artist = new Artist("John", "Doe", "ArtistName");
         Location location = new Location("Location Name", "Street1", "City1", "12345", "Country1");
-        PerformanceDetailDto performance1DetailDto = new PerformanceDetailDto(1L, "Matching Name", 1L, 1L, LocalDateTime.now(), BigDecimal.ONE, 300L, "A", artist, location, 300);
-        Performance performance1 = new Performance("Matching Name", 1L, 1L, LocalDateTime.now(), BigDecimal.ONE, 300L, "A", artist, location, 300);
-        Performance performance2 = new Performance("Other Name", 1L, 1L, LocalDateTime.now(), BigDecimal.valueOf(-100), 300L, "B", artist, location, 300);
+        PerformanceDetailDto performance1DetailDto = new PerformanceDetailDto(1L, "Matching Name",
+            1L, 1L, LocalDateTime.now(), BigDecimal.ONE, 300L, "A", artist, location, 300);
+        Performance performance1 = new Performance("Matching Name", 1L, 1L, LocalDateTime.now(),
+            BigDecimal.ONE, 300L, "A", artist, location, 300);
+        Performance performance2 = new Performance("Other Name", 1L, 1L, LocalDateTime.now(),
+            BigDecimal.valueOf(-100), 300L, "B", artist, location, 300);
 
         when(performanceRepository.findAll()).thenReturn(List.of(performance1, performance2));
         when(performanceMapper.toPerformanceDetailDto(performance1, artist, location))
             .thenReturn(performance1DetailDto);
         when(artistRepository.findArtistByArtistId(performance1.getArtistId())).thenReturn(artist);
-        when(locationRepository.findByLocationId(performance1.getLocationId())).thenReturn(location);
+        when(locationRepository.findByLocationId(performance1.getLocationId())).thenReturn(
+            location);
 
-
-        PerformanceSearchDto searchDto = new PerformanceSearchDto(null, BigDecimal.ONE, null); // Search by price
+        PerformanceSearchDto searchDto = new PerformanceSearchDto(null, BigDecimal.ONE,
+            null); // Search by price
 
         List<PerformanceDetailDto> result = performanceService.search(searchDto).toList();
 
@@ -124,16 +134,20 @@ public class CustomPerformanceServiceTest {
     void searchPerformanceByNameReturnsNoEventsWhenNoMatch() {
         Artist artist = new Artist("John", "Doe", "ArtistName");
         Location location = new Location("Location Name", "Street1", "City1", "12345", "Country1");
-        Performance performance1 = new Performance("Some Name", 1L, 1L, LocalDateTime.now(), BigDecimal.ONE, 300L, "A", artist, location, 300);
-        Performance performance2 = new Performance("Other Name", 1L, 1L, LocalDateTime.now(), BigDecimal.ONE, 300L, "B", artist, location, 300);
+        Performance performance1 = new Performance("Some Name", 1L, 1L, LocalDateTime.now(),
+            BigDecimal.ONE, 300L, "A", artist, location, 300);
+        Performance performance2 = new Performance("Other Name", 1L, 1L, LocalDateTime.now(),
+            BigDecimal.ONE, 300L, "B", artist, location, 300);
         when(performanceRepository.findAll()).thenReturn(List.of(performance1, performance2));
 
-        PerformanceSearchDto searchDto = new PerformanceSearchDto(null, null, "X"); // Search by hall
+        PerformanceSearchDto searchDto = new PerformanceSearchDto(null, null,
+            "X"); // Search by hall
 
         List<PerformanceDetailDto> result = performanceService.search(searchDto).toList();
 
         assertEquals(0, result.size(), "Should return no events");
         verify(performanceRepository, times(1)).findAll();
-        verify(performanceMapper, never()).toPerformanceDetailDto(any(Performance.class), any(Artist.class), any(Location.class));
+        verify(performanceMapper, never()).toPerformanceDetailDto(any(Performance.class),
+            any(Artist.class), any(Location.class));
     }
 }

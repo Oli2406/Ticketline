@@ -13,6 +13,7 @@ import at.ac.tuwien.sepr.groupphase.backend.service.NewsService;
 import at.ac.tuwien.sepr.groupphase.backend.service.UserService;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.NewsValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class CustomNewsService implements NewsService {
+public class NewsServiceImpl implements NewsService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        MethodHandles.lookup().lookupClass());
     private final UserService userService;
     private final NewsRepository newsRepository;
     private final NewsValidator newsValidator;
@@ -42,7 +44,8 @@ public class CustomNewsService implements NewsService {
     private final UserRepository userRepository;
 
     @Autowired
-    public CustomNewsService(NewsRepository newsRepository, UserService userService, NewsValidator newsValidator, NewsMapper newsMapper, UserRepository userRepository) {
+    public NewsServiceImpl(NewsRepository newsRepository, UserService userService,
+        NewsValidator newsValidator, NewsMapper newsMapper, UserRepository userRepository) {
         this.newsRepository = newsRepository;
         this.userService = userService;
         this.newsValidator = newsValidator;
@@ -64,11 +67,13 @@ public class CustomNewsService implements NewsService {
         LOGGER.trace("getUnreadNews({})", email);
         ApplicationUser user = userService.findApplicationUserByEmail(email);
 
-        return newsRepository.findUnreadNews(user.getReadNewsIds()).stream().map(newsMapper::entityToDetailDto).toList();
+        return newsRepository.findUnreadNews(user.getReadNewsIds()).stream()
+            .map(newsMapper::entityToDetailDto).toList();
     }
 
     @Override
-    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto) throws ValidationException, IOException {
+    public NewsCreateDto createNews(NewsCreateMpfDto mpfDto)
+        throws ValidationException, IOException {
         LOGGER.trace("createNews({})", mpfDto);
         newsValidator.validateNews(mpfDto);
 
@@ -82,7 +87,8 @@ public class CustomNewsService implements NewsService {
         }
 
         NewsCreateDto newsCreate = newsMapper.entityToCreateDtoWithImgUrl(mpfDto, imageUrls);
-        News news = new News(newsCreate.getTitle(), newsCreate.getSummary(), newsCreate.getContent(), newsCreate.getDate(), newsCreate.getImages());
+        News news = new News(newsCreate.getTitle(), newsCreate.getSummary(),
+            newsCreate.getContent(), newsCreate.getDate(), newsCreate.getImages());
 
         var createdNews = newsRepository.save(news);
 
@@ -93,7 +99,8 @@ public class CustomNewsService implements NewsService {
     @Transactional(readOnly = true)
     public NewsDetailDto getById(long id) throws NotFoundException {
         LOGGER.trace("getById({})", id);
-        News news = newsRepository.findById(id).orElseThrow(() -> new NotFoundException("News not found with id: " + id));
+        News news = newsRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("News not found with id: " + id));
 
         return newsMapper.entityToDetailDto(news);
     }

@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.*;
+import at.ac.tuwien.sepr.groupphase.backend.service.validators.ArtistValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -19,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-public class CustomArtistServiceTest {
+public class ArtistServiceImplTest {
 
-    private CustomArtistService artistService;
+    private ArtistServiceImpl artistService;
 
     @Mock
     private ArtistRepository artistRepository;
@@ -35,11 +36,12 @@ public class CustomArtistServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        artistService = new CustomArtistService(artistRepository, artistValidator, artistMapper);
+        artistService = new ArtistServiceImpl(artistRepository, artistValidator, artistMapper);
     }
 
     @Test
-    void createOrUpdateArtist_ShouldSaveArtist_WhenValidInput() throws ValidationException, ConflictException {
+    void createOrUpdateArtist_ShouldSaveArtist_WhenValidInput()
+        throws ValidationException, ConflictException {
         ArtistCreateDto dto = new ArtistCreateDto("Doe", "John", "JohnDoe");
 
         when(artistRepository.save(any(Artist.class))).thenAnswer(invocation -> {
@@ -53,9 +55,11 @@ public class CustomArtistServiceTest {
         assertNotNull(created, "Created artist DTO should not be null");
         assertAll(
             () -> assertNotNull(created.getArtistId(), "Artist ID should not be null"),
-            () -> assertEquals(dto.getFirstName(), created.getFirstName(), "First name should match"),
+            () -> assertEquals(dto.getFirstName(), created.getFirstName(),
+                "First name should match"),
             () -> assertEquals(dto.getLastName(), created.getLastName(), "Surname should match"),
-            () -> assertEquals(dto.getArtistName(), created.getArtistName(), "Artist name should match")
+            () -> assertEquals(dto.getArtistName(), created.getArtistName(),
+                "Artist name should match")
         );
 
         verify(artistValidator, times(1)).validateArtist(dto);
@@ -84,7 +88,8 @@ public class CustomArtistServiceTest {
             () -> artistService.getArtistById(1L),
             "Should throw exception for non-existent ID");
 
-        assertEquals("Artist not found with ID: 1", exception.getMessage(), "Exception message should match");
+        assertEquals("Artist not found with ID: 1", exception.getMessage(),
+            "Exception message should match");
         verify(artistRepository, times(1)).findById(1L);
     }
 
