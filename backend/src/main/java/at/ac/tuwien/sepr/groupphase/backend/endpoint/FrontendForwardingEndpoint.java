@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FrontendForwardingEndpoint {
 
+    @PermitAll
     @RequestMapping(value = "/**")
     public void forwardToFrontend(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
