@@ -3,7 +3,7 @@ import {AuthService} from '../../services/auth.service';
 import {NewsService} from "../../services/news.service";
 import {NewsDetailDto} from "../../dtos/news-data";
 import {ToastrService} from "ngx-toastr";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Globals} from "../../global/globals";
 
 @Component({
@@ -17,11 +17,14 @@ export class HomeComponent implements OnInit {
               private newsService: NewsService,
               private globals: Globals,
               private notification: ToastrService,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute) {
 
   }
 
   ngOnInit() {
+    this.saveResetTokenAndRedirect();
+
     if (this.isLoggedIn()) {
       this.initNews()
     }
@@ -31,6 +34,18 @@ export class HomeComponent implements OnInit {
 
   currentIndex = 0;
   displayedNews: NewsDetailDto[] = [];
+
+  saveResetTokenAndRedirect(){
+    console.log("save and reset pw");
+    this.route.queryParams.subscribe((params) => {
+      if (params['reset-password'] === 'true' && params['token']) {
+        const token = params['token'];
+        this.authService.storeResetToken(token);
+        console.log("stored token from URL");
+        this.router.navigate(['/reset-password']);
+      }
+    });
+  }
 
   updateDisplayedNews() {
     this.displayedNews = this.news.slice(this.currentIndex, this.currentIndex + 3);

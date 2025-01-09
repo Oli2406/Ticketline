@@ -150,7 +150,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
     }
 
     private String generateResetLink(String resetToken) {
-        return deployUrl + "/reset-password?token=" + resetToken;
+        return deployUrl + "/?reset-password=true&token=" + resetToken;
     }
 
     private PasswordResetToken validateAndGetResetToken(String token) {
