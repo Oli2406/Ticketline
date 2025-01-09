@@ -35,4 +35,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      */
     boolean existsByPerformanceId(Long performanceId);
 
+    /**
+     * Finds a ticket by its ticket ID.
+     *
+     * @return the ticket corresponding to the given ticket ID
+     */
+    Ticket findByTicketId(Long ticketId);
 }

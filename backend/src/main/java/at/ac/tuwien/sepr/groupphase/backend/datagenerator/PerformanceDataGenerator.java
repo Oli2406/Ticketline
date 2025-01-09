@@ -168,7 +168,7 @@ public class PerformanceDataGenerator {
             int duration3 = generateRandomDuration();
             createPerformanceIfNotExists(name3, artist3, location3, date3, price3, ticketNumber3, hall3, duration3);
         }
-
+        LOGGER.info("All performances were created!");
     }
 
     private void createPerformanceIfNotExists(String name, Artist artist, Location location, LocalDateTime date, BigDecimal price, Long ticketNumber, String hall, int duration) {
@@ -191,7 +191,7 @@ public class PerformanceDataGenerator {
     }
 
     private LocalDateTime generateRandomFutureDate() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now().minusDays(random.nextInt(365 * 2));
 
         int daysToAdd = random.nextInt(365 * 3);
         int hoursToAdd = random.nextInt(24);

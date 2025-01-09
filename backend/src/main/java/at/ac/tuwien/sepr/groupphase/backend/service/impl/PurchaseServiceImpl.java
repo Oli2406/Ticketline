@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
+import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,25 +28,34 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final TicketRepository ticketRepository;
     private final MerchandiseRepository merchandiseRepository;
+    private final RandomStringGenerator generator;
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
-        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
+        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
+        RandomStringGenerator generator) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
+        this.generator = generator;
     }
 
     @Override
     public PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto)
         throws ValidationException {
         logger.info("Creating or updating purchase: {}", purchaseCreateDto);
+        Optional<Long> optionalL = generator.retrieveOriginalId(purchaseCreateDto.getUserId());
+        Long value = optionalL.orElseThrow(() -> new ValidationException("Invalid user ID", List.of(
+            "User ID could not be resolved.",
+            "Ensure that the encrypted ID is correct."
+        )));
 
         Purchase purchase = new Purchase(
-            purchaseCreateDto.getUserId(),
+            value,
             purchaseCreateDto.getTicketIds(),
             purchaseCreateDto.getMerchandiseIds(),
             purchaseCreateDto.getTotalPrice(),
-            purchaseCreateDto.getPurchaseDate()
+            purchaseCreateDto.getPurchaseDate().plusHours(1),
+            purchaseCreateDto.getMerchandiseQuantities()
         );
 
         logger.debug("Mapped Purchase entity: {}", purchase);
@@ -63,7 +74,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             tickets,
             merchandise,
             purchase.getTotalPrice(),
-            purchase.getPurchaseDate()
+            purchase.getPurchaseDate(),
+            purchase.getMerchandiseQuantities()
         );
     }
 
@@ -84,7 +96,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 tickets,
                 merchandise,
                 purchase.getTotalPrice(),
-                purchase.getPurchaseDate()
+                purchase.getPurchaseDate(),
+                purchase.getMerchandiseQuantities()
             );
         }).collect(Collectors.toList());
     }
@@ -111,7 +124,8 @@ public class PurchaseServiceImpl implements PurchaseService {
             tickets,
             merchandise,
             purchase.getTotalPrice(),
-            purchase.getPurchaseDate()
+            purchase.getPurchaseDate(),
+            purchase.getMerchandiseQuantities()
         );
     }
 

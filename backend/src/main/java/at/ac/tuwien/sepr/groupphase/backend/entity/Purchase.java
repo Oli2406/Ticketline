@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,21 +26,34 @@ public class Purchase {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String merchandiseIds;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String merchandiseQuantities;
+
     @Column(nullable = false)
     private Long totalPrice;
 
     @Column(nullable = false)
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
 
     public Purchase() {
     }
 
-    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
+    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDateTime purchaseDate,
+                    List<Long> merchandiseQuantities) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
         this.setMerchandiseIds(merchandiseIds);
+        this.setMerchandiseQuantities(merchandiseQuantities);
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+    }
+
+    private void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+        this.merchandiseQuantities = convertListToCsv(merchandiseQuantities);
+    }
+
+    public List<Long> getMerchandiseQuantities() {
+        return convertCsvToList(this.merchandiseQuantities);
     }
 
     public Long getPurchaseId() {
@@ -84,11 +97,11 @@ public class Purchase {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 

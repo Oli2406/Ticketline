@@ -3,11 +3,12 @@ import {Ticket, TicketDto} from "./ticket";
 
 export interface Purchase {
   purchaseId?: number; // Primary Key
-  userId: number;
+  userId: String;
   ticketIds: number[];
   merchandiseIds: number[];
+  merchandiseQuantities: number[];
   totalPrice: number;
-  purchaseDate: Date;
+  purchaseDate: string;
 }
 
 export interface PurchaseListDto {

@@ -6,4 +6,5 @@ export interface Merchandise {
     category: string;
     stock: number;
     points: number;
+    reservedUntil?: string | null;
 }

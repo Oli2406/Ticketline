@@ -45,6 +45,7 @@ public class LocationDataGenerator {
         createLocationIfNotExists("Palau Sant Jordi", "Passeig Olímpic 5-7", "Barcelona", "08038", "Spanien");
         createLocationIfNotExists("Gorky Park Open-Air Stage", "Krymsky Val 9", "Moskau", "119049", "Russland");
         createLocationIfNotExists("Wiener Musikverein", "Musikvereinsplatz 1", "Wien", "1010", "Österreich");
+        LOGGER.info("All Locations are created!");
     }
 
     private void createLocationIfNotExists(String name, String street, String city, String postalCode, String country) {

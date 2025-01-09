@@ -48,6 +48,7 @@ public class TicketDataGenerator {
         for (Performance performance : performances) {
             createTicketsForPerformance(performance);
         }
+        LOGGER.info("Generated all tickets");
     }
 
     private void createTicketsForPerformance(Performance performance) {
@@ -135,7 +136,7 @@ public class TicketDataGenerator {
     }
 
     private String getRandomTicketStatus() {
-        String[] statuses = {"AVAILABLE", "RESERVED"};
+        String[] statuses = {"AVAILABLE", "RESERVED", "SOLD"};
         return statuses[random.nextInt(statuses.length)];
     }
 }

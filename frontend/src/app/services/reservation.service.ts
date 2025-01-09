@@ -3,42 +3,42 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
-import { Purchase, PurchaseListDto } from '../dtos/purchase';
+import { Reservation, ReservationListDto } from '../dtos/reservation';
 
 @Injectable({
   providedIn: 'root',
 })
-export class PurchaseService {
-  private apiUrl: string = this.globals.backendUri + '/purchase';
+export class ReservationService {
+  private apiUrl: string = this.globals.backendUri + '/reserved';
 
   constructor(private http: HttpClient, private globals: Globals) {}
 
   /**
-   * Get all purchases for a specific user by userId
+   * Get all reservations for a specific user by userId
    */
-  getPurchasesByUser(encryptedUserId: string): Observable<PurchaseListDto[]> {
+  getReservationsByUser(encryptedUserId: string): Observable<ReservationListDto[]> {
     const url = `${this.apiUrl}/user/${encryptedUserId}`;
-    return this.http.get<PurchaseListDto[]>(url).pipe(
+    return this.http.get<ReservationListDto[]>(url).pipe(
       catchError(this.handleError)
     );
   }
 
   /**
-   * Get a specific purchase by purchaseId
+   * Get a specific reservation by reservationId
    */
-  getPurchaseById(purchaseId: number): Observable<PurchaseListDto> {
-    const url = `${this.apiUrl}/${purchaseId}`;
-    return this.http.get<PurchaseListDto>(url).pipe(
+  getReservationById(reservationId: number): Observable<ReservationListDto> {
+    const url = `${this.apiUrl}/${reservationId}`;
+    return this.http.get<ReservationListDto>(url).pipe(
       catchError(this.handleError)
     );
   }
 
   /**
-   * Create a new purchase
+   * Create a new reservation
    */
-  createPurchase(purchase: Purchase): Observable<Purchase> {
+  createReservation(reservation: Reservation): Observable<Reservation> {
     console.log(this.apiUrl);
-    return this.http.post<Purchase>(this.apiUrl, purchase).pipe(
+    return this.http.post<Reservation>(this.apiUrl, reservation).pipe(
       catchError(this.handleError)
     );
   }

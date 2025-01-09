@@ -45,6 +45,7 @@ public class ArtistDataGenerator {
         createArtistIfNotExists("Don", "Pepijn Schipper", "Don Diablo");
         createArtistIfNotExists("Robbert", "van de Corput", "Hardwell");
         createArtistIfNotExists("Nick", "Rotteveel", "Nicky Romero");
+        LOGGER.info("All Artists are created!");
     }
 
     private void createArtistIfNotExists(String firstName, String lastName, String artistName) {
