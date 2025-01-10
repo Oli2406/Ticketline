@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -69,5 +70,12 @@ public interface EventService {
      *
      * @return a list of sales information of the top 10 events
      */
-    List<EventSalesDto> getTop10Events();
+    List<EventSalesDto> getTop10Events(int year, int month, String category);
+
+    /**
+     * Retrieves a list of all unique categories from the events table.
+     *
+     * @return a list of distinct category names as strings
+     */
+    List<String> getAllCategories();
 }

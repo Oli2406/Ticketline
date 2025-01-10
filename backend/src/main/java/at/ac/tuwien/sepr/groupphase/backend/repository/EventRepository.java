@@ -46,10 +46,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     /**
      * Retrieves the top 10 events based on the percentage of tickets sold.
-     * The query calculates the number of sold tickets, total tickets, and the sold percentage for each event.
      * Results are sorted by sold percentage in descending order.
      *
-     * @return A list of object arrays, where each array contains:
+     * @param year the year to filter events
+     * @param month the month to filter events (1-12)
+     * @param category the category to filter events
+     * @return a list of object arrays, where each array contains:
      *         - eventId (Long): ID of the event
      *         - eventTitle (String): name of the event
      *         - soldTickets (Long): number of tickets sold
@@ -69,12 +71,26 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             TICKET t ON ep.PERFORMANCE_ID = t.PERFORMANCE_ID
         JOIN
             EVENT e ON ep.EVENT_ID = e.EVENT_ID
+        WHERE
+            e.CATEGORY = :category
+            AND (
+                (YEAR(e.DATE_FROM) = :year AND MONTH(e.DATE_FROM) = :month)
+                OR
+                (YEAR(e.DATE_TO) = :year AND MONTH(e.DATE_TO) = :month)
+            )
         GROUP BY
             ep.EVENT_ID, e.TITLE
         ORDER BY
             soldPercentage DESC
         LIMIT 10
         """, nativeQuery = true)
-    List<Object[]> findTop10EventsAsObjects();
+    List<Object[]> findTop10EventsAsObjects(@Param("year") int year, @Param("month") int month, @Param("category") String category);
 
+    /**
+     * Retrieves all unique categories from the events table.
+     *
+     * @return a list of distinct categories found in the events table
+     */
+    @Query(value = "SELECT DISTINCT e.CATEGORY FROM EVENT e", nativeQuery = true)
+    List<String> findAllCategories();
 }

@@ -1,1 +1,26 @@
-<canvas #barCanvas></canvas>
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="month" class="form-label">Month</label>
+        <input type="month" id="month" name="month" class="form-control" [(ngModel)]="selectedMonth" (change)="onMonthChange($event)" />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" class="form-control" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)">
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <div *ngIf="isEmptyData" class="alert text-center">
+        No Events found for chosen month and category.
+      </div>
+      <canvas #barCanvas></canvas>
+    </div>
+  </div>
+</div>

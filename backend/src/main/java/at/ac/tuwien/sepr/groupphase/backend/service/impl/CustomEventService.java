@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,8 +108,10 @@ public class CustomEventService implements EventService {
             .collect(Collectors.toList());
     }
 
-    public List<EventSalesDto> getTop10Events() {
-        List<Object[]> results = eventRepository.findTop10EventsAsObjects();
+    @Override
+    public List<EventSalesDto> getTop10Events(int year, int month, String category) {
+        LOGGER.info("Getting top ten events with category {} in {} {}", category, month, year);
+        List<Object[]> results = eventRepository.findTop10EventsAsObjects(year, month, category);
 
         return results.stream()
             .map(e -> new EventSalesDto(
@@ -119,5 +122,11 @@ public class CustomEventService implements EventService {
                 ((Number) e[4]).doubleValue()
             ))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllCategories() {
+        LOGGER.info("Getting all categories");
+        return eventRepository.findAllCategories();
     }
 }

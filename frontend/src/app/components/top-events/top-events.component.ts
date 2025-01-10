@@ -3,26 +3,60 @@ import { Chart } from 'chart.js/auto';
 import { EventService } from "../../services/event.service";
 import { EventSalesDto } from "../../dtos/event";
 import { ToastrService } from "ngx-toastr";
+import {FormsModule} from "@angular/forms";
+import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
   selector: 'app-top-events',
   standalone: true,
-  imports: [],
+  imports: [
+    FormsModule,
+    NgForOf,
+    NgIf
+  ],
   templateUrl: './top-events.component.html',
   styleUrl: './top-events.component.scss'
 })
 export class TopEventsComponent implements AfterViewInit {
   @ViewChild('barCanvas') barCanvas: ElementRef;
 
+  data: EventSalesDto[] = [];
+  categories: string[] = [];
+  selectedCategory: string = '';
+  selectedMonth: string = '';
+  isEmptyData: boolean = false; // Flag for empty data
+  private chart: Chart | null = null; // Keep track of the chart instance
+
   constructor(private eventService: EventService,
               private notification: ToastrService) { }
 
-  data: EventSalesDto[] = [];
+  ngOnInit() {
+    this.eventService.getAllCategories().subscribe({
+      next: categories => {
+        this.categories = categories;
+        this.selectedCategory = this.categories[0];
+      },
+      error: err => {
+        this.notification.error('Failed to load categories.', 'Error');
+        console.error('EventService error:', err);
+      }
+    });
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    this.selectedMonth = `${year}-${month}`;
+  }
 
   ngAfterViewInit() {
-    this.eventService.getTop10Events().subscribe({
+    this.fetchTopEvents();
+  }
+
+  fetchTopEvents() {
+    this.eventService.getTop10Events(this.selectedMonth, this.selectedCategory).subscribe({
       next: data => {
         this.data = data;
+        this.isEmptyData = this.data.length === 0; // Set flag based on data
         this.renderChart();
       },
       error: err => {
@@ -32,18 +66,30 @@ export class TopEventsComponent implements AfterViewInit {
     });
   }
 
+  onCategoryChange(event: Event) {
+    this.fetchTopEvents();
+  }
+
+  onMonthChange(event: Event) {
+    this.fetchTopEvents();
+  }
+
   private renderChart(): void {
-    if (!this.data || this.data.length === 0) {
+    if (this.chart) {
+      this.chart.destroy(); // Destroy existing chart instance
+    }
+
+    if (!this.data || this.data.length === 0 || !this.barCanvas?.nativeElement) {
       return;
     }
 
     const labels = this.data.map(event => event.eventTitle);
     const percentages = this.data.map(event =>
-      parseFloat((event.soldPercentage*100).toFixed(2))
+      parseFloat((event.soldPercentage * 100).toFixed(2))
     );
 
     const ctx = this.barCanvas.nativeElement.getContext('2d');
-    new Chart(ctx, {
+    this.chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels,

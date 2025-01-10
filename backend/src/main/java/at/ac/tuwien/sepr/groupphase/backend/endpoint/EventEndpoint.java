@@ -16,12 +16,14 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.lang.invoke.MethodHandles;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -92,9 +94,18 @@ public class EventEndpoint {
 
     @PermitAll
     @GetMapping("/top10")
-    public ResponseEntity<List<EventSalesDto>> getTop10Events() {
+    public ResponseEntity<List<EventSalesDto>> getTop10Events(@RequestParam String month, @RequestParam String category) {
         LOGGER.info("Fetching top 10 events");
-        List<EventSalesDto> result = eventService.getTop10Events();
+        YearMonth yearMonth = YearMonth.parse(month);
+        List<EventSalesDto> result = eventService.getTop10Events(yearMonth.getYear(), yearMonth.getMonthValue(), category);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getAllCategories() {
+        LOGGER.info("Fetching all categories");
+        List<String> result = eventService.getAllCategories();
         return ResponseEntity.ok(result);
     }
 }

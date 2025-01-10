@@ -51,9 +51,19 @@ export class EventService {
     return this.http.get<EventListDto[]>(`${(this.apiUrl)}/artist/${id}`);
   }
 
-  getTop10Events() {
-    return this.http.get<EventSalesDto[]>(`${(this.apiUrl)}/top10`);
+  getTop10Events(month: string, category: string) {
+    return this.http.get<EventSalesDto[]>(`${this.apiUrl}/top10`, {
+      params: {
+        month: month,
+        category: category
+      }
+    });
   }
+
+  getAllCategories(): Observable<string[]> {
+    return this.http.get<string[]>(this.apiUrl + "/categories");
+  }
+
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';
