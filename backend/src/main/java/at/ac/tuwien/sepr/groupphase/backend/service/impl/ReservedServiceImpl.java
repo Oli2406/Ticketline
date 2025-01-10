@@ -115,7 +115,7 @@ public class ReservedServiceImpl implements ReservedService {
         Reservation existingReservation = reservedRepository.findById(
                 reservedDetailDto.getReservedId())
             .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
-        List<Long> oldTickets = existingReservation.getTicketIds();//the tickets before something was cancelled
+        List<Long> oldTickets = existingReservation.getTicketIds(); //the tickets before something was cancelled
         List<Long> ticketIds = new java.util.ArrayList<>(List.of());
         List<Ticket> tickets = reservedDetailDto.getTickets();
 

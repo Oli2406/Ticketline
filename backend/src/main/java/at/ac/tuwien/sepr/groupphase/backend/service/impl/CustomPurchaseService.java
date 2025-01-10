@@ -149,7 +149,7 @@ public class CustomPurchaseService implements PurchaseService {
         Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
         List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
-        List<Long> oldTickets = existingPurchase.getTicketIds();//the tickets before cancel
+        List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
         List<Ticket> tickets = purchaseDetailDto.getTickets();
 
         for (Ticket ticket : tickets) {
