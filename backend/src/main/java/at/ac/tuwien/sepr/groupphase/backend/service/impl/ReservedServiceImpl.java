@@ -9,6 +9,8 @@ import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,13 +28,15 @@ public class ReservedServiceImpl implements ReservedService {
     private final ReservedRepository reservedRepository;
     private final TicketRepository ticketRepository;
     private final RandomStringGenerator generator;
+    private final TicketService ticketService;
 
     public ReservedServiceImpl(ReservedRepository reservedRepository,
         TicketRepository ticketRepository,
-        RandomStringGenerator generator) {
+        RandomStringGenerator generator, TicketService ticketService) {
         this.reservedRepository = reservedRepository;
         this.ticketRepository = ticketRepository;
         this.generator = generator;
+        this.ticketService = ticketService;
     }
 
     @Override
@@ -108,10 +112,10 @@ public class ReservedServiceImpl implements ReservedService {
 
     @Override
     public void updateReservation(ReservedDetailDto reservedDetailDto) {
-        // Fetch the existing purchase
         Reservation existingReservation = reservedRepository.findById(
                 reservedDetailDto.getReservedId())
-            .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        List<Long> oldTickets = existingReservation.getTicketIds();//the tickets before something was cancelled
         List<Long> ticketIds = new java.util.ArrayList<>(List.of());
         List<Ticket> tickets = reservedDetailDto.getTickets();
 
@@ -119,8 +123,29 @@ public class ReservedServiceImpl implements ReservedService {
             ticketIds.add(ticket.getTicketId());
         }
 
+        List<Long> cancelledTickets = new ArrayList<>();
+
+        for (Long oldTicket : oldTickets) {
+            for (int j = 0; j < ticketIds.size(); j++) {
+                if (!ticketIds.contains(oldTicket)) {
+                    cancelledTickets.add(oldTicket);
+                    this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+                }
+            }
+        }
+
         existingReservation.setTicketIds(ticketIds);
         reservedRepository.save(existingReservation);
+
+        if (ticketIds.isEmpty()) {
+            cancelledTickets.add(oldTickets.getFirst());
+            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+            reservedRepository.deleteById(existingReservation.getReservationId());
+        } else {
+            existingReservation.setTicketIds(ticketIds);
+            reservedRepository.save(existingReservation);
+        }
+
         logger.info("Updated reservation: {}", existingReservation);
     }
 

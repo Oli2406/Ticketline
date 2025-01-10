@@ -11,6 +11,8 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,14 +31,16 @@ public class CustomPurchaseService implements PurchaseService {
     private final TicketRepository ticketRepository;
     private final MerchandiseRepository merchandiseRepository;
     private final RandomStringGenerator generator;
+    private final TicketService ticketService;
 
     public CustomPurchaseService(PurchaseRepository purchaseRepository,
         TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
-        RandomStringGenerator generator) {
+        RandomStringGenerator generator, TicketService ticketService) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
         this.generator = generator;
+        this.ticketService = ticketService;
     }
 
     @Override
@@ -142,20 +146,41 @@ public class CustomPurchaseService implements PurchaseService {
 
     @Override
     public void updatePurchase(PurchaseDetailDto purchaseDetailDto) {
-        // Fetch the existing purchase
         Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
-        List<Long> ticketIds = new java.util.ArrayList<>(List.of());
+        List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
+        List<Long> oldTickets = existingPurchase.getTicketIds();//the tickets before cancel
         List<Ticket> tickets = purchaseDetailDto.getTickets();
 
         for (Ticket ticket : tickets) {
             ticketIds.add(ticket.getTicketId());
         }
 
+        List<Long> cancelledTickets = new ArrayList<>();
+
+        for (int i = 0; i < oldTickets.size(); i++) {
+            for (int j = i + 1; j < ticketIds.size(); j++) {
+                if (!ticketIds.contains(oldTickets.get(i))) {
+                    cancelledTickets.add(oldTickets.get(i));
+                    this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+                }
+            }
+        }
+
         existingPurchase.setTicketIds(ticketIds);
         existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
         purchaseRepository.save(existingPurchase);
         logger.info("Updated purchase: {}", existingPurchase);
+
+        if (ticketIds.isEmpty()) {
+            cancelledTickets.add(oldTickets.getFirst());
+            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+            purchaseRepository.deleteById(existingPurchase.getPurchaseId());
+        } else {
+            existingPurchase.setTicketIds(ticketIds);
+            existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
+            purchaseRepository.save(existingPurchase);
+        }
     }
 
 }
