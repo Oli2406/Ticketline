@@ -3,7 +3,6 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
