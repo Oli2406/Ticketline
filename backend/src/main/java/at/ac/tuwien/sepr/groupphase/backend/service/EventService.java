@@ -7,7 +7,6 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
-import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Stream;
 

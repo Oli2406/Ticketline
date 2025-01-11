@@ -5,6 +5,7 @@ import { EventSalesDto } from "../../dtos/event";
 import { ToastrService } from "ngx-toastr";
 import {FormsModule} from "@angular/forms";
 import {NgForOf, NgIf} from "@angular/common";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-top-events',
@@ -28,7 +29,8 @@ export class TopEventsComponent implements AfterViewInit {
   private chart: Chart | null = null; // Keep track of the chart instance
 
   constructor(private eventService: EventService,
-              private notification: ToastrService) { }
+              private notification: ToastrService,
+              private router: Router) { }
 
   ngOnInit() {
     this.eventService.getAllCategories().subscribe({
@@ -121,8 +123,19 @@ export class TopEventsComponent implements AfterViewInit {
               label: (context) => `${context.raw}%`
             }
           }
+        },
+        onClick: (event, elements) => {
+          if (elements.length > 0) {
+            const index = elements[0].index;
+            const clickedEvent = this.data[index];
+            this.navigateToEventDetail(clickedEvent.eventId);
+          }
         }
       }
     });
+  }
+
+  private navigateToEventDetail(eventId: number): void {
+    this.router.navigate(['/event', eventId]);
   }
 }
