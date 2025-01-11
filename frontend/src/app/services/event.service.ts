@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {catchError, Observable, throwError} from 'rxjs';
 import {Globals} from '../global/globals';
-import {Event, EventListDto, EventSearch} from 'src/app/dtos/event';
+import {Event, EventListDto, EventSalesDto, EventSearch} from 'src/app/dtos/event';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +50,20 @@ export class EventService {
   getEventsByArtistId(id: number): Observable<EventListDto[]> {
     return this.http.get<EventListDto[]>(`${(this.apiUrl)}/artist/${id}`);
   }
+
+  getTop10Events(month: string, category: string) {
+    return this.http.get<EventSalesDto[]>(`${this.apiUrl}/top10`, {
+      params: {
+        month: month,
+        category: category
+      }
+    });
+  }
+
+  getAllCategories(): Observable<string[]> {
+    return this.http.get<string[]>(this.apiUrl + "/categories");
+  }
+
 
   public handleError(error: HttpErrorResponse): Observable<never> {
     let cleanedError = 'An unexpected error occurred.';

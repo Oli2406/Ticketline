@@ -13,13 +13,7 @@ import {ToastrService} from 'ngx-toastr';
 import {LocalStorageService} from "../../../services/LocalStorageService";
 import {Hall, PriceCategory, SectorType, Ticket, TicketType} from 'src/app/dtos/ticket';
 import {TicketService} from 'src/app/services/ticket.service';
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.css';
-import 'flatpickr/dist/themes/material_blue.css';
-import {Purchase} from "../../../dtos/purchase";
-import {PurchaseService} from 'src/app/services/purchase.service';
-import {catchError, forkJoin, lastValueFrom, map, Observable} from "rxjs";
-import {tap} from "rxjs/operators";
+import {catchError, forkJoin, map, Observable} from "rxjs";
 
 
 @Component({
@@ -63,7 +57,6 @@ export class EventCreateComponent implements OnInit {
     private toastr: ToastrService,
     private localStorageService: LocalStorageService,
     private ticketService: TicketService,
-    private purchaseService: PurchaseService
   ) {}
 
   ngOnInit() {
