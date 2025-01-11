@@ -346,6 +346,7 @@ export class CartComponent implements OnInit {
 
     const totalPrice = this.getTotalPrice();
     const today = new Date();
+    //set the address in the purchase??
     const purchasePayload: Purchase = {
       userId: this.authService.getUserIdFromToken(),
       ticketIds: tickets,
@@ -353,6 +354,9 @@ export class CartComponent implements OnInit {
       merchandiseQuantities: merchandiseQuantities,
       totalPrice: totalPrice,
       purchaseDate: today.toISOString(),
+      street: this.address.street,
+      postalCode: this.address.postalCode,
+      city: this.address.city
     };
 
     console.log('Purchase Payload:', JSON.stringify(purchasePayload));

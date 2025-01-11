@@ -35,18 +35,30 @@ public class Purchase {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String postalCode;
+
+    @Column(nullable = false)
+    private String city;
+
     public Purchase() {
     }
 
     public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice,
         LocalDateTime purchaseDate,
-        List<Long> merchandiseQuantities) {
+        List<Long> merchandiseQuantities, String street, String postalCode, String city) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
         this.setMerchandiseIds(merchandiseIds);
         this.setMerchandiseQuantities(merchandiseQuantities);
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+        this.street = street;
+        this.postalCode = postalCode;
+        this.city = city;
     }
 
     public void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
@@ -104,6 +116,30 @@ public class Purchase {
 
     public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     private static String convertListToCsv(List<Long> ids) {

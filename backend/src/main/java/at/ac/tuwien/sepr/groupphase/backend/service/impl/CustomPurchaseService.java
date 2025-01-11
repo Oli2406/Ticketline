@@ -59,7 +59,10 @@ public class CustomPurchaseService implements PurchaseService {
             purchaseCreateDto.getMerchandiseIds(),
             purchaseCreateDto.getTotalPrice(),
             purchaseCreateDto.getPurchaseDate().plusHours(1),
-            purchaseCreateDto.getMerchandiseQuantities()
+            purchaseCreateDto.getMerchandiseQuantities(),
+            purchaseCreateDto.getStreet(),
+            purchaseCreateDto.getPostalCode(),
+            purchaseCreateDto.getCity()
         );
 
         logger.debug("Mapped Purchase entity: {}", purchase);
@@ -79,7 +82,10 @@ public class CustomPurchaseService implements PurchaseService {
             merchandise,
             purchase.getTotalPrice(),
             purchase.getPurchaseDate(),
-            purchase.getMerchandiseQuantities()
+            purchase.getMerchandiseQuantities(),
+            purchase.getStreet(),
+            purchase.getPostalCode(),
+            purchase.getCity()
         );
     }
 
@@ -101,7 +107,10 @@ public class CustomPurchaseService implements PurchaseService {
                 merchandise,
                 purchase.getTotalPrice(),
                 purchase.getPurchaseDate(),
-                purchase.getMerchandiseQuantities()
+                purchase.getMerchandiseQuantities(),
+                purchase.getStreet(),
+                purchase.getPostalCode(),
+                purchase.getCity()
             );
         }).collect(Collectors.toList());
     }
@@ -129,7 +138,10 @@ public class CustomPurchaseService implements PurchaseService {
             merchandise,
             purchase.getTotalPrice(),
             purchase.getPurchaseDate(),
-            purchase.getMerchandiseQuantities()
+            purchase.getMerchandiseQuantities(),
+            purchase.getStreet(),
+            purchase.getPostalCode(),
+            purchase.getCity()
         );
     }
 

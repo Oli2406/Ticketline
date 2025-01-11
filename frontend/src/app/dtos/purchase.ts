@@ -9,6 +9,9 @@ export interface Purchase {
   merchandiseQuantities: number[];
   totalPrice: number;
   purchaseDate: string;
+  street: string;
+  postalCode: string;
+  city: string;
 }
 
 export interface PurchaseListDto {
@@ -18,4 +21,7 @@ export interface PurchaseListDto {
   merchandises: Merchandise[];
   totalPrice: number;
   purchaseDate: Date;
+  street: string;
+  postalCode: string;
+  city: string;
 }

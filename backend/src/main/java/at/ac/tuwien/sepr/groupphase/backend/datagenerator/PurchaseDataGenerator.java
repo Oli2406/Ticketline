@@ -33,7 +33,8 @@ public class PurchaseDataGenerator {
     private final MerchandiseRepository merchandiseRepository;
     private final Random random = new Random();
 
-    public PurchaseDataGenerator(PurchaseRepository purchaseRepository, TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
+    public PurchaseDataGenerator(PurchaseRepository purchaseRepository,
+        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
@@ -109,7 +110,10 @@ public class PurchaseDataGenerator {
                 merchandiseIds,
                 totalPrice,
                 getRandomPastDate(),
-                merchandiseQuantities
+                merchandiseQuantities,
+                "ExampleStreet",
+                "ExamplePostalCode",
+                "ExampleCity"
             );
 
             purchaseRepository.save(purchase);
@@ -137,13 +141,16 @@ public class PurchaseDataGenerator {
         List<Ticket> tickets = ticketRepository.findAllById(ticketIds);
         List<Merchandise> merchandise = merchandiseRepository.findAllById(merchandiseIds);
 
-        long ticketTotal = tickets.stream().mapToLong(ticket -> ticket.getPrice().longValue()).sum();
-        long merchandiseTotal = merchandise.stream().mapToLong(item -> item.getPrice().longValue()).sum();
+        long ticketTotal = tickets.stream().mapToLong(ticket -> ticket.getPrice().longValue())
+            .sum();
+        long merchandiseTotal = merchandise.stream().mapToLong(item -> item.getPrice().longValue())
+            .sum();
 
         return ticketTotal + merchandiseTotal;
     }
 
     private LocalDateTime getRandomPastDate() {
-        return LocalDateTime.now().minusDays(random.nextInt(365 * 3)).minusHours(random.nextInt(24)).minusMinutes(random.nextInt(60));
+        return LocalDateTime.now().minusDays(random.nextInt(365 * 3)).minusHours(random.nextInt(24))
+            .minusMinutes(random.nextInt(60));
     }
 }
