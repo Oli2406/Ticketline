@@ -70,7 +70,7 @@ public interface EventService {
      *
      * @return a list of sales information of the top 10 events
      */
-    List<EventSalesDto> getTop10Events(int year, int month, String category);
+    List<EventSalesDto> getTop10Events(Integer year, Integer month, String category);
 
     /**
      * Retrieves a list of all unique categories from the events table.

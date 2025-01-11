@@ -33,7 +33,7 @@ export class TopEventsComponent implements AfterViewInit {
   ngOnInit() {
     this.eventService.getAllCategories().subscribe({
       next: categories => {
-        this.categories = categories;
+        this.categories = ['All categories', ...categories];
         this.selectedCategory = this.categories[0];
       },
       error: err => {
@@ -41,11 +41,6 @@ export class TopEventsComponent implements AfterViewInit {
         console.error('EventService error:', err);
       }
     });
-
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    this.selectedMonth = `${year}-${month}`;
   }
 
   ngAfterViewInit() {
@@ -53,10 +48,14 @@ export class TopEventsComponent implements AfterViewInit {
   }
 
   fetchTopEvents() {
-    this.eventService.getTop10Events(this.selectedMonth, this.selectedCategory).subscribe({
+    let category = this.selectedCategory;
+    if (this.selectedCategory === 'All categories') {
+      category = '';
+    }
+    this.eventService.getTop10Events(this.selectedMonth, category).subscribe({
       next: data => {
         this.data = data;
-        this.isEmptyData = this.data.length === 0; // Set flag based on data
+        this.isEmptyData = this.data.length === 0;
         this.renderChart();
       },
       error: err => {
@@ -66,11 +65,14 @@ export class TopEventsComponent implements AfterViewInit {
     });
   }
 
-  onCategoryChange(event: Event) {
+  onCategoryChange() {
     this.fetchTopEvents();
   }
 
-  onMonthChange(event: Event) {
+  onMonthChange() {
+    if (this.selectedMonth === null) {
+      this.notification.info(this.selectedMonth);
+    }
     this.fetchTopEvents();
   }
 

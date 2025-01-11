@@ -3,13 +3,13 @@
     <div class="col-md-6">
       <div class="form-group">
         <label for="month" class="form-label">Month</label>
-        <input type="month" id="month" name="month" class="form-control" [(ngModel)]="selectedMonth" (change)="onMonthChange($event)" />
+        <input type="month" id="month" name="month" class="form-control" [(ngModel)]="selectedMonth" (change)="onMonthChange()" />
       </div>
     </div>
     <div class="col-md-6">
       <div class="form-group">
         <label for="category" class="form-label">Category</label>
-        <select id="category" class="form-control" [(ngModel)]="selectedCategory" (change)="onCategoryChange($event)">
+        <select id="category" class="form-control" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
           <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
         </select>
       </div>

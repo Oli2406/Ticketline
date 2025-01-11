@@ -94,10 +94,22 @@ public class EventEndpoint {
 
     @PermitAll
     @GetMapping("/top10")
-    public ResponseEntity<List<EventSalesDto>> getTop10Events(@RequestParam String month, @RequestParam String category) {
+    public ResponseEntity<List<EventSalesDto>> getTop10Events(@RequestParam(required = false) String month,
+        @RequestParam(required = false) String category) {
         LOGGER.info("Fetching top 10 events");
-        YearMonth yearMonth = YearMonth.parse(month);
-        List<EventSalesDto> result = eventService.getTop10Events(yearMonth.getYear(), yearMonth.getMonthValue(), category);
+        Integer year = null;
+        Integer monthValue = null;
+
+        if (month != null && !month.isEmpty()) {
+            YearMonth yearMonth = YearMonth.parse(month);
+            year = yearMonth.getYear();
+            monthValue = yearMonth.getMonthValue();
+        }
+        if (category != null && category.isEmpty()) {
+            category = null;
+        }
+
+        List<EventSalesDto> result = eventService.getTop10Events(year, monthValue, category);
         return ResponseEntity.ok(result);
     }
 

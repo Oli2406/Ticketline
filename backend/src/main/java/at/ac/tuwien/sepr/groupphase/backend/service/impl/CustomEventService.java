@@ -109,7 +109,7 @@ public class CustomEventService implements EventService {
     }
 
     @Override
-    public List<EventSalesDto> getTop10Events(int year, int month, String category) {
+    public List<EventSalesDto> getTop10Events(Integer year, Integer month, String category) {
         LOGGER.info("Getting top ten events with category {} in {} {}", category, month, year);
         List<Object[]> results = eventRepository.findTop10EventsAsObjects(year, month, category);
 

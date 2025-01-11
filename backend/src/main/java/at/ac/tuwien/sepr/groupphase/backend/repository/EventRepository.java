@@ -48,15 +48,15 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * Retrieves the top 10 events based on the percentage of tickets sold.
      * Results are sorted by sold percentage in descending order.
      *
-     * @param year the year to filter events
-     * @param month the month to filter events (1-12)
+     * @param year     the year to filter events
+     * @param month    the month to filter events (1-12)
      * @param category the category to filter events
      * @return a list of object arrays, where each array contains:
-     *         - eventId (Long): ID of the event
-     *         - eventTitle (String): name of the event
-     *         - soldTickets (Long): number of tickets sold
-     *         - totalTickets (Long): total number of tickets available
-     *         - soldPercentage (Double): percentage of tickets sold
+     * - eventId (Long): ID of the event
+     * - eventTitle (String): name of the event
+     * - soldTickets (Long): number of tickets sold
+     * - totalTickets (Long): total number of tickets available
+     * - soldPercentage (Double): percentage of tickets sold
      */
     @Query(value = """
         SELECT
@@ -72,8 +72,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         JOIN
             EVENT e ON ep.EVENT_ID = e.EVENT_ID
         WHERE
-            e.CATEGORY = :category
+            (:category IS NULL OR e.CATEGORY = :category) -- Include all categories if :category is NULL
             AND (
+                (:year IS NULL OR :month IS NULL) -- Include all time if year or month is NULL
+                OR
                 (YEAR(e.DATE_FROM) = :year AND MONTH(e.DATE_FROM) = :month)
                 OR
                 (YEAR(e.DATE_TO) = :year AND MONTH(e.DATE_TO) = :month)
@@ -84,7 +86,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             soldPercentage DESC
         LIMIT 10
         """, nativeQuery = true)
-    List<Object[]> findTop10EventsAsObjects(@Param("year") int year, @Param("month") int month, @Param("category") String category);
+    List<Object[]> findTop10EventsAsObjects(@Param("year") Integer year, @Param("month") Integer month, @Param("category") String category);
 
     /**
      * Retrieves all unique categories from the events table.
