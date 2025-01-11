@@ -55,8 +55,6 @@
 }
 
 
-
-
 h1, h2, h3, h4 {
   color: #3e3e3e;;
 }
@@ -125,8 +123,8 @@ li {
 .cancel-button {
 
   .btn {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 7px;
+    border-radius: 7px;
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
@@ -166,7 +164,7 @@ body {
   background-color: #f4f4f4;
 }
 
-.invoice-div{
+.invoice-div {
   content-visibility: hidden;
 }
 
@@ -220,7 +218,7 @@ body {
   font-size: 15px;
 }
 
-.invoice-bank{
+.invoice-bank {
   font-size: 15px;
 }
 
