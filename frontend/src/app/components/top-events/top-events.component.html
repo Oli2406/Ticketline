@@ -1,0 +1,36 @@
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="month" class="form-label">Month</label>
+      <input
+        type="month"
+        id="month"
+        class="form-control"
+        [(ngModel)]="selectedMonth"
+        (change)="onFilterChange()"
+      />
+    </div>
+    <div class="col-md-6">
+      <label for="category" class="form-label">Category</label>
+      <select
+        id="category"
+        class="form-control"
+        [(ngModel)]="selectedCategory"
+        (change)="onFilterChange()"
+      >
+        <option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <div *ngIf="isEmptyData" class="alert text-center">
+        No Events found for the chosen month and category.
+      </div>
+      <canvas #barCanvas></canvas>
+    </div>
+  </div>
+</div>

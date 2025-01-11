@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
@@ -114,5 +115,27 @@ public class EventServiceImpl implements EventService {
             .stream()
             .map(this.eventMapper::eventToEventDetailDto)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EventSalesDto> getTop10Events(Integer year, Integer month, String category) {
+        LOGGER.info("Getting top ten events with category {} in {} {}", category, month, year);
+        List<Object[]> results = eventRepository.findTop10EventsAsObjects(year, month, category);
+
+        return results.stream()
+            .map(e -> new EventSalesDto(
+                ((Number) e[0]).longValue(),
+                e[1].toString(),
+                ((Number) e[2]).longValue(),
+                ((Number) e[3]).longValue(),
+                ((Number) e[4]).doubleValue()
+            ))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllCategories() {
+        LOGGER.info("Getting all categories");
+        return eventRepository.findAllCategories();
     }
 }

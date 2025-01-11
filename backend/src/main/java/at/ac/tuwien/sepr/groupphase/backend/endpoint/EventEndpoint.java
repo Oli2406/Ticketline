@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -15,12 +16,14 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.lang.invoke.MethodHandles;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -86,6 +89,35 @@ public class EventEndpoint {
     public ResponseEntity<List<EventDetailDto>> getEventsByArtistId(@PathVariable Long id) {
         LOGGER.info("Fetching events containing performances with artistId: {}", id);
         List<EventDetailDto> result = eventService.getEventsByArtistId(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/top10")
+    public ResponseEntity<List<EventSalesDto>> getTop10Events(@RequestParam(required = false) String month,
+        @RequestParam(required = false) String category) {
+        LOGGER.info("Fetching top 10 events");
+        Integer year = null;
+        Integer monthValue = null;
+
+        if (month != null && !month.isEmpty()) {
+            YearMonth yearMonth = YearMonth.parse(month);
+            year = yearMonth.getYear();
+            monthValue = yearMonth.getMonthValue();
+        }
+        if (category != null && category.isEmpty()) {
+            category = null;
+        }
+
+        List<EventSalesDto> result = eventService.getTop10Events(year, monthValue, category);
+        return ResponseEntity.ok(result);
+    }
+
+    @PermitAll
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getAllCategories() {
+        LOGGER.info("Fetching all categories");
+        List<String> result = eventService.getAllCategories();
         return ResponseEntity.ok(result);
     }
 }
