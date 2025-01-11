@@ -51,11 +51,11 @@ public interface EventRepository extends JpaRepository<Event, Long> {
      * @param month    the month to filter events (1-12)
      * @param category the category to filter events
      * @return a list of object arrays, where each array contains:
-     * - eventId (Long): ID of the event
-     * - eventTitle (String): name of the event
-     * - soldTickets (Long): number of tickets sold
-     * - totalTickets (Long): total number of tickets available
-     * - soldPercentage (Double): percentage of tickets sold
+     *         eventId (Long): ID of the event
+     *         eventTitle (String): name of the event
+     *         soldTickets (Long): number of tickets sold
+     *         totalTickets (Long): total number of tickets available
+     *         soldPercentage (Double): percentage of tickets sold
      */
     @Query(value = """
         SELECT
