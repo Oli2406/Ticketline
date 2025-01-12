@@ -131,12 +131,14 @@ export class SeatingPlanAComponent {
         // Filter and sort tickets for Sector C
         this.seatedBackC = tickets
           .filter(ticket => ticket.sectorType === SectorType.C)
-          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
 
         // Filter and sort tickets for Sector B
         this.seatedBackB = tickets
           .filter(ticket => ticket.sectorType === SectorType.B)
-          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
 
         // Filter standing tickets for Sector A
         const standingTickets = tickets.filter(
@@ -151,13 +153,6 @@ export class SeatingPlanAComponent {
         this.standingTickets = standingTickets.filter(
           ticket => ticket.priceCategory === PriceCategory.STANDARD && ticket.status === 'AVAILABLE'
         ).length;
-
-        // Extract prices for VIP and regular standing tickets
-        const firstVipStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.VIP);
-        const firstRegularStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.STANDARD);
-
-        this.vipStandingPrice = firstVipStanding?.price || 0; // Get the price or fallback to 0
-        this.regularStandingPrice = firstRegularStanding?.price || 0; // Get the price or fallback to 0
       },
       error: (err) => {
         console.error('Error fetching tickets:', err);
@@ -166,10 +161,18 @@ export class SeatingPlanAComponent {
     });
   }
 
+
   getPerformanceDetails(id: number): void {
     this.performanceService.getPerformanceById(id).subscribe({
       next: (performance) => {
         this.performanceDetails = performance;
+        const performancePrice = performance.price; // Assuming 'price' is a property in PerformanceListDto
+
+        // Set dynamic ticket prices based on performance price
+        this.regularStandingPrice = performancePrice;
+        this.vipStandingPrice = performancePrice + 70;
+        this.seatedBackB.forEach(ticket => ticket.price = performancePrice + 40);
+        this.seatedBackC.forEach(ticket => ticket.price = performancePrice + 40);
 
         // Fetch artist details
         if (this.performanceDetails.artistId) {
@@ -200,6 +203,7 @@ export class SeatingPlanAComponent {
       },
     });
   }
+
 
   toggleTicketSelection(ticket: TicketDto): void {
     // Check if the ticket is user-owned (reserved or purchased)

@@ -102,12 +102,12 @@ export class SeatingPlanBComponent {
   loadTicketsByPerformance(performanceId: number): void {
     this.ticketService.getTicketsByPerformanceId(performanceId).subscribe({
       next: (tickets: TicketDto[]) => {
-        // Initialize seatedBackC arrays for each row
         const seatedBackCRows: { [key: number]: TicketDto[] } = {};
 
-        // Group tickets for sector C by row number
+        // Group and assign tickets for Sector C (rows 1 to 9)
         tickets.forEach((ticket) => {
           if (ticket.sectorType === SectorType.C) {
+            ticket.price = this.performanceDetails.price - 10; // Set price for Sector C
             if (!seatedBackCRows[ticket.rowNumber]) {
               seatedBackCRows[ticket.rowNumber] = [];
             }
@@ -120,9 +120,10 @@ export class SeatingPlanBComponent {
           this[`seatedBackC${row}`] = seatedBackCRows[row]?.sort((a, b) => a.seatNumber - b.seatNumber) || [];
         }
 
-        // Filter and sort tickets for Sector B
+        // Filter and set prices for Sector B
         this.seatedBackB = tickets
           .filter(ticket => ticket.sectorType === SectorType.B)
+          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 }))
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
 
         // Filter standing tickets for Sector A
@@ -130,7 +131,7 @@ export class SeatingPlanBComponent {
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
         );
 
-        // Count VIP and Premium standing tickets
+        // Count and set prices for VIP and Regular standing tickets
         this.vipStandingTickets = standingTickets.filter(
           ticket => ticket.priceCategory === PriceCategory.VIP && ticket.status === 'AVAILABLE'
         ).length;
@@ -139,12 +140,9 @@ export class SeatingPlanBComponent {
           ticket => ticket.priceCategory === PriceCategory.PREMIUM && ticket.status === 'AVAILABLE'
         ).length;
 
-        // Extract prices for VIP and Premium standing tickets
-        const firstVipStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.VIP);
-        const firstRegularStanding = standingTickets.find(ticket => ticket.priceCategory === PriceCategory.PREMIUM);
-
-        this.vipStandingPrice = firstVipStanding?.price || 0;
-        this.regularStandingPrice = firstRegularStanding?.price || 0;
+        // Set prices for standing tickets
+        this.regularStandingPrice = this.performanceDetails.price;
+        this.vipStandingPrice = this.performanceDetails.price + 30;
       },
       error: (err) => {
         console.error('Error fetching tickets:', err);
@@ -152,6 +150,7 @@ export class SeatingPlanBComponent {
       }
     });
   }
+
 
   private loadUserSeats(): void {
     const userId = this.authService.getUserIdFromToken();
@@ -188,36 +187,24 @@ export class SeatingPlanBComponent {
     this.performanceService.getPerformanceById(id).subscribe({
       next: (performance) => {
         this.performanceDetails = performance;
+        const performancePrice = performance.price; // Base performance price
 
-        // Fetch artist details
-        if (this.performanceDetails.artistId) {
-          this.artistService.getById(this.performanceDetails.artistId).subscribe({
-            next: (artist) => {
-              this.artistDetails = artist;
-            },
-            error: (err) => {
-              console.error('Error fetching artist details:', err);
-            },
-          });
-        }
+        // Set prices for different sectors and standing tickets
+        this.regularStandingPrice = performancePrice;
+        this.vipStandingPrice = performancePrice + 30;
 
-        // Fetch location details
-        if (this.performanceDetails.locationId) {
-          this.locationService.getById(this.performanceDetails.locationId).subscribe({
-            next: (location) => {
-              this.locationDetails = location;
-            },
-            error: (err) => {
-              console.error('Error fetching location details:', err);
-            },
-          });
+        // Update sector prices if tickets are already loaded
+        this.seatedBackB.forEach(ticket => ticket.price = performancePrice + 10);
+        for (let row = 1; row <= 9; row++) {
+          this[`seatedBackC${row}`].forEach(ticket => ticket.price = performancePrice - 10);
         }
       },
       error: (err) => {
         console.error('Error fetching performance details:', err);
-      },
+      }
     });
   }
+
 
   toggleTicketSelection(ticket: TicketDto): void {
     if (!ticket) return;
