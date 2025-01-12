@@ -1,31 +1,42 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PurchaseCreateDto {
-    private Long userId;
+
+    private String userId;
     private List<Long> ticketIds;
     private List<Long> merchandiseIds;
+    private List<Long> merchandiseQuantities;
     private Long totalPrice;
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
+    private String street;
+    private String postalCode;
+    private String city;
 
-    public PurchaseCreateDto(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
+    public PurchaseCreateDto(String userId, List<Long> ticketIds, List<Long> merchandiseIds,
+        Long totalPrice, LocalDateTime purchaseDate, List<Long> merchandiseQuantities,
+        String street, String postalCode, String city) {
         this.userId = userId;
         this.ticketIds = ticketIds;
         this.merchandiseIds = merchandiseIds;
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+        this.merchandiseQuantities = merchandiseQuantities;
+        this.street = street;
+        this.postalCode = postalCode;
+        this.city = city;
     }
 
     public PurchaseCreateDto() {
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -53,11 +64,43 @@ public class PurchaseCreateDto {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public List<Long> getMerchandiseQuantities() {
+        return merchandiseQuantities;
+    }
+
+    public void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+        this.merchandiseQuantities = merchandiseQuantities;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

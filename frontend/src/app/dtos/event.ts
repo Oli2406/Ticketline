@@ -24,3 +24,11 @@ export interface EventSearch {
   dateLatest?: string;
   performanceIds?: number[];
 }
+
+export interface EventSalesDto {
+  eventId: number;
+  eventTitle: string;
+  soldTickets: number;
+  totalTickets: number;
+  soldPercentage: number;
+}

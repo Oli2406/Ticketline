@@ -120,3 +120,131 @@ li {
   padding: 1rem 0;
 }
 
+.cancel-button {
+
+  .btn {
+    padding: 7px;
+    border-radius: 7px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+
+    &.btn-primary {
+      background-color: #4D47C3;
+      color: white;
+      border: none;
+
+      &:hover {
+        background-color: #514dc7;
+      }
+    }
+
+    &.btn-secondary {
+      background-color: #ccc;
+      color: #333;
+      border: none;
+
+      &:hover {
+        background-color: #bbb;
+      }
+
+      &:disabled {
+        background-color: #eee;
+        color: #999;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+.invoice-div {
+  content-visibility: hidden;
+}
+
+.invoice-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: auto;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.invoice-header h1 {
+  margin: 0;
+  font-size: 2em;
+  color: #333333;
+}
+
+.invoice-details,
+.invoice-items {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.invoice-details td,
+.invoice-items th,
+.invoice-items td {
+  padding: 10px;
+  border: 1px solid #dddddd;
+}
+
+.invoice-items th {
+  background-color: #f4f4f4;
+  text-align: left;
+}
+
+.invoice-footer {
+  text-align: right;
+}
+
+.invoice-footer td {
+  padding: 10px;
+  border-top: 2px solid #333333;
+  font-size: 15px;
+}
+
+.invoice-bank {
+  font-size: 15px;
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.btn-download {
+  padding: 10px 20px;
+  background-color: #4d47c3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  align-self: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #514dc7;
+  }
+}
+
+.quantity-text {
+  text-align: left;
+  margin-left: 13px;
+}
+

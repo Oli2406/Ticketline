@@ -25,6 +25,8 @@ import {ArtistComponent} from "./components/artist/artist.component";
 import {EventComponent} from "./components/event/event.component";
 import {LocationComponent} from "./components/location/location.component";
 import {UserAccountComponent} from "./components/user-account/user-account.component";
+import {OrderOverviewComponent} from "./components/order-overview/order-overview.component";
+import {TopEventsComponent} from "./components/top-events/top-events.component";
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -39,6 +41,7 @@ const routes: Routes = [
   {path: 'seatingPlanB', canActivate: mapToCanActivate([AuthGuard]), component: SeatingPlanBComponent},
   {path: 'search', canActivate: mapToCanActivate([AuthGuard]), component: SearchComponent},
   {path: 'news', canActivate: mapToCanActivate([AuthGuard]), component: NewsComponent},
+  {path: 'order-overview',canActivate: mapToCanActivate([AuthGuard]), component: OrderOverviewComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'message', canActivate: mapToCanActivate([AuthGuard]), component: MessageComponent},
   {path: 'news/details/:id', component: NewsDetailComponent },
@@ -54,6 +57,7 @@ const routes: Routes = [
   {path: 'verify-reset-code',  canActivate: [AuthGuard] , component: VerifyResetCodeComponent},
   {path: 'send-email' , component: SendEmailComponent},
   {path: 'user-account', canActivate:[AuthGuard] ,component: UserAccountComponent},
+  {path: 'top-events', canActivate:[AuthGuard] ,component: TopEventsComponent},
   {path: 'home', component: HomeComponent}
 ];
 

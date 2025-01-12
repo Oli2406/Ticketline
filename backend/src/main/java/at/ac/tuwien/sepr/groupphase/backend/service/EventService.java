@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -62,4 +63,18 @@ public interface EventService {
      * @return a list of all events found
      */
     List<EventDetailDto> getEventsByArtistId(Long id);
+
+    /**
+     * Retrieves the top 10 events based on the percentage of tickets sold.
+     *
+     * @return a list of sales information of the top 10 events
+     */
+    List<EventSalesDto> getTop10Events(Integer year, Integer month, String category);
+
+    /**
+     * Retrieves a list of all unique categories from the events table.
+     *
+     * @return a list of distinct category names as strings
+     */
+    List<String> getAllCategories();
 }

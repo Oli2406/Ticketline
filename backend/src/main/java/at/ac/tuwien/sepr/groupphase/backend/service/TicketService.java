@@ -60,4 +60,12 @@ public interface TicketService {
      * @param id the ID of the ticket to delete
      */
     void deleteTicket(Long id);
+
+    /**
+     * Updates the status of a list of tickets identified by their IDs.
+     *
+     * @param ticketIds the list of ticket IDs whose status needs to be updated
+     * @param status the new status to be applied to the tickets
+     */
+    void updateTicketStatusList(List<Long> ticketIds, String status);
 }

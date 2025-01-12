@@ -4,6 +4,7 @@ import { TicketDto } from '../dtos/ticket';
 import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { Globals } from '../global/globals';
+import {Purchase} from "../dtos/purchase";
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +30,7 @@ export class CartService {
     return storedCart ? JSON.parse(storedCart) : [];
   }
 
-  private saveCart(cartItems: { item: Merchandise | TicketDto; quantity: number }[]): void {
+  saveCart(cartItems: { item: Merchandise | TicketDto; quantity: number }[]): void {
     localStorage.setItem(this.getCartKey(), JSON.stringify(cartItems));
   }
 
@@ -54,12 +55,15 @@ export class CartService {
     if (existingItem) {
       existingItem.quantity++;
     } else {
-      cartItems.push({ item, quantity: 1 });
+      const reservedUntil = "performanceId" in item
+        ? new Date(Date.now() + 10 * 60 * 1000).toISOString()
+        : null;
+
+      cartItems.push({ item: { ...item, reservedUntil }, quantity: 1 });
     }
 
     this.saveCart(cartItems);
   }
-
 
   updateCartItem(item: Merchandise | TicketDto, quantity: number): void {
     const cartItems = this.getCart();
@@ -129,12 +133,13 @@ export class CartService {
       .toPromise();
   }
 
-  purchaseItems(purchasePayload: { itemId: number; quantity: number }[]): Promise<void> {
-    this.API_URL = this.globals.backendUri + '/users/purchase';
+  purchase(purchasePayload: Purchase): Promise<void> {
+    const API_URL = this.globals.backendUri + '/purchase';
     return this.http
-      .post<void>(`${this.API_URL}`, purchasePayload, {
+      .post<void>(API_URL, purchasePayload, {
         headers: { 'Content-Type': 'application/json' },
       })
       .toPromise();
   }
+
 }

@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,21 +26,47 @@ public class Purchase {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String merchandiseIds;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String merchandiseQuantities;
+
     @Column(nullable = false)
     private Long totalPrice;
 
     @Column(nullable = false)
-    private LocalDate purchaseDate;
+    private LocalDateTime purchaseDate;
+
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String postalCode;
+
+    @Column(nullable = false)
+    private String city;
 
     public Purchase() {
     }
 
-    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice, LocalDate purchaseDate) {
+    public Purchase(Long userId, List<Long> ticketIds, List<Long> merchandiseIds, Long totalPrice,
+        LocalDateTime purchaseDate,
+        List<Long> merchandiseQuantities, String street, String postalCode, String city) {
         this.userId = userId;
         this.setTicketIds(ticketIds);
         this.setMerchandiseIds(merchandiseIds);
+        this.setMerchandiseQuantities(merchandiseQuantities);
         this.totalPrice = totalPrice;
         this.purchaseDate = purchaseDate;
+        this.street = street;
+        this.postalCode = postalCode;
+        this.city = city;
+    }
+
+    public void setMerchandiseQuantities(List<Long> merchandiseQuantities) {
+        this.merchandiseQuantities = convertListToCsv(merchandiseQuantities);
+    }
+
+    public List<Long> getMerchandiseQuantities() {
+        return convertCsvToList(this.merchandiseQuantities);
     }
 
     public Long getPurchaseId() {
@@ -84,12 +110,36 @@ public class Purchase {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDate getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
     }
 
     private static String convertListToCsv(List<Long> ids) {

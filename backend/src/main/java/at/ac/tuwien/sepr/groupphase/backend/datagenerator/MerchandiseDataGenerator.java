@@ -5,6 +5,7 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 
 @Component
 @Profile("generateData")
+@DependsOn("performanceDataGenerator")
 public class MerchandiseDataGenerator {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -46,6 +48,7 @@ public class MerchandiseDataGenerator {
             200, "9.jpg", new BigDecimal("299.99").multiply(BigDecimal.valueOf(10)).intValue());
         createMerchandiseIfNotExists("Swimsuit", "fashion", new BigDecimal("16200.66"),
             1, "10.jpg", new BigDecimal("16200.66").multiply(BigDecimal.valueOf(10)).intValue());
+        LOGGER.info("All merchandise were created!");
     }
 
     public void createMerchandiseIfNotExists(

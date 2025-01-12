@@ -4,12 +4,13 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
+import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,10 +30,16 @@ public class PurchaseEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PurchaseService purchaseService;
     private final RandomStringGenerator randomStringGenerator;
+    private final MerchandiseService merchandiseService;
+    private final TicketService ticketService;
 
-    public PurchaseEndpoint(PurchaseService purchaseService, RandomStringGenerator randomStringGenerator) {
+    public PurchaseEndpoint(PurchaseService purchaseService,
+        RandomStringGenerator randomStringGenerator,
+        MerchandiseService merchandiseService, TicketService ticketService) {
         this.purchaseService = purchaseService;
         this.randomStringGenerator = randomStringGenerator;
+        this.merchandiseService = merchandiseService;
+        this.ticketService = ticketService;
     }
 
     @PermitAll
@@ -46,7 +53,8 @@ public class PurchaseEndpoint {
 
     @PermitAll
     @GetMapping("/user/{encryptedUserId}")
-    public ResponseEntity<List<PurchaseDetailDto>> getPurchasesByUser(@PathVariable String encryptedUserId) {
+    public ResponseEntity<List<PurchaseDetailDto>> getPurchasesByUser(
+        @PathVariable String encryptedUserId) {
         LOG.info("Fetching purchases for user with encrypted ID: {}", encryptedUserId);
         Long userId = randomStringGenerator.retrieveOriginalId(encryptedUserId)
             .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
@@ -58,10 +66,28 @@ public class PurchaseEndpoint {
 
     @PermitAll
     @PostMapping
-    public ResponseEntity<PurchaseDetailDto> createPurchase(@RequestBody PurchaseCreateDto purchaseCreateDto) throws ValidationException {
+    public ResponseEntity<PurchaseDetailDto> createPurchase(
+        @RequestBody PurchaseCreateDto purchaseCreateDto) throws ValidationException {
         LOG.info("Received request to create or update Purchase: {}", purchaseCreateDto);
+        merchandiseService.reduceStockOfMerchandiseList(purchaseCreateDto.getMerchandiseIds(),
+            purchaseCreateDto.getMerchandiseQuantities());
+        ticketService.updateTicketStatusList(purchaseCreateDto.getTicketIds(), "SOLD");
         PurchaseDetailDto createdPurchase = purchaseService.createPurchase(purchaseCreateDto);
         LOG.info("Successfully created/updated Purchase: {}", createdPurchase);
         return ResponseEntity.ok(createdPurchase);
+    }
+
+    @PermitAll
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updatePurchase(@PathVariable Long id,
+        @RequestBody PurchaseDetailDto purchaseDetailDto) throws ValidationException {
+        LOG.info("Received request to update Purchase with ID: {}{}", id, purchaseDetailDto);
+        if (!id.equals(purchaseDetailDto.getPurchaseId())) {
+            throw new ValidationException("ID mismatch",
+                List.of("URL ID does not match the body ID."));
+        }
+        purchaseService.updatePurchase(purchaseDetailDto);
+        LOG.info("Successfully updated Purchase: {}", purchaseDetailDto);
+        return ResponseEntity.noContent().build();
     }
 }
