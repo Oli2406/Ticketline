@@ -35,4 +35,6 @@ public interface ReservedService {
      * @throws ValidationException if the input data is invalid
      */
     ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException;
+    //todo annotate
+    void deleteTicketFromReservation(Long reservationId, Long ticketId);
 }

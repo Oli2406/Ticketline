@@ -104,6 +104,35 @@ public class ReservedServiceImpl implements ReservedService {
         );
     }
 
+    @Override
+    public void deleteTicketFromReservation(Long reservationId, Long ticketId) {
+        logger.info("Deleting ticket {} from reservation {}", ticketId, reservationId);
+
+        // Fetch the reservation by ID
+        Reservation reservation = reservedRepository.findById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found with ID: " + reservationId));
+
+        // Check if the ticket is present in the reservation
+        boolean removed = reservation.getTicketIds().removeIf(id -> id.equals(ticketId));
+
+        if (!removed) {
+            throw new IllegalArgumentException("Ticket not found in reservation with ID: " + ticketId);
+        }
+
+        // If the reservation becomes empty after removing the ticket, delete the reservation
+        if (reservation.getTicketIds().isEmpty()) {
+            reservedRepository.delete(reservation);
+            logger.info("Deleted reservation {} as it has no remaining tickets", reservationId);
+        } else {
+            // Otherwise, update the reservation
+            reservedRepository.save(reservation);
+            logger.info("Updated reservation {} after removing ticket {}", reservationId, ticketId);
+        }
+
+        logger.info("Updated ticket {} status to AVAILABLE", ticketId);
+    }
+
+
     /*
     @Override
     public void deleteReservation(Long reservationId) {

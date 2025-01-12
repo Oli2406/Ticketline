@@ -27,6 +27,11 @@
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+                <div class="button-container">
+                  <button class="btn btn-purple" (click)="addToCart(ticket)">
+                    <i class="bi bi-cart me-2"></i>Add to Cart
+                  </button>
+                </div>
               </div>
             </li>
           </ul>

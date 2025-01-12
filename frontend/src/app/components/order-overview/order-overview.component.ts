@@ -11,6 +11,8 @@ import { PerformanceService } from 'src/app/services/performance.service';
 import { LocationService } from '../../services/location.service';
 import { PerformanceDetailDto, PerformanceListDto } from '../../dtos/performance';
 import { ArtistService } from '../../services/artist.service';
+import {TicketService} from "../../services/ticket.service";
+import {CartService} from "../../services/cart.service";
 
 @Component({
   selector: 'app-order-overview',
@@ -20,7 +22,7 @@ import { ArtistService } from '../../services/artist.service';
   styleUrls: ['./order-overview.component.scss'],
 })
 export class OrderOverviewComponent implements OnInit {
-  reservedTickets: { date: Date; reserved: TicketDto[]; showDetails: boolean }[] = [];
+  reservedTickets: { date: Date; reserved: TicketDto[]; reservedId: number; showDetails: boolean }[] = [];
   purchasedTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   performanceNames: { [performanceId: number]: PerformanceListDto } = {};
@@ -34,7 +36,9 @@ export class OrderOverviewComponent implements OnInit {
     private toastr: ToastrService,
     private performanceService: PerformanceService,
     private locationService: LocationService,
-    private artistService: ArtistService
+    private artistService: ArtistService,
+    private ticketService: TicketService,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +134,7 @@ export class OrderOverviewComponent implements OnInit {
       .map((reservation) => ({
         date: new Date(reservation.reservedDate),
         reserved: reservation.tickets,
+        reservedId: reservation.reservedId,
         showDetails: false,
       }))
       .sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -222,4 +227,91 @@ export class OrderOverviewComponent implements OnInit {
     }
     return this.performanceLocations[performanceId];
   }
+
+  /*addToCart(ticket: TicketDto): void {
+    if (ticket.status !== 'RESERVED') {
+      this.toastr.error('This ticket cannot be added to the cart.', 'Error');
+      return;
+    }
+
+    const reservationId = this.findReservationIdByTicket(ticket);
+    if (reservationId === null) {
+      this.toastr.error('Failed to find reservation for the ticket.', 'Error');
+      return;
+    }
+
+    this.reservationService.deleteTicketFromReservation(reservationId, ticket.ticketId).subscribe({
+      next: () => {
+        this.removeTicketFromReservations(ticket);
+        this.cartService.addToCart(ticket);
+        this.ticketService.updateTicket(ticket).subscribe({
+          next: () => {
+            this.toastr.success('Ticket added to cart successfully!', 'Success');
+          },
+          error: (err) => {
+            console.error('Error updating ticket status:', err);
+            this.toastr.error('Failed to update ticket status. Please try again.', 'Error');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error deleting ticket from reservation:', err);
+        this.toastr.error('Failed to remove ticket from reservation. Please try again.', 'Error');
+      }
+    });
+  }*/
+  addToCart(ticket: TicketDto): void {
+    if (ticket.status !== 'RESERVED') {
+      this.toastr.error('This ticket cannot be added to the cart.', 'Error');
+      return;
+    }
+    const reservationId = this.findReservationIdByTicket(ticket);
+    if (reservationId === null) {
+      this.toastr.error('Failed to find reservation for the ticket.', 'Error');
+      return;
+    }
+    this.removeTicketFromReservations(ticket);
+    this.cartService.addToCart(ticket);
+
+    this.ticketService.updateTicket(ticket).subscribe({
+      next: () => {
+        this.toastr.success('Ticket added to cart successfully!', 'Success');
+      },
+      error: (err) => {
+        console.error('Error updating ticket status:', err);
+        this.toastr.error('Failed to update ticket status. Please try again.', 'Error');
+      }
+    });
+  }
+
+
+
+  private removeTicketFromReservations(ticket: TicketDto): void {
+    this.reservedTickets.forEach((group, groupIndex) => {
+      const ticketIndex = group.reserved.findIndex((t) => t.ticketId === ticket.ticketId);
+
+      if (ticketIndex > -1) {
+        group.reserved.splice(ticketIndex, 1);
+
+        if (group.reserved.length === 0) { //remove the group if theres no more tickets in the reservation
+          this.reservedTickets.splice(groupIndex, 1);
+        }
+      }
+    });
+  }
+
+  private findReservationIdByTicket(ticket: TicketDto): number | null {
+    for (const group of this.reservedTickets) {
+      if (group.reserved.some((t: TicketDto) => t.ticketId === ticket.ticketId)) {
+        return group.reservedId;
+      }
+    }
+    return null;
+  }
+
+
+
+
+
+
 }
