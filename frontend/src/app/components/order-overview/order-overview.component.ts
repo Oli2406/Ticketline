@@ -16,6 +16,8 @@ import {
   ConfirmationDialogMode,
   ConfirmDialogComponent
 } from "../confirm-dialog/confirm-dialog.component";
+import {map} from "rxjs";
+import {transform} from "lodash";
 
 @Component({
   selector: 'app-order-overview',
@@ -202,18 +204,6 @@ export class OrderOverviewComponent implements OnInit {
     return this.performanceNames[performanceId].name;
   }
 
-  /*  getPerformanceDate(performanceId: number): void {
-
-      this.performanceService.getPerformanceById(performanceId).subscribe({
-        next: (performance) => {
-          this.performanceDate = performance.date;
-        },
-        error: (err) => {
-          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-        },
-      });
-    }*/
-
   getArtistName(performanceId: number): string {
     if (!this.performanceNames[performanceId]) {
       this.performanceService.getPerformanceById(performanceId).subscribe({
@@ -314,14 +304,7 @@ export class OrderOverviewComponent implements OnInit {
     this.receiptService.exportToPDF();
   }
 
-  public generateCancelReservationPDF(reservation: ReservationListDto, canceledTicker: TicketDto): void {
-    this.receiptService.exportToPDF();
-  }
-
   cancelPurchase(ticket: TicketDto) {
-    console.log('cancel purchase ticket id ' + ticket.ticketId);
-
-    //const confDialogue = this.confirmationDialogue.
     this.cancelledTicket = ticket;
     let cancelledPurchaseId: number;
 
@@ -329,7 +312,6 @@ export class OrderOverviewComponent implements OnInit {
       purchase.tickets.forEach((purchaseTicket) => {
         if (purchaseTicket.ticketId === ticket.ticketId) {
           cancelledPurchaseId = purchase.purchaseId;
-          console.log(cancelledPurchaseId);
 
           // Fetch the purchase details
           this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
@@ -339,7 +321,6 @@ export class OrderOverviewComponent implements OnInit {
               this.address.street = this.cancelledPurchase.street;
               this.address.postalCode = this.cancelledPurchase.postalCode;
               this.address.city = this.cancelledPurchase.city;
-              console.log(this.address.street, this.address.city, this.address.postalCode)
 
               const updatedPurchase: PurchaseListDto = {
                 purchaseId: cancelledPurchaseId,
@@ -353,13 +334,12 @@ export class OrderOverviewComponent implements OnInit {
                 city: this.cancelledPurchase.city
               };
 
-              this.generateCancelPurchasePDF();
-
               // Update the purchase
               this.purchaseService.updatePurchase(updatedPurchase).subscribe({
                 next: () => {
                   this.toastr.success('Purchase cancelled successfully.', 'Success');
                   this.loadUserPurchases(this.authService.getUserIdFromToken());
+                  this.generateCancelPurchasePDF();
                 },
                 error: (err) => {
                   console.error('Error updating purchase:', err.message);
@@ -377,6 +357,7 @@ export class OrderOverviewComponent implements OnInit {
     });
     this.showConfirmDeletionDialogP = false;
   }
+
 
   cancelReservation(ticketReservation: TicketDto) {
     console.log('cancel reservation ' + ticketReservation.ticketId);
@@ -425,12 +406,12 @@ export class OrderOverviewComponent implements OnInit {
     this.showConfirmDeletionDialogR = false;
   }
 
-  showCancelMessagePurchase(ticket:TicketDto) {
+  showCancelMessagePurchase(ticket: TicketDto) {
     this.showConfirmDeletionDialogP = true;
     this.cancelledTicket = ticket;
   }
 
-  showCancelMessageReservation(ticket: TicketDto ) {
+  showCancelMessageReservation(ticket: TicketDto) {
     this.showConfirmDeletionDialogR = true;
     this.cancelledTicket = ticket;
   }
