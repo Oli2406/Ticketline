@@ -16,9 +16,11 @@ public interface PurchaseService {
      *
      * @param purchaseCreateDto the data for creating or updating the purchase
      * @return the detailed representation of the created or updated purchase
-     * @throws ValidationException if the input data fails validation (e.g., missing or invalid fields)
+     * @throws ValidationException if the input data fails validation (e.g., missing or invalid
+     *                             fields)
      */
-    PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto) throws ValidationException;
+    PurchaseDetailDto createPurchase(PurchaseCreateDto purchaseCreateDto)
+        throws ValidationException;
 
     /**
      * Retrieves a specific purchase by its ID.
@@ -42,4 +44,11 @@ public interface PurchaseService {
      * @param id the ID of the purchase to delete
      */
     void deletePurchase(Long id);
+
+    /**
+     * Updates a purchase with the given data.
+     *
+     * @param purchaseDetailDto the updated purchase
+     */
+    void updatePurchase(PurchaseDetailDto purchaseDetailDto);
 }

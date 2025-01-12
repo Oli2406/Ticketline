@@ -20,7 +20,9 @@
             <li *ngFor="let ticket of group.reserved">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -28,6 +30,12 @@
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
+              <div class="cancel-button">
+                <button class="btn btn-primary" (click)="showCancelMessageReservation(ticket)">
+                  <i>Cancel Ticket</i>
+                </button>
+              </div>
+              <br>
             </li>
           </ul>
         </div>
@@ -51,7 +59,9 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -59,6 +69,12 @@
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
+              <div class="cancel-button">
+                <button class="btn btn-primary" (click)="showCancelMessagePurchase(ticket)">
+                  <i>Cancel Ticket</i>
+                </button>
+              </div>
+              <br>
             </li>
           </ul>
         </div>
@@ -82,7 +98,9 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -98,7 +116,121 @@
   </section>
 
   <!-- Wenn keine Tickets vorhanden sind -->
-  <ng-container *ngIf="reservedTickets.length === 0 && purchasedTickets.length === 0 && pastTickets.length === 0">
+  <ng-container
+    *ngIf="reservedTickets.length === 0 && purchasedTickets.length === 0 && pastTickets.length === 0">
     <p>You have no tickets yet.</p>
   </ng-container>
+
+  <!-- start of the cancellation invoice -->
+
+  <div class="invoice-div">
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Cancellation Invoice</title>
+    </head>
+    <body>
+    <div class="invoice-container">
+      <div class="invoice-header">
+        <h1>Ticket-Cancellation Invoice</h1>
+        <div>
+          <p>Cancellation Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong>
+          </p>
+          <p>Cancellation Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
+        </div>
+      </div>
+
+      <table class="invoice-details">
+        <tr>
+          <td>
+            <strong>Issuer:</strong> <br>
+            Ticketline - GmbH<br>
+            Wiedner Hautpstrasse 76/2/2<br>
+            1040 Wien <br>
+            E-Mail: info&#64;ticketline-website.at<br>
+            UID: ATU12345678
+          </td>
+          <td>
+            <strong>Recipient:</strong><br>
+            {{ userFirstName }} {{ userLastName }}<br>
+            {{ this.address.street }}<br>
+            {{ this.address.postalCode }} {{ this.address.city }}<br>
+            E-Mail: {{ userEmail }} <br>
+          </td>
+        </tr>
+      </table>
+
+      <table class="invoice-items">
+        <thead>
+        <tr>
+          <th>Ticket ID</th>
+          <th>Row Number</th>
+          <th>Seat Number</th>
+          <th>Sector</th>
+          <th>Ticket Type</th>
+          <th>Quantity</th>
+          <th>Unit Price incl. tax</th>
+          <th>Tax (13%)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>{{ cancelledTicket.ticketId }}</td>
+          <td>{{ cancelledTicket.rowNumber }}</td>
+          <td>{{ cancelledTicket.seatNumber }}</td>
+          <td>{{ cancelledTicket.sectorType }}</td>
+          <td>{{ cancelledTicket.ticketType }}</td>
+          <td>{{ 1 }}</td>
+          <td>{{ cancelledTicket.price }} €</td>
+          <td>{{ ((cancelledTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }} €</td>
+        </tr>
+        </tbody>
+      </table>
+      <table class="invoice-footer">
+        <tr>
+          <td><strong>Total Price excl. tax.:</strong></td>
+          <td><strong>{{ (cancelledTicket.price / 113) * 100 | number: '1.2-2' }} €</strong></td>
+        </tr>
+        <tr>
+          <td><strong>sales Tax (13%):</strong></td>
+          <td><strong>{{ ((cancelledTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }}€</strong>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Total Price incl. tax:</strong></td>
+          <td><strong>{{ cancelledTicket.price| number: '1.2-2' }} €</strong></td>
+        </tr>
+      </table>
+
+      <div class="invoice-bank">
+        <p> Your purchase has been successfully cancelled and the tickets are available again.</p>
+        <p> The above mentioned amount will be transferred back to your bank account within the next
+          7
+          business days.</p>
+        <p> If you have any further questions please contact our customer service. </p>
+      </div>
+    </div>
+    </body>
+    </html>
+  </div>
 </div>
+
+@if (showConfirmDeletionDialogP) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.confirm"
+    [message]="cancelMessagePurchase"
+    (confirm)="cancelPurchase(cancelledTicket)"
+    (cancel)="showConfirmDeletionDialogP = false">
+  </app-confirm-dialog>
+}
+
+@if (showConfirmDeletionDialogR) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.confirm"
+    [message]="cancelMessageReservation"
+    (confirm)="cancelReservation(cancelledTicket)"
+    (cancel)="showConfirmDeletionDialogR = false">
+  </app-confirm-dialog>
+}

@@ -35,4 +35,11 @@ public interface ReservedService {
      * @throws ValidationException if the input data is invalid
      */
     ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException;
+
+    /**
+     * Updates an existing one based on the provided data.
+     *
+     * @param reservedDetailDto the data forupdating a reservation
+     */
+    void updateReservation(ReservedDetailDto reservedDetailDto);
 }
