@@ -16,6 +16,7 @@ import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {Reservation} from "../../dtos/reservation";
 import { AuthService } from "../../services/auth.service";
 import {ReservationService} from "../../services/reservation.service";
+import {PurchaseService} from "../../services/purchase.service";
 
 @Component({
   selector: 'app-seating-plan-B',
@@ -62,6 +63,10 @@ export class SeatingPlanBComponent {
 
   performanceID: number = 0;
 
+  reservedAndPurchasedSeats: number[] = [];
+  cartedSeats: number[] = [];
+
+
   constructor(
     private toastr: ToastrService,
     private performanceService: PerformanceService,
@@ -73,6 +78,7 @@ export class SeatingPlanBComponent {
     private dialog: MatDialog,
     private authService: AuthService,
     private reservedService: ReservationService,
+    private purchaseService: PurchaseService
   ) {}
 
   ngOnInit(): void {
@@ -85,12 +91,13 @@ export class SeatingPlanBComponent {
         this.getPerformanceDetails(performanceId);
         this.loadTicketsByPerformance(performanceId);
       }
-
     });
+
     this.getPerformanceDetails(this.performanceID);
     this.loadTicketsByPerformance(this.performanceID);
-
+    this.loadUserSeats(); // Load user-owned seats
   }
+
 
   loadTicketsByPerformance(performanceId: number): void {
     this.ticketService.getTicketsByPerformanceId(performanceId).subscribe({
@@ -146,6 +153,35 @@ export class SeatingPlanBComponent {
     });
   }
 
+  private loadUserSeats(): void {
+    const userId = this.authService.getUserIdFromToken();
+    if (userId) {
+      forkJoin([
+        this.reservedService.getReservationsByUser(userId),
+        this.purchaseService.getPurchasesByUser(userId)
+      ]).subscribe({
+        next: ([reservations, purchases]) => {
+          reservations.forEach(reservation => {
+            reservation.tickets.forEach(ticket => {
+              this.reservedAndPurchasedSeats.push(ticket.ticketId);
+            });
+          });
+
+          purchases.forEach(purchase => {
+            purchase.tickets.forEach(ticket => {
+              this.reservedAndPurchasedSeats.push(ticket.ticketId);
+            });
+          });
+        },
+        error: (err) => {
+          console.error('Error loading user seats:', err);
+          this.toastr.error('Failed to load reserved and purchased seats.', 'Error');
+        }
+      });
+    }
+  }
+
+
 
 
   getPerformanceDetails(id: number): void {
@@ -184,20 +220,38 @@ export class SeatingPlanBComponent {
   }
 
   toggleTicketSelection(ticket: TicketDto): void {
-    if (!ticket) return; // Ensure ticket is valid
+    if (!ticket) return;
 
-    // Find the index of the ticket in the selectedTickets array
+    // Check if the ticket is user-owned (reserved or purchased)
+    if (this.reservedAndPurchasedSeats.includes(ticket.ticketId)) {
+      if (ticket.status === 'RESERVED') {
+        this.toastr.info('You have already reserved this ticket.', 'Info');
+      } else if (ticket.status === 'SOLD') {
+        this.toastr.info('You have already purchased this ticket.', 'Info');
+      }
+      return; // Prevent further actions for user-owned tickets
+    }
+
+    // Check if the ticket is already in the cart
+    if (this.cartedSeats.includes(ticket.ticketId)) {
+      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+      return; // Prevent further actions for carted tickets
+    }
+
+    // Handle regular ticket selection
     const index = this.selectedTickets.findIndex(
-      (t) =>
-        t.rowNumber === ticket.rowNumber &&
-        t.seatNumber === ticket.seatNumber &&
-        t.sectorType === ticket.sectorType
+      (t) => t.ticketId === ticket.ticketId
     );
 
     if (index > -1) {
-      // Deselect the ticket if it's already selected
       this.selectedTickets.splice(index, 1);
       this.updateTotalPrice();
+      return;
+    }
+
+    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
+    if (totalSelected >= 8) {
+      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
       return;
     }
 
@@ -206,17 +260,10 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    // Check if the max ticket limit is reached
-    const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
-    if (totalSelected >= 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
-      return;
-    }
-
-    // Add the ticket to the selection
     this.selectedTickets.push(ticket);
     this.updateTotalPrice();
   }
+
 
 
   toggleStandingSector(priceCategory: PriceCategory): void {
@@ -343,6 +390,7 @@ export class SeatingPlanBComponent {
         reservationDto.ticketIds = [];
         this.resetSelections();
         this.loadTicketsByPerformance(this.performanceID);
+        this.loadUserSeats();
       },
       error: (err) => {
         console.error('Error creating reservation:', err);
@@ -379,13 +427,19 @@ export class SeatingPlanBComponent {
   }
 
   getClass(ticket: TicketDto): { [key: string]: boolean } {
+    const isSeated = ticket.sectorType === SectorType.B || ticket.sectorType === SectorType.C;
+    const isUserOwned = this.reservedAndPurchasedSeats.includes(ticket.ticketId) && isSeated;
+    const isInCart = this.cartedSeats.includes(ticket.ticketId) && isSeated;
+
     return {
       available: ticket.status === 'AVAILABLE',
-      reserved: ticket.status === 'RESERVED',
-      sold: ticket.status === 'SOLD',
-      'selected-seat': this.selectedTickets.includes(ticket),
+      reserved: ticket.status === 'RESERVED' && !isUserOwned && !isInCart,
+      sold: ticket.status === 'SOLD' && !isUserOwned,
+      'selected-seat': this.selectedTickets.includes(ticket) && !isUserOwned && !isInCart,
+      'user-owned-seat': isUserOwned || isInCart
     };
   }
+
 
   addToCart(): void {
     if (this.totalTickets === 0) {
@@ -396,8 +450,8 @@ export class SeatingPlanBComponent {
     const dialogRef = this.dialog.open(TicketExpirationDialogComponent, {
       width: '500px',
       disableClose: true,
-      panelClass: 'custom-dialog-container', // Add custom panel class
-      backdropClass: 'custom-dialog-backdrop', // Add custom backdrop class
+      panelClass: 'custom-dialog-container',
+      backdropClass: 'custom-dialog-backdrop',
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -406,6 +460,7 @@ export class SeatingPlanBComponent {
       this.selectedTickets.forEach(ticket => {
         ticket.status = 'RESERVED';
         this.cartService.addToCart(ticket);
+        this.cartedSeats.push(ticket.ticketId); // Track tickets added to the cart
         updateRequests.push(this.ticketService.updateTicket(ticket));
       });
 
@@ -415,6 +470,7 @@ export class SeatingPlanBComponent {
             vipTickets.forEach(ticket => {
               ticket.status = 'RESERVED';
               this.cartService.addToCart(ticket);
+              this.cartedSeats.push(ticket.ticketId); // Track tickets added to the cart
               updateRequests.push(this.ticketService.updateTicket(ticket));
             });
             this.resetSelections();
@@ -433,6 +489,7 @@ export class SeatingPlanBComponent {
             premiumTickets.forEach(ticket => {
               ticket.status = 'RESERVED';
               this.cartService.addToCart(ticket);
+              this.cartedSeats.push(ticket.ticketId);
               updateRequests.push(this.ticketService.updateTicket(ticket));
             });
             this.resetSelections();
@@ -457,4 +514,5 @@ export class SeatingPlanBComponent {
       });
     });
   }
+
 }
