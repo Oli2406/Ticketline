@@ -25,7 +25,6 @@ public class CustomHealthEndpoint {
         this.applicationContext = applicationContext;
     }
 
-
     @PermitAll
     @GetMapping
     public ResponseEntity<String> getHealth() {
@@ -36,8 +35,9 @@ public class CustomHealthEndpoint {
     }
 
     /**
-     * Before the shutdown of a pod this url will be called. Afterwards the health probes fail. Therefore the pod
-     * is removed from the healthy pods which are exposed. This way a zero downtime upgrade is possible.
+     * Before the shutdown of a pod this url will be called. Afterwards the health probes fail.
+     * Therefore the pod is removed from the healthy pods which are exposed. This way a zero
+     * downtime upgrade is possible.
      */
     @PermitAll
     @GetMapping("/prepareShutdown")

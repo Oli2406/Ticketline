@@ -1,0 +1,277 @@
+.event-container {
+  display: flex;
+  flex-direction: row; /* Layout in einer Zeile anordnen */
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 30px;
+
+  .main-title {
+    flex: 1; /* Nimmt links Platz ein */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center; /* Zentriert vertikal innerhalb des Containers */
+    height: 80vh; /* Nutzt die gesamte Höhe des Bildschirms */
+
+    h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #3e3e3e;
+      margin: 0; /* Entfernt unerwünschte Abstände */
+    }
+  }
+
+  .form-sections {
+    flex: 2; /* Mehr Platz für den rechten Bereich */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 80px;
+    margin-left: 200px; /* Schiebt die gesamte Sektion nach rechts */
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      //background-color: #f9f9f9; /* Hintergrundfarbe für Abschnitte */
+      padding: 15px;
+      border-radius: 8px;
+
+      h2 {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: #333;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          input,
+          select,
+          textarea {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+
+            &:focus {
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+              border-color: #7d5efc; /* Highlight border color on focus */
+            }
+          }
+
+          .select-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            select {
+              flex: 1;
+              padding: 10px;
+              border: 1px solid #ddd;
+              border-radius: 6px;
+              font-size: 1rem;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Drop shadow */
+            }
+
+            .btn-add-inline {
+              padding: 5px 10px;
+              background-color: #4d47c3;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+              &:hover {
+                background-color: #514dc7;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .performances {
+      margin-top: 20px;
+      width: 70%;
+
+      h2 {
+        font-size: 1.4rem;
+        color: #333;
+      }
+
+      .performance-list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+
+        li {
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          margin-bottom: 10px;
+          font-size: 0.9rem;
+        }
+      }
+
+      .btn-create-performance {
+        padding: 10px 20px;
+        background-color: #4d47c3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        &:hover {
+          background-color: #514dc7;
+        }
+      }
+
+      .performance-form {
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+
+        h3 {
+          font-size: 1.2rem;
+          margin-bottom: 10px;
+        }
+
+        .form-group {
+          margin-bottom: 10px;
+
+          input,
+          select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Drop shadow */
+          }
+        }
+
+        .btn-save-performance {
+          padding: 10px 20px;
+          background-color: #4d47c3;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 1rem;
+          cursor: pointer;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+          &:hover {
+            background-color: #514dc7;
+          }
+        }
+      }
+    }
+  }
+
+  .submit-container {
+    margin-top: 20px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    width: 70%;
+
+    .btn-create {
+      padding: 10px 20px;
+      background-color: #4d47c3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      align-self: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background-color: #514dc7;
+      }
+    }
+  }
+
+  .artist-form,
+  .location-form {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    .btn-save {
+      padding: 10px 20px;
+      background-color: #4d47c3;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background-color: #514dc7;
+      }
+    }
+  }
+}
+
+.custom-label {
+  color: #333;
+}
+
+.performance-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4d47c3; /* Rotes Icon */
+  font-size: 1.2rem;
+}
+
+.delete-button:hover {
+  color: #7d77e0; /* Dunkleres Rot beim Hovern */
+}
+
+.calendar-icon {
+  color: #4d47c3; /* Normales Lila */
+  position: absolute;
+  right: 14rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 1.1rem;
+  transition: color 0.2s ease; /* Sanfter Übergang */
+}
+
+.calendar-icon:hover {
+  color: #7d77e0; /* Helleres Lila beim Hover */
+}
+
+.bi-trash {
+  font-size: 1.2rem; /* Größe des Icons */
+}
+

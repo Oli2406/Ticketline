@@ -1,0 +1,148 @@
+<div class="container mt-5">
+  <!-- Header -->
+  <!-- Hall A Information -->
+  <div class="text-center mt-3">
+    <div *ngIf="performanceDetails">
+      <h2>{{ performanceDetails?.name }}</h2>
+      <p >
+        <strong>Hall:</strong> {{ performanceDetails?.hall }}<br />
+        <strong>Band:</strong> {{ artistDetails?.artistName }}<br />
+        <strong>Location:</strong> {{ locationDetails?.name }}<br />
+        <strong>Date:</strong> {{ performanceDetails?.date | date: 'yyyy-MM-dd hh:mm' }}
+      </p>
+    </div>
+      <p *ngIf="!performanceDetails">Loading performance details...</p>
+  </div>
+
+  <!-- Seating Plan and Details -->
+  <div class="row justify-content-center">
+    <!-- Seating Plan -->
+    <div class="col-lg-8">
+      <div class="seating-plan-box p-4 rounded position-relative">
+        <!-- Stage -->
+        <div class="row justify-content-center mb-3">
+          <div class="bg-black text-center text-white p-2 rounded">
+            <h4>Stage</h4>
+          </div>
+        </div>
+
+        <!-- VIP Standing -->
+        <div
+          class="vip-standing position-absolute text-center rounded"
+          (click)="toggleStandingSector(priceCategory.VIP)"
+          [ngClass]="{ 'selected-sector': selectedStanding.vip > 0 }"
+        >
+          <h5>VIP Standing</h5>
+          <div>
+            <span>Available Tickets: {{ vipStandingTickets }}</span>
+          </div>
+        </div>
+
+        <!-- Standing -->
+        <div
+          class="standing position-absolute text-center rounded"
+          (click)="toggleStandingSector(priceCategory.STANDARD)"
+          [ngClass]="{ 'selected-sector': selectedStanding.standard > 0 }"
+        >
+          <h5>Regular Standing</h5>
+          <div>
+            <span>Available Tickets: {{ standingTickets }}</span>
+          </div>
+        </div>
+
+        <!-- Seated Back -->
+        <div class="seated-back position-absolute">
+          <!-- Sector B -->
+          <div class="seating-grid">
+            <div
+              *ngFor="let seat of seatedBackB || []"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+              class="seat-box-b"
+            >
+            </div>
+          </div>
+
+          <!-- Space Divider -->
+          <div class="seating-divider"></div>
+
+          <!-- Sector C -->
+          <div class="seating-grid">
+            <div
+              *ngFor="let seat of seatedBackC || []"
+              [ngClass]="getClass(seat)"
+              (click)="toggleTicketSelection(seat)"
+              class="seat-box"
+            >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Tickets Info -->
+    <div class="col-lg-4">
+      <div class="p-4 border rounded bg-light">
+        <h5 class="text-center">Selected Tickets</h5>
+        <div *ngIf="selectedTickets.length > 0" class="mt-4">
+          <p><strong>Selected Seats:</strong></p>
+          <ul>
+            <li *ngFor="let seat of selectedTickets">
+              Sector {{ seat.sectorType }} - Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }} ({{ seat.price }}€)
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="selectedStanding.vip > 0">
+          <p><strong>Selected Standing Tickets (VIP):</strong></p>
+          <ul>
+            <li>
+              Sector A - VIP Standing - ({{ selectedStanding.vip * vipStandingPrice }}€)
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="selectedStanding.vip"
+                (change)="validateStandingTickets('vip')"
+                class="form-control ticket-input d-inline-block w-auto"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="selectedStanding.standard > 0">
+          <p><strong>Selected Standing Tickets (Regular):</strong></p>
+          <ul>
+            <li>
+              Sector A - Regular Standing - ({{ selectedStanding.standard * regularStandingPrice }}€)
+              <input
+                type="number"
+                min="0"
+                [(ngModel)]="selectedStanding.standard"
+                (change)="validateStandingTickets('standard')"
+                class="form-control ticket-input d-inline-block w-auto"
+              />
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-4">
+          <p><strong>Total Tickets:</strong> {{ totalTickets }}</p>
+          <p><strong>Total Price:</strong> {{ totalPrice }}€</p>
+        </div>
+
+        <!-- Buttons for Clear, Reserve, and Buy -->
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-gray" (click)="resetSelections()">
+            <i class="bi bi-x me-2"></i>Clear
+          </button>
+          <button class="btn btn-light-purple" (click)="reserveTickets()">
+            <i class="bi bi-bookmark me-2"></i>Reserve
+          </button>
+          <button class="btn btn-purple" (click)="addToCart()">
+            <i class="bi bi-cart me-2"></i>Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

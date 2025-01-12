@@ -1,11 +1,25 @@
-<div class="jumbotron mt-5">
-  <h1 class="display-4">Welcome to the SE PR group phase!</h1>
-  <hr class="my-4">
-  <a *ngIf="!authService.isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
-  <div *ngIf="authService.isLoggedIn()">
-    <p>Check out the latest message from the SE PR group phase.</p>
-    <p class="lead">
-      <a class="btn btn-primary btn-lg" routerLink="/message" role="button">Message</a>
-    </p>
+<div class="mt-3">
+  <a *ngIf="!isLoggedIn()" class="btn btn-primary btn-lg" routerLink="/login" role="button">Login</a>
+  <div *ngIf="isLoggedIn()">
+    <h1 class="text-center">Unread News</h1>
+    <div class="d-flex align-items-center mt-5">
+      <button class="btn btn-light me-3" (click)="previousNews()" [disabled]="currentIndex === 0">
+        &lt;
+      </button>
+      <div class="d-flex justify-content-between flex-wrap w-100">
+        <div *ngFor="let n of displayedNews" class="card w-30 cursor-pointer"
+             (click)="navigateToNewsDetails(n.id)">
+          <img [src]="n.images[0]" class="card-img-top" alt="News Image">
+          <div class="card-body">
+            <h2 class="card-title">{{ n.title }}</h2>
+            <p class="card-text text-muted">{{ n.date | date: 'yyyy-MM-dd' }}</p>
+            <p>{{ truncate(n.summary, 200) }}</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-light ms-3" (click)="nextNews()" [disabled]="currentIndex >= news.length - 3">
+        &gt;
+      </button>
+    </div>
   </div>
 </div>

@@ -1,0 +1,163 @@
+<div class="event-container">
+  <!-- Main Title -->
+  <div class="main-title">
+    <h1>Create a New Event</h1>
+  </div>
+
+  <div class="form-sections">
+    <!-- Event Details -->
+    <div class="section event-details">
+      <h2>Event Details</h2>
+      <form>
+        <label class="custom-label fw-bold">Title</label>
+        <div class="form-group">
+          <input type="text" placeholder="Event Title" [(ngModel)]="eventData.title" name="title" />
+        </div>
+        <label class="custom-label fw-bold">Description</label>
+        <div class="form-group">
+          <textarea placeholder="Description" [(ngModel)]="eventData.description" name="description"></textarea>
+        </div>
+        <form>
+          <div class="form-group">
+            <label class="custom-label fw-bold">Start Date</label>
+            <input type="date" id="dateFrom" [(ngModel)]="eventData.dateFrom" name="dateFrom" required />
+
+            <label class="custom-label fw-bold">End Date</label>
+            <input type="date" id="dateTo" [(ngModel)]="eventData.dateTo" name="dateTo" required />
+          </div>
+        </form>
+        <label class="custom-label fw-bold">Category</label>
+        <div class="form-group">
+          <input type="text" placeholder="Category" [(ngModel)]="eventData.category" name="category" />
+        </div>
+      </form>
+    </div>
+
+    <!-- Performances -->
+    <div class="section performances">
+      <h2>Performances</h2>
+
+      <!-- List of Created Performances -->
+      <ul class="performance-list">
+        <li *ngFor="let performance of performances; let i = index" class="performance-item">
+          <span>{{ performance.name }}</span>
+          <button (click)="deletePerformance(i)" class="delete-button" aria-label="Delete performance">
+            <i class="bi bi-trash"></i>
+          </button>
+        </li>
+      </ul>
+
+
+      <!-- Button to Create Performance -->
+      <button type="button" class="btn-create-performance" (click)="togglePerformanceForm()">Create Performance</button>
+
+      <!-- Performance Form -->
+      <div *ngIf="showPerformanceForm" class="performance-form">
+        <form>
+          <div class="form-group">
+            <label class="custom-label fw-bold">Performance name</label>
+            <input type="text" placeholder="Performance name" [(ngModel)]="newPerformance.name" name="performanceName" />
+          </div>
+          <div class="form-group">
+            <label class="custom-label fw-bold">Basic price</label>
+            <input type="number" placeholder="Basic price" [(ngModel)]="newPerformance.price" name="performancePrice" />
+          </div>
+          <label class="custom-label fw-bold">Duration (minutes)</label>
+          <div class="form-group">
+            <input type="number" placeholder="Duration (minutes)" [(ngModel)]="newPerformance.duration" name="duration" />
+          </div>
+          <!-- Select Artist -->
+          <div class="form-group artist-select">
+            <label class="custom-label fw-bold">Artist</label>
+            <div class="select-container">
+              <select [(ngModel)]="newPerformance.artistId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Artist</option>
+                <option *ngFor="let artist of artists" [value]="artist.artistId">{{ artist.artistName }}</option>
+              </select>
+              <button type="button" class="btn-add-inline" (click)="toggleArtistForm()">+</button>
+            </div>
+          </div>
+          <!-- Artist Form -->
+          <div *ngIf="showArtistForm" class="artist-form">
+            <h3>Create New Artist</h3>
+
+            <form>
+              <label class="custom-label fw-bold">First name</label>
+              <div class="form-group">
+                <input type="text" placeholder="First Name" [(ngModel)]="newArtist.firstName" name="firstName" />
+              </div>
+              <label class="custom-label fw-bold">Last name</label>
+              <div class="form-group">
+                <input type="text" placeholder="Last name" [(ngModel)]="newArtist.lastName" name="lastName" />
+              </div>
+              <label class="custom-label fw-bold">Artist/ Band name</label>
+              <div class="form-group">
+                <input type="text" placeholder="Artist/ Band name" [(ngModel)]="newArtist.artistName" name="artistName" />
+              </div>
+              <button type="button" class="btn-save" (click)="createArtist()">Create Artist</button>
+            </form>
+          </div>
+
+          <!-- Select Location -->
+          <div class="form-group location-select">
+            <label class="custom-label fw-bold">Location</label>
+            <div class="select-container">
+              <select [(ngModel)]="newPerformance.locationId" [ngModelOptions]="{ standalone: true }">
+                <option value="" disabled selected>Select Location</option>
+                <option *ngFor="let location of locations" [value]="location.locationId">{{ location.name }}</option>
+              </select>
+              <button type="button" class="btn-add-inline" (click)="toggleLocationForm()">+</button>
+            </div>
+          </div>
+          <!-- Location Form -->
+          <div *ngIf="showLocationForm" class="location-form">
+            <h3>Create New Location</h3>
+            <form>
+              <label class="custom-label fw-bold">Location name</label>
+              <div class="form-group">
+                <input type="text" placeholder="Location name" [(ngModel)]="newLocation.name" name="locationName" />
+              </div>
+              <label class="custom-label fw-bold">Street</label>
+              <div class="form-group">
+                <input type="text" placeholder="Street" [(ngModel)]="newLocation.street" name="street" />
+              </div>
+              <label class="custom-label fw-bold">City</label>
+              <div class="form-group">
+                <input type="text" placeholder="City" [(ngModel)]="newLocation.city" name="city" />
+              </div>
+              <label class="custom-label fw-bold">Postal code</label>
+              <div class="form-group">
+                <input type="text" placeholder="Postal Code" [(ngModel)]="newLocation.postalCode" name="postalCode" />
+              </div>
+              <label class="custom-label fw-bold">Country</label>
+              <div class="form-group">
+                <input type="text" placeholder="Country" [(ngModel)]="newLocation.country" name="country" />
+              </div>
+              <button type="button" class="btn-save" (click)="createLocation()">Create Location</button>
+            </form>
+          </div>
+          <label class="custom-label fw-bold">Date and Time</label>
+          <div class="form-group">
+            <input type="datetime-local" placeholder="Performance Date and Time" [(ngModel)]="newPerformance.date" name="performanceDate" />
+          </div>
+          <label class="custom-label fw-bold">Hall</label>
+          <div class="form-group">
+            <select [(ngModel)]="newPerformance.hall" (change)="updateTicketNumber()" name="Hall">
+              <option value="" disabled selected>Select Hall</option>
+              <option value="A">Hall A</option>
+              <option value="B">Hall B</option>
+            </select>
+          </div>
+          <label class="custom-label fw-bold">Number of tickets</label>
+          <div class="form-group">
+            <input type="number" placeholder="Number of tickets" [value]="newPerformance.ticketNumber" disabled name="ticketNumber" /> <!-- readonly -->
+          </div>
+          <button type="button" class="btn-save-performance" (click)="createPerformance()">Save Performance</button>
+        </form>
+      </div>
+    </div>
+    <div class="submit-container">
+      <button type="button" class="btn-create" (click)="onSubmit()">Create Event</button>
+    </div>
+  </div>
+</div>

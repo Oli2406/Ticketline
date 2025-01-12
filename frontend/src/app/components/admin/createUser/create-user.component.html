@@ -1,0 +1,89 @@
+<div class="signup-container">
+  <div class="signup-left">
+    <h1>Create a User</h1>
+  </div>
+  <div class="signup-right">
+    <h2>Create User</h2>
+    <form>
+      <div class="form-group">
+        <label class="custom-label fw-bold">Email</label>
+        <input
+          type="email"
+          placeholder="Email"
+          [(ngModel)]="createUserData.email"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="form-group">
+        <label class="custom-label fw-bold">First name</label>
+        <input
+          type="text"
+          placeholder="First name"
+          [(ngModel)]="createUserData.firstName"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="form-group">
+        <label class="custom-label fw-bold">Last name</label>
+        <input
+          type="text"
+          placeholder="Last name"
+          [(ngModel)]="createUserData.lastName"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="form-group password-group">
+        <label class="custom-label fw-bold">Password</label>
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Password"
+          [(ngModel)]="createUserData.password"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="togglePasswordVisibility()"
+        >
+          <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+        </button>
+      </div>
+      <div class="form-group password-group">
+        <label class="custom-label fw-bold">Confirm password</label>
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          placeholder="Confirm Password"
+          [(ngModel)]="createUserData.confirmedPassword"
+          [ngModelOptions]="{ standalone: true }"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="toggleConfirmPasswordVisibility()"
+        >
+          <i class="bi" [ngClass]="showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'"
+             style="position: absolute; top: -2px; right: 5px; cursor: pointer;"></i>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-label">
+          Give the user admin rights?
+          <input
+            type="checkbox"
+            [(ngModel)]="createUserData.isAdmin"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </label>
+      </div>
+      <button
+        type="button"
+        class="btn-register"
+        (click)="onSubmit()"
+
+      >
+        Create User
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+.dialog-container {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #4D47C3;
+}
+
+.dialog-content {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333333;
+}
+
+.dialog-actions {
+  margin-top: 20px;
+  text-align: center;
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+
+  .btn-purple {
+    background-color: #4D47C3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #3a369d;
+    }
+  }
+}

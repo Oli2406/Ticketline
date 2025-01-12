@@ -1,0 +1,419 @@
+<div class="button-group mt-3 text-center">
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
+    (click)="changeSearchType(SearchType.event)">
+    event
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
+    (click)="changeSearchType(SearchType.artist)">
+    artist
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
+    (click)="changeSearchType(SearchType.location)">
+    location
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
+    (click)="changeSearchType(SearchType.performance)">
+    performance
+  </button>
+  <button
+    class="btn me-3"
+    [ngClass]="{'btn-primary': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
+    (click)="changeSearchType(SearchType.advanced)">
+    advanced
+  </button>
+</div>
+
+<!-- Event Search Form -->
+<div *ngIf="curSearchType === SearchType.event" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <!-- hidden submit button -->
+    <input hidden="hidden" type="submit"/>
+
+    <div class="row">
+      <!-- Event title -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="eventTitle">Title</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.title" class="form-control"
+               id="eventTitle"
+               name="eventTitle" placeholder="Enter title of event" type="text"/>
+      </div>
+
+      <!-- Event category -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="eventCategory">Category</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.category" class="form-control"
+               id="eventCategory"
+               name="eventCategory" placeholder="Enter category" type="text"/>
+      </div>
+
+      <!-- Event date (Earliest) -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="eventDateEarliest">Takes place after</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateEarliest" class="form-control"
+               id="eventDateEarliest" name="eventDateEarliest" type="date"/>
+      </div>
+
+      <!-- Event date (Latest) -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="eventDateLatest">Takes place before</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateLatest" class="form-control"
+               id="eventDateLatest" name="eventDateLatest" type="date"/>
+      </div>
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Location Search Form -->
+<div *ngIf="curSearchType === SearchType.location" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <!-- hidden submit button -->
+    <input hidden="hidden" type="submit"/>
+
+    <div class="row">
+      <!-- Location name -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationName">Name</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.name" class="form-control"
+               id="locationName"
+               name="locationName" placeholder="Enter location name" type="text"/>
+      </div>
+
+      <!-- Location street -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationStreet">Street</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.street" class="form-control"
+               id="locationStreet"
+               name="locationStreet" placeholder="Enter street" type="text"/>
+      </div>
+
+      <!-- Location city -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationCity">City</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.city" class="form-control"
+               id="locationCity"
+               name="locationCity" placeholder="Enter city" type="text"/>
+      </div>
+
+      <!-- Location country -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationCountry">Country</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.country" class="form-control"
+               id="locationCountry"
+               name="locationCountry" placeholder="Enter country" type="text"/>
+      </div>
+
+      <!-- Location postal code -->
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="locationPostalCode">Postal Code</label>
+        <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.postalCode" class="form-control"
+               id="locationPostalCode"
+               name="locationPostalCode" placeholder="Enter postal code" type="number"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+<!-- Artist Search Form -->
+<div *ngIf="curSearchType === SearchType.artist" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="firstName">First Name</label>
+        <input
+          class="form-control"
+          id="firstName"
+          name="firstName"
+          [(ngModel)]="artistSearchParams.firstName"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter first name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="lastName">Last Name</label>
+        <input
+          class="form-control"
+          id="lastName"
+          name="lastName"
+          [(ngModel)]="artistSearchParams.lastName"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter last name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="artistBandName">Artist/Band Name</label>
+        <input
+          class="form-control"
+          id="artistBandName"
+          name="artistBandName"
+          [(ngModel)]="artistSearchParams.artistName"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter artist/band name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Performance Search Form -->
+<div *ngIf="curSearchType === SearchType.performance" class="mt-3">
+  <form (ngSubmit)="updateData()">
+    <div class="row justify-content-center">
+      <div class="col-md-3 mb-3">
+
+        <label class="form-label" for="performanceDate">Date and Time</label>
+        <input
+          class="form-control"
+          id="performanceDate"
+          name="performanceDate"
+          [(ngModel)]="performanceSearchParams.date"
+          (ngModelChange)="searchChanged()"
+          type="datetime-local"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="performancePrice">Price</label>
+        <input
+          class="form-control"
+          id="performancePrice"
+          name="performancePrice"
+          [(ngModel)]="performanceSearchParams.price"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter base price"
+          type="number"/>
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label" for="performanceHall">Artist/Band Name</label>
+        <input
+          class="form-control"
+          id="performanceHall"
+          name="performanceHall"
+          [(ngModel)]="performanceSearchParams.hall"
+          (ngModelChange)="searchChanged()"
+          placeholder="Enter hall name"
+          type="text"/>
+      </div>
+
+      <div class="col-md-3 mb-3 d-flex align-items-end">
+        <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
+          <i class="bi bi-x-circle"></i> Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Search Results for events -->
+<p *ngIf="curSearchType === SearchType.event && events.length === 0">No events were found.</p>
+<table
+  *ngIf="curSearchType === SearchType.event && events.length > 0"
+  class="table table-hover text-center mt-3">
+  <thead class="th-purp">
+  <tr>
+    <th>Name</th>
+    <th>Category</th>
+    <th>Description</th>
+    <th>Startdate</th>
+    <th>Enddate</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let event of events">
+    <td>{{ event.title }}</td>
+    <td>{{ event.category }}</td>
+    <td>{{ truncate(event.description, 164) }}</td>
+    <td>{{ event.dateFrom }}</td>
+    <td>{{ event.dateTo }}</td>
+    <td>
+      <button [routerLink]="['/event', event.eventId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i>
+      </button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Search Results for artist -->
+<p *ngIf="curSearchType === SearchType.artist && artists.length === 0">No artists were found.</p>
+
+<table *ngIf="curSearchType === SearchType.artist && artists.length > 0" class="table table-hover text-center mt-3">
+  <thead class="th-purp">
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Artist/Band Name</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let artist of artists">
+    <td>{{ artist.firstName }}</td>
+    <td>{{ artist.lastName }}</td>
+    <td>{{ artist.artistName }}</td>
+    <td>
+      <a [routerLink]="['/artist', artist.artistId]" class="btn btn-secondary bg-purp"><i class="bi bi-info-lg"></i></a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Search Results for location -->
+<p *ngIf="curSearchType === SearchType.location && locations.length === 0">No locations were found.</p>
+
+<table *ngIf="curSearchType === SearchType.location && locations.length > 0" class="table table-hover text-center mt-3">
+  <thead class="th-purp">
+  <tr>
+    <th>Name</th>
+    <th>Address</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let location of locations">
+    <td>{{ location.name }}</td>
+    <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
+    <td>
+      <button [routerLink]="['/location', location.locationId]" class="btn btn-secondary bg-purp"><i
+        class="bi bi-info-lg"></i></button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div *ngIf="curSearchType === SearchType.advanced" class="mt-3">
+  <div class="input-group mb-3">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Enter advanced search query..."
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="performAdvancedSearch()"/>
+    <button class="btn btn-primary" (click)="performAdvancedSearch()">Search</button>
+    <button type="button" (click)="clearSearch()" class="btn btn-secondary">
+      <i class="bi bi-x-circle"></i> Clear
+    </button>
+    <span
+      class="btn btn-light"
+      style="cursor: default;"
+      data-bs-toggle="tooltip"
+      data-bs-placement="top"
+      title="Search for performances by the event in which they take place, the artist performing or the performance
+      venue. Separate search terms with spaces (e.g., 2025-04-23 Opera SingerName).">
+      <i class="bi bi-question-lg"></i>
+    </span>
+  </div>
+</div>
+
+<!-- Advanced Search Results -->
+<div *ngIf="curSearchType === SearchType.advanced" class="mt-3">
+  <table *ngIf="advancedSearchPerformances.length > 0" class="table table-hover text-center mt-3">
+    <thead class="th-purp">
+    <tr>
+      <th>Name</th>
+      <th>Location</th>
+      <th>Time & Date</th>
+      <th>Duration</th>
+      <th>Price</th>
+      <th>Artist</th>
+      <th>Ticket Number</th>
+      <th>Hall</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let performance of advancedSearchPerformances">
+      <td>{{ performance.name }}</td>
+      <td>{{ performance.location.name }}</td>
+      <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
+      <td>{{ performance.duration | duration }}</td>
+      <td>{{ performance.price | currency: 'EUR' }}</td>
+      <td>{{ performance.artist.artistName }}</td>
+      <td>{{ performance.ticketNumber }}</td>
+      <td>{{ performance.hall }}</td>
+      <td>
+        <button
+          class="btn btn-secondary bg-purp"
+          [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
+          [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+          <i class="bi bi-ticket-fill"></i> Tickets
+        </button>
+      </td>
+
+    </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="advancedSearchPerformances.length === 0" class="text-center mt-3">
+    <p>No performances found for the current search query.</p>
+  </div>
+</div>
+
+
+<!-- Search Results for performance -->
+<p *ngIf="curSearchType === SearchType.performance && performances.length === 0">No performances were found.</p>
+
+<table *ngIf="curSearchType === SearchType.performance && performances.length > 0"
+       class="table table-hover text-center mt-3">
+  <thead class="th-purp">
+  <tr>
+    <th>Name</th>
+    <th>Location</th>
+    <th>Time & Date</th>
+    <th>Duration</th>
+    <th>Price</th>
+    <th>Artist</th>
+    <th>Ticket Number</th>
+    <th>Hall</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let performance of performances">
+    <td>{{ performance.name }}</td>
+    <td>{{ performance.location.name }}</td>
+    <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
+    <td>{{ performance.duration | duration }}</td>
+    <td>{{ performance.price | currency: 'EUR' }}</td>
+    <td>{{ performance.artist.artistName }}</td>
+    <td>{{ performance.ticketNumber }}</td>
+    <td>{{ performance.hall }}</td>
+    <td>
+      <button
+        class="btn btn-secondary bg-purp"
+        [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
+        [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+        <i class="bi bi-ticket-fill"></i> Tickets
+      </button>
+    </td>
+
+  </tr>
+  </tbody>
+</table>

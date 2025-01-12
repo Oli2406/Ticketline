@@ -20,9 +20,15 @@ public class SecurityPropertiesConfig {
     }
 
     public static class Auth {
+
         private String header;
         private String prefix;
         private String loginUri;
+        private int maxLoginAttempts;
+        private Long expirationTimeResetToken;
+        private int maxResetCodeAttempts;
+        private int maxResetTokenRequests;
+        private Long resetTokenResendInterval;
 
         public String getHeader() {
             return header;
@@ -47,9 +53,50 @@ public class SecurityPropertiesConfig {
         public void setLoginUri(String loginUri) {
             this.loginUri = loginUri;
         }
+
+        public int getMaxLoginAttempts() {
+            return maxLoginAttempts;
+        }
+
+        public void setMaxLoginAttempts(int maxLoginAttempts) {
+            this.maxLoginAttempts = maxLoginAttempts;
+        }
+
+        public Long getExpirationTimeResetToken() {
+            return expirationTimeResetToken;
+        }
+
+        public void setExpirationTimeResetToken(Long expirationTimeResetToken) {
+            this.expirationTimeResetToken = expirationTimeResetToken;
+        }
+
+        public int getMaxResetCodeAttempts() {
+            return maxResetCodeAttempts;
+        }
+
+        public void setMaxResetCodeAttempts(int maxResetCodeAttempts) {
+            this.maxResetCodeAttempts = maxResetCodeAttempts;
+        }
+
+        public int getMaxResetTokenRequests() {
+            return maxResetTokenRequests;
+        }
+
+        public void setMaxResetTokenRequests(int maxResetTokenRequests) {
+            this.maxResetTokenRequests = maxResetTokenRequests;
+        }
+
+        public Long getResetTokenResendInterval() {
+            return resetTokenResendInterval;
+        }
+
+        public void setResetTokenResendInterval(Long resetTokenResendInterval) {
+            this.resetTokenResendInterval = resetTokenResendInterval;
+        }
     }
 
     public static class Jwt {
+
         private String secret;
         private String type;
         private String issuer;
