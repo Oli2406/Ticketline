@@ -242,10 +242,21 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    if (this.getTotalUserTicketsForPerformance() >= 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+    const totalSelected = this.getTotalUserTicketsForPerformance();
+    if (totalSelected >= 8) {
+      const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
+
+      if (reservedCount === 0) {
+        this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      } else if (reservedCount === 1) {
+        this.toastr.error(`You have already reserved or purchased 1 ticket. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      } else {
+        this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      }
+
       return;
     }
+
 
     const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
     if (index > -1) {
@@ -261,10 +272,22 @@ export class SeatingPlanBComponent {
 
 
   toggleStandingSector(priceCategory: PriceCategory): void {
-    if (this.getTotalUserTicketsForPerformance() >= 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+    const totalUserTickets = this.getTotalUserTicketsForPerformance();
+
+    if (totalUserTickets >= 8) {
+      const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
+
+      if (reservedCount === 0) {
+        this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      } else if (reservedCount === 1) {
+        this.toastr.error(`You have already reserved or purchased 1 ticket. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      } else {
+        this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      }
+
       return;
     }
+
 
     if (priceCategory === PriceCategory.VIP) {
       this.selectedStanding.vip = this.selectedStanding.vip > 0 ? 0 : 1;
@@ -313,8 +336,9 @@ export class SeatingPlanBComponent {
       return;
     }
 
+    const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
     if (this.getTotalUserTicketsForPerformance() > 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only reserve up to ${8 - reservedCount} more tickets.`, 'Error');
       return;
     }
 

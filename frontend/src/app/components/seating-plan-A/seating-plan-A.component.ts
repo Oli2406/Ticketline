@@ -252,10 +252,21 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    if (this.getTotalUserTicketsForPerformance() >= 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+    const totalSelected = this.getTotalUserTicketsForPerformance();
+    if (totalSelected >= 8) {
+      const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
+
+      if (reservedCount === 0) {
+        this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      } else if (reservedCount === 1) {
+        this.toastr.error(`You have already reserved or purchased 1 ticket. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      } else {
+        this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      }
+
       return;
     }
+
 
     const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
     if (index > -1) {
@@ -274,9 +285,19 @@ export class SeatingPlanAComponent {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
 
     if (totalUserTickets >= 8) {
-      this.toastr.error('You cannot select more than 8 tickets..', 'Error');
+      const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
+
+      if (reservedCount === 0) {
+        this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      } else if (reservedCount === 1) {
+        this.toastr.error(`You have already reserved or purchased 1 ticket. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      } else {
+        this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only select up to ${8 - reservedCount} more tickets.`, 'Error');
+      }
+
       return;
     }
+
 
     if (priceCategory === this.priceCategory.VIP) {
       if (this.selectedStanding.vip > 0) {
@@ -341,8 +362,9 @@ export class SeatingPlanAComponent {
       return;
     }
 
+    const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
     if (this.getTotalUserTicketsForPerformance() > 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+      this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only reserve up to ${8 - reservedCount} more tickets.`, 'Error');
       return;
     }
 
@@ -483,24 +505,10 @@ export class SeatingPlanAComponent {
           }
         }
 
-        return result; // Return the filtered tickets
+        return result;
       })
     );
   }
-  private executeUpdates(updateRequests: Observable<any>[]): void {
-    forkJoin(updateRequests).subscribe({
-      next: () => {
-        this.toastr.success(`Successfully reserved ${this.totalTickets} tickets!`, 'Reservation Successful');
-        this.resetSelections();
-        this.loadTicketsByPerformance(this.performanceID);
-      },
-      error: err => {
-        console.error('Error reserving tickets:', err);
-        this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
-      }
-    });
-  }
-
 
   getClass(ticket: TicketDto): { [key: string]: boolean } {
     const isSeated = ticket.sectorType === SectorType.B || ticket.sectorType === SectorType.C;
