@@ -37,6 +37,13 @@ public interface ReservedService {
     ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException;
 
     /**
+     * Updates an existing one based on the provided data.
+     *
+     * @param reservedDetailDto the data forupdating a reservation
+     */
+    void updateReservation(ReservedDetailDto reservedDetailDto);
+
+    /**
      * Deletes a specific ticket from an existing reservation.
      *
      * @param reservationId the ID of the reservation from which the ticket should be deleted
@@ -44,3 +51,4 @@ public interface ReservedService {
      */
     void deleteTicketFromReservation(Long reservationId, Long ticketId);
 }
+

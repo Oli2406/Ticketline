@@ -88,7 +88,8 @@
           <p><strong>Selected Seats:</strong></p>
           <ul>
             <li *ngFor="let seat of selectedTickets">
-              Sector {{ seat.sectorType }} - Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }} ({{ seat.price }}€)
+              Sector {{ seat.sectorType }} - Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }} ({{ seat.price | number: '1.2-2' }}€
+              )
             </li>
           </ul>
         </div>
@@ -127,7 +128,7 @@
 
         <div class="mt-4">
           <p><strong>Total Tickets:</strong> {{ totalTickets }}</p>
-          <p><strong>Total Price:</strong> {{ totalPrice }}€</p>
+          <p><strong>Total Price:</strong> {{ totalPrice | number: '1.2-2' }}€</p>
         </div>
 
         <!-- Buttons for Clear, Reserve, and Buy -->

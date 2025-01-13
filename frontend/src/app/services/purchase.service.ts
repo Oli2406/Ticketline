@@ -44,6 +44,17 @@ export class PurchaseService {
   }
 
   /**
+   * Update a purchase after cancelling a ticket
+   */
+  updatePurchase(purchase: PurchaseListDto): Observable<PurchaseListDto> {
+    console.log(this.apiUrl);
+    const url = `${this.apiUrl}/${purchase.purchaseId}`;
+    return this.http.put<PurchaseListDto>(url, purchase).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * Handle HTTP errors
    */
   private handleError(error: HttpErrorResponse): Observable<never> {

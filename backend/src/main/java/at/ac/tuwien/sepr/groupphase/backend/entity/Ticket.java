@@ -63,9 +63,10 @@ public class Ticket {
     public Ticket() {
     }
 
-    public Ticket(Long performanceId, Integer rowNumber, Integer seatNumber, PriceCategory priceCategory,
-                  TicketType ticketType, SectorType sectorType, BigDecimal price, String status, Hall hall,
-                  Long reservationNumber, LocalDateTime date) {
+    public Ticket(Long performanceId, Integer rowNumber, Integer seatNumber,
+        PriceCategory priceCategory,
+        TicketType ticketType, SectorType sectorType, BigDecimal price, String status, Hall hall,
+        Long reservationNumber, LocalDateTime date) {
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
         this.priceCategory = priceCategory;
