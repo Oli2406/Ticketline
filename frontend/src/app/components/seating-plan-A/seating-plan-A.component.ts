@@ -228,7 +228,6 @@ export class SeatingPlanAComponent {
   toggleTicketSelection(ticket: TicketDto): void {
     if (!ticket) return;
 
-    // Check if the ticket is user-owned (reserved or purchased)
     if (this.reservedAndPurchasedSeats.includes(ticket.ticketId)) {
       if (ticket.status === 'RESERVED') {
         this.toastr.info('You have already reserved this ticket.', 'Info');
@@ -238,19 +237,26 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    // Check if the ticket is already in the cart
     if (this.cartedSeats.includes(ticket.ticketId)) {
       this.toastr.info('You have already added this ticket to your cart.', 'Info');
       return;
     }
 
-    // Check if adding this ticket exceeds the 8-ticket limit for the current performance
+    if (ticket.status === 'RESERVED' || ticket.status === 'SOLD') {
+      this.toastr.error('This ticket is not available.', 'Error');
+      return;
+    }
+
+    if (this.cartedSeats.includes(ticket.ticketId)) {
+      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+      return;
+    }
+
     if (this.getTotalUserTicketsForPerformance() >= 8) {
       this.toastr.error('You cannot select more than 8 tickets.', 'Error');
       return;
     }
 
-    // Handle regular ticket selection (add or remove from selectedTickets)
     const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
     if (index > -1) {
       this.selectedTickets.splice(index, 1);
@@ -260,6 +266,8 @@ export class SeatingPlanAComponent {
 
     this.updateTotalPrice();
   }
+
+
 
 
   toggleStandingSector(priceCategory: PriceCategory): void {
@@ -509,6 +517,7 @@ export class SeatingPlanAComponent {
   }
 
 
+
   addToCart(): void {
     if (this.totalTickets === 0) {
       this.toastr.error("No tickets selected to add to the cart!", "Error");
@@ -589,5 +598,6 @@ export class SeatingPlanAComponent {
       });
     });
   }
+
 
 }

@@ -20,9 +20,9 @@
   width: 80%;
   top: 80px;
   left: 10%;
-  border: 1px solid #4b5156;
+  border: 1px solid orange;
   padding: 10px;
-  background-color: #ffe066; /* Bright yellow */
+  background-color: white; /* Bright yellow */
 }
 
 /* Standing */
@@ -77,17 +77,23 @@
 }
 
 .seat-box.available {
-  background-color: #0096ff; /* Bright blue */
+  background-color: white;
+  border: 1px solid #0096ff;
+  cursor: pointer;
 }
 
 .seat-box.reserved {
   background-color: #e0e0e0;
   cursor: not-allowed;
+  border-color: #b0b0b0;
+
 }
 
 .seat-box.sold {
   background-color: #e0e0e0;
   cursor: not-allowed;
+  border-color: #b0b0b0;
+
 }
 
 .seat-box.selected-seat {
@@ -105,16 +111,22 @@
 }
 
 .seat-box-b.available {
-  background-color: #28a745; /* Bright green */
+  background-color: white; /* White background */
+  border: 1px solid #28a745; /* Green border */
+  cursor: pointer;
 }
+
 
 .seat-box-b.reserved {
   background-color: #e0e0e0;
+  border-color: #b0b0b0;
   cursor: not-allowed;
 }
 
 .seat-box-b.sold {
   background-color: #e0e0e0;
+  border-color: #b0b0b0;
+
   cursor: not-allowed;
 }
 
@@ -156,4 +168,13 @@ button i {
   background-color: black !important;
   cursor: not-allowed;
 }
+
+.legend-box {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+  border: 1px solid #888;
+}
+
 

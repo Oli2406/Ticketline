@@ -216,13 +216,29 @@ export class SeatingPlanBComponent {
 
 
   toggleTicketSelection(ticket: TicketDto): void {
+    if (!ticket) return;
+
     if (this.reservedAndPurchasedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('You already own this ticket.', 'Info');
+      if (ticket.status === 'RESERVED') {
+        this.toastr.info('You have already reserved this ticket.', 'Info');
+      } else if (ticket.status === 'SOLD') {
+        this.toastr.info('You have already purchased this ticket.', 'Info');
+      }
       return;
     }
 
     if (this.cartedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('This ticket is already in your cart.', 'Info');
+      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+      return;
+    }
+
+    if (ticket.status === 'RESERVED' || ticket.status === 'SOLD') {
+      this.toastr.error('This ticket is not available.', 'Error');
+      return;
+    }
+
+    if (this.cartedSeats.includes(ticket.ticketId)) {
+      this.toastr.info('You have already added this ticket to your cart.', 'Info');
       return;
     }
 
@@ -231,7 +247,7 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    const index = this.selectedTickets.findIndex(t => t.ticketId === ticket.ticketId);
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
     if (index > -1) {
       this.selectedTickets.splice(index, 1);
     } else {
@@ -240,6 +256,7 @@ export class SeatingPlanBComponent {
 
     this.updateTotalPrice();
   }
+
 
 
 
@@ -380,9 +397,11 @@ export class SeatingPlanBComponent {
       reserved: ticket.status === 'RESERVED' && !isUserOwned && !isInCart,
       sold: ticket.status === 'SOLD' && !isUserOwned,
       'selected-seat': this.selectedTickets.includes(ticket) && !isUserOwned && !isInCart,
-      'user-owned-seat': isUserOwned || isInCart
+      'user-owned-seat': isUserOwned || isInCart,
+      'unavailable-seat': ticket.status === 'RESERVED' || ticket.status === 'SOLD' // New class for unavailable tickets
     };
   }
+
 
 
   addToCart(): void {

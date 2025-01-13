@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <!-- Standing -->
+        <!-- Regular Standing -->
         <div
           class="standing position-absolute text-center rounded"
           (click)="toggleStandingSector(priceCategory.PREMIUM)"
@@ -57,8 +57,7 @@
               [ngClass]="getClass(seat)"
               (click)="toggleTicketSelection(seat)"
               class="seat-box-sector-b"
-            >
-            </div>
+            ></div>
           </div>
         </div>
 
@@ -67,31 +66,33 @@
 
         <!-- Sector C -->
         <div class="seated-back-c mt-4">
-          <div *ngFor="let row of [1, 2, 3, 4, 5, 6, 7, 8, 9]" class="seating-grid-c seating-grid-c{{row}}" id="seatingGridC{{row}}">
+          <div
+            *ngFor="let row of [1, 2, 3, 4, 5, 6, 7, 8, 9]"
+            class="seating-grid-c seating-grid-c{{ row }}"
+            id="seatingGridC{{ row }}"
+          >
             <div
               *ngFor="let seat of this['seatedBackC' + row] || []"
               [ngClass]="getClass(seat)"
               (click)="toggleTicketSelection(seat)"
               class="seat-box"
-            >
-            </div>
+            ></div>
           </div>
         </div>
-
-
       </div>
     </div>
 
-
-    <!-- Selected Tickets Info -->
+    <!-- Selected Tickets Info and Legend -->
     <div class="col-lg-4">
+      <!-- Selected Tickets Info -->
       <div class="p-4 border rounded bg-light">
         <h5 class="text-center">Selected Tickets</h5>
         <div *ngIf="selectedTickets.length > 0" class="mt-4">
           <p><strong>Selected Seats:</strong></p>
           <ul>
             <li *ngFor="let seat of selectedTickets">
-              Sector {{ seat.sectorType }} - Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }} ({{ seat.price }}€)
+              Sector {{ seat.sectorType }} - Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }}
+              ({{ seat.price | number: '1.2-2' }}€)
             </li>
           </ul>
         </div>
@@ -100,7 +101,7 @@
           <p><strong>Selected Standing Tickets (VIP):</strong></p>
           <ul>
             <li>
-              Sector A - VIP Standing - ({{ selectedStanding.vip * vipStandingPrice }}€)
+              Sector A - VIP Standing - ({{ selectedStanding.vip * vipStandingPrice | number: '1.2-2' }}€)
               <input
                 type="number"
                 min="0"
@@ -116,7 +117,7 @@
           <p><strong>Selected Standing Tickets (Regular):</strong></p>
           <ul>
             <li>
-              Sector A - Regular Standing - ({{ selectedStanding.premium * regularStandingPrice }}€)
+              Sector A - Regular Standing - ({{ selectedStanding.premium * regularStandingPrice | number: '1.2-2' }}€)
               <input
                 type="number"
                 min="0"
@@ -130,7 +131,7 @@
 
         <div class="mt-4">
           <p><strong>Total Tickets:</strong> {{ totalTickets }}</p>
-          <p><strong>Total Price:</strong> {{ totalPrice }}€</p>
+          <p><strong>Total Price:</strong> {{ totalPrice | number: '1.2-2' }}€</p>
         </div>
 
         <!-- Buttons for Clear, Reserve, and Buy -->
@@ -144,6 +145,48 @@
           <button class="btn btn-purple" (click)="addToCart()">
             <i class="bi bi-cart me-2"></i>Add to Cart
           </button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="p-4 border rounded bg-light mt-4">
+        <h5 class="text-center">Legend</h5>
+        <div class="mt-3">
+          <!-- Selected Seat -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: #514dc7; border: 1px solid #888;"></div>
+            <span>Selected Seat (Any Category)</span>
+          </div>
+
+          <!-- Available Seat - Sector B -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: white; border: 1px solid #28a745;"></div>
+            <span>Available Seat - Sector B (+10€)</span>
+          </div>
+
+          <!-- Available Seat - Sector C -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: white; border: 1px solid #0096ff;"></div>
+            <span>Available Seat - Sector C (-10€)</span>
+          </div>
+
+          <!-- Reserved/Sold Seat -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: #e0e0e0; border: 1px solid #b0b0b0;"></div>
+            <span>Reserved/Sold Seat</span>
+          </div>
+
+          <!-- VIP Standing -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: white; border: 1px solid orange;"></div>
+            <span>VIP Standing (+30€)</span>
+          </div>
+
+          <!-- Regular Standing -->
+          <div class="d-flex align-items-center mb-2">
+            <div class="legend-box" style="background-color: white; border: 1px solid #6c757d;"></div>
+            <span>Regular Standing (Base Price)</span>
+          </div>
         </div>
       </div>
     </div>

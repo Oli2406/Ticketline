@@ -1,5 +1,5 @@
 .seating-plan-box {
-  background-color: #f8f9fa;
+  background-color: #e3e3e3;
   border: 1px solid #ccc;
   position: relative;
   height: 500px;
@@ -24,9 +24,9 @@
   width: 60%;
   top: 80px;
   left: 20%;
-  border: 1px solid #6c757d;
+  border: 1px solid orange;
   padding: 10px;
-  background-color: #ffe066;
+  background-color: white;
 }
 
 /* Standing */
@@ -149,16 +149,19 @@
 }
 
 .seat-box.available {
-  background-color: #0096ff;
+  background-color: white;
+  border-color: #0096ff;
 }
 
   .seat-box.reserved {
   background-color: #e0e0e0;
+    border-color: #b0b0b0;
   cursor: not-allowed;
 }
 
 .seat-box.sold {
   background-color: #e0e0e0;
+  border-color: #b0b0b0;
   cursor: not-allowed;
 }
 
@@ -177,13 +180,15 @@
 }
 
 .seat-box-sector-b.available {
-  background-color: #28a745;
+  background-color: white;
+  border-color: #28a745;
 
 
 }
 
 .seat-box-sector-b.reserved {
   background-color: #e0e0e0;
+  border-color: #b0b0b0;
   cursor: not-allowed;
 }
 
@@ -194,6 +199,7 @@
 
 .seat-box-sector-b.sold {
   background-color: #e0e0e0;
+  border-color: #b0b0b0;
   cursor: not-allowed;
 }
 
@@ -227,5 +233,13 @@ button.btn-secondary {
 .user-owned-seat {
   background-color: black !important;
   cursor: pointer;
+}
+
+.legend-box {
+  display: inline-block;
+  width: 23px;
+  height: 15px;
+  margin-right: 10px;
+  border: 1px solid #888;
 }
 
