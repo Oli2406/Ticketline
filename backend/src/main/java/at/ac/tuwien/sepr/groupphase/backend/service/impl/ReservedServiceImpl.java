@@ -31,8 +31,8 @@ public class ReservedServiceImpl implements ReservedService {
     private final TicketService ticketService;
 
     public ReservedServiceImpl(ReservedRepository reservedRepository,
-        TicketRepository ticketRepository,
-        RandomStringGenerator generator, TicketService ticketService) {
+                               TicketRepository ticketRepository,
+                               RandomStringGenerator generator, TicketService ticketService) {
         this.reservedRepository = reservedRepository;
         this.ticketRepository = ticketRepository;
         this.generator = generator;
@@ -149,14 +149,36 @@ public class ReservedServiceImpl implements ReservedService {
         logger.info("Updated reservation: {}", existingReservation);
     }
 
-    /*
     @Override
-    public void deleteReservation(Long reservationId) {
-        logger.info("Deleting reservation with ID: {}", reservationId);
-        if (!reservedRepository.existsById(reservationId)) {
-            throw new IllegalArgumentException("Reservation not found");
+    public void deleteTicketFromReservation(Long reservationId, Long ticketId) {
+        logger.info("Deleting ticket {} from reservation {}", ticketId, reservationId);
+
+        // Fetch the reservation by ID
+        Reservation reservation = reservedRepository.findById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found with ID: " + reservationId));
+
+        // Get the list of current tickets in the reservation
+        List<Long> ticketIds = reservation.getTicketIds();
+
+        // Check if the ticket is present in the reservation
+        if (!ticketIds.contains(ticketId)) {
+            throw new IllegalArgumentException("Ticket not found in reservation with ID: " + ticketId);
         }
-        reservedRepository.deleteById(reservationId);
-        logger.debug("Deleted reservation with ID: {}", reservationId);
-    }*/
+
+        // Remove the ticket from the list
+        ticketIds.remove(ticketId);
+
+        // If the reservation becomes empty after removing the ticket, delete the reservation
+        if (ticketIds.isEmpty()) {
+            reservedRepository.delete(reservation);
+            logger.info("Deleted reservation {} as it has no remaining tickets", reservationId);
+        } else {
+            // Otherwise, update the reservation
+            reservation.setTicketIds(ticketIds);
+            reservedRepository.save(reservation);
+            logger.info("Updated reservation {} after removing ticket {}", reservationId, ticketId);
+        }
+    }
+
 }
+

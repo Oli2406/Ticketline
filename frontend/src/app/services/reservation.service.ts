@@ -79,4 +79,12 @@ export class ReservationService {
     }
     return throwError(() => new Error(cleanedError));
   }
+
+  deleteTicketFromReservation(reservationId: number, ticketId: number): Observable<void> {
+    const url = `${this.apiUrl}/${reservationId}/ticket/${ticketId}`;
+    return this.http.delete<void>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 }
