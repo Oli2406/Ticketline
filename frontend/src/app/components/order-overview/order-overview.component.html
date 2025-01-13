@@ -20,33 +20,35 @@
             <li *ngFor="let ticket of group.reserved">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{
-                    getPerformanceName(ticket.performanceId)
-                  }}</span>
+                <span><strong>Performance Name:</strong> {{ getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+
+              <div class="button-wrapper" style="display: flex; gap: 10px; margin-top: 10px;">
+                <div class="cancel-button">
+                  <button class="btn btn-primary" (click)="showCancelMessageReservation(ticket)">
+                    <i>Cancel Ticket</i>
+                  </button>
+                </div>
                 <div class="button-container">
                   <button class="btn btn-purple" (click)="addToCart(ticket)">
                     <i class="bi bi-cart me-2"></i>Add to Cart
                   </button>
                 </div>
               </div>
-              <div class="cancel-button">
-                <button class="btn btn-primary" (click)="showCancelMessageReservation(ticket)">
-                  <i>Cancel Ticket</i>
-                </button>
-              </div>
-              <br>
+
             </li>
           </ul>
         </div>
       </div>
     </div>
   </section>
+
 
   <!-- Aktuelle Käufe -->
   <section *ngIf="purchasedTickets.length > 0" class="section">
