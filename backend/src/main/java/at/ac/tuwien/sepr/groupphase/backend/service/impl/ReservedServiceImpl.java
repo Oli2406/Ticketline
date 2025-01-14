@@ -10,7 +10,9 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+
 import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -81,12 +83,6 @@ public class ReservedServiceImpl implements ReservedService {
     public ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException {
         logger.info("Creating reservation: {}", reservedCreateDto);
 
-        // Validate user ID
-        Long userId = generator.retrieveOriginalId(reservedCreateDto.getUserId())
-            .orElseThrow(() -> new ValidationException("Invalid user ID", List.of(
-                "User ID could not be resolved.",
-                "Ensure that the encrypted ID is correct."
-            )));
 
         // Lock and validate tickets
         List<Ticket> tickets = ticketRepository.findByIdsWithLock(reservedCreateDto.getTicketIds());
@@ -103,6 +99,12 @@ public class ReservedServiceImpl implements ReservedService {
         // Update ticket statuses
         tickets.forEach(ticket -> ticket.setStatus("RESERVED"));
         ticketRepository.saveAll(tickets);
+
+        Long userId = generator.retrieveOriginalId(reservedCreateDto.getUserId())
+            .orElseThrow(() -> new ValidationException("Invalid user ID",
+                List.of("User ID could not be resolved.",
+                    "Ensure that the encrypted ID is correct."
+                )));
 
         // Create reservation
         Reservation reservation = new Reservation(
