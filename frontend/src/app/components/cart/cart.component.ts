@@ -215,7 +215,7 @@ export class CartComponent implements OnInit {
     if (this.isTicket(item)) {
       const ticket = item as TicketDto;
       ticket.status = 'AVAILABLE';
-      this.ticketService.updateTicket(ticket).subscribe({
+      this.ticketService.updateTicket(ticket.ticketId ,ticket).subscribe({
         next: () => {
           this.toastr.success('Ticket successfully removed and marked as available.', 'Success');
         },

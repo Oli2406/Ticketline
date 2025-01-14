@@ -13,7 +13,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -188,4 +187,5 @@ public class Ticket {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
+
 }
