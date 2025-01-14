@@ -8,7 +8,7 @@ import { ArtistService } from 'src/app/services/artist.service';
 import { Artist } from "../../dtos/artist";
 import { Location } from "../../dtos/location";
 import { TicketService } from 'src/app/services/ticket.service';
-import { forkJoin, map, Observable } from "rxjs";
+import {catchError, forkJoin, map, Observable, throwError} from "rxjs";
 import {CartService} from "../../services/cart.service";
 import {ActivatedRoute} from "@angular/router";
 import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
@@ -87,23 +87,25 @@ export class SeatingPlanBComponent {
     this.route.queryParams.subscribe(params => {
       const performanceId = +params['id'];
       const hall = params['hall'];
-
       if (performanceId) {
         this.performanceID = performanceId;
         this.getPerformanceDetails(performanceId);
-        this.loadTicketsByPerformance(performanceId);
+        this.loadTicketsByPerformance(performanceId).subscribe({
+          next: tickets => {
+            console.log('Tickets loaded successfully:', tickets);
+          },
+          error: err => {
+            console.error('Error loading tickets on initialization:', err);
+          }
+        });
       }
     });
-
-    this.getPerformanceDetails(this.performanceID);
-    this.loadTicketsByPerformance(this.performanceID);
     this.loadUserSeats();
   }
 
-
-  loadTicketsByPerformance(performanceId: number): void {
-    this.ticketService.getTicketsByPerformanceId(performanceId).subscribe({
-      next: (tickets: TicketDto[]) => {
+  loadTicketsByPerformance(performanceId: number): Observable<TicketDto[]> {
+    return this.ticketService.getTicketsByPerformanceId(performanceId).pipe(
+      map((tickets: TicketDto[]) => {
         const seatedBackCRows: { [key: number]: TicketDto[] } = {};
 
         tickets.forEach(ticket => {
@@ -117,12 +119,13 @@ export class SeatingPlanBComponent {
         });
 
         for (let row = 1; row <= 9; row++) {
-          this[`seatedBackC${row}`] = seatedBackCRows[row]?.sort((a, b) => a.seatNumber - b.seatNumber) || [];
+          const sortedRowTickets = seatedBackCRows[row]?.sort((a, b) => a.seatNumber - b.seatNumber) || [];
+          this[`seatedBackC${row}`] = sortedRowTickets;
         }
 
         this.seatedBackB = tickets
           .filter(ticket => ticket.sectorType === SectorType.B)
-          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 }))
+          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 })) // Adjust price
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
 
         const standingTickets = tickets.filter(
@@ -139,14 +142,16 @@ export class SeatingPlanBComponent {
 
         this.regularStandingPrice = this.performanceDetails.price;
         this.vipStandingPrice = this.performanceDetails.price + 30;
-      },
-      error: err => {
+
+        return tickets;
+      }),
+      catchError(err => {
         console.error('Error fetching tickets:', err);
         this.toastr.error('Failed to load tickets. Please try again.', 'Error');
-      }
-    });
+        return throwError(err);
+      })
+    );
   }
-
 
   private loadUserSeats(): void {
     const userId = this.authService.getUserIdFromToken();
@@ -184,13 +189,13 @@ export class SeatingPlanBComponent {
       });
     }
   }
+
   getTotalUserTicketsForPerformance(): number {
     const reservedAndPurchased = this.userTicketsPerPerformance[this.performanceID] || 0;
     const carted = this.cartedSeats.length;
     const selected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     return reservedAndPurchased + carted + selected;
   }
-
 
   getPerformanceDetails(id: number): void {
     this.performanceService.getPerformanceById(id).subscribe({
@@ -201,6 +206,28 @@ export class SeatingPlanBComponent {
         // Set prices for different sectors and standing tickets
         this.regularStandingPrice = performancePrice;
         this.vipStandingPrice = performancePrice + 30;
+
+        if (this.performanceDetails.artistId) {
+          this.artistService.getById(this.performanceDetails.artistId).subscribe({
+            next: (artist) => {
+              this.artistDetails = artist;
+            },
+            error: (err) => {
+              console.error('Error fetching artist details:', err);
+            },
+          });
+        }
+
+        if (this.performanceDetails.locationId) {
+          this.locationService.getById(this.performanceDetails.locationId).subscribe({
+            next: (location) => {
+              this.locationDetails = location;
+            },
+            error: (err) => {
+              console.error('Error fetching location details:', err);
+            },
+          });
+        }
 
         // Update sector prices if tickets are already loaded
         this.seatedBackB.forEach(ticket => ticket.price = performancePrice + 10);
@@ -213,7 +240,6 @@ export class SeatingPlanBComponent {
       }
     });
   }
-
 
   toggleTicketSelection(ticket: TicketDto): void {
     if (!ticket) return;
@@ -268,9 +294,6 @@ export class SeatingPlanBComponent {
     this.updateTotalPrice();
   }
 
-
-
-
   toggleStandingSector(priceCategory: PriceCategory): void {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
 
@@ -322,7 +345,7 @@ export class SeatingPlanBComponent {
     this.totalPrice = seatedPrice + standingVipPrice + standingRegularPrice;
   }
 
-   resetSelections(): void {
+  resetSelections(): void {
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     this.selectedTickets = [];
     this.selectedStanding = { vip: 0, premium: 0 };
@@ -338,36 +361,56 @@ export class SeatingPlanBComponent {
 
     const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
     if (this.getTotalUserTicketsForPerformance() > 8) {
-      this.toastr.error(`You have already reserved or purchased ${reservedCount} tickets. You can only reserve up to ${8 - reservedCount} more tickets.`, 'Error');
+      this.toastr.error(
+        `You have already reserved or purchased ${reservedCount} tickets. You can only reserve up to ${8 - reservedCount} more tickets.`,
+        'Error'
+      );
       return;
     }
 
-    const reservationDto: Reservation = {
-      userId: this.authService.getUserIdFromToken(),
-      ticketIds: [],
-      reservedDate: new Date().toISOString()
-    };
+    this.loadTicketsByPerformance(this.performanceID).subscribe({
+      next: availableTickets => {
+        const unavailableTickets = this.selectedTickets.filter(
+          ticket => !availableTickets.some(available => available.ticketId === ticket.ticketId)
+        );
 
-    this.selectedTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
-
-    if (this.selectedStanding.vip > 0 || this.selectedStanding.premium > 0) {
-      forkJoin([
-        this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
-        this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
-      ]).subscribe({
-        next: ([vipTickets, premiumTickets]) => {
-          vipTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
-          premiumTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
-          this.sendReservation(reservationDto);
-        },
-        error: err => {
-          console.error('Error fetching standing tickets:', err);
-          this.toastr.error('Failed to reserve tickets.', 'Error');
+        if (unavailableTickets.length > 0) {
+          this.toastr.error("Some of the selected tickets are no longer available.", "Error");
+          return;
         }
-      });
-    } else {
-      this.sendReservation(reservationDto);
-    }
+
+        const reservationDto: Reservation = {
+          userId: this.authService.getUserIdFromToken(),
+          ticketIds: this.selectedTickets.map(ticket => ticket.ticketId),
+          reservedDate: new Date().toISOString()
+        };
+
+        if (this.selectedStanding.vip > 0 || this.selectedStanding.premium > 0) {
+          forkJoin([
+            this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip),
+            this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium)
+          ]).subscribe({
+            next: ([vipTickets, premiumTickets]) => {
+              vipTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
+              premiumTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
+
+              // Send reservation to backend
+              this.sendReservation(reservationDto);
+            },
+            error: err => {
+              console.error('Error fetching standing tickets:', err);
+              this.toastr.error('Failed to reserve tickets.', 'Error');
+            }
+          });
+        } else {
+          this.sendReservation(reservationDto);
+        }
+      },
+      error: err => {
+        console.error('Error validating tickets before reservation:', err);
+        this.toastr.error('Failed to validate tickets. Please try again.', 'Error');
+      }
+    });
   }
 
   private sendReservation(reservationDto: Reservation): void {
@@ -380,7 +423,7 @@ export class SeatingPlanBComponent {
       },
       error: err => {
         console.error('Error creating reservation:', err);
-        this.toastr.error('Failed to create reservation.', 'Error');
+        this.toastr.error('Failed to create reservation. Some tickets are unavailable', 'Error');
       }
     });
   }
@@ -426,67 +469,64 @@ export class SeatingPlanBComponent {
     };
   }
 
-
-
   addToCart(): void {
-    if (this.totalTickets === 0) {
-      this.toastr.error('No tickets selected to add to cart.', 'Error');
-      return;
-    }
+    this.loadTicketsByPerformance(this.performanceID).subscribe({
+      next: availableTickets => {
+        const unavailableTickets = this.selectedTickets.filter(
+          ticket => !availableTickets.some(available => available.ticketId === ticket.ticketId)
+        );
 
-    if (this.getTotalUserTicketsForPerformance() > 8) {
-      this.toastr.error('You cannot select more than 8 tickets.', 'Error');
-      return;
-    }
-
-    const dialogRef = this.dialog.open(TicketExpirationDialogComponent, {
-      width: '500px',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      const updateRequests = [];
-
-      this.selectedTickets.forEach(ticket => {
-        ticket.status = 'RESERVED';
-        this.cartService.addToCart(ticket);
-        this.cartedSeats.push(ticket.ticketId);
-        updateRequests.push(this.ticketService.updateTicket(ticket));
-      });
-
-      if (this.selectedStanding.vip > 0) {
-        this.getAvailableStandingTickets(PriceCategory.VIP, this.selectedStanding.vip).subscribe(vipTickets => {
-          vipTickets.forEach(ticket => {
-            ticket.status = 'RESERVED';
-            this.cartService.addToCart(ticket);
-            this.cartedSeats.push(ticket.ticketId);
-            updateRequests.push(this.ticketService.updateTicket(ticket));
-          });
-        });
-      }
-
-      if (this.selectedStanding.premium > 0) {
-        this.getAvailableStandingTickets(PriceCategory.PREMIUM, this.selectedStanding.premium).subscribe(premiumTickets => {
-          premiumTickets.forEach(ticket => {
-            ticket.status = 'RESERVED';
-            this.cartService.addToCart(ticket);
-            this.cartedSeats.push(ticket.ticketId);
-            updateRequests.push(this.ticketService.updateTicket(ticket));
-          });
-        });
-      }
-
-      forkJoin(updateRequests).subscribe({
-        next: () => {
-          this.toastr.success('Tickets added to cart successfully!', 'Success');
-          this.resetSelections();
-        },
-        error: err => {
-          console.error('Error adding tickets to cart:', err);
-          this.toastr.error('Failed to add tickets to cart.', 'Error');
+        if (unavailableTickets.length > 0) {
+          this.toastr.error("Some of the selected tickets are no longer available.", "Error");
+          return;
         }
-      });
+
+        if (this.totalTickets === 0) {
+          this.toastr.error("No tickets selected to add to the cart!", "Error");
+          return;
+        }
+
+        if (this.getTotalUserTicketsForPerformance() > 8) {
+          this.toastr.error('You cannot select more than 8 tickets.', 'Error');
+          return;
+        }
+
+        const dialogRef = this.dialog.open(TicketExpirationDialogComponent, {
+          width: '500px',
+          disableClose: true,
+          panelClass: 'custom-dialog-container',
+          backdropClass: 'custom-dialog-backdrop',
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+          const updateRequests = this.selectedTickets.map(ticket => {
+            ticket.status = 'RESERVED';
+            return this.ticketService.updateTicket(ticket.ticketId, {
+              ...ticket,
+              status: 'RESERVED',
+            });
+          });
+
+          forkJoin(updateRequests).subscribe({
+            next: updatedTickets => {
+              updatedTickets.forEach(ticket => {
+                this.cartService.addToCart(ticket);
+                this.cartedSeats.push(ticket.ticketId);
+              });
+              this.resetSelections();
+              this.toastr.success("Tickets successfully added to cart!", "Success");
+            },
+            error: err => {
+              console.error('Error reserving tickets while adding to cart:', err);
+              this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+            }
+          });
+        });
+      },
+      error: err => {
+        console.error('Error loading tickets by performance:', err);
+        this.toastr.error('Failed to check ticket availability. Please try again.', 'Error');
+      }
     });
   }
-
 }

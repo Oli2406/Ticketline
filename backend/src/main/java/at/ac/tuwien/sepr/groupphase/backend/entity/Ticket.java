@@ -13,7 +13,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -82,6 +81,19 @@ public class Ticket {
 
     public Ticket(Long performanceId, Integer rowNumber, Integer seatNumber,
                   PriceCategory priceCategory,
+                  TicketType ticketType, SectorType sectorType, BigDecimal price) {
+        this.rowNumber = rowNumber;
+        this.seatNumber = seatNumber;
+        this.priceCategory = priceCategory;
+        this.ticketType = ticketType;
+        this.sectorType = sectorType;
+        this.price = price;
+        this.status = status;
+        this.performanceId = performanceId;
+    }
+
+    public Ticket(Long performanceId, Integer rowNumber, Integer seatNumber,
+                  PriceCategory priceCategory, String status,
                   TicketType ticketType, SectorType sectorType, BigDecimal price) {
         this.rowNumber = rowNumber;
         this.seatNumber = seatNumber;
@@ -188,4 +200,5 @@ public class Ticket {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
+
 }

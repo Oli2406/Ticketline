@@ -438,7 +438,7 @@ export class OrderOverviewComponent implements OnInit {
       next: () => {
         this.removeTicketFromReservations(ticket);
         this.cartService.addToCart(ticket);
-        this.ticketService.updateTicket(ticket).subscribe({
+        this.ticketService.updateTicket(ticket.ticketId, ticket).subscribe({
           next: () => {
             this.toastr.success('Ticket added to cart successfully!', 'Success');
           },
@@ -464,7 +464,7 @@ export class OrderOverviewComponent implements OnInit {
       if (ticketIndex > -1) {
         group.reserved.splice(ticketIndex, 1);
 
-        if (group.reserved.length === 0) { //remove the group if theres no more tickets in the reservation
+        if (group.reserved.length === 0) {
           this.reservedTickets.splice(groupIndex, 1);
         }
       }

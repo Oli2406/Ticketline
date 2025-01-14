@@ -37,10 +37,11 @@ export class TicketService {
 
   /**
    * Updates the entire ticket, including its status.
+   * @param ticketId - The ID of the ticket to update
    * @param ticket - The ticket object to update with its new status.
    * @returns Observable<TicketDto>
    */
-  updateTicket(ticket: TicketDto): Observable<TicketDto> {
+  updateTicket(ticketId: number, ticket: TicketDto): Observable<TicketDto> {
     const url = `${this.apiUrl}/${ticket.ticketId}`;
     return this.http.put<TicketDto>(url, ticket).pipe(
       catchError(this.handleError)
