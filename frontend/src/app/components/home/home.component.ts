@@ -27,6 +27,8 @@ export class HomeComponent implements OnInit {
 
     if (this.isLoggedIn()) {
       this.initNews()
+    } else {
+      this.router.navigate(['/login']);
     }
   }
 

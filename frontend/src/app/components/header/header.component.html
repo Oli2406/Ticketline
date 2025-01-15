@@ -9,7 +9,9 @@
   <!-- Logo in the top left -->
   <div class="logo"></div>
 
+
   <!-- Navigation Buttons -->
+  @if (authService.isLoggedIn()) {
   <div class="nav-buttons">
     <button class="v76_370" [class.active]="currentPage === 'home'" (click)="setActivePage('home')">
       Home
@@ -30,7 +32,7 @@
       Top Events
     </button>
   </div>
-
+  }
   <!-- Authentication Buttons -->
   <div class="auth-buttons">
     @if (!authService.isLoggedIn()) {
