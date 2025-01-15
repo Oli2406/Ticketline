@@ -69,7 +69,7 @@ export class UserAccountComponent implements OnInit {
 
     const userDto: UserToUpdateDto = {
       id: this.authService.getUserIdFromToken(),
-      email : this.editUser.value.username,
+      email : this.editUser.value.username.toLowerCase(),
       firstName: this.editUser.value.firstName,
       lastName: this.editUser.value.lastName,
       password: this.editUser.value.newPassword,
