@@ -113,6 +113,7 @@ public class UserEndpoint {
         userService.deleteUser(userDto);
     }
 
+    @PermitAll
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserUpdateDto> getUser(@PathVariable String id) {
         LOGGER.trace("GET " + BASE_PATH + " {}", id);

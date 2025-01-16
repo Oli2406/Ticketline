@@ -88,6 +88,7 @@ class RegisterRepositoryUnitTest {
         userWithoutPoints.setLastName("Doe");
         userWithoutPoints.setEmail("jane.doe@example.com");
         userWithoutPoints.setPassword("securePassword123");
+        userWithoutPoints.setAdmin(false);
         ApplicationUser savedUser = userRepository.save(userWithoutPoints);
         assertEquals(0, savedUser.getPoints());
     }
