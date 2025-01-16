@@ -214,4 +214,8 @@ public class ApplicationUser {
     public void incrementVersion() {
         this.version++;
     }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 }

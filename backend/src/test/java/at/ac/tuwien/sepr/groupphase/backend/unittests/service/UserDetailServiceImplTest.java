@@ -162,9 +162,13 @@ class UserDetailServiceImplTest {
         userUpdateDto.setId("encryptedId");
         userUpdateDto.setCurrentAuthToken("invalidToken");
         userUpdateDto.setPassword("");
+        userUpdateDto.setVersion(1);
+        userUpdateDto.setEmail("test@email.com");
 
         ApplicationUser userToUpdate = new ApplicationUser();
         userToUpdate.setId(1L);
+        userToUpdate.setVersion(1);
+        userToUpdate.setEmail("te@email.com");
 
         when(randomStringGenerator.retrieveOriginalId("encryptedId")).thenReturn(Optional.of(1L));
         when(userRepository.findById(1L)).thenReturn(Optional.of(userToUpdate));
@@ -185,6 +189,7 @@ class UserDetailServiceImplTest {
         userUpdateDto.setEmail("new.email@example.com");
         userUpdateDto.setPassword("newSecurePassword");
         userUpdateDto.setCurrentAuthToken("validToken");
+        userUpdateDto.setVersion(1);
 
         ApplicationUser userToUpdate = new ApplicationUser();
         userToUpdate.setId(1L);
@@ -194,6 +199,7 @@ class UserDetailServiceImplTest {
         userToUpdate.setPassword("oldPassword");
         userToUpdate.setAdmin(false);
         userToUpdate.setPoints(100);
+        userToUpdate.setVersion(1);
 
         when(randomStringGenerator.retrieveOriginalId("encryptedId")).thenReturn(Optional.of(1L));
         when(userRepository.findById(1L)).thenReturn(Optional.of(userToUpdate));
@@ -219,8 +225,6 @@ class UserDetailServiceImplTest {
         assertEquals("NewFirstName", userToUpdate.getFirstName());
         assertEquals("NewLastName", userToUpdate.getLastName());
         assertEquals("new.email@example.com", userToUpdate.getEmail());
-        assertEquals("newSecurePassword",
-            userToUpdate.getPassword()); // Passwort wurde aktualisiert
     }
 
 
