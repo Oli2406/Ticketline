@@ -88,11 +88,7 @@ public class UserDetailServiceImpl implements UserService {
             () -> new NotFoundException(
                 String.format("Could not find the user with the email address %s",
                     userLoginDto.getEmail())));
-
-        if (user.isLoggedIn()) {
-            throw new BadCredentialsException("User is already logged in.");
-        }
-
+        
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
 
         if (user.isLocked()) {
