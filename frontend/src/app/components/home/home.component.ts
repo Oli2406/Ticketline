@@ -38,7 +38,6 @@ export class HomeComponent implements OnInit {
   displayedNews: NewsDetailDto[] = [];
 
   saveResetTokenAndRedirect(){
-    console.log("save and reset pw");
     this.route.queryParams.subscribe((params) => {
       if (params['reset-password'] === 'true' && params['token']) {
         const token = params['token'];

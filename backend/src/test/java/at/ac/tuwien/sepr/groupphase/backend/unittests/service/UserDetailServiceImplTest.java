@@ -2,9 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
@@ -12,10 +16,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
@@ -23,17 +27,12 @@ import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserDetailServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import java.util.ArrayList;
 import java.util.List;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class UserDetailServiceImplTest {
 
@@ -46,7 +45,7 @@ class UserDetailServiceImplTest {
     private ApplicationUser mockUser;
 
     @Mock
-    private RegisterRepository registerRepository;
+    private ApplicationUser applicationUser;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -70,7 +69,7 @@ class UserDetailServiceImplTest {
         MockitoAnnotations.openMocks(this);
         userService =
             new UserDetailServiceImpl(
-                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator,
+                userRepository, passwordEncoder, jwtTokenizer, userValidator,
                 jwt, auth, randomStringGenerator);
     }
 
@@ -95,7 +94,7 @@ class UserDetailServiceImplTest {
         assertEquals("Invalid email. Failed validations: .", exception.getMessage());
 
         verify(userValidator).validateRegister(userRegistrationDto);
-        verifyNoInteractions(registerRepository, passwordEncoder, jwtTokenizer);
+        verifyNoInteractions(applicationUser, passwordEncoder, jwtTokenizer);
     }
 
     @Test
