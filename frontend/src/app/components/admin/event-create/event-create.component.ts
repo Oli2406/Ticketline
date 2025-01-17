@@ -46,7 +46,6 @@ export class EventCreateComponent implements OnInit {
 
   selectedArtist = null;
   selectedLocation = null;
-  flatpickrInstance: any;
 
   constructor(
     private datePipe: DatePipe,
@@ -63,18 +62,6 @@ export class EventCreateComponent implements OnInit {
     this.loadFromLocalStorage();
     this.loadArtists();
     this.loadLocations();
-    /*flatpickr("#dateRange", {
-      mode: "range",
-      dateFormat: "Y-m-d",
-      onClose: (selectedDates: Date[], dateStr: string, instance: any) => {
-        const [dateFrom, dateTo] = selectedDates;
-        this.eventData.dateFrom = dateFrom;
-        this.eventData.dateTo = dateTo;
-      },
-      onReady: (selectedDates, dateStr, instance) => {
-        this.flatpickrInstance = instance;
-      }
-    });*/
   }
 
   saveToLocalStorage() {
@@ -391,6 +378,20 @@ export class EventCreateComponent implements OnInit {
     );
   }
 
+  deletePerformance50(performanceId: number): void {
+    this.performanceService.deletePerformance(performanceId).subscribe({
+      next: () => {
+        console.log(`Performance with ID ${performanceId} deleted successfully.`);
+        this.toastr.success(`Performance with ID ${performanceId} deleted successfully!`);
+      },
+      error: (err) => {
+        console.error(`Error deleting performance with ID ${performanceId}:`, err);
+        this.toastr.error(`Failed to delete performance with ID ${performanceId}.`, 'Error');
+      },
+    });
+  }
+
+
   onSubmit() {
     this.sendPerformancesToBackend()
       .then(() => {
@@ -402,7 +403,21 @@ export class EventCreateComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error during event creation:', err);
+            // Lösche alle erstellten Performances im Backend
+            if (this.eventData.performanceIds.length > 0) {
+              const deletePromises = this.eventData.performanceIds.map((performanceId) => {
+                // Zuerst Tickets löschen, dann die Performance
+                return this.performanceService.deletePerformance(performanceId).toPromise();
+              });
 
+              Promise.all(deletePromises)
+                .then(() => {
+                  console.log('All created performances and Tickets have been deleted due to event creation error.');
+                })
+                .catch(deleteErr => {
+                  console.error('Error deleting performances or their tickets:', deleteErr);
+                });
+            }
             const errors = Array.isArray(err.message)
               ? err.message
               : err.message.split(/\n/);
@@ -458,7 +473,6 @@ export class EventCreateComponent implements OnInit {
                 createdPerformance.hall,
                 createdPerformance.date
               ).then(() => {
-
                 resolve();
               }).catch((ticketError) => {
                 this.toastr.error('Error generating tickets.', 'Error');
