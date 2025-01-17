@@ -2,9 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
 import {DeleteUserDto, UserUpdateReadNewsDto} from "../dtos/user-data";
-import {ToastrService} from "ngx-toastr";
 import {Observable} from "rxjs";
-import {RegisterData, UserRegistrationDto, UserToUpdateDto} from "../dtos/register-data";
+import {UserToUpdateDto} from "../dtos/register-data";
 
 
 @Injectable({
@@ -28,5 +27,25 @@ export class UserService {
 
   deleteUser(userToDelete: DeleteUserDto) {
     return this.httpClient.delete(`${this.baseUri}`, {body:userToDelete});
+  }
+
+  getUserData(userId: string): Observable<UserToUpdateDto> {
+    return this.httpClient.get<UserToUpdateDto>(`${this.baseUri}/${userId}`);
+  }
+
+  /**
+   * Stores the version of current user data in localStorage.
+   */
+  storeUserVersion(version: number): void {
+    localStorage.setItem('userVersion', String(version));
+  }
+
+  clearUserVersion():void {
+    localStorage.removeItem('userVersion');
+  }
+
+  getUserVersion():number {
+    const version = localStorage.getItem('userVersion');
+    return Number(version);
   }
 }

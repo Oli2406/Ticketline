@@ -8,6 +8,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -94,4 +95,6 @@ public interface UserService extends UserDetailsService {
     String updateUser(UserUpdateDto user) throws ValidationException, ConflictException;
 
     void deleteUser(DeleteUserDto userDto) throws ValidationException;
+
+    UserUpdateDto getUser(String encryptedId) throws NotFoundException;
 }

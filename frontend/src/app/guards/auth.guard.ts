@@ -56,6 +56,19 @@ export class AuthGuard {
       );
     }
 
+    this.authService.isCurrentUserLoggedInInBackend().subscribe({
+          next: isLoggedIn => {
+            if (!isLoggedIn) {
+              this.authService.clearAuthToken();
+              this.router.navigate(['/login']);
+            }
+          }, error: () => {
+            this.authService.clearAuthToken();
+            this.router.navigate(['/login']);
+          },
+        }
+    );
+
     if (this.authService.isLoggedIn()) {
       return true;
     } else {
