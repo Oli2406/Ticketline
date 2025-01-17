@@ -45,13 +45,15 @@
   margin-bottom: 10px;
   font-size: 1rem;
   line-height: 1.5;
-  gap: 5px; /* Abstand zwischen den einzelnen Flex-Elementen */
+  gap: 1px; /* Weniger Abstand zwischen den Flex-Elementen */
 }
 
 .ticket-details span {
-  flex: 0 1 25%; /* Flexible Breite, etwa 30% pro Element */
-  text-align: left; /* Linksbündig für besseren Lesefluss */
-  margin-left: 20px;
+  flex: 0 1 30%; /* Weniger Breite pro Element für engeres Layout */
+  text-align: left; /* Linksbündig */
+  margin-left: 25px; /* Abstand von links */
+  margin-top: 10px; /* Abstand oberhalb des Textes */
+  margin-bottom: 10px; /* Abstand unterhalb des Textes */
 }
 
 
