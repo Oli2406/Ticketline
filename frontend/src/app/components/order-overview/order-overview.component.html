@@ -27,6 +27,8 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
@@ -70,6 +72,8 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
@@ -109,6 +113,8 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
