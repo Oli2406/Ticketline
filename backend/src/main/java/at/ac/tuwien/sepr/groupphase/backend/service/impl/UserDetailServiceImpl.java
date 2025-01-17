@@ -88,7 +88,7 @@ public class UserDetailServiceImpl implements UserService {
             () -> new NotFoundException(
                 String.format("Could not find the user with the email address %s",
                     userLoginDto.getEmail())));
-        
+
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
 
         if (user.isLocked()) {
@@ -112,6 +112,7 @@ public class UserDetailServiceImpl implements UserService {
 
         if (user.getLoginAttempts() >= auth.getMaxLoginAttempts()) {
             user.setLocked(true);
+            user.setLoggedIn(false);
             userRepository.save(user);
             throw new BadCredentialsException(
                 "User account has been locked because of too many incorrect attempts");
