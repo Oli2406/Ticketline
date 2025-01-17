@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +57,8 @@ public class ApplicationUser {
     private int numberOfRequestedResetTokens;
     @Column(nullable = false)
     private LocalDateTime latestRequestedResetTokenTime;
+
+    private Integer version;
 
     public ApplicationUser() {
         this.latestRequestedResetTokenTime = LocalDateTime.MIN;
@@ -206,4 +207,15 @@ public class ApplicationUser {
         this.latestRequestedResetTokenTime = latestRequestedResetTokenTime;
     }
 
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void incrementVersion() {
+        this.version++;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 }

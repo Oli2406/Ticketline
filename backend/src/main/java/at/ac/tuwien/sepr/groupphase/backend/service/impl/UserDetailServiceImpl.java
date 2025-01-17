@@ -11,7 +11,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
@@ -44,19 +43,17 @@ public class UserDetailServiceImpl implements UserService {
     private final JwtTokenizer jwtTokenizer;
     private final SecurityPropertiesConfig.Jwt jwt;
     private final SecurityPropertiesConfig.Auth auth;
-    private final RegisterRepository registerRepository;
     private final UserValidator userValidator;
     private final RandomStringGenerator randomStringGenerator;
 
     @Autowired
     public UserDetailServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-        JwtTokenizer jwtTokenizer, RegisterRepository registerRepository,
+        JwtTokenizer jwtTokenizer,
         UserValidator userValidator, SecurityPropertiesConfig.Jwt jwt,
         SecurityPropertiesConfig.Auth auth, RandomStringGenerator randomStringGenerator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenizer = jwtTokenizer;
-        this.registerRepository = registerRepository;
         this.userValidator = userValidator;
         this.jwt = jwt;
         this.auth = auth;
@@ -92,13 +89,9 @@ public class UserDetailServiceImpl implements UserService {
                 String.format("Could not find the user with the email address %s",
                     userLoginDto.getEmail())));
 
-        if (user.isLoggedIn()) {
-            throw new BadCredentialsException("User is already logged in.");
-        }
-
         UserDetails userDetails = loadUserByUsername(userLoginDto.getEmail());
 
-        if (!userDetails.isAccountNonLocked()) {
+        if (user.isLocked()) {
             throw new BadCredentialsException("Account is locked");
         }
         if (userDetails.isAccountNonExpired() && userDetails.isCredentialsNonExpired()
@@ -119,6 +112,7 @@ public class UserDetailServiceImpl implements UserService {
 
         if (user.getLoginAttempts() >= auth.getMaxLoginAttempts()) {
             user.setLocked(true);
+            user.setLoggedIn(false);
             userRepository.save(user);
             throw new BadCredentialsException(
                 "User account has been locked because of too many incorrect attempts");
@@ -241,7 +235,6 @@ public class UserDetailServiceImpl implements UserService {
     @Override
     public String updateUser(UserUpdateDto user) throws ValidationException, ConflictException {
         LOGGER.info("update user: {}", user);
-        userValidator.validateUserForUpdate(user);
 
         Long originalId = randomStringGenerator.retrieveOriginalId(user.getId())
             .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
@@ -251,29 +244,61 @@ public class UserDetailServiceImpl implements UserService {
                 String.format("Could not find the user with the email address %s",
                     user.getEmail())));
 
-        userToUpdate.setFirstName(user.getFirstName());
-        userToUpdate.setLastName(user.getLastName());
-        userToUpdate.setEmail(user.getEmail());
-
-        if (!user.getPassword().isEmpty()) {
-            userToUpdate.setPassword(user.getPassword());
+        if (!user.getVersion().equals(userToUpdate.getVersion())) {
+            List<String> error = new ArrayList<>();
+            error.add(
+                "The data has been modified by another session. \n You will be logged out now.");
+            throw new ConflictException("Update for customer has a conflict: ",
+                error);
         }
 
-        userRepository.save(userToUpdate);
+        boolean emailChanged = hasEmailChanged(user, userToUpdate);
+        boolean hasUserChanged = emailChanged || hasUserChanged(user, userToUpdate);
+        if (hasUserChanged) {
 
-        String authToken = user.getCurrentAuthToken();
-        if (!jwtTokenizer.validateToken(authToken)) {
-            throw new SecurityException("Invalid authentication token");
+            userValidator.validateUserForUpdate(user, emailChanged);
+
+            userToUpdate.setFirstName(user.getFirstName());
+            userToUpdate.setLastName(user.getLastName());
+            userToUpdate.setEmail(user.getEmail());
+            userToUpdate.incrementVersion();
+
+            var password = user.getPassword();
+            if (!password.isEmpty()) {
+                String hashedPassword = passwordEncoder.encode(password);
+                userToUpdate.setPassword(hashedPassword);
+            }
+
+            userRepository.save(userToUpdate);
+
+            String authToken = user.getCurrentAuthToken();
+            if (!jwtTokenizer.validateToken(authToken)) {
+                throw new SecurityException("Invalid authentication token");
+            }
+
+            jwtTokenizer.blockToken(authToken);
+
+            List<String> roles =
+                userToUpdate.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+
+            return jwtTokenizer.getAuthToken(userToUpdate.getEmail(), roles,
+                randomStringGenerator.generateRandomString(userToUpdate.getId()),
+                userToUpdate.getPoints(), userToUpdate.getFirstName(), userToUpdate.getLastName());
         }
 
-        jwtTokenizer.blockToken(authToken);
+        return user.getCurrentAuthToken();
+    }
 
-        List<String> roles =
-            userToUpdate.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+    private static boolean hasUserChanged(UserUpdateDto user, ApplicationUser userToUpdate) {
+        boolean hasFirstNameChanged = user.getFirstName().equals(userToUpdate.getFirstName());
+        boolean hasLastNameChanged = user.getLastName().equals(userToUpdate.getLastName());
+        boolean hasPasswordChanged = !user.getPassword().isEmpty();
 
-        return jwtTokenizer.getAuthToken(userToUpdate.getEmail(), roles,
-            randomStringGenerator.generateRandomString(userToUpdate.getId()),
-            userToUpdate.getPoints(), userToUpdate.getFirstName(), userToUpdate.getLastName());
+        return hasFirstNameChanged || hasLastNameChanged || hasPasswordChanged;
+    }
+
+    private static boolean hasEmailChanged(UserUpdateDto user, ApplicationUser userToUpdate) {
+        return !user.getEmail().equals(userToUpdate.getEmail());
     }
 
     @Override
@@ -310,5 +335,25 @@ public class UserDetailServiceImpl implements UserService {
         }
 
         LOGGER.info("deleted user: {}", userDto);
+    }
+
+    @Override
+    public UserUpdateDto getUser(String encryptedId) throws NotFoundException {
+        LOGGER.info("get user with encrypted id: {}", encryptedId);
+
+        Long originalId = randomStringGenerator.retrieveOriginalId(encryptedId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        ApplicationUser user = userRepository.findById(originalId).orElseThrow(
+            () -> new NotFoundException(
+                String.format("Could not find the user with the encrypted id %s", encryptedId)));
+
+        UserUpdateDto userDto = new UserUpdateDto();
+        userDto.setId(encryptedId);
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
+        userDto.setEmail(user.getEmail());
+        userDto.setVersion(user.getVersion());
+        return userDto;
     }
 }

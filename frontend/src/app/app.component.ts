@@ -29,11 +29,11 @@ export class AppComponent {
         next: isLoggedIn => {
           if (!isLoggedIn) {
             this.authService.clearAuthToken();
-            this.router.navigate(['/login'])
+            this.router.navigate(['/login']);
           }
         }, error: () => {
           this.authService.clearAuthToken();
-          this.router.navigate(['/login'])
+          this.router.navigate(['/login']);
         },
       }
     );
