@@ -14,9 +14,8 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {PerformanceService} from 'src/app/services/performance.service';
 import {Purchase} from "../../dtos/purchase";
 import {PurchaseService} from "../../services/purchase.service";
-import {DatePipe} from "@angular/common";
 import {TicketService} from "../../services/ticket.service";
-import {forEach} from "lodash";
+import cardValidator from 'card-validator';
 
 @Component({
   selector: 'app-cart',
@@ -57,6 +56,8 @@ export class CartComponent implements OnInit {
     paypalEmail: '',
     bankAccount: '',
   };
+
+  validationResult: string = '';
 
   performanceDetails: PerformanceListDto = null;
   performanceCache: { [id: number]: string } = {};
@@ -249,6 +250,15 @@ export class CartComponent implements OnInit {
     this.paymentDetails.creditCardNumber = input.value;
   }
 
+  validateCreditCard(): boolean {
+    const creditCardValidation = cardValidator.number(this.paymentDetails.creditCardNumber);
+    if (!creditCardValidation.isValid) {
+      this.validationResult = 'Invalid credit card number';
+      return false;
+    }
+    return true;
+}
+
   formatBankAccountNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1-').replace(/-$/, '');
@@ -319,6 +329,14 @@ export class CartComponent implements OnInit {
       this.toastr.error('Your cart is empty.');
       return;
     }
+    if (this.paymentDetails.bankAccount === '' && this.paymentDetails.creditCardNumber === '' && this.paymentDetails.paypalEmail === '') {
+      this.toastr.error('Insufficient payment details.');
+      return;
+    }
+    if(!this.validateCreditCard()) {
+      this.toastr.error('Invalid credit card number.');
+      return;
+    }
     if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
       this.toastr.error('You do not have enough points.');
       return;
@@ -346,7 +364,6 @@ export class CartComponent implements OnInit {
 
     const totalPrice = this.getTotalPrice();
     const today = new Date();
-    //set the address in the purchase??
     const purchasePayload: Purchase = {
       userId: this.authService.getUserIdFromToken(),
       ticketIds: tickets,

@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 public class ApplicationUser {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
