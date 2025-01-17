@@ -29,6 +29,7 @@ public class AdminServiceImpl implements AdminService {
         ApplicationUser user = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
         user.setLocked(false);
+        user.setLoginAttempts(0);
         userRepository.save(user);
     }
 
