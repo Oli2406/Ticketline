@@ -70,4 +70,12 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT t FROM Ticket t WHERE t.ticketId IN :ids")
     List<Ticket> findByIdsWithLock(@Param("ids") List<Long> ids);
+
+    /**
+     * Deletes all tickets associated with a specific performance ID.
+     *
+     * @param performanceId the ID of the performance whose tickets are to be deleted
+     * @return the number of tickets deleted
+     */
+    int deleteByPerformanceId(Long performanceId);
 }
