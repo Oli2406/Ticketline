@@ -32,7 +32,6 @@ export class UserAccountComponent implements OnInit {
               private toastr: ToastrService) {}
 
   ngOnInit(): void {
-    //init
     this.editUser = this.fb.group({
       username: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],

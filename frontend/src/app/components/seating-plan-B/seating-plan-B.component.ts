@@ -163,7 +163,6 @@ export class SeatingPlanBComponent {
         next: ([reservations, purchases]) => {
           this.userTicketsPerPerformance[this.performanceID] = 0;
 
-          // Count reserved and purchased tickets for the current performance
           reservations.forEach(reservation => {
             reservation.tickets.forEach(ticket => {
               if (ticket.performanceId === this.performanceID) {
@@ -201,9 +200,8 @@ export class SeatingPlanBComponent {
     this.performanceService.getPerformanceById(id).subscribe({
       next: (performance) => {
         this.performanceDetails = performance;
-        const performancePrice = performance.price; // Base performance price
+        const performancePrice = performance.price;
 
-        // Set prices for different sectors and standing tickets
         this.regularStandingPrice = performancePrice;
         this.vipStandingPrice = performancePrice + 30;
 
@@ -229,7 +227,6 @@ export class SeatingPlanBComponent {
           });
         }
 
-        // Update sector prices if tickets are already loaded
         this.seatedBackB.forEach(ticket => ticket.price = performancePrice + 10);
         for (let row = 1; row <= 9; row++) {
           this[`seatedBackC${row}`].forEach(ticket => ticket.price = performancePrice - 10);
@@ -394,7 +391,6 @@ export class SeatingPlanBComponent {
               vipTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
               premiumTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
 
-              // Send reservation to backend
               this.sendReservation(reservationDto);
             },
             error: err => {

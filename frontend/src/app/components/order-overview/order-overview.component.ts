@@ -16,8 +16,6 @@ import {
   ConfirmationDialogMode,
   ConfirmDialogComponent
 } from "../confirm-dialog/confirm-dialog.component";
-import {map} from "rxjs";
-import {transform} from "lodash";
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
 
@@ -29,7 +27,12 @@ import {CartService} from "../../services/cart.service";
   styleUrls: ['./order-overview.component.scss'],
 })
 export class OrderOverviewComponent implements OnInit {
-  reservedTickets: { date: Date; reserved: TicketDto[]; reservedId: number; showDetails: boolean }[] = [];
+  reservedTickets: {
+    date: Date;
+    reserved: TicketDto[];
+    reservedId: number;
+    showDetails: boolean
+  }[] = [];
   purchasedTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   performanceNames: { [performanceId: number]: PerformanceListDto } = {};
@@ -45,8 +48,8 @@ export class OrderOverviewComponent implements OnInit {
     rowNumber: 1,
     seatNumber: 1,
     priceCategory: PriceCategory.STANDARD,
-    ticketType: TicketType.SEATED, // Updated
-    sectorType: SectorType.A, // New sector enum
+    ticketType: TicketType.SEATED,
+    sectorType: SectorType.A,
     price: 1,
     status: '', // e.g., "AVAILABLE", "RESERVED", "SOLD"
     performanceId: 1,
@@ -55,6 +58,20 @@ export class OrderOverviewComponent implements OnInit {
     date: new Date(),
     reservedUntil: ''
   };
+  cancelledTickets: TicketDto[];
+
+  invoiceTickets: TicketDto[];
+  invoicePurchase: PurchaseListDto = {
+    purchaseId: 1,
+    userId: 1,
+    tickets: [],
+    merchandises: [],
+    totalPrice: 0,
+    purchaseDate: new Date(),
+    street: '',
+    postalCode: '',
+    city: ''
+  }
 
   address = {
     street: 'ExampleStreet',
@@ -62,18 +79,18 @@ export class OrderOverviewComponent implements OnInit {
     city: 'ExampleCity',
   };
 
-  //load user details for the invoice
   userFirstName: string;
   userLastName: string;
   userEmail: string;
   invoiceCounter: number = 1;
 
-  //confirmation dialogue for cancelling a ticket
   ConfirmationDialogMode = ConfirmationDialogMode;
-  showConfirmDeletionDialogP = false;
-  showConfirmDeletionDialogR = false;
-  cancelMessagePurchase = 'Do you really want to cancel your purchased ticket?';
-  cancelMessageReservation = 'Do you really want to cancel your reservation?';
+  showConfirmDeletionDialogPTicket = false;
+  showConfirmDeletionDialogReTicket = false;
+  showConfirmDeletionDialogAllP = false;
+  showConfirmDeletionDialogAllRes = false;
+  cancelMessagePurchase = 'Do you really want to cancel your purchased ticket(s)?';
+  cancelMessageReservation = 'Do you really want to cancel your reservation(s)?';
 
   constructor(
     private authService: AuthService,
@@ -86,7 +103,6 @@ export class OrderOverviewComponent implements OnInit {
     private receiptService: ReceiptService,
     private ticketService: TicketService,
     private cartService: CartService
-
   ) {
   }
 
@@ -158,39 +174,37 @@ export class OrderOverviewComponent implements OnInit {
     });
 
     this.purchasedTickets = Object.entries(currentMap)
-      .map(([date, tickets]) => ({
-        date: new Date(date),
-        purchased: tickets,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .map(([date, tickets]) => ({
+      date: new Date(date),
+      purchased: tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     this.pastTickets = Object.entries(pastMap)
-      .map(([date, tickets]) => ({
-        date: new Date(date),
-        purchased: tickets,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .map(([date, tickets]) => ({
+      date: new Date(date),
+      purchased: tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   private processReservations(reservations: ReservationListDto[]): void {
     const today = new Date();
     // Setze die Zeit auf Mitternacht, um nur das Datum zu vergleichen
 
-    console.log(reservations);
-
     this.reservedTickets = reservations
-      .filter((reservation) =>
-        reservation.tickets.every((ticket) => new Date(ticket.date) >= today) // Alle Tickets müssen ab heute sein
-      )
-      .map((reservation) => ({
-        date: new Date(reservation.reservedDate),
-        reserved: reservation.tickets,
-        reservedId: reservation.reservedId,
-        showDetails: false,
-      }))
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    .filter((reservation) =>
+      reservation.tickets.every((ticket) => new Date(ticket.date) >= today) // Alle Tickets müssen ab heute sein
+    )
+    .map((reservation) => ({
+      date: new Date(reservation.reservedDate),
+      reserved: reservation.tickets,
+      reservedId: reservation.reservedId,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   getPerformanceName(performanceId: number): string {
@@ -207,6 +221,21 @@ export class OrderOverviewComponent implements OnInit {
       return 'Loading...';
     }
 
+    return this.performanceNames[performanceId].name;
+  }
+
+  getTicketPerformanceForInvoice(performanceId: number): string {
+    if (!this.performanceNames[performanceId]) {
+      this.performanceService.getPerformanceById(performanceId).subscribe({
+        next: (performance) => {
+          this.performanceNames[performanceId] = performance;
+        },
+        error: (err) => {
+          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
+          this.performanceNames[performanceId].name = 'Error loading name';
+        },
+      });
+    }
     return this.performanceNames[performanceId].name;
   }
 
@@ -306,11 +335,129 @@ export class OrderOverviewComponent implements OnInit {
     return new Date().getFullYear().toString() + '-00' + this.invoiceCounter;
   }
 
-  public generateCancelPurchasePDF(): void {
-    this.receiptService.exportToPDF();
+
+  fetchPurchaseForInvoice(tickets: TicketDto[]) {
+    let purchaseId: number;
+    this.invoiceTickets = tickets;
+    console.log(this.invoiceTickets);
+    let counter = 0;
+
+    this.userPurchases.forEach((purchase) => {
+      purchase.tickets.forEach((purchaseTicket) => {
+        if ((purchaseTicket.ticketId === tickets[0].ticketId) && counter < 1) {
+          purchaseId = purchase.purchaseId;
+
+          this.purchaseService.getPurchaseById(purchaseId).subscribe({
+            next: (purchase: PurchaseListDto) => {
+              this.invoicePurchase = purchase;
+              this.invoiceTickets = purchase.tickets;
+              counter++;
+              this.purchaseService.getPurchaseById(this.invoicePurchase.purchaseId).subscribe({
+                  next: () => {
+                    this.toastr.info('Downloading Invoice.', 'Download');
+                    this.generateDownloadPDF();
+                  }
+                }
+              )
+            },
+            error: (err) => {
+              console.error('Error fetching purchase:', err.message);
+              this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
+            },
+          });
+        }
+      });
+    });
   }
 
-  cancelPurchase(ticket: TicketDto) {
+  cancelCompletePurchase(tickets: TicketDto[]) {
+    let cancelledPurchaseId: number;
+    this.cancelledTickets = tickets;
+
+    try {
+      this.userPurchases.forEach((purchase) => {
+        purchase.tickets.forEach((purchaseTicket) => {
+          if (purchaseTicket.ticketId === tickets[0].ticketId) {
+            cancelledPurchaseId = purchase.purchaseId;
+
+            this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
+              next: (purchase: PurchaseListDto) => {
+                this.cancelledPurchase = purchase;
+                this.cancelledPurchase.tickets = [];
+
+                this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
+                  next: () => {
+                    this.toastr.success('Purchase cancelled successfully.', 'Success');
+                    this.loadUserPurchases(this.authService.getUserIdFromToken());
+                    //this.generateCancelPurchasePDF();
+                  },
+                  error: (err) => {
+                    console.error('Error updating purchase:', err.message);
+                    this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+                  },
+                });
+              },
+              error: (err) => {
+                console.error('Error fetching purchase:', err.message);
+                this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
+              },
+            });
+          }
+        });
+      });
+    } catch
+      (error) {
+      console.error('Error deleting purchase:', error);
+      this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+    }
+
+    this.showConfirmDeletionDialogAllP = false;
+  }
+
+  cancelCompleteReservation(tickets: TicketDto[]) {
+    let cancelledReservationId: number;
+    this.cancelledTickets = tickets;
+
+    try {
+      this.userReservations.forEach((reservation) => {
+        reservation.tickets.forEach((reservedTicket) => {
+          if (reservedTicket.ticketId === tickets[0].ticketId) {
+            cancelledReservationId = reservation.reservedId;
+
+            this.reservationService.getReservationById(cancelledReservationId).subscribe({
+              next: (reservation: ReservationListDto) => {
+                this.cancelledReservation = reservation;
+                this.cancelledReservation.tickets = [];
+
+                this.reservationService.updateReservation(this.cancelledReservation).subscribe({
+                  next: () => {
+                    this.toastr.success('Reservation cancelled successfully. ', 'Success');
+                    this.loadUserReservations(this.authService.getUserIdFromToken());
+                  },
+                  error: (err) => {
+                    console.error('Error updating reservation:', err.message);
+                    this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
+                  },
+                });
+              },
+              error: (err) => {
+                console.error('Error fetching reservation:', err.message);
+                this.toastr.error('Failed to load reservation details. Please try again.', 'Error');
+              },
+            });
+          }
+        });
+      });
+    } catch
+      (error) {
+      console.error('Error deleting purchase:', error);
+      this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+    }
+
+    this.showConfirmDeletionDialogAllRes = false;
+  }
+
+  cancelPurchasedTicket(ticket: TicketDto) {
     this.cancelledTicket = ticket;
     let cancelledPurchaseId: number;
 
@@ -319,7 +466,6 @@ export class OrderOverviewComponent implements OnInit {
         if (purchaseTicket.ticketId === ticket.ticketId) {
           cancelledPurchaseId = purchase.purchaseId;
 
-          // Fetch the purchase details
           this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
             next: (purchase: PurchaseListDto) => {
               this.cancelledPurchase = purchase;
@@ -340,7 +486,6 @@ export class OrderOverviewComponent implements OnInit {
                 city: this.cancelledPurchase.city
               };
 
-              // Update the purchase
               this.purchaseService.updatePurchase(updatedPurchase).subscribe({
                 next: () => {
                   this.generateCancelPurchasePDF();
@@ -361,12 +506,11 @@ export class OrderOverviewComponent implements OnInit {
         }
       });
     });
-    this.showConfirmDeletionDialogP = false;
+    this.showConfirmDeletionDialogPTicket = false;
   }
 
 
-  cancelReservation(ticketReservation: TicketDto) {
-    console.log('cancel reservation ' + ticketReservation.ticketId);
+  cancelReservationTicket(ticketReservation: TicketDto) {
     this.cancelledTicket = ticketReservation;
     let cancelledReservationId: number;
 
@@ -375,7 +519,6 @@ export class OrderOverviewComponent implements OnInit {
         if (reservedTicket.ticketId === ticketReservation.ticketId) {
           cancelledReservationId = reservation.reservedId;
 
-          // Fetch the reservation details
           this.reservationService.getReservationById(cancelledReservationId).subscribe({
             next: (reservation: ReservationListDto) => {
               this.cancelledReservation = reservation;
@@ -387,12 +530,9 @@ export class OrderOverviewComponent implements OnInit {
                 reservedDate: this.cancelledReservation.reservedDate
               };
 
-              //this.generateCancelReservationPDF(updatedReservation, ticketReservation);
-
-              // Update the reservation
               this.reservationService.updateReservation(updatedReservation).subscribe({
                 next: () => {
-                  this.toastr.success('Reservation' + cancelledReservationId + ' cancelled successfully. ', 'Success');
+                  this.toastr.success('Reservation cancelled successfully. ', 'Success');
                   this.loadUserReservations(this.authService.getUserIdFromToken());
                 },
                 error: (err) => {
@@ -409,17 +549,28 @@ export class OrderOverviewComponent implements OnInit {
         }
       });
     });
-    this.showConfirmDeletionDialogR = false;
+    this.showConfirmDeletionDialogReTicket = false;
   }
 
   showCancelMessagePurchase(ticket: TicketDto) {
-    this.showConfirmDeletionDialogP = true;
+    this.showConfirmDeletionDialogPTicket = true;
     this.cancelledTicket = ticket;
   }
 
+  showCancelMessageCompletePurchase(tickets: TicketDto[]) {
+    this.showConfirmDeletionDialogAllP = true;
+    this.cancelledTickets = tickets;
+
+  }
+
   showCancelMessageReservation(ticket: TicketDto) {
-    this.showConfirmDeletionDialogR = true;
+    this.showConfirmDeletionDialogReTicket = true;
     this.cancelledTicket = ticket;
+  }
+
+  showCancelMessageCompleteReservation(tickets: TicketDto[]) {
+    this.showConfirmDeletionDialogAllRes = true;
+    this.cancelledTickets = tickets;
   }
 
   addToCart(ticket: TicketDto): void {
@@ -456,7 +607,6 @@ export class OrderOverviewComponent implements OnInit {
   }
 
 
-
   private removeTicketFromReservations(ticket: TicketDto): void {
     this.reservedTickets.forEach((group, groupIndex) => {
       const ticketIndex = group.reserved.findIndex((t) => t.ticketId === ticket.ticketId);
@@ -480,4 +630,11 @@ export class OrderOverviewComponent implements OnInit {
     return null;
   }
 
+  public generateDownloadPDF() {
+    this.receiptService.exportToDownloadPDF();
+  }
+
+  public generateCancelPurchasePDF(): void {
+    this.receiptService.exportToPDF();
+  }
 }

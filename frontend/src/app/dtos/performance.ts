@@ -1,4 +1,4 @@
-import {Location, LocationListDto} from "./location";
+import {LocationListDto} from "./location";
 import {ArtistListDto} from "./artist";
 
 export interface Performance {

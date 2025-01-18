@@ -33,4 +33,24 @@ export class ReceiptService {
     }
   }
 
+  public exportToDownloadPDF(): void {
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: 'invoice.pdf',
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+      },
+    };
+
+    const element = document.querySelector('.invoice-container-download');
+    if (element) {
+      html2pdf().set(options).from(element).save();
+    } else {
+      console.error('Invoice container not found.');
+    }
+  }
+
 }

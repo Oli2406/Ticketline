@@ -39,7 +39,6 @@ export class SeatingPlanAComponent {
   ticketType = TicketType;
   sectorType = SectorType;
 
-  // Total tickets and price
   totalTickets: number = 0;
   totalPrice: number = 0;
 
@@ -58,9 +57,6 @@ export class SeatingPlanAComponent {
 
   private userTicketsPerPerformance: { [performanceId: number]: number } = {};
 
-
-
-  // Inject dependencies
   constructor(
     private toastr: ToastrService,
     private performanceService: PerformanceService,
@@ -98,16 +94,13 @@ export class SeatingPlanAComponent {
   private loadUserSeats(): void {
     const userId = this.authService.getUserIdFromToken();
     if (userId) {
-      // Fetch reservations and purchases in parallel
       forkJoin([
         this.reservedService.getReservationsByUser(userId),
         this.purchaseService.getPurchasesByUser(userId)
       ]).subscribe({
         next: ([reservations, purchases]) => {
-          // Initialize ticket count for the current performance
           this.userTicketsPerPerformance[this.performanceID] = 0;
 
-          // Count tickets for the current performance in reservations
           reservations.forEach(reservation => {
             reservation.tickets.forEach(ticket => {
               if (ticket.performanceId === this.performanceID) {
@@ -117,7 +110,6 @@ export class SeatingPlanAComponent {
             });
           });
 
-          // Count tickets for the current performance in purchases
           purchases.forEach(purchase => {
             purchase.tickets.forEach(ticket => {
               if (ticket.performanceId === this.performanceID) {
@@ -145,26 +137,21 @@ export class SeatingPlanAComponent {
   loadTicketsByPerformance(performanceId: number): Observable<TicketDto[]> {
     return this.ticketService.getTicketsByPerformanceId(performanceId).pipe(
       map((tickets: TicketDto[]) => {
-        // Process tickets as needed
 
-        // Filter and sort tickets for Sector C
         this.seatedBackC = tickets
           .filter(ticket => ticket.sectorType === SectorType.C)
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
           .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
 
-        // Filter and sort tickets for Sector B
         this.seatedBackB = tickets
           .filter(ticket => ticket.sectorType === SectorType.B)
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
           .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
 
-        // Filter standing tickets for Sector A
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
         );
 
-        // Count VIP and regular standing tickets
         this.vipStandingTickets = standingTickets.filter(
           ticket => ticket.priceCategory === PriceCategory.VIP && ticket.status === 'AVAILABLE'
         ).length;
@@ -173,7 +160,6 @@ export class SeatingPlanAComponent {
           ticket => ticket.priceCategory === PriceCategory.STANDARD && ticket.status === 'AVAILABLE'
         ).length;
 
-        // Return the tickets to allow further usage
         return tickets;
       }),
       catchError(err => {
@@ -188,7 +174,7 @@ export class SeatingPlanAComponent {
     this.performanceService.getPerformanceById(id).subscribe({
       next: (performance) => {
         this.performanceDetails = performance;
-        const performancePrice = performance.price; // Assuming 'price' is a property in PerformanceListDto
+        const performancePrice = performance.price;
 
         // Set dynamic ticket prices based on performance price
         this.regularStandingPrice = performancePrice;
@@ -208,7 +194,6 @@ export class SeatingPlanAComponent {
           });
         }
 
-        // Fetch location details
         if (this.performanceDetails.locationId) {
           this.locationService.getById(this.performanceDetails.locationId).subscribe({
             next: (location) => {
@@ -365,7 +350,6 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    // Validate ticket availability before reservation
     this.loadTicketsByPerformance(this.performanceID).subscribe({
       next: availableTickets => {
         const unavailableTickets = this.selectedTickets.filter(
@@ -392,7 +376,6 @@ export class SeatingPlanAComponent {
               vipTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
               standardTickets.forEach(ticket => reservationDto.ticketIds.push(ticket.ticketId));
 
-              // Send reservation to the backend
               this.sendReservation(reservationDto);
             },
             error: err => {
@@ -401,7 +384,6 @@ export class SeatingPlanAComponent {
             }
           });
         } else {
-          // Send reservation to backend for seated tickets only
           this.sendReservation(reservationDto);
         }
       },
@@ -506,10 +488,8 @@ export class SeatingPlanAComponent {
             });
           });
 
-          // Use forkJoin to wait for all ticket updates to complete
           forkJoin(updateRequests).subscribe({
             next: updatedTickets => {
-              // Only add tickets that were successfully updated
               updatedTickets.forEach(ticket => {
                 this.cartService.addToCart(ticket);
                 this.cartedSeats.push(ticket.ticketId);

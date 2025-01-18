@@ -14,11 +14,9 @@ import {ErrorFormatterService} from "../../services/error-formatter.service";
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
-  // Error flag
   error = false;
   errorMessage = '';
 
-  // User data
   users: any[] = [];
   currentUserEmail = '';
 
@@ -32,8 +30,7 @@ export class AdminComponent implements OnInit {
               private adminService: AdminService,
               private userService: UserService,
               private router: Router,
-              private toastr: ToastrService,
-              private errorFormatter: ErrorFormatterService) {
+              private toastr: ToastrService,) {
   }
 
   ngOnInit(): void {
@@ -41,9 +38,6 @@ export class AdminComponent implements OnInit {
     this.currentUserEmail = this.authService.getUserEmailFromToken();
   }
 
-  /**
-   * Load users from the backend
-   */
   loadUsers(): void {
     this.adminService.getUsers().subscribe({
       next: (data) => {
@@ -56,9 +50,6 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  /**
-   * Lock a user account
-   */
   lockUser(userId: number): void {
     this.adminService.lockUser(userId).subscribe({
       next: () => this.loadUsers(),
@@ -69,9 +60,6 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  /**
-   * Unlock a user account
-   */
   unlockUser(userId: number): void {
     this.adminService.unlockUser(userId).subscribe({
       next: () => this.loadUsers(),
@@ -82,9 +70,6 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  /**
-   * Reset a user's password
-   */
   resetPassword(email: string): void {
     this.adminService.sendEmailToResetPassword(email).subscribe({
       next: () => {
@@ -97,9 +82,6 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  /**
-   * Clear error messages
-   */
   vanishError(): void {
     this.error = false;
   }
@@ -141,7 +123,7 @@ export class AdminComponent implements OnInit {
         this.showConfirmDeletionDialog = false;
         this.ngOnInit();
 
-        if(userToDelete.authToken !== null) {
+        if (userToDelete.authToken !== null) {
           this.authService.clearAuthToken();
         }
       },

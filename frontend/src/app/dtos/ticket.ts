@@ -26,8 +26,8 @@ export interface TicketDto {
   rowNumber?: number;
   seatNumber?: number;
   priceCategory: PriceCategory;
-  ticketType: TicketType; // Updated
-  sectorType: SectorType; // New sector enum
+  ticketType: TicketType;
+  sectorType: SectorType;
   price: number;
   status: string; // e.g., "AVAILABLE", "RESERVED", "SOLD"
   performanceId: number;
@@ -42,8 +42,8 @@ export interface Ticket {
   rowNumber: number;
   seatNumber: number;
   priceCategory: PriceCategory;
-  ticketType: TicketType; // Updated
-  sectorType: SectorType; // New sector enum
+  ticketType: TicketType;
+  sectorType: SectorType;
   price: number;
   status: string; // e.g., "AVAILABLE", "RESERVED", "SOLD"
   performanceId: number;

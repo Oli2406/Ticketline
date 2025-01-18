@@ -100,9 +100,6 @@ export class CartComponent implements OnInit {
         this.ticketTaxAmount = this.ticketTaxAmount + tTax;
       }
     }
-
-    console.log(this.merchandiseTaxAmount + ' Merch tax');
-    console.log(this.ticketTaxAmount + ' Ticket tax');
   }
 
   countTicketMerchandiseInCart() {
@@ -113,8 +110,6 @@ export class CartComponent implements OnInit {
         this.ticketCounter = this.ticketCounter + 1;
       }
     }
-    console.log(this.merchandiseCounter + 'merchandise');
-    console.log(this.ticketCounter + 'tickets');
   }
 
   startPeriodicCountdown(): void {
@@ -353,7 +348,6 @@ export class CartComponent implements OnInit {
     const merchandiseQuantities: number[] = [];
     const tickets: number[] = [];
 
-    // Separate merchandise and tickets
     this.cartItems.forEach(cartItem => {
       if (this.isMerchandise(cartItem.item)) {
         merchandise.push(cartItem.item.merchandiseId);
@@ -381,7 +375,7 @@ export class CartComponent implements OnInit {
     const today = new Date();
     const purchasePayload: Purchase = {
       userId: this.authService.getUserIdFromToken(),
-      ticketIds: this.selectedPaymentOption === 'points' ? [] : tickets, // Only include tickets if not paying with points
+      ticketIds: this.selectedPaymentOption === 'points' ? [] : tickets,
       merchandiseIds: merchandise,
       merchandiseQuantities: merchandiseQuantities,
       totalPrice: totalPrice,

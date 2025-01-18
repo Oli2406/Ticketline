@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AuthRequest, ResetPasswordTokenDto} from '../dtos/auth-request';
-import {catchError, Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
