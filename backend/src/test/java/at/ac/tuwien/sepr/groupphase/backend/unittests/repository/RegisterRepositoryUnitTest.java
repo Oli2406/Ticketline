@@ -1,100 +1,102 @@
 package at.ac.tuwien.sepr.groupphase.backend.unittests.repository;
 
-import at.ac.tuwien.sepr.groupphase.backend.entity.RegisterUser;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @DataJpaTest
 class RegisterRepositoryUnitTest {
 
     @Autowired
-    private RegisterRepository registerRepository;
+    private UserRepository userRepository;
 
-    private RegisterUser testUser;
-    private RegisterUser testAdmin;
+    private ApplicationUser testUser;
+    private ApplicationUser testAdmin;
 
     @BeforeEach
     void setUp() {
-        testUser = new RegisterUser();
+        testUser = new ApplicationUser();
         testUser.setFirstName("John");
         testUser.setLastName("Doe");
         testUser.setEmail("john.doe@example.com");
         testUser.setPassword("securePassword123");
         testUser.setAdmin(false);
-        testUser.setBanned(false);
-        testUser.setLoyaltyPoints(100);
+        testUser.setLocked(false);
+        testUser.setPoints(100);
 
-        testAdmin = new RegisterUser();
+        testAdmin = new ApplicationUser();
         testAdmin.setFirstName("Admin");
         testAdmin.setLastName("Mustermann");
         testAdmin.setEmail("admin.user@example.com");
         testAdmin.setPassword("adminPassword123");
         testAdmin.setAdmin(true);
-        testAdmin.setBanned(false);
-        testAdmin.setLoyaltyPoints(0);
+        testAdmin.setLocked(false);
+        testAdmin.setPoints(0);
     }
 
     @Test
     void saveAndRetrieveUser() {
-        RegisterUser savedUser = registerRepository.save(testUser);
-        Optional<RegisterUser> retrievedUser = registerRepository.findById(savedUser.getId());
+        ApplicationUser savedUser = userRepository.save(testUser);
+        Optional<ApplicationUser> retrievedUser = userRepository.findById(savedUser.getId());
         assertTrue(retrievedUser.isPresent());
         assertEquals(savedUser.getEmail(), retrievedUser.get().getEmail());
     }
 
     @Test
     void updateUser() {
-        RegisterUser savedUser = registerRepository.save(testUser);
-        savedUser.setBanned(true);
-        RegisterUser updatedUser = registerRepository.save(savedUser);
-        Optional<RegisterUser> retrievedUser = registerRepository.findById(updatedUser.getId());
+        ApplicationUser savedUser = userRepository.save(testUser);
+        savedUser.setLocked(true);
+        ApplicationUser updatedUser = userRepository.save(savedUser);
+        Optional<ApplicationUser> retrievedUser = userRepository.findById(updatedUser.getId());
         assertTrue(retrievedUser.isPresent());
-        assertTrue(retrievedUser.get().isBanned());
+        assertTrue(retrievedUser.get().isLocked());
     }
 
     @Test
     void deleteUser() {
-        RegisterUser savedUser = registerRepository.save(testUser);
-        registerRepository.delete(savedUser);
-        Optional<RegisterUser> deletedUser = registerRepository.findById(savedUser.getId());
+        ApplicationUser savedUser = userRepository.save(testUser);
+        userRepository.delete(savedUser);
+        Optional<ApplicationUser> deletedUser = userRepository.findById(savedUser.getId());
         assertFalse(deletedUser.isPresent());
     }
 
     @Test
     void existsByEmail_ReturnsTrueIfExists() {
-        registerRepository.save(testUser);
-        boolean exists = registerRepository.existsByEmail("john.doe@example.com");
+        userRepository.save(testUser);
+        boolean exists = userRepository.existsByEmail("john.doe@example.com");
         assertTrue(exists);
     }
 
     @Test
     void existsByEmail_ReturnsFalseIfNotExists() {
-        boolean exists = registerRepository.existsByEmail("nonexistent@example.com");
+        boolean exists = userRepository.existsByEmail("nonexistent@example.com");
         assertFalse(exists);
     }
 
     @Test
     void loyaltyPoints_DefaultIsZero() {
-        RegisterUser userWithoutPoints = new RegisterUser();
+        ApplicationUser userWithoutPoints = new ApplicationUser();
         userWithoutPoints.setFirstName("Jane");
         userWithoutPoints.setLastName("Doe");
         userWithoutPoints.setEmail("jane.doe@example.com");
         userWithoutPoints.setPassword("securePassword123");
-        RegisterUser savedUser = registerRepository.save(userWithoutPoints);
-        assertEquals(0, savedUser.getLoyaltyPoints());
+        userWithoutPoints.setAdmin(false);
+        ApplicationUser savedUser = userRepository.save(userWithoutPoints);
+        assertEquals(0, savedUser.getPoints());
     }
 
     @Test
     void saveAndRetrieveAdmin() {
-        RegisterUser savedUser = registerRepository.save(testAdmin);
-        Optional<RegisterUser> retrievedUser = registerRepository.findById(savedUser.getId());
+        ApplicationUser savedUser = userRepository.save(testAdmin);
+        Optional<ApplicationUser> retrievedUser = userRepository.findById(savedUser.getId());
         assertTrue(retrievedUser.isPresent());
         assertEquals(savedUser.getEmail(), retrievedUser.get().getEmail());
         assertTrue(retrievedUser.get().isAdmin());

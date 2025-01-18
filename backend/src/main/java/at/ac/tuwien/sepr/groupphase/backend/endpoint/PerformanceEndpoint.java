@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
+import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import jakarta.annotation.security.PermitAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,11 @@ public class PerformanceEndpoint {
     public static final String BASE_PATH = "/api/v1/performance";
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final PerformanceService performanceService;
+    private final TicketService ticketService;
 
-    public PerformanceEndpoint(PerformanceService performanceService) {
+    public PerformanceEndpoint(PerformanceService performanceService, TicketService ticketService) {
         this.performanceService = performanceService;
+        this.ticketService = ticketService;
     }
 
     @Secured("ROLE_ADMIN")
@@ -118,6 +121,4 @@ public class PerformanceEndpoint {
         LOGGER.debug("Performance updated successfully: {}", updatedPerformance);
         return ResponseEntity.ok(updatedPerformance);
     }
-
-
 }

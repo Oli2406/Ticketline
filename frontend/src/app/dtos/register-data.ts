@@ -30,6 +30,7 @@ export interface UserToUpdateDto {
   password: string;
   confirmedPassword: string;
   currentAuthToken: string;
+  version:number;
 }
 
 export interface AdminUserRegistrationDto {

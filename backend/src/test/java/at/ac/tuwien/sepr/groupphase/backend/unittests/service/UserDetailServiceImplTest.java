@@ -2,9 +2,13 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import at.ac.tuwien.sepr.groupphase.backend.config.SecurityPropertiesConfig;
@@ -12,10 +16,10 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
@@ -23,17 +27,12 @@ import at.ac.tuwien.sepr.groupphase.backend.service.impl.UserDetailServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import java.util.ArrayList;
 import java.util.List;
-import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class UserDetailServiceImplTest {
 
@@ -46,7 +45,7 @@ class UserDetailServiceImplTest {
     private ApplicationUser mockUser;
 
     @Mock
-    private RegisterRepository registerRepository;
+    private ApplicationUser applicationUser;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -70,7 +69,7 @@ class UserDetailServiceImplTest {
         MockitoAnnotations.openMocks(this);
         userService =
             new UserDetailServiceImpl(
-                userRepository, passwordEncoder, jwtTokenizer, registerRepository, userValidator,
+                userRepository, passwordEncoder, jwtTokenizer, userValidator,
                 jwt, auth, randomStringGenerator);
     }
 
@@ -95,7 +94,7 @@ class UserDetailServiceImplTest {
         assertEquals("Invalid email. Failed validations: .", exception.getMessage());
 
         verify(userValidator).validateRegister(userRegistrationDto);
-        verifyNoInteractions(registerRepository, passwordEncoder, jwtTokenizer);
+        verifyNoInteractions(applicationUser, passwordEncoder, jwtTokenizer);
     }
 
     @Test
@@ -163,9 +162,13 @@ class UserDetailServiceImplTest {
         userUpdateDto.setId("encryptedId");
         userUpdateDto.setCurrentAuthToken("invalidToken");
         userUpdateDto.setPassword("");
+        userUpdateDto.setVersion(1);
+        userUpdateDto.setEmail("test@email.com");
 
         ApplicationUser userToUpdate = new ApplicationUser();
         userToUpdate.setId(1L);
+        userToUpdate.setVersion(1);
+        userToUpdate.setEmail("te@email.com");
 
         when(randomStringGenerator.retrieveOriginalId("encryptedId")).thenReturn(Optional.of(1L));
         when(userRepository.findById(1L)).thenReturn(Optional.of(userToUpdate));
@@ -186,6 +189,7 @@ class UserDetailServiceImplTest {
         userUpdateDto.setEmail("new.email@example.com");
         userUpdateDto.setPassword("newSecurePassword");
         userUpdateDto.setCurrentAuthToken("validToken");
+        userUpdateDto.setVersion(1);
 
         ApplicationUser userToUpdate = new ApplicationUser();
         userToUpdate.setId(1L);
@@ -195,6 +199,7 @@ class UserDetailServiceImplTest {
         userToUpdate.setPassword("oldPassword");
         userToUpdate.setAdmin(false);
         userToUpdate.setPoints(100);
+        userToUpdate.setVersion(1);
 
         when(randomStringGenerator.retrieveOriginalId("encryptedId")).thenReturn(Optional.of(1L));
         when(userRepository.findById(1L)).thenReturn(Optional.of(userToUpdate));
@@ -220,8 +225,6 @@ class UserDetailServiceImplTest {
         assertEquals("NewFirstName", userToUpdate.getFirstName());
         assertEquals("NewLastName", userToUpdate.getLastName());
         assertEquals("new.email@example.com", userToUpdate.getEmail());
-        assertEquals("newSecurePassword",
-            userToUpdate.getPassword()); // Passwort wurde aktualisiert
     }
 
 

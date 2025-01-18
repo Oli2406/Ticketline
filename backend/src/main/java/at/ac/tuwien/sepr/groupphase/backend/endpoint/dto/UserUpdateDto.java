@@ -20,6 +20,9 @@ public class UserUpdateDto {
     @NotNull(message = "Auth Token must not be empty")
     private String currentAuthToken;
 
+    @NotNull(message = "Version must not be null")
+    private Integer version;
+
     public String getId() {
         return id;
     }
@@ -74,5 +77,13 @@ public class UserUpdateDto {
 
     public void setCurrentAuthToken(String currentAuthToken) {
         this.currentAuthToken = currentAuthToken;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 }

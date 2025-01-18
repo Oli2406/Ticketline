@@ -7,6 +7,7 @@ import {Router} from "@angular/router";
 import {ToastrService} from "ngx-toastr";
 import {DeleteUserDto} from "../../dtos/user-data";
 import {ConfirmationDialogMode} from "../confirm-dialog/confirm-dialog.component";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'app-user-account',
@@ -31,26 +32,39 @@ export class UserAccountComponent implements OnInit {
               private toastr: ToastrService) {}
 
   ngOnInit(): void {
+    //init
+    this.editUser = this.fb.group({
+      username: ['', [Validators.required, Validators.email]],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      newPassword: ['', [Validators.minLength(8)]],
+      confirmPassword: [''],
+    },
+        {
+          validators: this.passwordsMatchValidator
+        });
+
     this.fillForm();
   }
 
   private fillForm() {
-    const email = this.authService.getUserEmailFromToken();
-    const firstName = this.authService.getUserFirstNameFromToken();
-    const lastName = this.authService.getUserLastNameFromToken();
+    const userId = this.authService.getUserIdFromToken();
 
-    this.editUser = this.fb.group(
-      {
-        username: [email, [Validators.required, Validators.email]],
-        firstName: [firstName, Validators.required],
-        lastName: [lastName, Validators.required],
-        newPassword: ['', [Validators.minLength(8)]],
-        confirmPassword: ['']
+    this.userService.getUserData(userId).subscribe({
+      next: (data: UserToUpdateDto) => {
+
+        this.editUser.patchValue({
+          username: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+
+        });
+        this.userService.storeUserVersion(data.version);
       },
-      {
-        validators: this.passwordsMatchValidator
-      }
-    );
+      error: (err) => {
+        this.toastr.error('Failed to load user data. Please try again.', 'Error');
+      },
+    });
   }
 
   private passwordsMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
@@ -69,12 +83,13 @@ export class UserAccountComponent implements OnInit {
 
     const userDto: UserToUpdateDto = {
       id: this.authService.getUserIdFromToken(),
-      email : this.editUser.value.username,
+      email : this.editUser.value.username.toLowerCase(),
       firstName: this.editUser.value.firstName,
       lastName: this.editUser.value.lastName,
       password: this.editUser.value.newPassword,
       confirmedPassword: this.editUser.value.confirmPassword,
-      currentAuthToken: this.authService.getAuthToken()
+      currentAuthToken: this.authService.getAuthToken(),
+      version: this.userService.getUserVersion()
     }
     this.userService.updateUser(userDto).subscribe({
       next: (newAuthToken:string) => {
@@ -85,7 +100,11 @@ export class UserAccountComponent implements OnInit {
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        this.toastr.error(err.errors.errors, 'FAILED to update account');
+        this.handleError(err);
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
       }
     });
 
@@ -136,5 +155,20 @@ export class UserAccountComponent implements OnInit {
 
   showDeleteMessage(){
     this.showConfirmDeletionDialog = true;
+  }
+
+  handleError(error: HttpErrorResponse): void {
+    if (error.error) {
+      try {
+        const errorResponse = JSON.parse(error.error);
+        if (errorResponse.errors) {
+          let errorMessage = errorResponse.errors;
+          errorMessage = errorMessage.replace(/^\[|\]$/g, '');
+          this.toastr.error(errorMessage, 'Failed to update account');
+        }
+      } catch (e) {
+        console.error('Error parsing the error response:', e);
+      }
+    }
   }
 }

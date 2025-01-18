@@ -14,9 +14,11 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.SearchPerformanceRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.PerformanceValidator;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,18 +41,20 @@ public class PerformanceServiceImpl implements PerformanceService {
     private final SearchPerformanceRepository searchPerformanceRepository;
     private final ArtistRepository artistRepository;
     private final LocationRepository locationRepository;
+    private final TicketRepository ticketRepository;
     private final PerformanceMapper performanceMapper;
 
     public PerformanceServiceImpl(PerformanceRepository performanceRepository,
-        PerformanceValidator performanceValidator,
-        SearchPerformanceRepository searchPerformanceRepository,
-        ArtistRepository artistRepository, LocationRepository locationRepository,
-        PerformanceMapper performanceMapper) {
+                                  PerformanceValidator performanceValidator,
+                                  SearchPerformanceRepository searchPerformanceRepository,
+                                  ArtistRepository artistRepository, LocationRepository locationRepository,
+                                  PerformanceMapper performanceMapper, TicketRepository ticketRepository) {
         this.performanceRepository = performanceRepository;
         this.performanceValidator = performanceValidator;
         this.searchPerformanceRepository = searchPerformanceRepository;
         this.artistRepository = artistRepository;
         this.locationRepository = locationRepository;
+        this.ticketRepository = ticketRepository;
         this.performanceMapper = performanceMapper;
     }
 
@@ -117,8 +121,15 @@ public class PerformanceServiceImpl implements PerformanceService {
     }
 
     @Override
+    @Transactional
     public void deletePerformance(Long id) {
         LOGGER.info("Deleting performance with ID: {}", id);
+        int deletedTickets = ticketRepository.deleteByPerformanceId(id);
+        if (deletedTickets > 0) {
+            LOGGER.info("Tickets were deleted: {}", deletedTickets);
+        } else {
+            LOGGER.info("Tickets were not deleted: {}", deletedTickets);
+        }
         performanceRepository.deleteById(id);
         LOGGER.debug("Deleted performance with ID: {}", id);
     }

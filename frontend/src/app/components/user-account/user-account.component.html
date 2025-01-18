@@ -91,9 +91,9 @@
               (click)="toggleConfirmPasswordVisibility()"
             ></i>
           </div>
-          <div *ngIf="submitted && editUser.controls.confirmPassword.errors"
+          <div
                class="text-danger mt-1">
-            <small *ngIf="editUser.errors?.passwordMismatch">
+            <small *ngIf="submitted && editUser.errors?.passwordMismatch">
               Passwords do not match!
             </small>
           </div>

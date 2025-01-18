@@ -45,11 +45,14 @@ public class PerformanceServiceImplTest {
     @Mock
     private PerformanceMapper performanceMapper;
 
+    @Mock
+    private TicketRepository ticketRepository;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
         performanceService = new PerformanceServiceImpl(performanceRepository, performanceValidator,
-            searchPerformanceRepository, artistRepository, locationRepository, performanceMapper);
+            searchPerformanceRepository, artistRepository, locationRepository, performanceMapper, ticketRepository);
     }
 
     @Test
