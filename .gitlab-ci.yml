@@ -18,6 +18,11 @@ test-backend:
   script:
     - cd backend
     - mvn -B clean install
+    - mvn clean verify
+  artifacts:
+    paths:
+      - backend/target/site/jacoco
+    expire_in: 1 day
 
 test-frontend:
   stage: test
