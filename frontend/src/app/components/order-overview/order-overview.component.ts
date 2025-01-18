@@ -343,9 +343,9 @@ export class OrderOverviewComponent implements OnInit {
               // Update the purchase
               this.purchaseService.updatePurchase(updatedPurchase).subscribe({
                 next: () => {
+                  this.generateCancelPurchasePDF();
                   this.toastr.success('Purchase cancelled successfully.', 'Success');
                   this.loadUserPurchases(this.authService.getUserIdFromToken());
-                  this.generateCancelPurchasePDF();
                 },
                 error: (err) => {
                   console.error('Error updating purchase:', err.message);
