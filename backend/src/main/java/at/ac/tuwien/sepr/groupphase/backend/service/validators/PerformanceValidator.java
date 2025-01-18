@@ -86,7 +86,7 @@ public class PerformanceValidator {
             validationErrors.add("Hall is required");
         }
 
-        if (performanceCreateDto.getHall().length() > 50) {
+        if (performanceCreateDto.getHall() != null && performanceCreateDto.getHall().length() > 50) {
             validationErrors.add("Performance hall must be less than 50 characters");
         }
 
@@ -98,12 +98,11 @@ public class PerformanceValidator {
             validationErrors.add("Event duration must be less than 600 minutes or 10 hours");
         }
 
-        LocalDateTime start = performanceCreateDto.getDate();
-        LocalDateTime end = performanceCreateDto.getDate()
-            .plusMinutes(performanceCreateDto.getDuration());
-
         if (performanceCreateDto.getLocationId() != null && performanceCreateDto.getDate() != null
             && performanceCreateDto.getHall() != null) {
+            LocalDateTime start = performanceCreateDto.getDate();
+            LocalDateTime end = performanceCreateDto.getDate()
+                .plusMinutes(performanceCreateDto.getDuration());
             List<Performance> performances = performanceRepository.findByLocationIdAndHall(
                 performanceCreateDto.getLocationId(), performanceCreateDto.getHall());
             for (Performance performance : performances) {

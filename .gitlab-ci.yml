@@ -18,6 +18,9 @@ test-backend:
   script:
     - cd backend
     - mvn -B clean install
+    - mvn clean verify
+  artifacts:
+    - target/site/jacoco
 
 test-frontend:
   stage: test
