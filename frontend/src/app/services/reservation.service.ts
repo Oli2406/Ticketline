@@ -4,6 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
 import { Reservation, ReservationListDto } from '../dtos/reservation';
+import {PurchaseListDto} from "../dtos/purchase";
 
 @Injectable({
   providedIn: 'root',
@@ -44,7 +45,7 @@ export class ReservationService {
   }
 
   /**
-   * Update a reservation after cancelling a ticket
+   * Updates or deletes a reservation after cancelling tickets
    */
   updateReservation(reservation: ReservationListDto): Observable<ReservationListDto> {
     console.log(this.apiUrl);
@@ -86,5 +87,4 @@ export class ReservationService {
       catchError(this.handleError)
     );
   }
-
 }

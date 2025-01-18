@@ -128,11 +128,13 @@ li {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
+    margin-right: 16px;
 
     &.btn-primary {
       background-color: #4D47C3;
       color: white;
       border: none;
+      margin-right: 16px;
 
       &:hover {
         background-color: #514dc7;
@@ -168,7 +170,20 @@ body {
   content-visibility: hidden;
 }
 
+.invoice-div-download {
+  content-visibility: hidden;
+}
+
 .invoice-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: auto;
+}
+
+.invoice-container-download {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
@@ -228,6 +243,7 @@ body {
 }
 
 .btn-download {
+  font-family: Arial, serif;
   padding: 10px 20px;
   background-color: #4d47c3;
   color: white;

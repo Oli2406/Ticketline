@@ -44,7 +44,7 @@ export class PurchaseService {
   }
 
   /**
-   * Update a purchase after cancelling a ticket
+   * Update or deletes a purchase after cancelling tickets
    */
   updatePurchase(purchase: PurchaseListDto): Observable<PurchaseListDto> {
     console.log(this.apiUrl);
