@@ -1,5 +1,5 @@
 export interface Artist {
-  artistId?: number; // Primary Key
+  artistId?: number;
   firstName: string;
   lastName: string;
   artistName: string;

@@ -4,7 +4,6 @@ import { CommonModule } from "@angular/common";
 import { MerchandiseService } from "../../../services/merchandise.service";
 import { ToastrService } from "ngx-toastr";
 import { Router } from "@angular/router";
-import { RegisterService } from "../../../services/register.service";
 import {AdminService} from "../../../services/admin.service";
 
 @Component({
@@ -32,7 +31,6 @@ export class MerchandiseCreateComponent {
     private merchandiseService: MerchandiseService,
     private toastr: ToastrService,
     private router: Router,
-    private adminService: AdminService
   ) {}
 
   onImageSelected(event: Event): void {

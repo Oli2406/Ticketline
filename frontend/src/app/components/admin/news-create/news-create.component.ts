@@ -65,18 +65,16 @@ export class NewsCreateComponent implements OnInit {
     }
   }
 
-  /*private methods for creating form data*/
-
   private createFormData(news: NewsDto): FormData {
     const formData = new FormData();
     formData.append('title', news.title);
     formData.append('summary', news.summary);
     formData.append('content', news.content);
-    formData.append('date', news.date.toISOString().split('T')[0]); // Ensure correct date format
+    formData.append('date', news.date.toISOString().split('T')[0]);
 
     if (this.selectedFiles) {
       for (const file of this.selectedFiles) {
-        formData.append('images', file, file.name); // Correct key for file
+        formData.append('images', file, file.name);
       }
     }
     return formData;
@@ -117,7 +115,7 @@ export class NewsCreateComponent implements OnInit {
   displayImages(images: string[]): void {
     const container = document.getElementById('imageContainer');
     if (container) {
-      container.innerHTML = ''; // Clear the container before displaying new images
+      container.innerHTML = '';
 
       images.forEach((image) => {
         const imgElement = document.createElement('img');
@@ -125,7 +123,7 @@ export class NewsCreateComponent implements OnInit {
         imgElement.setAttribute('alt', 'Preview Image');
         imgElement.style.maxHeight = '100px';
         imgElement.style.maxWidth = '100px';
-        imgElement.style.margin = '5px'; // Add some spacing between images
+        imgElement.style.margin = '5px';
         container.appendChild(imgElement);
       });
     }

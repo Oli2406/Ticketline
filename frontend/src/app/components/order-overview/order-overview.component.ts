@@ -16,11 +16,8 @@ import {
   ConfirmationDialogMode,
   ConfirmDialogComponent
 } from "../confirm-dialog/confirm-dialog.component";
-import {catchError, generate, map} from "rxjs";
-import {transform} from "lodash";
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
-import {Merchandise} from "../../dtos/merchandise";
 
 @Component({
   selector: 'app-order-overview',
@@ -51,8 +48,8 @@ export class OrderOverviewComponent implements OnInit {
     rowNumber: 1,
     seatNumber: 1,
     priceCategory: PriceCategory.STANDARD,
-    ticketType: TicketType.SEATED, // Updated
-    sectorType: SectorType.A, // New sector enum
+    ticketType: TicketType.SEATED,
+    sectorType: SectorType.A,
     price: 1,
     status: '', // e.g., "AVAILABLE", "RESERVED", "SOLD"
     performanceId: 1,
@@ -63,9 +60,8 @@ export class OrderOverviewComponent implements OnInit {
   };
   cancelledTickets: TicketDto[];
 
-  //variables for downloading the invoice again
   invoiceTickets: TicketDto[];
-  invoicePurchase: PurchaseListDto ={
+  invoicePurchase: PurchaseListDto = {
     purchaseId: 1,
     userId: 1,
     tickets: [],
@@ -83,13 +79,11 @@ export class OrderOverviewComponent implements OnInit {
     city: 'ExampleCity',
   };
 
-  //load user details for the invoice
   userFirstName: string;
   userLastName: string;
   userEmail: string;
   invoiceCounter: number = 1;
 
-  //confirmation dialogue for cancelling a ticket(s)
   ConfirmationDialogMode = ConfirmationDialogMode;
   showConfirmDeletionDialogPTicket = false;
   showConfirmDeletionDialogReTicket = false;
@@ -230,7 +224,7 @@ export class OrderOverviewComponent implements OnInit {
     return this.performanceNames[performanceId].name;
   }
 
-  getTicketPerformanceForInvoice(performanceId: number): string{
+  getTicketPerformanceForInvoice(performanceId: number): string {
     if (!this.performanceNames[performanceId]) {
       this.performanceService.getPerformanceById(performanceId).subscribe({
         next: (performance) => {
@@ -342,30 +336,28 @@ export class OrderOverviewComponent implements OnInit {
   }
 
 
-  fetchPurchaseForInvoice(tickets:TicketDto[]){
+  fetchPurchaseForInvoice(tickets: TicketDto[]) {
     let purchaseId: number;
-    this.invoiceTickets= tickets;
+    this.invoiceTickets = tickets;
     console.log(this.invoiceTickets);
     let counter = 0;
 
     this.userPurchases.forEach((purchase) => {
       purchase.tickets.forEach((purchaseTicket) => {
         if ((purchaseTicket.ticketId === tickets[0].ticketId) && counter < 1) {
-          purchaseId= purchase.purchaseId;
-          console.log(purchaseId);
+          purchaseId = purchase.purchaseId;
 
           this.purchaseService.getPurchaseById(purchaseId).subscribe({
             next: (purchase: PurchaseListDto) => {
               this.invoicePurchase = purchase;
-              this.invoiceTickets= purchase.tickets;
-              //TODO address, and total price are not set correctly
+              this.invoiceTickets = purchase.tickets;
               counter++;
               this.purchaseService.getPurchaseById(this.invoicePurchase.purchaseId).subscribe({
-                next:() => {
-                  this.toastr.info('Downloading Invoice.', 'Download');
-                  this.generateDownloadPDF();
+                  next: () => {
+                    this.toastr.info('Downloading Invoice.', 'Download');
+                    this.generateDownloadPDF();
                   }
-              }
+                }
               )
             },
             error: (err) => {
@@ -387,7 +379,6 @@ export class OrderOverviewComponent implements OnInit {
         purchase.tickets.forEach((purchaseTicket) => {
           if (purchaseTicket.ticketId === tickets[0].ticketId) {
             cancelledPurchaseId = purchase.purchaseId;
-            console.log(cancelledPurchaseId);
 
             this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
               next: (purchase: PurchaseListDto) => {
@@ -475,7 +466,6 @@ export class OrderOverviewComponent implements OnInit {
         if (purchaseTicket.ticketId === ticket.ticketId) {
           cancelledPurchaseId = purchase.purchaseId;
 
-          // Fetch the purchase details
           this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
             next: (purchase: PurchaseListDto) => {
               this.cancelledPurchase = purchase;
@@ -496,7 +486,6 @@ export class OrderOverviewComponent implements OnInit {
                 city: this.cancelledPurchase.city
               };
 
-              // Update the purchase
               this.purchaseService.updatePurchase(updatedPurchase).subscribe({
                 next: () => {
                   this.generateCancelPurchasePDF();
@@ -522,7 +511,6 @@ export class OrderOverviewComponent implements OnInit {
 
 
   cancelReservationTicket(ticketReservation: TicketDto) {
-    console.log('cancel reservation ' + ticketReservation.ticketId);
     this.cancelledTicket = ticketReservation;
     let cancelledReservationId: number;
 
@@ -531,7 +519,6 @@ export class OrderOverviewComponent implements OnInit {
         if (reservedTicket.ticketId === ticketReservation.ticketId) {
           cancelledReservationId = reservation.reservedId;
 
-          // Fetch the reservation details
           this.reservationService.getReservationById(cancelledReservationId).subscribe({
             next: (reservation: ReservationListDto) => {
               this.cancelledReservation = reservation;
@@ -543,7 +530,6 @@ export class OrderOverviewComponent implements OnInit {
                 reservedDate: this.cancelledReservation.reservedDate
               };
 
-              // Update the reservation
               this.reservationService.updateReservation(updatedReservation).subscribe({
                 next: () => {
                   this.toastr.success('Reservation cancelled successfully. ', 'Success');

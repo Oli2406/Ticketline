@@ -1,4 +1,4 @@
-import {Ticket, TicketDto} from "./ticket";
+import {TicketDto} from "./ticket";
 
 export interface Reservation {
   reservedId?: number; // Primary Key

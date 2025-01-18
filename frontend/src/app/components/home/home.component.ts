@@ -42,7 +42,6 @@ export class HomeComponent implements OnInit {
       if (params['reset-password'] === 'true' && params['token']) {
         const token = params['token'];
         this.authService.storeResetToken(token);
-        console.log("stored token from URL");
         this.router.navigate(['/reset-password']);
       }
     });
