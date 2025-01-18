@@ -20,7 +20,9 @@ test-backend:
     - mvn -B clean install
     - mvn clean verify
   artifacts:
-    - target/site/jacoco
+    paths:
+      - backend/target/site/jacoco
+    expire_in: 1 day
 
 test-frontend:
   stage: test
