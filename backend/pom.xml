@@ -147,7 +147,6 @@
                                 at/ac/tuwien/sepr/groupphase/backend/enums/**,
                                 at/ac/tuwien/sepr/groupphase/backend/exception/**,
                                 at/ac/tuwien/sepr/groupphase/backend/endpoint/dto/**,
-                                aat/ac/tuwien/sepr/groupphase/backend/endpoint/mapper/**,
                                 at/ac/tuwien/sepr/groupphase/backend/endpoint/exceptionhandler/**
                             </excludes>
                         </configuration>
