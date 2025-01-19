@@ -31,7 +31,7 @@ import java.util.List;
 public class CustomPerformanceRepositoryImpl implements SearchPerformanceRepository {
 
     @PersistenceContext
-    private EntityManager entityManager;
+    public EntityManager entityManager;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -123,7 +123,7 @@ public class CustomPerformanceRepositoryImpl implements SearchPerformanceReposit
         return results;
     }
 
-    private LocalDateTime parseDateTime(String term) {
+    public LocalDateTime parseDateTime(String term) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
             return LocalDateTime.parse(term, formatter);
