@@ -38,6 +38,9 @@ public class UserDataGenerator {
         createUserIfNotExists("Herta", "Musterfrau", "herta.musterfrau@email.com", "password",
             true, 123456);
         createUserIfNotExists("Karl", "Admin", "karl.admin@email.com", "password", true, 77777);
+        createUserIfNotExists("日向", "翔陽", "hinata.shoyo@email.com", "password", false, 10);
+        createUserIfNotExists("أمل", "لماس", "لماس@email.com", "password", false, 10);
+
     }
 
     private void createUserIfNotExists(String firstName, String lastName, String email,

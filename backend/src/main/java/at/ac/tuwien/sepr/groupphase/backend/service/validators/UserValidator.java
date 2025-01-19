@@ -89,9 +89,26 @@ public class UserValidator {
     private static void validateEmail(String email, List<String> validationErrors) {
         if (email == null || email.trim().isEmpty()) {
             validationErrors.add("Email must not be empty");
-        } else if (!email
-            .matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
-            validationErrors.add("Invalid email format");
+            return;
+        }
+
+        email = email.trim();
+
+        int atIndex = email.indexOf('@');
+        int dotIndex = email.lastIndexOf('.');
+
+        if (atIndex < 1 || atIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters before or after '@'");
+            return;
+        }
+
+        if (dotIndex <= atIndex + 1 || dotIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters after '@' or after '.'");
+            return;
+        }
+
+        if (dotIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters after '.'");
         }
     }
 
