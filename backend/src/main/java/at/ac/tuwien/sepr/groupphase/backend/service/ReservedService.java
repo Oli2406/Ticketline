@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.service;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservationOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -50,5 +51,13 @@ public interface ReservedService {
      * @param ticketId      the ID of the ticket to delete
      */
     void deleteTicketFromReservation(Long reservationId, Long ticketId);
+
+    /**
+     * Retrieves a list of detailed reservations for a specific user by their user ID.
+     *
+     * @param userId the ID of the user
+     * @return a list of reservation details for the given user
+     */
+    List<ReservationOverviewDto> getReservationDetailsByUser(Long userId);
 }
 

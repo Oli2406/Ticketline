@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
 import html2pdf from 'html2pdf.js';
+const pdf: any = html2pdf;
 
 
 @Injectable({
