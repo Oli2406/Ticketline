@@ -42,6 +42,18 @@
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
+.merchandise-card .card-footer {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 10px;
+}
+
+.merchandise-card .btn-add-to-cart {
+  margin: 0 auto !important;
+}
+
+
 .merchandise-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -52,6 +64,8 @@
   font-weight: bold;
   margin: 10px 0 5px;
 }
+
+
 
 .description {
   font-size: 14px;

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AuthRequest, ResetPasswordTokenDto} from '../dtos/auth-request';
-import {catchError, Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {jwtDecode} from 'jwt-decode';
@@ -15,6 +15,7 @@ import {ErrorFormatterService} from "./error-formatter.service";
 export class AuthService {
 
   private authBaseUri: string = this.globals.backendUri + '/authentication';
+  private pointsBaseUri: string = this.globals.backendUri + '/users';
   private resetTokenKey = 'resetPasswordToken';
 
   constructor(private httpClient: HttpClient,
@@ -238,6 +239,6 @@ export class AuthService {
   }
 
   getUserPoints(email: string): Observable<number> {
-    return this.httpClient.get<number>(`${this.authBaseUri}/user-points?email=${email}`);
+    return this.httpClient.get<number>(`${this.pointsBaseUri}/user-points?email=${email}`);
   }
 }

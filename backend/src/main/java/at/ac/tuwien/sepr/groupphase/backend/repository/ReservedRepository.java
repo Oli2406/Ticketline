@@ -17,11 +17,4 @@ public interface ReservedRepository extends JpaRepository<Reservation, Long> {
      */
     List<Reservation> findByUserId(Long userId);
 
-    /**
-     * Check if a reservation exists by its ID.
-     *
-     * @param reservationId the ID of the reservation
-     * @return true if the reservation exists, false otherwise
-     */
-    boolean existsByReservationId(Long reservationId);
 }

@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Globals} from "../global/globals";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2pdf from 'html2pdf.js';
+const pdf: any = html2pdf;
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,30 +14,44 @@ export class ReceiptService {
               private globals: Globals) {
   }
 
-  public exportToPDF() {
-    const doc = new jsPDF('p', 'mm', 'a4');
+  public exportToPDF(): void {
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: 'invoice.pdf',
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+      },
+    };
 
-    html2canvas(document.querySelector(".invoice-container"), {
-      scale: 2
-    }).then(canvas => {
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 height in mm
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        doc.addPage();
-        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-      doc.setFontSize(20);
-      doc.save('pdf-invoice');
-    });
+    const element = document.querySelector('.invoice-container');
+    if (element) {
+      html2pdf().set(options).from(element).save();
+    } else {
+      console.error('Invoice container not found.');
+    }
   }
+
+  public exportToDownloadPDF(): void {
+    const options = {
+      margin: [10, 10, 10, 10],
+      filename: 'invoice.pdf',
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+      },
+    };
+
+    const element = document.querySelector('.invoice-container-download');
+    if (element) {
+      html2pdf().set(options).from(element).save();
+    } else {
+      console.error('Invoice container not found.');
+    }
+  }
+
 }

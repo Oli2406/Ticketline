@@ -14,9 +14,8 @@ import {HttpErrorResponse} from "@angular/common/http";
 import {PerformanceService} from 'src/app/services/performance.service';
 import {Purchase} from "../../dtos/purchase";
 import {PurchaseService} from "../../services/purchase.service";
-import {DatePipe} from "@angular/common";
 import {TicketService} from "../../services/ticket.service";
-import {forEach} from "lodash";
+import cardValidator from 'card-validator';
 
 @Component({
   selector: 'app-cart',
@@ -57,6 +56,8 @@ export class CartComponent implements OnInit {
     paypalEmail: '',
     bankAccount: '',
   };
+
+  validationResult: string = '';
 
   performanceDetails: PerformanceListDto = null;
   performanceCache: { [id: number]: string } = {};
@@ -99,9 +100,6 @@ export class CartComponent implements OnInit {
         this.ticketTaxAmount = this.ticketTaxAmount + tTax;
       }
     }
-
-    console.log(this.merchandiseTaxAmount + ' Merch tax');
-    console.log(this.ticketTaxAmount + ' Ticket tax');
   }
 
   countTicketMerchandiseInCart() {
@@ -112,8 +110,6 @@ export class CartComponent implements OnInit {
         this.ticketCounter = this.ticketCounter + 1;
       }
     }
-    console.log(this.merchandiseCounter + 'merchandise');
-    console.log(this.ticketCounter + 'tickets');
   }
 
   startPeriodicCountdown(): void {
@@ -215,7 +211,7 @@ export class CartComponent implements OnInit {
     if (this.isTicket(item)) {
       const ticket = item as TicketDto;
       ticket.status = 'AVAILABLE';
-      this.ticketService.updateTicket(ticket).subscribe({
+      this.ticketService.updateTicket(ticket.ticketId ,ticket).subscribe({
         next: () => {
           this.toastr.success('Ticket successfully removed and marked as available.', 'Success');
         },
@@ -248,6 +244,15 @@ export class CartComponent implements OnInit {
     input.value = input.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1-').replace(/-$/, '');
     this.paymentDetails.creditCardNumber = input.value;
   }
+
+  validateCreditCard(): boolean {
+    const creditCardValidation = cardValidator.number(this.paymentDetails.creditCardNumber);
+    if (!creditCardValidation.isValid) {
+      this.validationResult = 'Invalid credit card number';
+      return false;
+    }
+    return true;
+}
 
   formatBankAccountNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -307,49 +312,70 @@ export class CartComponent implements OnInit {
   async buy(): Promise<void> {
     this.countTicketMerchandiseInCart();
     this.calculateTaxAmounts();
+
     if (!this.selectedPaymentOption) {
       this.toastr.error('Please select a payment option.');
       return;
     }
+
     if (!this.address.street || !this.address.postalCode || !this.address.city) {
       this.toastr.error('Please fill in all address fields.');
       return;
     }
+
     if (this.cartItems.length === 0) {
       this.toastr.error('Your cart is empty.');
       return;
     }
+
+    if (this.paymentDetails.bankAccount === '' && this.paymentDetails.creditCardNumber === '' &&
+      this.paymentDetails.paypalEmail === '' && this.selectedPaymentOption != 'points') {
+      this.toastr.error('Insufficient payment details.');
+      return;
+    }
+
+    if (this.selectedPaymentOption === 'creditCard' && !this.validateCreditCard()) {
+      this.toastr.error('Invalid credit card number.');
+      return;
+    }
+
     if (this.selectedPaymentOption === 'points' && this.accountPoints < this.getTotalPoints()) {
       this.toastr.error('You do not have enough points.');
       return;
     }
 
-    const hasTickets = this.cartItems.some(cartItem => 'performanceId' in cartItem.item);
-    if (this.selectedPaymentOption === 'points' && hasTickets) {
-      this.toastr.error('You cannot buy tickets with points.');
-      this.selectedPaymentOption = '';
-      return;
-    }
-
-    const tickets: number[] = [];
     const merchandise: number[] = [];
     const merchandiseQuantities: number[] = [];
+    const tickets: number[] = [];
 
     this.cartItems.forEach(cartItem => {
-      if ('ticketId' in cartItem.item) {
-        tickets.push(cartItem.item.ticketId);
-      } else if ('merchandiseId' in cartItem.item) {
+      if (this.isMerchandise(cartItem.item)) {
         merchandise.push(cartItem.item.merchandiseId);
         merchandiseQuantities.push(cartItem.quantity);
+      } else if (this.isTicket(cartItem.item)) {
+        tickets.push(cartItem.item.ticketId);
       }
     });
 
+    if (this.selectedPaymentOption === 'points') {
+      if (tickets.length > 0) {
+        this.toastr.info(
+          'Only merchandise will be purchased with points. Tickets remain in the cart.',
+          'Notice'
+        );
+      }
+
+      if (merchandise.length === 0) {
+        this.toastr.error('No merchandise in the cart to purchase with points.');
+        return;
+      }
+    }
+
     const totalPrice = this.getTotalPrice();
     const today = new Date();
-    //set the address in the purchase??
     const purchasePayload: Purchase = {
       userId: this.authService.getUserIdFromToken(),
-      ticketIds: tickets,
+      ticketIds: this.selectedPaymentOption === 'points' ? [] : tickets,
       merchandiseIds: merchandise,
       merchandiseQuantities: merchandiseQuantities,
       totalPrice: totalPrice,
@@ -359,25 +385,26 @@ export class CartComponent implements OnInit {
       city: this.address.city
     };
 
-    console.log('Purchase Payload:', JSON.stringify(purchasePayload));
-
     this.purchaseService.createPurchase(purchasePayload).subscribe({
       next: async () => {
-        try {
-          this.generatePDF();
-          if (this.selectedPaymentOption === 'points') {
-            await this.cartService.deductPoints(this.getTotalPoints());
-          } else {
-            await this.cartService.addPoints(this.getTotalPointsToAdd());
-          }
-
-          this.cartService.clearCart();
-          this.toastr.success('Thank you for your purchase.');
-          await this.router.navigate(['merchandise']);
-        } catch (error) {
-          console.error('Post-Purchase Error:', error);
-          this.toastr.error('An unexpected error occurred. Please try again.');
+        this.generatePDF()
+        if (this.selectedPaymentOption === 'points') {
+          await this.cartService.deductPoints(this.getTotalPoints());
+        } else {
+          await this.cartService.addPoints(this.getTotalPointsToAdd());
         }
+
+        // Update cart: Retain tickets if using points
+        if (this.selectedPaymentOption === 'points') {
+          this.cartItems = this.cartItems.filter(cartItem =>
+            this.isTicket(cartItem.item)
+          );
+          this.cartService.saveCart(this.cartItems);
+        } else {
+          this.cartService.clearCart();
+        }
+        this.toastr.success('Thank you for your purchase.');
+        await this.router.navigate(['merchandise']);
       },
       error: (error: HttpErrorResponse) => {
         console.error('Purchase Error:', error);
@@ -386,9 +413,10 @@ export class CartComponent implements OnInit {
         } else {
           this.toastr.error('An unexpected error occurred. Please try again.');
         }
-      },
+      }
     });
   }
+
 
   updatePaymentOption(option: string): void {
     const hasTickets = this.cartItems.some(cartItem => 'performanceId' in cartItem.item);

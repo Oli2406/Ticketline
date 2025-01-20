@@ -10,14 +10,16 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+
 import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +33,8 @@ public class ReservedServiceImpl implements ReservedService {
     private final TicketService ticketService;
 
     public ReservedServiceImpl(ReservedRepository reservedRepository,
-        TicketRepository ticketRepository,
-        RandomStringGenerator generator, TicketService ticketService) {
+                               TicketRepository ticketRepository,
+                               RandomStringGenerator generator, TicketService ticketService) {
         this.reservedRepository = reservedRepository;
         this.ticketRepository = ticketRepository;
         this.generator = generator;
@@ -76,31 +78,44 @@ public class ReservedServiceImpl implements ReservedService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
-    public ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto)
-        throws ValidationException {
+    public ReservedDetailDto createReservation(ReservedCreateDto reservedCreateDto) throws ValidationException {
         logger.info("Creating reservation: {}", reservedCreateDto);
 
-        Optional<Long> optionalUserId = generator.retrieveOriginalId(reservedCreateDto.getUserId());
-        Long userId = optionalUserId.orElseThrow(
-            () -> new ValidationException("Invalid user ID", List.of(
-                "User ID could not be resolved.",
-                "Ensure that the encrypted ID is correct."
-            )));
 
+        // Lock and validate tickets
+        List<Ticket> tickets = ticketRepository.findByIdsWithLock(reservedCreateDto.getTicketIds());
+        List<Long> unavailableTickets = tickets.stream()
+            .filter(ticket -> !ticket.getStatus().equals("AVAILABLE"))
+            .map(Ticket::getTicketId)
+            .toList();
+
+        if (!unavailableTickets.isEmpty()) {
+            logger.error("Some tickets are not available: {}", unavailableTickets);
+            throw new ValidationException("Some tickets are not available for reservation: ", List.of(unavailableTickets.toString()));
+        }
+
+        // Update ticket statuses
+        tickets.forEach(ticket -> ticket.setStatus("RESERVED"));
+        ticketRepository.saveAll(tickets);
+
+        Long userId = generator.retrieveOriginalId(reservedCreateDto.getUserId())
+            .orElseThrow(() -> new ValidationException("Invalid user ID",
+                List.of("User ID could not be resolved.",
+                    "Ensure that the encrypted ID is correct."
+                )));
+
+        // Create reservation
         Reservation reservation = new Reservation(
             userId,
             reservedCreateDto.getTicketIds(),
             reservedCreateDto.getReservedDate().plusHours(1)
         );
 
-        logger.debug("Mapped Reservation entity: {}", reservation);
-
         reservation = reservedRepository.save(reservation);
 
-        List<Ticket> tickets = ticketRepository.findAllById(reservation.getTicketIds());
-
-        logger.info("Saved reservation to database: {}", reservation);
+        logger.info("Reservation created: {}", reservation);
 
         return new ReservedDetailDto(
             reservation.getUserId(),
@@ -109,6 +124,7 @@ public class ReservedServiceImpl implements ReservedService {
             reservation.getReservationId()
         );
     }
+
 
     @Override
     public void updateReservation(ReservedDetailDto reservedDetailDto) {
@@ -149,14 +165,36 @@ public class ReservedServiceImpl implements ReservedService {
         logger.info("Updated reservation: {}", existingReservation);
     }
 
-    /*
     @Override
-    public void deleteReservation(Long reservationId) {
-        logger.info("Deleting reservation with ID: {}", reservationId);
-        if (!reservedRepository.existsById(reservationId)) {
-            throw new IllegalArgumentException("Reservation not found");
+    public void deleteTicketFromReservation(Long reservationId, Long ticketId) {
+        logger.info("Deleting ticket {} from reservation {}", ticketId, reservationId);
+
+        // Fetch the reservation by ID
+        Reservation reservation = reservedRepository.findById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found with ID: " + reservationId));
+
+        // Get the list of current tickets in the reservation
+        List<Long> ticketIds = reservation.getTicketIds();
+
+        // Check if the ticket is present in the reservation
+        if (!ticketIds.contains(ticketId)) {
+            throw new IllegalArgumentException("Ticket not found in reservation with ID: " + ticketId);
         }
-        reservedRepository.deleteById(reservationId);
-        logger.debug("Deleted reservation with ID: {}", reservationId);
-    }*/
+
+        // Remove the ticket from the list
+        ticketIds.remove(ticketId);
+
+        // If the reservation becomes empty after removing the ticket, delete the reservation
+        if (ticketIds.isEmpty()) {
+            reservedRepository.delete(reservation);
+            logger.info("Deleted reservation {} as it has no remaining tickets", reservationId);
+        } else {
+            // Otherwise, update the reservation
+            reservation.setTicketIds(ticketIds);
+            reservedRepository.save(reservation);
+            logger.info("Updated reservation {} after removing ticket {}", reservationId, ticketId);
+        }
+    }
+
 }
+

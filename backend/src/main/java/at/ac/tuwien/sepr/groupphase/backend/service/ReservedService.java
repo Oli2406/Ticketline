@@ -42,4 +42,13 @@ public interface ReservedService {
      * @param reservedDetailDto the data forupdating a reservation
      */
     void updateReservation(ReservedDetailDto reservedDetailDto);
+
+    /**
+     * Deletes a specific ticket from an existing reservation.
+     *
+     * @param reservationId the ID of the reservation from which the ticket should be deleted
+     * @param ticketId      the ID of the ticket to delete
+     */
+    void deleteTicketFromReservation(Long reservationId, Long ticketId);
 }
+

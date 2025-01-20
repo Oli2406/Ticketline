@@ -1,10 +1,15 @@
 package at.ac.tuwien.sepr.groupphase.backend.repository;
 
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -41,4 +46,36 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @return the ticket corresponding to the given ticket ID
      */
     Ticket findByTicketId(Long ticketId);
+
+    /**
+     * Finds a ticket by its ID and applies a pessimistic write lock to prevent
+     * concurrent modifications.
+     *
+     * @param id the ID of the ticket to be retrieved
+     * @return an {@code Optional} containing the ticket if it exists, or an empty
+     *         {@code Optional} if no ticket with the specified ID exists
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Ticket t WHERE t.ticketId = :id")
+    Optional<Ticket> findByIdWithLock(@Param("id") Long id);
+
+    /**
+     * Finds tickets by a list of ticket IDs with a pessimistic write lock.
+     * This ensures that the selected tickets are locked for updates
+     * until the end of the current transaction.
+     *
+     * @param ids the list of ticket IDs to fetch with a lock
+     * @return a list of tickets corresponding to the provided IDs
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT t FROM Ticket t WHERE t.ticketId IN :ids")
+    List<Ticket> findByIdsWithLock(@Param("ids") List<Long> ids);
+
+    /**
+     * Deletes all tickets associated with a specific performance ID.
+     *
+     * @param performanceId the ID of the performance whose tickets are to be deleted
+     * @return the number of tickets deleted
+     */
+    int deleteByPerformanceId(Long performanceId);
 }

@@ -1,9 +1,7 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -65,16 +65,16 @@ public class ReservedEndpoint {
     @PostMapping
     public ResponseEntity<ReservedDetailDto> createReservation(@RequestBody ReservedCreateDto reservedCreateDto) throws ValidationException {
         LOG.info("Received request to create or update reservation: {}", reservedCreateDto);
-        ticketService.updateTicketStatusList(reservedCreateDto.getTicketIds(), "RESERVED");
         ReservedDetailDto createdReservation = reservedService.createReservation(reservedCreateDto);
         LOG.info("Successfully created/updated reservation: {}", createdReservation);
         return ResponseEntity.ok(createdReservation);
     }
 
+
     @PermitAll
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateReservation(@PathVariable Long id,
-        @RequestBody ReservedDetailDto reservedDetailDto) throws ValidationException {
+                                                  @RequestBody ReservedDetailDto reservedDetailDto) throws ValidationException {
         LOG.info("Received request to update Reservation with ID: {}{}", id, reservedDetailDto);
 
         if (!id.equals(reservedDetailDto.getReservedId())) {
@@ -83,6 +83,15 @@ public class ReservedEndpoint {
         }
         reservedService.updateReservation(reservedDetailDto);
         LOG.info("Successfully updated Purchase: {}", reservedDetailDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @DeleteMapping("/{reservationId}/ticket/{ticketId}")
+    public ResponseEntity<Void> deleteTicketFromReservation(@PathVariable Long reservationId, @PathVariable Long ticketId) {
+        LOG.info("Received request to delete ticket {} from reservation {}", ticketId, reservationId);
+        reservedService.deleteTicketFromReservation(reservationId, ticketId);
+        LOG.info("Successfully deleted ticket {} from reservation {}", ticketId, reservationId);
         return ResponseEntity.noContent().build();
     }
 }

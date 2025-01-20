@@ -96,4 +96,12 @@ export class PerformanceService {
     );
   }
 
+  deletePerformance(performanceId: number): Observable<void> {
+    const url = `${this.apiUrl}/${performanceId}`;
+    return this.http.delete<void>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+
 }

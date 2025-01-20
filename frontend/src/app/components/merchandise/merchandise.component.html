@@ -21,13 +21,13 @@
         <div class="card-body">
           <h5 class="card-title">{{ item.name }}</h5>
           <p class="description">{{ item.category }}</p>
-          <div class="price-points">
+          <div class="price-stock-container">
             <p class="price">{{ item.price | number: '1.2-2' }} €</p>
             <p class="stock">Stock: {{ item.stock }}</p>
           </div>
           <p class="points">{{ item.points }} Points</p>
         </div>
-        <div class="card-footer text-end">
+        <div class="card-footer d-flex justify-content-between align-items-center">
           <button class="btn btn-add-to-cart" (click)="addToCart(item)">Add to Cart</button>
         </div>
       </div>
@@ -56,7 +56,7 @@
     </ng-container>
 
     <button
-      class="btn btn-light ms-2"
+      class="btn btn-light"
       (click)="goToPage(currentPage + 1)"
       [disabled]="currentPage === totalPages"
     >

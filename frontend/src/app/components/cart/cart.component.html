@@ -77,14 +77,12 @@
         </div>
 
         <label class="payment-option"
-               [class.selected]="selectedPaymentOption === 'points'"
-               [class.disabled]="hasTicketsInCart">
+               [class.selected]="selectedPaymentOption === 'points'">
           <input
             type="radio"
             name="paymentOption"
             value="points"
-            [(ngModel)]="selectedPaymentOption"
-            [disabled]="hasTicketsInCart" />
+            [(ngModel)]="selectedPaymentOption">
           <i class="fas fa-coins"></i>
           Pay with Points
         </label>
@@ -253,7 +251,6 @@
   </div>
 </div>
 
-<!-- Hidden invoice html for creating the receipt -->
 <div class="invoice-div">
   <!DOCTYPE html>
   <html lang="de">
@@ -265,7 +262,7 @@
   <body>
   <div class="invoice-container">
     <div class="invoice-header">
-      <h1>Invoice</h1>
+      <h1>Ticket Purchase Invoice</h1>
       <div>
         <p>Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
         <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
@@ -277,7 +274,7 @@
         <td>
           <strong>Issuer:</strong> <br>
           Ticketline - GmbH<br>
-          Wiedner Hautpstrasse 76/2/2<br>
+          Wiedner Hauptstraße 76/2/2<br>
           1040 Wien <br>
           E-Mail: info&#64;ticketline-website.at<br>
           UID: ATU12345678
@@ -299,81 +296,69 @@
         <th>Description</th>
         <th>Quantity</th>
         <th>Unit Price incl. tax</th>
-        <th>Unit Price excl. tax</th>
-        <th>Tax/Single Unit</th>
-        <th>Total Price</th>
+        <th>Tax (20% or 13%)</th>
+        <th>Total Price incl. tax</th>
       </tr>
       </thead>
       <tbody>
-        @for (item of cartItems; track item) {
-          <tr>
-            <td>
-              <span>{{ getItemDisplayName(item.item) }}</span>
-            </td>
-            <td>{{ item.quantity }}</td>
-            <td *ngIf="selectedPaymentOption === 'points'">
-              @if (isMerchandise(item.item)){
-                {{ item.item.points }}
-              }
-
-            </td>
-            <td *ngIf="selectedPaymentOption === 'points'">
-              @if (isMerchandise(item.item)){
-                {{item.item.points * item.quantity }}
-              }
-            </td>
-            <td *ngIf="selectedPaymentOption !== 'points'">{{ item.item.price }} €</td>
-            <td *ngIf="selectedPaymentOption !== 'points'">
-              @if (isMerchandise(item.item)){
-              {{((item.item.price/120)*100) | number: '1.2-2' }} €
-              } @else {
-                <!-- tickets in austria only have a 13% tax rate -->
-                {{((item.item.price/113)*100) | number: '1.2-2' }} €
-              }
-            </td>
-            <td *ngIf="selectedPaymentOption !== 'points'">
-              @if (isMerchandise(item.item)){
-                {{((item.item.price/120)*100)*0.2 | number: '1.2-2' }} €
-              } @else {
-                <!-- tickets in austria only have a 13% tax rate -->
-                {{((item.item.price/113)*100) *0.13| number: '1.2-2' }} €
-              }
-            </td>
-            <td *ngIf="selectedPaymentOption !== 'points'">{{ item.item.price * item.quantity }} €</td>
-          </tr>
-        }
+      <tr *ngFor="let item of cartItems" [hidden]="selectedPaymentOption === 'points' && !isMerchandise(item.item)">
+        <td>{{ getItemDisplayName(item.item) }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>
+          <ng-container *ngIf="selectedPaymentOption === 'points' && isMerchandise(item.item)">
+            {{ item.item.points }} Points
+          </ng-container>
+          <ng-container *ngIf="selectedPaymentOption !== 'points'">
+            {{ item.item.price | number: '1.2-2' }} €
+          </ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="isMerchandise(item.item)">
+            {{ ((item.item.price / 120) * 100) * 0.2 | number: '1.2-2' }} €
+          </ng-container>
+          <ng-container *ngIf="!isMerchandise(item.item)">
+            {{ ((item.item.price / 113) * 100) * 0.13 | number: '1.2-2' }} €
+          </ng-container>
+        </td>
+        <td>
+          <ng-container *ngIf="selectedPaymentOption === 'points' && isMerchandise(item.item)">
+            {{ item.item.points * item.quantity }} Points
+          </ng-container>
+          <ng-container *ngIf="selectedPaymentOption !== 'points'">
+            {{ item.item.price * item.quantity | number: '1.2-2' }} €
+          </ng-container>
+        </td>
+      </tr>
       </tbody>
     </table>
+
     <table class="invoice-footer">
       <tr *ngIf="selectedPaymentOption === 'points'">
-        <td><strong>Total Price in Points</strong></td>
+        <td><strong>Total Price in Points:</strong></td>
         <td><strong>{{ getTotalPoints() }}</strong></td>
       </tr>
       <tr *ngIf="selectedPaymentOption !== 'points'">
-        <td><strong>Total Price excl. tax.:</strong></td>
-        <td><strong>{{ (getTotalPrice()/120)*100 | number: '1.2-2' }} €</strong></td>
+        <td><strong>Total Price excl. tax:</strong></td>
+        <td><strong>{{ (getTotalPrice() / 120) * 100 | number: '1.2-2' }} €</strong></td>
       </tr>
       <tr *ngIf="selectedPaymentOption !== 'points'">
-        <td><strong>Sales Tax:</strong></td>
-        <td><strong>{{ merchandiseTaxAmount + ticketTaxAmount| number: '1.2-2' }} €</strong></td>
+        <td><strong>Sales Tax (20% or 13%):</strong></td>
+        <td><strong>{{ merchandiseTaxAmount + ticketTaxAmount | number: '1.2-2' }} €</strong></td>
       </tr>
       <tr *ngIf="selectedPaymentOption !== 'points'">
         <td><strong>Total Price incl. tax:</strong></td>
-        <td><strong>{{ getTotalPrice()| number: '1.2-2' }} €</strong></td>
+        <td><strong>{{ getTotalPrice() | number: '1.2-2' }} €</strong></td>
       </tr>
     </table>
 
     <div class="invoice-bank">
       <p>Thank you for your purchase at Ticket-Line!</p>
-      <p> Your merchandise items will be delivered within the next 14 business days.</p>
+      <p>Your merchandise items will be delivered within the next 14 business days.</p>
       <p *ngIf="selectedPaymentOption !== 'points'">Banking information: IBAN: AT08 1750 2024 8558 1234, BIC: BAWAATWW</p>
-      <p *ngIf="selectedPaymentOption === 'points'"> Your current points after this purchase : {{ accountPoints - getTotalPoints() }}</p>
-      <p> Tax Information: Merchandise have a 20% sales tax. Tickets have a 13% sales tax.</p>
+      <p *ngIf="selectedPaymentOption === 'points'">Your current points after this purchase: {{ accountPoints - getTotalPoints() }}</p>
+      <p>Tax Information: Merchandise have a 20% sales tax. Tickets have a 13% sales tax.</p>
     </div>
   </div>
   </body>
   </html>
-
-
 </div>
-

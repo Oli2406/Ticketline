@@ -45,13 +45,15 @@
   margin-bottom: 10px;
   font-size: 1rem;
   line-height: 1.5;
-  gap: 5px; /* Abstand zwischen den einzelnen Flex-Elementen */
+  gap: 1px; /* Weniger Abstand zwischen den Flex-Elementen */
 }
 
 .ticket-details span {
-  flex: 0 1 25%; /* Flexible Breite, etwa 30% pro Element */
-  text-align: left; /* Linksbündig für besseren Lesefluss */
-  margin-left: 20px;
+  flex: 0 1 30%; /* Weniger Breite pro Element für engeres Layout */
+  text-align: left; /* Linksbündig */
+  margin-left: 25px; /* Abstand von links */
+  margin-top: 10px; /* Abstand oberhalb des Textes */
+  margin-bottom: 10px; /* Abstand unterhalb des Textes */
 }
 
 
@@ -128,11 +130,13 @@ li {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
+    margin-right: 16px;
 
     &.btn-primary {
       background-color: #4D47C3;
       color: white;
       border: none;
+      margin-right: 16px;
 
       &:hover {
         background-color: #514dc7;
@@ -168,7 +172,20 @@ body {
   content-visibility: hidden;
 }
 
+.invoice-div-download {
+  content-visibility: hidden;
+}
+
 .invoice-container {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: auto;
+}
+
+.invoice-container-download {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
@@ -228,6 +245,7 @@ body {
 }
 
 .btn-download {
+  font-family: Arial, serif;
   padding: 10px 20px;
   background-color: #4d47c3;
   color: white;
@@ -246,5 +264,13 @@ body {
 .quantity-text {
   text-align: left;
   margin-left: 13px;
+}
+
+.btn-purple {
+  background-color: #514dc7;
+  border: none;
+  color: white;
+  margin-right: 20px;
+  margin-left: 10px;
 }
 

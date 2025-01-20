@@ -13,9 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -154,17 +157,26 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @Transactional
     public TicketDetailDto updateTicket(Long ticketId, TicketCreateDto ticketCreateDto)
         throws ValidationException, ConflictException {
         LOGGER.info("Updating ticket with ID: {}", ticketId);
 
+        // Validate the incoming ticket data
         ticketValidator.validateTicket(ticketCreateDto);
 
-        Ticket existingTicket = ticketRepository.findById(ticketId)
+        // Lock the ticket row to prevent concurrent updates
+        Ticket existingTicket = ticketRepository.findByIdWithLock(ticketId)
             .orElseThrow(() -> {
                 LOGGER.error("Ticket not found with ID: {}", ticketId);
                 return new IllegalArgumentException("Ticket not found with ID: " + ticketId);
             });
+
+        // Check if the ticket is available if the status is being updated to RESERVED
+        if (Objects.equals(ticketCreateDto.getStatus(), "RESERVED") && !existingTicket.getStatus().equals("AVAILABLE")) {
+            LOGGER.error("Ticket with ID {} is not available for reservation.", ticketId);
+            throw new ConflictException("Ticket is not available for reservation.", new ArrayList<>());
+        }
 
         // Update the ticket details
         existingTicket.setRowNumber(ticketCreateDto.getRowNumber());
@@ -183,8 +195,8 @@ public class TicketServiceImpl implements TicketService {
         Ticket savedTicket = ticketRepository.save(existingTicket);
         LOGGER.debug("Updated ticket saved to database: {}", savedTicket);
 
-        // Return the updated ticket as a DTO
-        TicketDetailDto ticketDetailDto = new TicketDetailDto(
+        // Map the saved ticket to a DTO
+        return new TicketDetailDto(
             savedTicket.getTicketId(),
             savedTicket.getPerformanceId(),
             savedTicket.getRowNumber(),
@@ -198,10 +210,8 @@ public class TicketServiceImpl implements TicketService {
             savedTicket.getReservationNumber(),
             savedTicket.getDate()
         );
-
-        LOGGER.info("Returning updated ticket DTO: {}", ticketDetailDto);
-        return ticketDetailDto;
     }
+
 
     @Override
     public void deleteTicket(Long id) {

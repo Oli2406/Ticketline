@@ -1,8 +1,8 @@
 import {Merchandise} from "./merchandise";
-import {Ticket, TicketDto} from "./ticket";
+import {TicketDto} from "./ticket";
 
 export interface Purchase {
-  purchaseId?: number; // Primary Key
+  purchaseId?: number;
   userId: String;
   ticketIds: number[];
   merchandiseIds: number[];

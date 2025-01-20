@@ -32,11 +32,11 @@ export class HeaderComponent implements OnInit {
     this.authService.isCurrentUserLoggedInInBackend().subscribe((isLoggedIn) => {
       if(!isLoggedIn){
         this.authService.clearAuthToken();
-        this.router.navigate(['/login'])
       } else {
         this.authService.logoutUser();
-        this.setActivePage('home');
       }
+
+      this.router.navigate(['/login']);
     });
   }
 

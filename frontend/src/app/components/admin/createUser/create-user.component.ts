@@ -40,13 +40,11 @@ export class CreateUserComponent {
   }
 
   onSubmit() {
-    // Check if passwords match
     if (this.createUserData.password !== this.createUserData.confirmedPassword) {
       this.toastr.error('Passwords do not match!', 'Error');
       return;
     }
 
-    // Prepare the payload as `AdminUserRegistrationDto`
     const payload: AdminUserRegistrationDto = {
       firstName: this.createUserData.firstName,
       lastName: this.createUserData.lastName,
@@ -55,7 +53,6 @@ export class CreateUserComponent {
       isAdmin: this.createUserData.isAdmin,
     };
 
-    // Make the API call to create the user
     this.registerService.registerUser(payload).subscribe({
       next: () => {
         this.toastr.success('User created successfully!', 'Success');

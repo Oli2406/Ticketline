@@ -1,8 +1,8 @@
 export interface Event {
-  eventId?: number; // Primary Key
+  eventId?: number;
   title: string;
-  dateFrom: Date; // Startdatum
-  dateTo: Date; // Enddatum
+  dateFrom: Date;
+  dateTo: Date;
   category: string;
   description: string;
   performanceIds?: number[];

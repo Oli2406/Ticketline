@@ -13,7 +13,6 @@ import {ToastrService} from 'ngx-toastr';
 export class LoginComponent implements OnInit {
 
   loginForm: UntypedFormGroup;
-  // After first submission attempt, form validation will start
   submitted = false;
 
   showPassword: boolean = false;
@@ -37,7 +36,7 @@ export class LoginComponent implements OnInit {
     this.submitted = true;
     if (this.loginForm.valid) {
       const authRequest: AuthRequest = new AuthRequest(
-        this.loginForm.controls.username.value,
+        this.loginForm.controls.username.value.toLowerCase(),
         this.loginForm.controls.password.value
       );
       this.authenticateUser(authRequest);

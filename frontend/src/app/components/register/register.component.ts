@@ -47,7 +47,7 @@ export class RegisterComponent {
     const payload: UserRegistrationDto = {
       firstName: this.registerData.firstName,
       lastName: this.registerData.lastName,
-      email: this.registerData.email,
+      email: this.registerData.email.toLowerCase(),
       password: this.registerData.password,
     };
     if (this.registerData.password !== this.registerData.confirmedPassword) {

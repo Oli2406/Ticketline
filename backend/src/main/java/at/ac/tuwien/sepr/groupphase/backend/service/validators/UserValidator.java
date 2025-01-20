@@ -4,24 +4,23 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserRegistrationDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.RegisterRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
+import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserValidator {
 
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final RegisterRepository registerRepository;
+    private final UserRepository userRepository;
 
-    public UserValidator(RegisterRepository registerRepository) {
-        this.registerRepository = registerRepository;
+    public UserValidator(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public void validateRegister(UserRegistrationDto registerDto)
@@ -49,12 +48,14 @@ public class UserValidator {
         }
     }
 
-    public void validateUserForUpdate(UserUpdateDto user)
+    public void validateUserForUpdate(UserUpdateDto user, boolean hasEmailChanged)
         throws ValidationException, ConflictException {
         LOGGER.trace("validateUserForUpdate({})", user);
         List<String> validationErrors = new ArrayList<>();
 
-        isEmailUnique(user.getEmail());
+        if (hasEmailChanged) {
+            isEmailUnique(user.getEmail());
+        }
 
         validateName(user.getFirstName(), validationErrors, "First name is required",
             "First name must be less than 255 characters",
@@ -77,7 +78,7 @@ public class UserValidator {
     }
 
     public void isEmailUnique(String email) throws ConflictException {
-        if (registerRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             List<String> error = new ArrayList<>();
             error.add("email is already registered");
             LOGGER.warn("conflict error in create : {}", error);
@@ -88,9 +89,26 @@ public class UserValidator {
     private static void validateEmail(String email, List<String> validationErrors) {
         if (email == null || email.trim().isEmpty()) {
             validationErrors.add("Email must not be empty");
-        } else if (!email
-            .matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,63}$")) {
-            validationErrors.add("Invalid email format");
+            return;
+        }
+
+        email = email.trim();
+
+        int atIndex = email.indexOf('@');
+        int dotIndex = email.lastIndexOf('.');
+
+        if (atIndex < 1 || atIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters before or after '@'");
+            return;
+        }
+
+        if (dotIndex <= atIndex + 1 || dotIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters after '@' or after '.'");
+            return;
+        }
+
+        if (dotIndex == email.length() - 1) {
+            validationErrors.add("Invalid email format: missing characters after '.'");
         }
     }
 

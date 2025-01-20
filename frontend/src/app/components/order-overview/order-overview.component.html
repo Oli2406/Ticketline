@@ -27,16 +27,30 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
               <div class="cancel-button">
                 <button class="btn btn-primary" (click)="showCancelMessageReservation(ticket)">
-                  <i>Cancel Ticket</i>
+                  Cancel Ticket
+                </button>
+                <button class="btn btn-purple" (click)="addToCart(ticket)">
+                  <i class="bi bi-cart me-2"></i>Add to Cart
                 </button>
               </div>
+
               <br>
             </li>
+            <div class="cancel-button">
+              <button class="btn btn-primary"
+                      (click)="showCancelMessageCompleteReservation(group.reserved)">
+                Cancel Reservation
+              </button>
+            </div>
           </ul>
         </div>
       </div>
@@ -66,16 +80,29 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
               <div class="cancel-button">
                 <button class="btn btn-primary" (click)="showCancelMessagePurchase(ticket)">
-                  <i>Cancel Ticket</i>
+                  Cancel Ticket
                 </button>
               </div>
               <br>
             </li>
+            <div class="cancel-button">
+              <button class="btn btn-primary" (click)="fetchPurchaseForInvoice(group.purchased)">
+                Download Invoice
+              </button>
+              <button class="btn btn-primary"
+                      (click)="showCancelMessageCompletePurchase(group.purchased)">
+                Cancel Purchase
+              </button>
+            </div>
           </ul>
         </div>
       </div>
@@ -105,6 +132,10 @@
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
                 <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
@@ -165,6 +196,7 @@
       <table class="invoice-items">
         <thead>
         <tr>
+          <th>Performance</th>
           <th>Ticket ID</th>
           <th>Row Number</th>
           <th>Seat Number</th>
@@ -177,6 +209,7 @@
         </thead>
         <tbody>
         <tr>
+          <td>{{getTicketPerformanceForInvoice(cancelledTicket.performanceId)}}</td>
           <td>{{ cancelledTicket.ticketId }}</td>
           <td>{{ cancelledTicket.rowNumber }}</td>
           <td>{{ cancelledTicket.seatNumber }}</td>
@@ -213,24 +246,216 @@
       </div>
     </div>
     </body>
+
+
     </html>
+    <div class="invoice-div-download">
+      <!DOCTYPE html>
+      <html lang="de">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Invoice</title>
+      </head>
+      <body>
+      <div class="invoice-container-download">
+        <div class="invoice-header">
+          <h1>Invoice</h1>
+          <div>
+            <p>Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
+            <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
+          </div>
+        </div>
+
+        <table class="invoice-details">
+          <tr>
+            <td>
+              <strong>Issuer:</strong> <br>
+              Ticketline - GmbH<br>
+              Wiedner Hautpstrasse 76/2/2<br>
+              1040 Wien <br>
+              E-Mail: info&#64;ticketline-website.at<br>
+              UID: ATU12345678
+            </td>
+            <td>
+              <strong>Recipient:</strong><br>
+              {{ userFirstName }} {{ userLastName }}<br>
+              {{ this.invoicePurchase.street }}<br>
+              {{ this.invoicePurchase.postalCode }} {{ this.invoicePurchase.city }}<br>
+              E-Mail: {{ userEmail }} <br>
+            </td>
+          </tr>
+        </table>
+
+        <table class="invoice-items">
+          <thead>
+          <tr>
+            <th>Performance</th>
+            <th>Row Number</th>
+            <th>Seat Number</th>
+            <th>Sector</th>
+            <th>Ticket Type</th>
+            <th>Quantity</th>
+            <th>Unit Price incl. tax</th>
+            <th>Tax (13%)</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (invTicket of invoiceTickets; track invTicket) {
+              <tr>
+                <td>{{ getTicketPerformanceForInvoice(invTicket.performanceId) }}</td>
+                <td>{{ invTicket.rowNumber }}</td>
+                <td>{{ invTicket.seatNumber }}</td>
+                <td>{{ invTicket.sectorType }}</td>
+                <td>{{ invTicket.ticketType }}</td>
+                <td>{{ 1 }}</td>
+                <td>{{ invTicket.price }} €</td>
+                <td>{{ ((invTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }} €</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <table class="invoice-footer">
+          <td><strong>Total Price excl. tax.:</strong></td>
+          <td><strong>{{ (this.invoicePurchase.totalPrice / 113) * 100 | number: '1.2-2' }}
+            €</strong></td>
+          <td><strong>Sales Tax:</strong></td>
+          <td><strong>{{ ((this.invoicePurchase.totalPrice / 113) * 100) * 0.13 | number: '1.2-2' }}
+            €</strong></td>
+          <td><strong>Total Price incl. tax:</strong></td>
+          <td><strong>{{ this.invoicePurchase.totalPrice| number: '1.2-2' }} €</strong></td>
+        </table>
+
+        <div class="invoice-bank">
+          <p>Thank you for your purchase at Ticket-Line!</p>
+          <p> Tax Information: Tickets have a 13% sales tax.</p>
+        </div>
+      </div>
+      </body>
+      </html>
+    </div>
   </div>
 </div>
 
-@if (showConfirmDeletionDialogP) {
+<div class="invoice-div-download">
+  <!DOCTYPE html>
+  <html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+  </head>
+  <body>
+  <div class="invoice-container">
+    <div class="invoice-header">
+      <h1>Invoice</h1>
+      <div>
+        <p>Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
+        <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
+      </div>
+    </div>
+
+    <table class="invoice-details">
+      <tr>
+        <td>
+          <strong>Issuer:</strong> <br>
+          Ticketline - GmbH<br>
+          Wiedner Hautpstrasse 76/2/2<br>
+          1040 Wien <br>
+          E-Mail: info&#64;ticketline-website.at<br>
+          UID: ATU12345678
+        </td>
+        <td>
+          <strong>Recipient:</strong><br>
+          {{ userFirstName }} {{ userLastName }}<br>
+          {{ invoicePurchase.street }}<br>
+          {{ invoicePurchase.postalCode }} {{ invoicePurchase.city }}<br>
+          E-Mail: {{ userEmail }} <br>
+        </td>
+      </tr>
+    </table>
+
+    <table class="invoice-items">
+      <thead>
+      <tr>
+        <th>Ticket ID</th>
+        <th>Row Number</th>
+        <th>Seat Number</th>
+        <th>Sector</th>
+        <th>Ticket Type</th>
+        <th>Quantity</th>
+        <th>Unit Price incl. tax</th>
+        <th>Tax (13%)</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (ticket of invoiceTickets; track ticket) {
+          <tr>
+            <td>{{ ticket.ticketId }}</td>
+            <td>{{ ticket.rowNumber }}</td>
+            <td>{{ ticket.seatNumber }}</td>
+            <td>{{ ticket.sectorType }}</td>
+            <td>{{ ticket.ticketType }}</td>
+            <td>{{ 1 }}</td>
+            <td>{{ ticket.price }} €</td>
+            <td>{{ ((ticket.price / 113) * 100) * 0.13 | number: '1.2-2' }} €</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <table class="invoice-footer">
+      <td><strong>Total Price excl. tax.:</strong></td>
+      <td><strong>{{ (invoicePurchase.totalPrice / 113) * 100 | number: '1.2-2' }} €</strong></td>
+      <td><strong>Sales Tax:</strong></td>
+      <td><strong>{{ ((invoicePurchase.totalPrice / 113) * 100) * 0.13 | number: '1.2-2' }}
+        €</strong></td>
+      <td><strong>Total Price incl. tax:</strong></td>
+      <td><strong>{{ invoicePurchase.totalPrice| number: '1.2-2' }} €</strong></td>
+    </table>
+
+    <div class="invoice-bank">
+      <p>Thank you for your purchase at Ticket-Line!</p>
+      <p> Tax Information: Tickets have a 13% sales tax.</p>
+    </div>
+  </div>
+  </body>
+  </html>
+</div>
+
+@if (showConfirmDeletionDialogPTicket) {
   <app-confirm-dialog
     [mode]="ConfirmationDialogMode.confirm"
     [message]="cancelMessagePurchase"
-    (confirm)="cancelPurchase(cancelledTicket)"
-    (cancel)="showConfirmDeletionDialogP = false">
+    (confirm)="cancelPurchasedTicket(cancelledTicket)"
+    (cancel)="showConfirmDeletionDialogPTicket = false">
   </app-confirm-dialog>
 }
 
-@if (showConfirmDeletionDialogR) {
+@if (showConfirmDeletionDialogAllP) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.confirm"
+    [message]="cancelMessagePurchase"
+    (confirm)="cancelCompletePurchase(cancelledTickets)"
+    (cancel)="showConfirmDeletionDialogPTicket = false">
+  </app-confirm-dialog>
+}
+
+@if (showConfirmDeletionDialogReTicket) {
   <app-confirm-dialog
     [mode]="ConfirmationDialogMode.confirm"
     [message]="cancelMessageReservation"
-    (confirm)="cancelReservation(cancelledTicket)"
-    (cancel)="showConfirmDeletionDialogR = false">
+    (confirm)="cancelReservationTicket(cancelledTicket)"
+    (cancel)="showConfirmDeletionDialogReTicket = false">
   </app-confirm-dialog>
 }
+
+@if (showConfirmDeletionDialogAllRes) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.confirm"
+    [message]="cancelMessageReservation"
+    (confirm)="cancelCompleteReservation(cancelledTickets)"
+    (cancel)="showConfirmDeletionDialogPTicket = false">
+  </app-confirm-dialog>
+}
+
+

@@ -44,7 +44,7 @@ export class ReservationService {
   }
 
   /**
-   * Update a reservation after cancelling a ticket
+   * Updates or deletes a reservation after cancelling tickets
    */
   updateReservation(reservation: ReservationListDto): Observable<ReservationListDto> {
     console.log(this.apiUrl);
@@ -78,5 +78,12 @@ export class ReservationService {
       }
     }
     return throwError(() => new Error(cleanedError));
+  }
+
+  deleteTicketFromReservation(reservationId: number, ticketId: number): Observable<void> {
+    const url = `${this.apiUrl}/${reservationId}/ticket/${ticketId}`;
+    return this.http.delete<void>(url).pipe(
+      catchError(this.handleError)
+    );
   }
 }

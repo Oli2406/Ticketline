@@ -1,5 +1,5 @@
 export interface Location {
-  locationId?: number; // Primary Key
+  locationId?: number;
   name: string;
   street: string;
   city: string;
