@@ -891,5 +891,4 @@ class UserDetailServiceImplTest {
         verify(userRepository).findUserByEmail("user@example.com");
         verifyNoInteractions(jwtTokenizer); // Token blocking should not occur
     }
-
 }
