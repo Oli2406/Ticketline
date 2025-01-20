@@ -77,7 +77,7 @@ public class UserDetailServiceImpl implements UserService {
     @Override
     public ApplicationUser findApplicationUserByEmail(String email) {
         LOGGER.debug("Finding application user by email: {}", email);
-        return userRepository.findUserByEmail(email).orElseThrow(() -> new NotFoundException(
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException(
             String.format("Could not find the user with the email address %s", email)));
     }
 
@@ -187,6 +187,10 @@ public class UserDetailServiceImpl implements UserService {
 
         List<String> roles =
             toRegister.isAdmin() ? List.of("ROLE_ADMIN", "ROLE_USER") : List.of("ROLE_USER");
+        LOGGER.info("Calling getAuthToken with: email={}, roles={}, randomString={}, points={}, firstName={}, lastName={}",
+            toRegister.getEmail(), roles, randomStringGenerator.generateRandomString(toRegister.getId()),
+            toRegister.getPoints(), toRegister.getFirstName(), toRegister.getLastName());
+
         return jwtTokenizer.getAuthToken(toRegister.getEmail(), roles,
             randomStringGenerator.generateRandomString(toRegister.getId()), toRegister.getPoints(),
             toRegister.getFirstName(), toRegister.getLastName());
