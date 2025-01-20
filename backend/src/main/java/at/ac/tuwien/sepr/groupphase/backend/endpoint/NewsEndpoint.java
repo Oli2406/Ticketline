@@ -78,10 +78,4 @@ public class NewsEndpoint {
         List<NewsDetailDto> news = newsService.getUnreadNews(email);
         return ResponseEntity.ok(news);
     }
-
-    @PermitAll
-    @GetMapping("/create")
-    public String getRoot() {
-        return "Get stub";
-    }
 }

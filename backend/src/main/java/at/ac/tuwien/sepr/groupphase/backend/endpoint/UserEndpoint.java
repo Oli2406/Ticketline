@@ -4,6 +4,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.DeleteUserDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseItemDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.UserUpdateReadNewsDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.InsufficientStockException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -14,6 +15,8 @@ import jakarta.annotation.security.PermitAll;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -54,6 +57,13 @@ public class UserEndpoint {
 
         userService.updateReadNews(dto);
         return ResponseEntity.ok().build();
+    }
+
+    @PermitAll
+    @GetMapping("/user-points")
+    public ResponseEntity<Integer> getUserPoints(@RequestParam String email) {
+        Optional<ApplicationUser> user = Optional.ofNullable(userService.findApplicationUserByEmail(email));
+        return user.map(applicationUser -> ResponseEntity.ok(applicationUser.getPoints())).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(0));
     }
 
     @PermitAll
