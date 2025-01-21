@@ -18,6 +18,7 @@ import {
 } from "../confirm-dialog/confirm-dialog.component";
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
+import {forEach} from "lodash";
 
 @Component({
   selector: 'app-order-overview',
@@ -310,15 +311,23 @@ export class OrderOverviewComponent implements OnInit {
     );
 
     if (matchingPurchase) {
-      this.cancelledPurchase = { ...matchingPurchase };
+      this.cancelledPurchase = {...matchingPurchase};
       this.cancelledPurchase.tickets = [];
+
+      this.cancelledTickets.map(ticket => {
+        ticket.status = 'SOLD';
+        return this.ticketService.updateTicket(ticket.ticketId, {
+          ...ticket,
+          status: 'AVAILABLE',
+        });
+      });
 
       this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
         next: () => {
           this.toastr.success('Purchase cancelled successfully.', 'Success');
           this.loadUserPurchases(this.authService.getUserIdFromToken());
-          // Optional: PDF generieren
-          // this.generateCancelPurchasePDF();
+          //TODO pdf fixen --> zeigt nur ein ticket
+          //this.generateCancelPurchasePDF();
         },
         error: (err) => {
           console.error('Error updating purchase:', err.message);
@@ -340,7 +349,15 @@ export class OrderOverviewComponent implements OnInit {
     );
 
     if (matchingReservation) {
-      this.cancelledReservation = { ...matchingReservation, tickets: [] };
+      this.cancelledReservation = {...matchingReservation, tickets: []};
+
+      this.cancelledTickets.map(ticket => {
+        ticket.status = 'RESERVED';
+        return this.ticketService.updateTicket(ticket.ticketId, {
+          ...ticket,
+          status: 'AVAILABLE',
+        });
+      });
 
       this.reservationService.updateReservation(this.cancelledReservation).subscribe({
         next: () => {
@@ -473,7 +490,6 @@ export class OrderOverviewComponent implements OnInit {
       }
     });
   }
-
 
 
   private removeTicketFromReservations(ticket: TicketDto): void {
