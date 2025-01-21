@@ -8,7 +8,7 @@ import { ArtistService } from 'src/app/services/artist.service';
 import { Artist } from "../../dtos/artist";
 import { Location } from "../../dtos/location";
 import { TicketService } from 'src/app/services/ticket.service';
-import {catchError, forkJoin, map, Observable, throwError} from "rxjs";
+import {catchError, forkJoin, map, Observable, of, throwError} from "rxjs";
 import {CartService} from "../../services/cart.service";
 import {ActivatedRoute} from "@angular/router";
 import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
@@ -124,9 +124,9 @@ export class SeatingPlanBComponent {
         }
 
         this.seatedBackB = tickets
-          .filter(ticket => ticket.sectorType === SectorType.B)
-          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 })) // Adjust price
-          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
+        .filter(ticket => ticket.sectorType === SectorType.B)
+        .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 })) // Adjust price
+        .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
 
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
@@ -495,7 +495,8 @@ export class SeatingPlanBComponent {
         });
 
         dialogRef.afterClosed().subscribe(() => {
-          const updateRequests = this.selectedTickets.map(ticket => {
+          // Process seated tickets
+          const seatedUpdateRequests = this.selectedTickets.map(ticket => {
             ticket.status = 'RESERVED';
             return this.ticketService.updateTicket(ticket.ticketId, {
               ...ticket,
@@ -503,18 +504,50 @@ export class SeatingPlanBComponent {
             });
           });
 
-          forkJoin(updateRequests).subscribe({
-            next: updatedTickets => {
-              updatedTickets.forEach(ticket => {
-                this.cartService.addToCart(ticket);
-                this.cartedSeats.push(ticket.ticketId);
+          // Process standing tickets (VIP and Premium)
+          const vipCount = this.selectedStanding.vip;
+          const premiumCount = this.selectedStanding.premium;
+
+          const vipStanding$ = vipCount > 0
+            ? this.getAvailableStandingTickets(PriceCategory.VIP, vipCount)
+            : of([] as TicketDto[]);
+          const premiumStanding$ = premiumCount > 0
+            ? this.getAvailableStandingTickets(PriceCategory.PREMIUM, premiumCount)
+            : of([] as TicketDto[]);
+
+          // First get available standing tickets concurrently
+          forkJoin([vipStanding$, premiumStanding$]).subscribe({
+            next: ([vipTickets, premiumTickets]) => {
+              // Create update requests for standing tickets
+              const standingUpdateRequests = [...vipTickets, ...premiumTickets].map(ticket => {
+                ticket.status = 'RESERVED';
+                return this.ticketService.updateTicket(ticket.ticketId, {
+                  ...ticket,
+                  status: 'RESERVED',
+                });
               });
-              this.resetSelections();
-              this.toastr.success("Tickets successfully added to cart!", "Success");
+
+              // Combine seated and standing update requests
+              const allUpdateRequests = [...seatedUpdateRequests, ...standingUpdateRequests];
+
+              forkJoin(allUpdateRequests).subscribe({
+                next: updatedTickets => {
+                  updatedTickets.forEach(ticket => {
+                    this.cartService.addToCart(ticket);
+                    this.cartedSeats.push(ticket.ticketId);
+                  });
+                  this.resetSelections();
+                  this.toastr.success("Tickets successfully added to cart!", "Success");
+                },
+                error: err => {
+                  console.error('Error reserving tickets while adding to cart:', err);
+                  this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+                }
+              });
             },
             error: err => {
-              console.error('Error reserving tickets while adding to cart:', err);
-              this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+              console.error('Error fetching standing tickets:', err);
+              this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
             }
           });
         });
