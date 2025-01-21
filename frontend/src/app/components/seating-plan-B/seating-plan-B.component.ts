@@ -1,20 +1,22 @@
-import { Component } from '@angular/core';
-import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
-import { ToastrService } from 'ngx-toastr';
-import { PerformanceService } from 'src/app/services/performance.service';
-import { PerformanceListDto } from 'src/app/dtos/performance';
-import { LocationService } from 'src/app/services/location.service';
-import { ArtistService } from 'src/app/services/artist.service';
-import { Artist } from "../../dtos/artist";
-import { Location } from "../../dtos/location";
-import { TicketService } from 'src/app/services/ticket.service';
+import {Component} from '@angular/core';
+import {TicketDto, TicketType, SectorType, PriceCategory} from "../../dtos/ticket";
+import {ToastrService} from 'ngx-toastr';
+import {PerformanceService} from 'src/app/services/performance.service';
+import {PerformanceListDto} from 'src/app/dtos/performance';
+import {LocationService} from 'src/app/services/location.service';
+import {ArtistService} from 'src/app/services/artist.service';
+import {Artist} from "../../dtos/artist";
+import {Location} from "../../dtos/location";
+import {TicketService} from 'src/app/services/ticket.service';
 import {catchError, forkJoin, map, Observable, of, throwError} from "rxjs";
 import {CartService} from "../../services/cart.service";
 import {ActivatedRoute} from "@angular/router";
-import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
+import {
+  TicketExpirationDialogComponent
+} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
 import {MatDialog, MatDialogModule} from "@angular/material/dialog";
 import {Reservation} from "../../dtos/reservation";
-import { AuthService } from "../../services/auth.service";
+import {AuthService} from "../../services/auth.service";
 import {ReservationService} from "../../services/reservation.service";
 import {PurchaseService} from "../../services/purchase.service";
 
@@ -32,7 +34,7 @@ export class SeatingPlanBComponent {
 
   // Selected Tickets and Info
   selectedTickets: TicketDto[] = [];
-  selectedStanding: { vip: number; premium: number } = { vip: 0, premium: 0 };
+  selectedStanding: { vip: number; premium: number } = {vip: 0, premium: 0};
 
   // Enums for easier reference
   priceCategory = PriceCategory;
@@ -81,7 +83,8 @@ export class SeatingPlanBComponent {
     private authService: AuthService,
     private reservedService: ReservationService,
     private purchaseService: PurchaseService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -125,7 +128,7 @@ export class SeatingPlanBComponent {
 
         this.seatedBackB = tickets
         .filter(ticket => ticket.sectorType === SectorType.B)
-        .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 10 })) // Adjust price
+        .map(ticket => ({...ticket, price: this.performanceDetails.price + 10})) // Adjust price
         .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber);
 
         const standingTickets = tickets.filter(
@@ -345,7 +348,7 @@ export class SeatingPlanBComponent {
   resetSelections(): void {
     const totalSelected = this.selectedTickets.length + this.selectedStanding.vip + this.selectedStanding.premium;
     this.selectedTickets = [];
-    this.selectedStanding = { vip: 0, premium: 0 };
+    this.selectedStanding = {vip: 0, premium: 0};
     this.totalTickets = 0;
     this.totalPrice = 0;
   }

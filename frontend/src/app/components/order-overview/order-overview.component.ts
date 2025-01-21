@@ -314,25 +314,29 @@ export class OrderOverviewComponent implements OnInit {
       this.cancelledPurchase = {...matchingPurchase};
       this.cancelledPurchase.tickets = [];
 
-      this.cancelledTickets.map(ticket => {
-        ticket.status = 'SOLD';
-        return this.ticketService.updateTicket(ticket.ticketId, {
+      const updatePromises = tickets.map(ticket =>
+        this.ticketService.updateTicket(ticket.ticketId, {
           ...ticket,
           status: 'AVAILABLE',
-        });
-      });
+        }).toPromise()
+      );
 
-      this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
-        next: () => {
-          this.toastr.success('Purchase cancelled successfully.', 'Success');
-          this.loadUserPurchases(this.authService.getUserIdFromToken());
-          //TODO pdf fixen --> zeigt nur ein ticket
-          //this.generateCancelPurchasePDF();
-        },
-        error: (err) => {
-          console.error('Error updating purchase:', err.message);
-          this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
-        }
+      Promise.all(updatePromises)
+      .then(() => {
+        this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
+          next: () => {
+            this.toastr.success('Purchase cancelled successfully.', 'Success');
+            this.loadUserPurchases(this.authService.getUserIdFromToken());
+          },
+          error: (err) => {
+            console.error('Error updating purchase:', err.message);
+            this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating tickets:', error.message);
+        this.toastr.error('Failed to update tickets. Please try again.', 'Error');
       });
     } else {
       this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
@@ -343,6 +347,7 @@ export class OrderOverviewComponent implements OnInit {
 
   cancelCompleteReservation(tickets: TicketDto[]) {
     this.cancelledTickets = tickets;
+    console.log(this.cancelledTickets);
 
     const matchingReservation = this.userReservations.find((reservation) =>
       reservation.tickets.some((reservedTicket) => reservedTicket.ticketId === tickets[0].ticketId)
@@ -351,31 +356,35 @@ export class OrderOverviewComponent implements OnInit {
     if (matchingReservation) {
       this.cancelledReservation = {...matchingReservation, tickets: []};
 
-      this.cancelledTickets.map(ticket => {
-        ticket.status = 'RESERVED';
-        return this.ticketService.updateTicket(ticket.ticketId, {
+      const updatePromises = tickets.map(ticket =>
+        this.ticketService.updateTicket(ticket.ticketId, {
           ...ticket,
           status: 'AVAILABLE',
-        });
-      });
+        }).toPromise()
+      );
 
-      this.reservationService.updateReservation(this.cancelledReservation).subscribe({
-        next: () => {
-          this.toastr.success('Reservation cancelled successfully.', 'Success');
-          this.loadUserReservations(this.authService.getUserIdFromToken());
-        },
-        error: (err) => {
-          console.error('Error updating reservation:', err.message);
-          this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
-        },
+      Promise.all(updatePromises)
+      .then(() => {
+        this.reservationService.updateReservation(this.cancelledReservation).subscribe({
+          next: () => {
+            this.toastr.success('Reservation cancelled successfully.', 'Success');
+            this.loadUserReservations(this.authService.getUserIdFromToken());
+          },
+          error: (err) => {
+            console.error('Error updating reservation:', err.message);
+            this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating tickets:', error.message);
+        this.toastr.error('Failed to update tickets. Please try again.', 'Error');
       });
     } else {
-      this.toastr.error('No matching reservation found for the provided tickets.', 'Error');
+      this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
     }
-
     this.showConfirmDeletionDialogAllRes = false;
   }
-
 
   cancelPurchasedTicket(ticket: TicketDto) {
     this.cancelledTicket = ticket;
