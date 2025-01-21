@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.MerchandiseService;
@@ -90,5 +91,18 @@ public class PurchaseEndpoint {
         purchaseService.updatePurchase(purchaseDetailDto);
         LOG.info("Successfully updated Purchase: {}", purchaseDetailDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/details/{encryptedUserId}")
+    public ResponseEntity<List<PurchaseOverviewDto>> getPurchaseDetailsByUser(
+        @PathVariable String encryptedUserId) {
+        LOG.info("Fetching detailed purchases for user with encrypted ID: {}", encryptedUserId);
+        Long userId = randomStringGenerator.retrieveOriginalId(encryptedUserId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        List<PurchaseOverviewDto> purchases = purchaseService.getPurchaseDetailsByUser(userId);
+        LOG.info("Fetched {} detailed purchases for user with ID: {}", purchases.size(), userId);
+        return ResponseEntity.ok(purchases);
     }
 }

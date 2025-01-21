@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
-import { Reservation, ReservationListDto } from '../dtos/reservation';
+import {Reservation, ReservationDetailDto, ReservationListDto} from '../dtos/reservation';
 
 @Injectable({
   providedIn: 'root',
@@ -80,9 +80,22 @@ export class ReservationService {
     return throwError(() => new Error(cleanedError));
   }
 
+  /**
+   * Deletes a ticket from a specific reservation by reservationId and ticketId
+   */
   deleteTicketFromReservation(reservationId: number, ticketId: number): Observable<void> {
     const url = `${this.apiUrl}/${reservationId}/ticket/${ticketId}`;
     return this.http.delete<void>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Get detailed reservations for a specific user by userId
+   */
+  getReservationDetailsByUser(encryptedUserId: string): Observable<ReservationDetailDto[]> {
+    const url = `${this.apiUrl}/details/${encryptedUserId}`;
+    return this.http.get<ReservationDetailDto[]>(url).pipe(
       catchError(this.handleError)
     );
   }

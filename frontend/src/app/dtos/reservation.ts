@@ -13,3 +13,18 @@ export interface ReservationListDto {
   tickets: TicketDto[];
   reservedDate: Date;
 }
+
+export interface ReservationDetailDto {
+  reservedId: number;
+  userId: number;
+  tickets: TicketDto[];
+  reservedDate: Date;
+
+  performanceDetails: {
+    [performanceId: number]: {
+      name: string;
+      artistName: string;
+      locationName: string;
+    };
+  };
+}

@@ -1,10 +1,8 @@
 <div class="user-orders">
-  <!-- Main Title -->
   <div class="main-title">
     <h1>My Tickets</h1>
   </div>
 
-  <!-- Reservierte Tickets in der Zukunft -->
   <section *ngIf="reservedTickets.length > 0" class="section">
     <h2>Current Reservations</h2>
     <div *ngFor="let group of reservedTickets" class="ticket-group">
@@ -20,11 +18,9 @@
             <li *ngFor="let ticket of group.reserved">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{
-                    getPerformanceName(ticket.performanceId)
-                  }}</span>
-                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
-                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{getPerformanceNameOfReservation(ticket.performanceId)}}</span>
+                <span><strong>Artist:</strong> {{ getArtistNameOfReservation(ticket.performanceId) }}</span>
+                <span><strong>Location:</strong> {{ getPerformanceLocationOfReservation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span
@@ -57,7 +53,6 @@
     </div>
   </section>
 
-  <!-- Aktuelle Käufe -->
   <section *ngIf="purchasedTickets.length > 0" class="section">
     <h2>Current Purchases</h2>
     <div *ngFor="let group of purchasedTickets" class="ticket-group">
@@ -73,9 +68,7 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{
-                    getPerformanceName(ticket.performanceId)
-                  }}</span>
+                <span><strong>Performance Name:</strong> {{getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -109,7 +102,6 @@
     </div>
   </section>
 
-  <!-- Vergangene Käufe -->
   <section *ngIf="pastTickets.length > 0" class="section">
     <h2>Purchase History</h2>
     <div *ngFor="let group of pastTickets" class="ticket-group">
@@ -125,9 +117,7 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{
-                    getPerformanceName(ticket.performanceId)
-                  }}</span>
+                <span><strong>Performance Name:</strong> {{getPerformanceName(ticket.performanceId) }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>

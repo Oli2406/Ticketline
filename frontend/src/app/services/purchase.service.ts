@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
-import { Purchase, PurchaseListDto } from '../dtos/purchase';
+import {Purchase, PurchaseDetailDto, PurchaseListDto} from '../dtos/purchase';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +19,16 @@ export class PurchaseService {
   getPurchasesByUser(encryptedUserId: string): Observable<PurchaseListDto[]> {
     const url = `${this.apiUrl}/user/${encryptedUserId}`;
     return this.http.get<PurchaseListDto[]>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Get all detailed purchases for a specific user by userId
+   */
+  getPurchaseDetailsByUser(encryptedUserId: string): Observable<PurchaseDetailDto[]> {
+    const url = `${this.apiUrl}/details/${encryptedUserId}`;
+    return this.http.get<PurchaseDetailDto[]>(url).pipe(
       catchError(this.handleError)
     );
   }

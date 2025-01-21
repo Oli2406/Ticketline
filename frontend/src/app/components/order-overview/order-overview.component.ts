@@ -5,8 +5,8 @@ import {PurchaseService} from '../../services/purchase.service';
 import {ReservationService} from '../../services/reservation.service';
 import {ToastrService} from 'ngx-toastr';
 import {Hall, PriceCategory, SectorType, TicketDto, TicketType} from '../../dtos/ticket';
-import {PurchaseListDto} from '../../dtos/purchase';
-import {ReservationListDto} from '../../dtos/reservation';
+import {PurchaseDetailDto, PurchaseListDto} from '../../dtos/purchase';
+import {ReservationDetailDto, ReservationListDto} from '../../dtos/reservation';
 import {PerformanceService} from 'src/app/services/performance.service';
 import {LocationService} from '../../services/location.service';
 import {PerformanceListDto} from '../../dtos/performance';
@@ -39,8 +39,8 @@ export class OrderOverviewComponent implements OnInit {
   performanceDate: Date;
   artistCache: { [artistId: number]: string } = {};
   performanceLocations: { [locationId: number]: string } = {};
-  userPurchases: PurchaseListDto[];
-  userReservations: ReservationListDto[];
+  userPurchases: PurchaseDetailDto[] = [];
+  userReservations: ReservationDetailDto[] = [];
   cancelledPurchase: PurchaseListDto;
   cancelledReservation: ReservationListDto;
   cancelledTicket: TicketDto = {
@@ -119,29 +119,50 @@ export class OrderOverviewComponent implements OnInit {
   }
 
   loadUserPurchases(userId: string): void {
-    this.purchaseService.getPurchasesByUser(userId).subscribe({
-      next: (purchases: PurchaseListDto[]) => {
-        this.userPurchases = purchases;
-        this.processPurchases(purchases);
+    this.purchaseService.getPurchaseDetailsByUser(userId).subscribe({
+      next: (details: PurchaseDetailDto[]) => {
+        this.userPurchases = details;
+        this.processPurchases(details);
       },
       error: (err) => {
-        console.error('Error fetching purchases:', err.message);
+        console.error('Error fetching purchase details:', err.message);
         this.toastr.error('Failed to load your purchases. Please try again.', 'Error');
       },
     });
   }
 
   loadUserReservations(userId: string): void {
-    this.reservationService.getReservationsByUser(userId).subscribe({
-      next: (reservations: ReservationListDto[]) => {
-        this.userReservations = reservations;
-        this.processReservations(reservations);
+    this.reservationService.getReservationDetailsByUser(userId).subscribe({
+      next: (details: ReservationDetailDto[]) => {
+        this.userReservations = details;
+        this.processReservations(details);
       },
       error: (err) => {
-        console.error('Error fetching reservations:', err.message);
+        console.error('Error fetching reservation details:', err.message);
         this.toastr.error('Failed to load your reservations. Please try again.', 'Error');
       },
     });
+  }
+
+  getPerformanceNameOfReservation(performanceId: number): string {
+    const reservation = this.findReservationByPerformanceId(performanceId);
+    return reservation?.performanceDetails[performanceId]?.name || 'Unknown Performance';
+  }
+
+  getArtistNameOfReservation(performanceId: number): string {
+    const reservation = this.findReservationByPerformanceId(performanceId);
+    return reservation?.performanceDetails[performanceId]?.artistName || 'Unknown Artist';
+  }
+
+  getPerformanceLocationOfReservation(performanceId: number): string {
+    const reservation = this.findReservationByPerformanceId(performanceId);
+    return reservation?.performanceDetails[performanceId]?.locationName || 'Unknown Location';
+  }
+
+  private findReservationByPerformanceId(performanceId: number): ReservationDetailDto | undefined {
+    return this.userReservations.find(reservation =>
+      Object.keys(reservation.performanceDetails).some(id => Number(id) === performanceId)
+    );
   }
 
   private processPurchases(purchases: PurchaseListDto[]): void {
@@ -192,7 +213,6 @@ export class OrderOverviewComponent implements OnInit {
 
   private processReservations(reservations: ReservationListDto[]): void {
     const today = new Date();
-    // Setze die Zeit auf Mitternacht, um nur das Datum zu vergleichen
 
     this.reservedTickets = reservations
     .filter((reservation) =>
@@ -208,106 +228,34 @@ export class OrderOverviewComponent implements OnInit {
   }
 
   getPerformanceName(performanceId: number): string {
-    if (!this.performanceNames[performanceId]) {
-      this.performanceService.getPerformanceById(performanceId).subscribe({
-        next: (performance) => {
-          this.performanceNames[performanceId] = performance;
-        },
-        error: (err) => {
-          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-          this.performanceNames[performanceId].name = 'Error loading name';
-        },
-      });
-      return 'Loading...';
-    }
-
-    return this.performanceNames[performanceId].name;
-  }
-
-  getTicketPerformanceForInvoice(performanceId: number): string {
-    if (!this.performanceNames[performanceId]) {
-      this.performanceService.getPerformanceById(performanceId).subscribe({
-        next: (performance) => {
-          this.performanceNames[performanceId] = performance;
-        },
-        error: (err) => {
-          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-          this.performanceNames[performanceId].name = 'Error loading name';
-        },
-      });
-    }
-    return this.performanceNames[performanceId].name;
+    const purchase = this.findPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.name || 'Unknown Performance';
   }
 
   getArtistName(performanceId: number): string {
-    if (!this.performanceNames[performanceId]) {
-      this.performanceService.getPerformanceById(performanceId).subscribe({
-        next: (performance) => {
-          this.performanceNames[performanceId] = performance;
-
-          if (!this.artistCache[performance.artistId]) {
-            this.loadArtistName(performance.artistId);
-          }
-        },
-        error: (err) => {
-          console.error(`Failed to fetch performance with ID ${performanceId}:`, err);
-        },
-      });
-      return 'Loading...';
-    }
-
-    const artistId = this.performanceNames[performanceId].artistId;
-
-    if (!this.artistCache[artistId]) {
-      this.loadArtistName(artistId);
-      return 'Loading artist...';
-    }
-
-    return this.artistCache[artistId];
-  }
-
-  private loadArtistName(artistId: number): void {
-    this.artistService.getById(artistId).subscribe({
-      next: (artist) => {
-        if (artist.artistName != null) {
-          this.artistCache[artistId] = artist.artistName;
-        } else {
-          this.artistCache[artistId] = artist.firstName + ' ' + artist.lastName;
-        }
-      },
-      error: (err) => {
-        console.error(`Failed to fetch artist with ID ${artistId}:`, err);
-        this.artistCache[artistId] = 'Unknown Artist';
-      },
-    });
+    const purchase = this.findPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.artistName || 'Unknown Artist';
   }
 
   getPerformanceLocation(performanceId: number): string {
-    if (!this.performanceLocations[performanceId]) {
-      this.performanceService.getPerformanceById(performanceId).subscribe({
-        next: (performance) => {
-          if (performance.locationId) {
-            this.locationService.getById(performance.locationId).subscribe({
-              next: (location) => {
-                this.performanceLocations[performanceId] = location.name;
-              },
-              error: (err) => {
-                console.error(`Error fetching location details for ID ${performance.locationId}:`, err);
-                this.performanceLocations[performanceId] = 'Error loading location';
-              },
-            });
-          } else {
-            this.performanceLocations[performanceId] = 'Location not found';
-          }
-        },
-        error: (err) => {
-          console.error(`Error fetching performance with ID ${performanceId}:`, err);
-          this.performanceLocations[performanceId] = 'Error loading performance';
-        },
-      });
-      return 'Loading...';
+    const purchase = this.findPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.locationName || 'Unknown Location';
+  }
+
+  private findPurchaseByPerformanceId(performanceId: number): PurchaseDetailDto | undefined {
+    return this.userPurchases.find(purchase =>
+      Object.keys(purchase.performanceDetails).some(id => Number(id) === performanceId)
+    );
+  }
+
+  getTicketPerformanceForInvoice(performanceId: number): string {
+    for (const purchase of this.userPurchases) {
+      if (purchase.performanceDetails && purchase.performanceDetails[performanceId]) {
+        return purchase.performanceDetails[performanceId].name;
+      }
     }
-    return this.performanceLocations[performanceId];
+
+    return 'Unknown Performance';
   }
 
   fetchUser(): void {
@@ -337,220 +285,148 @@ export class OrderOverviewComponent implements OnInit {
 
 
   fetchPurchaseForInvoice(tickets: TicketDto[]) {
-    let purchaseId: number;
     this.invoiceTickets = tickets;
-    console.log(this.invoiceTickets);
-    let counter = 0;
 
-    this.userPurchases.forEach((purchase) => {
-      purchase.tickets.forEach((purchaseTicket) => {
-        if ((purchaseTicket.ticketId === tickets[0].ticketId) && counter < 1) {
-          purchaseId = purchase.purchaseId;
+    const matchingPurchase = this.userPurchases.find((purchase) =>
+      purchase.tickets.some((purchaseTicket) => purchaseTicket.ticketId === tickets[0].ticketId)
+    );
 
-          this.purchaseService.getPurchaseById(purchaseId).subscribe({
-            next: (purchase: PurchaseListDto) => {
-              this.invoicePurchase = purchase;
-              this.invoiceTickets = purchase.tickets;
-              counter++;
-              this.purchaseService.getPurchaseById(this.invoicePurchase.purchaseId).subscribe({
-                  next: () => {
-                    this.toastr.info('Downloading Invoice.', 'Download');
-                    this.generateDownloadPDF();
-                  }
-                }
-              )
-            },
-            error: (err) => {
-              console.error('Error fetching purchase:', err.message);
-              this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
-            },
-          });
-        }
-      });
-    });
+    if (matchingPurchase) {
+      this.invoicePurchase = matchingPurchase;
+      this.invoiceTickets = matchingPurchase.tickets;
+
+      this.toastr.info('Downloading Invoice.', 'Download');
+      this.generateDownloadPDF();
+    } else {
+      this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
+    }
   }
 
   cancelCompletePurchase(tickets: TicketDto[]) {
-    let cancelledPurchaseId: number;
     this.cancelledTickets = tickets;
 
-    try {
-      this.userPurchases.forEach((purchase) => {
-        purchase.tickets.forEach((purchaseTicket) => {
-          if (purchaseTicket.ticketId === tickets[0].ticketId) {
-            cancelledPurchaseId = purchase.purchaseId;
+    const matchingPurchase = this.userPurchases.find((purchase) =>
+      purchase.tickets.some((purchaseTicket) => purchaseTicket.ticketId === tickets[0].ticketId)
+    );
 
-            this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
-              next: (purchase: PurchaseListDto) => {
-                this.cancelledPurchase = purchase;
-                this.cancelledPurchase.tickets = [];
+    if (matchingPurchase) {
+      this.cancelledPurchase = { ...matchingPurchase };
+      this.cancelledPurchase.tickets = [];
 
-                this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
-                  next: () => {
-                    this.toastr.success('Purchase cancelled successfully.', 'Success');
-                    this.loadUserPurchases(this.authService.getUserIdFromToken());
-                    //this.generateCancelPurchasePDF();
-                  },
-                  error: (err) => {
-                    console.error('Error updating purchase:', err.message);
-                    this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
-                  },
-                });
-              },
-              error: (err) => {
-                console.error('Error fetching purchase:', err.message);
-                this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
-              },
-            });
-          }
-        });
+      this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
+        next: () => {
+          this.toastr.success('Purchase cancelled successfully.', 'Success');
+          this.loadUserPurchases(this.authService.getUserIdFromToken());
+          // Optional: PDF generieren
+          // this.generateCancelPurchasePDF();
+        },
+        error: (err) => {
+          console.error('Error updating purchase:', err.message);
+          this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+        }
       });
-    } catch
-      (error) {
-      console.error('Error deleting purchase:', error);
-      this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+    } else {
+      this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
     }
 
     this.showConfirmDeletionDialogAllP = false;
   }
 
   cancelCompleteReservation(tickets: TicketDto[]) {
-    let cancelledReservationId: number;
     this.cancelledTickets = tickets;
 
-    try {
-      this.userReservations.forEach((reservation) => {
-        reservation.tickets.forEach((reservedTicket) => {
-          if (reservedTicket.ticketId === tickets[0].ticketId) {
-            cancelledReservationId = reservation.reservedId;
+    const matchingReservation = this.userReservations.find((reservation) =>
+      reservation.tickets.some((reservedTicket) => reservedTicket.ticketId === tickets[0].ticketId)
+    );
 
-            this.reservationService.getReservationById(cancelledReservationId).subscribe({
-              next: (reservation: ReservationListDto) => {
-                this.cancelledReservation = reservation;
-                this.cancelledReservation.tickets = [];
+    if (matchingReservation) {
+      this.cancelledReservation = { ...matchingReservation, tickets: [] };
 
-                this.reservationService.updateReservation(this.cancelledReservation).subscribe({
-                  next: () => {
-                    this.toastr.success('Reservation cancelled successfully. ', 'Success');
-                    this.loadUserReservations(this.authService.getUserIdFromToken());
-                  },
-                  error: (err) => {
-                    console.error('Error updating reservation:', err.message);
-                    this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
-                  },
-                });
-              },
-              error: (err) => {
-                console.error('Error fetching reservation:', err.message);
-                this.toastr.error('Failed to load reservation details. Please try again.', 'Error');
-              },
-            });
-          }
-        });
+      this.reservationService.updateReservation(this.cancelledReservation).subscribe({
+        next: () => {
+          this.toastr.success('Reservation cancelled successfully.', 'Success');
+          this.loadUserReservations(this.authService.getUserIdFromToken());
+        },
+        error: (err) => {
+          console.error('Error updating reservation:', err.message);
+          this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
+        },
       });
-    } catch
-      (error) {
-      console.error('Error deleting purchase:', error);
-      this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+    } else {
+      this.toastr.error('No matching reservation found for the provided tickets.', 'Error');
     }
 
     this.showConfirmDeletionDialogAllRes = false;
   }
 
+
   cancelPurchasedTicket(ticket: TicketDto) {
     this.cancelledTicket = ticket;
-    let cancelledPurchaseId: number;
 
-    this.userPurchases.forEach((purchase) => {
-      purchase.tickets.forEach((purchaseTicket) => {
-        if (purchaseTicket.ticketId === ticket.ticketId) {
-          cancelledPurchaseId = purchase.purchaseId;
+    const matchingPurchase = this.userPurchases.find((purchase) =>
+      purchase.tickets.some((purchaseTicket) => purchaseTicket.ticketId === ticket.ticketId)
+    );
 
-          this.purchaseService.getPurchaseById(cancelledPurchaseId).subscribe({
-            next: (purchase: PurchaseListDto) => {
-              this.cancelledPurchase = purchase;
+    if (matchingPurchase) {
+      this.address.street = matchingPurchase.street;
+      this.address.postalCode = matchingPurchase.postalCode;
+      this.address.city = matchingPurchase.city;
 
-              this.address.street = this.cancelledPurchase.street;
-              this.address.postalCode = this.cancelledPurchase.postalCode;
-              this.address.city = this.cancelledPurchase.city;
+      const updatedPurchase = {
+        ...matchingPurchase,
+        tickets: matchingPurchase.tickets.filter((item) => item.ticketId !== ticket.ticketId)
+      };
 
-              const updatedPurchase: PurchaseListDto = {
-                purchaseId: cancelledPurchaseId,
-                userId: this.cancelledPurchase.userId,
-                tickets: this.cancelledPurchase.tickets.filter(item => item.ticketId !== ticket.ticketId),
-                merchandises: this.cancelledPurchase.merchandises,
-                totalPrice: this.cancelledPurchase.totalPrice,
-                purchaseDate: this.cancelledPurchase.purchaseDate,
-                street: this.cancelledPurchase.street,
-                postalCode: this.cancelledPurchase.postalCode,
-                city: this.cancelledPurchase.city
-              };
-
-              this.purchaseService.updatePurchase(updatedPurchase).subscribe({
-                next: () => {
-                  this.generateCancelPurchasePDF();
-                  this.toastr.success('Purchase cancelled successfully.', 'Success');
-                  this.loadUserPurchases(this.authService.getUserIdFromToken());
-                },
-                error: (err) => {
-                  console.error('Error updating purchase:', err.message);
-                  this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
-                },
-              });
-            },
-            error: (err) => {
-              console.error('Error fetching purchase:', err.message);
-              this.toastr.error('Failed to load purchase details. Please try again.', 'Error');
-            },
-          });
+      this.purchaseService.updatePurchase(updatedPurchase).subscribe({
+        next: () => {
+          this.generateCancelPurchasePDF();
+          this.toastr.success('Purchase cancelled successfully.', 'Success');
+          this.loadUserPurchases(this.authService.getUserIdFromToken());
+        },
+        error: (err) => {
+          console.error('Error updating purchase:', err.message);
+          this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
         }
       });
-    });
+    } else {
+      this.toastr.error('No matching purchase found for the selected ticket.', 'Error');
+    }
+
     this.showConfirmDeletionDialogPTicket = false;
   }
 
-
   cancelReservationTicket(ticketReservation: TicketDto) {
     this.cancelledTicket = ticketReservation;
-    let cancelledReservationId: number;
 
-    this.userReservations.forEach((reservation) => {
-      reservation.tickets.forEach((reservedTicket) => {
-        if (reservedTicket.ticketId === ticketReservation.ticketId) {
-          cancelledReservationId = reservation.reservedId;
+    const matchingReservation = this.userReservations.find((reservation) =>
+      reservation.tickets.some((reservedTicket) => reservedTicket.ticketId === ticketReservation.ticketId)
+    );
 
-          this.reservationService.getReservationById(cancelledReservationId).subscribe({
-            next: (reservation: ReservationListDto) => {
-              this.cancelledReservation = reservation;
+    if (matchingReservation) {
+      const updatedReservation = {
+        ...matchingReservation,
+        tickets: matchingReservation.tickets.filter(
+          (item) => item.ticketId !== ticketReservation.ticketId
+        ),
+      };
 
-              const updatedReservation: ReservationListDto = {
-                reservedId: cancelledReservationId,
-                userId: this.cancelledReservation.userId,
-                tickets: this.cancelledReservation.tickets.filter(item => item.ticketId !== ticketReservation.ticketId),
-                reservedDate: this.cancelledReservation.reservedDate
-              };
-
-              this.reservationService.updateReservation(updatedReservation).subscribe({
-                next: () => {
-                  this.toastr.success('Reservation cancelled successfully. ', 'Success');
-                  this.loadUserReservations(this.authService.getUserIdFromToken());
-                },
-                error: (err) => {
-                  console.error('Error updating reservation:', err.message);
-                  this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
-                },
-              });
-            },
-            error: (err) => {
-              console.error('Error fetching reservation:', err.message);
-              this.toastr.error('Failed to load reservation details. Please try again.', 'Error');
-            },
-          });
-        }
+      this.reservationService.updateReservation(updatedReservation).subscribe({
+        next: () => {
+          this.toastr.success('Reservation ticket cancelled successfully.', 'Success');
+          this.loadUserReservations(this.authService.getUserIdFromToken());
+        },
+        error: (err) => {
+          console.error('Error updating reservation:', err.message);
+          this.toastr.error('Failed to cancel the ticket in the reservation. Please try again.', 'Error');
+        },
       });
-    });
+    } else {
+      this.toastr.error('No matching reservation found for the selected ticket.', 'Error');
+    }
+
     this.showConfirmDeletionDialogReTicket = false;
   }
+
 
   showCancelMessagePurchase(ticket: TicketDto) {
     this.showConfirmDeletionDialogPTicket = true;
@@ -589,15 +465,7 @@ export class OrderOverviewComponent implements OnInit {
       next: () => {
         this.removeTicketFromReservations(ticket);
         this.cartService.addToCart(ticket);
-        this.ticketService.updateTicket(ticket.ticketId, ticket).subscribe({
-          next: () => {
-            this.toastr.success('Ticket added to cart successfully!', 'Success');
-          },
-          error: (err) => {
-            console.error('Error updating ticket status:', err);
-            this.toastr.error('Failed to update ticket status. Please try again.', 'Error');
-          }
-        });
+        this.toastr.success('Ticket added to cart successfully!', 'Success');
       },
       error: (err) => {
         console.error('Error deleting ticket from reservation:', err);
@@ -605,6 +473,7 @@ export class OrderOverviewComponent implements OnInit {
       }
     });
   }
+
 
 
   private removeTicketFromReservations(ticket: TicketDto): void {

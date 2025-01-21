@@ -1,15 +1,22 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservationOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
+import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ReservedRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
 
 import java.util.ArrayList;
 
@@ -19,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,14 +40,20 @@ public class ReservedServiceImpl implements ReservedService {
     private final TicketRepository ticketRepository;
     private final RandomStringGenerator generator;
     private final TicketService ticketService;
+    private final PerformanceRepository performanceRepository;
+    private final ArtistRepository artistRepository;
+    private final LocationRepository locationRepository;
 
     public ReservedServiceImpl(ReservedRepository reservedRepository,
                                TicketRepository ticketRepository,
-                               RandomStringGenerator generator, TicketService ticketService) {
+                               RandomStringGenerator generator, TicketService ticketService, PerformanceRepository performanceRepository, ArtistRepository artistRepository, LocationRepository locationRepository) {
         this.reservedRepository = reservedRepository;
         this.ticketRepository = ticketRepository;
         this.generator = generator;
         this.ticketService = ticketService;
+        this.performanceRepository = performanceRepository;
+        this.artistRepository = artistRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -196,5 +211,43 @@ public class ReservedServiceImpl implements ReservedService {
         }
     }
 
+    @Override
+    public List<ReservationOverviewDto> getReservationDetailsByUser(Long userId) {
+        logger.info("Fetching detailed reservations for user with ID: {}", userId);
+
+        List<Reservation> reservations = reservedRepository.findByUserId(userId);
+
+        return reservations.stream().map(reservation -> {
+            List<Ticket> tickets = ticketRepository.findAllById(reservation.getTicketIds());
+
+            Map<Long, Map<String, String>> performanceDetails = new HashMap<>();
+            for (Ticket ticket : tickets) {
+                Long performanceId = ticket.getPerformanceId();
+                if (!performanceDetails.containsKey(performanceId)) {
+                    Performance performance = performanceRepository.findById(performanceId)
+                        .orElseThrow(() -> new IllegalArgumentException("Performance not found"));
+                    Artist artist = artistRepository.findById(performance.getArtistId())
+                        .orElseThrow(() -> new IllegalArgumentException("Artist not found"));
+                    Location location = locationRepository.findById(performance.getLocationId())
+                        .orElseThrow(() -> new IllegalArgumentException("Location not found"));
+
+                    Map<String, String> details = new HashMap<>();
+                    details.put("name", performance.getName());
+                    details.put("artistName", artist.getArtistName());
+                    details.put("locationName", location.getName());
+
+                    performanceDetails.put(performanceId, details);
+                }
+            }
+
+            return new ReservationOverviewDto(
+                reservation.getReservationId(),
+                reservation.getUserId(),
+                tickets,
+                reservation.getReservationDate(),
+                performanceDetails
+            );
+        }).collect(Collectors.toList());
+    }
 }
 

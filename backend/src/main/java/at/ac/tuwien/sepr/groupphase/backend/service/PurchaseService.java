@@ -2,6 +2,7 @@ package at.ac.tuwien.sepr.groupphase.backend.service;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 
 import java.util.List;
@@ -51,4 +52,12 @@ public interface PurchaseService {
      * @param purchaseDetailDto the updated purchase
      */
     void updatePurchase(PurchaseDetailDto purchaseDetailDto);
+
+    /**
+     * Retrieves all detailed purchases for a specific user.
+     *
+     * @param userId the ID of the user whose purchases to retrieve
+     * @return a list of detailed representations of the user's purchases
+     */
+    List<PurchaseOverviewDto> getPurchaseDetailsByUser(Long userId);
 }
