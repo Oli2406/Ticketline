@@ -14,6 +14,10 @@ public class PerformanceSearchDto {
         this.hall = hall;
     }
 
+    public PerformanceSearchDto() {
+
+    }
+
     public LocalDateTime getDate() {
         return date;
     }
