@@ -7,6 +7,7 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PerformanceSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
+import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.service.PerformanceService;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,5 +118,58 @@ class PerformanceEndpointTest {
         List<PerformanceDetailDto> result = Objects.requireNonNull(response.getBody()).toList();
         assertEquals(1, result.size());
         assertEquals(performance1, result.getFirst());
+    }
+
+    @Test
+    void getByEventIdsReturnsPerformancesWithGivenEventIds() {
+        Long eventId = 1L;
+
+        when(performanceService.getByEventId(eventId)).thenReturn(mockPerformances);
+
+        ResponseEntity<List<PerformanceDetailDto>> response = performanceEndpoint.getByEventId(eventId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockPerformances, response.getBody());
+    }
+
+    @Test
+    void getByLocationIdReturnsPerformancesWithGivenLocationId() {
+        Long locationId = 1L;
+
+        when(performanceService.getByLocationId(locationId)).thenReturn(mockPerformances);
+
+        ResponseEntity<List<PerformanceDetailDto>> response = performanceEndpoint.getByLocationId(locationId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(mockPerformances, response.getBody());
+    }
+
+    @Test
+    void advancedSearchReturnsEventsForValidQuery() {
+        String query = "music festival";
+        when(performanceService.performAdvancedSearch(query)).thenReturn(mockPerformances);
+
+        ResponseEntity<?> response = performanceEndpoint.advancedSearch(query);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(mockPerformances, response.getBody());
+        verify(performanceService, times(1)).performAdvancedSearch(query);
+    }
+
+    @Test
+    void updatePerformanceUpdatesTicketNumberSuccessfully() throws NotFoundException {
+        Long performanceId = 1L;
+        Long newTicketNumber = 100L;
+        PerformanceDetailDto updatedPerformance = new PerformanceDetailDto(1L, "Performance1", 1L, 1L, LocalDateTime.now(), BigDecimal.ONE, newTicketNumber, "A", artist, location, 1);
+
+        when(performanceService.updateTicketNumberById(performanceId, newTicketNumber)).thenReturn(updatedPerformance);
+
+        ResponseEntity<PerformanceDetailDto> response = performanceEndpoint.updatePerformance(performanceId, newTicketNumber);
+
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedPerformance, response.getBody());
+        verify(performanceService, times(1)).updateTicketNumberById(performanceId, newTicketNumber);
     }
 }
