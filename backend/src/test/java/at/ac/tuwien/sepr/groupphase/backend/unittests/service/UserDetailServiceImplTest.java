@@ -6,8 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -28,7 +32,6 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.ApplicationUser;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.NotFoundException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
-import at.ac.tuwien.sepr.groupphase.backend.repository.EncryptedIdRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.UserRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.JwtTokenizer;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
@@ -37,11 +40,16 @@ import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -72,13 +80,11 @@ class UserDetailServiceImplTest {
     private SecurityPropertiesConfig.Auth auth;
 
     @Mock
-    private EncryptedIdRepository encryptedIdRepository;
-
-    @Mock
     private SecurityPropertiesConfig.Jwt jwt;
 
     @Mock
     private RandomStringGenerator randomStringGenerator;
+
 
     @BeforeEach
     void setUp() {
@@ -88,6 +94,7 @@ class UserDetailServiceImplTest {
                 userRepository, passwordEncoder, jwtTokenizer, userValidator,
                 jwt, auth, randomStringGenerator);
         when(auth.getMaxLoginAttempts()).thenReturn(5);
+        userService = Mockito.spy(userService);
     }
 
     @Test
@@ -891,4 +898,108 @@ class UserDetailServiceImplTest {
         verify(userRepository).findUserByEmail("user@example.com");
         verifyNoInteractions(jwtTokenizer); // Token blocking should not occur
     }
+
+    @Test
+    void testLogin_SuccessfulReturnsJwtToken() {
+        UserLoginDto loginDto = new UserLoginDto();
+        loginDto.setEmail("user@example.com");
+        loginDto.setPassword("rawPassword");
+
+        ApplicationUser user = new ApplicationUser();
+        user.setId(42L);
+        user.setEmail("user@example.com");
+        user.setLocked(false);
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setPoints(100);
+
+        when(userRepository.findUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+        List<GrantedAuthority> authorityList = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+            "user@example.com",
+            "encodedPassword",
+            true, true, true, true,
+            authorityList
+        );
+
+        doReturn(userDetails).when(userService).loadUserByUsername("user@example.com");
+        when(passwordEncoder.matches("rawPassword", "encodedPassword")).thenReturn(true);
+        when(randomStringGenerator.generateRandomString(user.getId())).thenReturn("randomString");
+
+        List<String> expectedRoles = List.of("ROLE_USER");
+        String expectedToken = "dummy-jwt-token";
+        when(jwtTokenizer.getAuthToken(
+            eq("user@example.com"),
+            eq(expectedRoles),
+            eq("randomString"),
+            eq(user.getPoints()),
+            eq(user.getFirstName()),
+            eq(user.getLastName())
+        )).thenReturn(expectedToken);
+
+        String actualToken = userService.login(loginDto);
+        assertEquals(expectedToken, actualToken);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void testLogin_UserNotFoundShouldThrowNotFoundException() {
+        UserLoginDto loginDto = new UserLoginDto();
+        loginDto.setEmail("nonexistent@example.com");
+        loginDto.setPassword("irrelevant");
+
+        when(userRepository.findUserByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+            userService.login(loginDto);
+        });
+        assertEquals("Could not find the user with the email address nonexistent@example.com", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateUserUserChanged() throws Exception {
+        Long userId = 1L;
+        String encryptedId = "encryptedId123";
+        String oldAuthToken = "oldAuthToken";
+
+        ApplicationUser storedUser = new ApplicationUser();
+        storedUser.setId(userId);
+        storedUser.setFirstName("John");
+        storedUser.setLastName("Doe");
+        storedUser.setEmail("john.doe@example.com");
+        storedUser.setPassword("hashedPassword");
+        storedUser.setVersion(0);
+        storedUser.setPoints(100);
+        storedUser.setAdmin(false);
+
+        UserUpdateDto updateDto = new UserUpdateDto();
+        updateDto.setId(encryptedId);
+        updateDto.setFirstName("Johnny");
+        updateDto.setLastName("Doe");
+        updateDto.setEmail("john.doe@example.com");
+        updateDto.setVersion(0);
+        updateDto.setPassword("");
+        updateDto.setCurrentAuthToken(oldAuthToken);
+
+        when(randomStringGenerator.retrieveOriginalId(encryptedId))
+            .thenReturn(Optional.of(userId));
+        when(userRepository.findById(userId))
+            .thenReturn(Optional.of(storedUser));
+        when(jwtTokenizer.validateToken(oldAuthToken)).thenReturn(true);
+
+        when(randomStringGenerator.generateRandomString(userId)).thenReturn("dummyRandomString");
+
+        String newAuthToken = "newAuthToken456";
+        when(jwtTokenizer.getAuthToken(
+            anyString(), anyList(), anyString(), anyInt(), anyString(), anyString()))
+            .thenReturn(newAuthToken);
+
+        String resultToken = userService.updateUser(updateDto);
+
+        Assertions.assertEquals(newAuthToken, resultToken, "A new token should be returned when user data has changed.");
+        verify(jwtTokenizer).blockToken(oldAuthToken);
+        verify(userRepository).save(any(ApplicationUser.class));
+    }
+
 }
