@@ -217,4 +217,9 @@ public class ApplicationUser {
     public void setVersion(Integer version) {
         this.version = version;
     }
+
+    public boolean setIsLoggedIn(boolean isLoggedIn) {
+        this.isLoggedIn = isLoggedIn;
+        return isLoggedIn;
+    }
 }
