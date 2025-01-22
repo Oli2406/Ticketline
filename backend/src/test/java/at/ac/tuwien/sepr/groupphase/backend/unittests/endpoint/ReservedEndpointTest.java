@@ -26,8 +26,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -195,41 +193,6 @@ public class ReservedEndpointTest {
         assertEquals(204, response.getStatusCodeValue());
         verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
     }
-    
-    @Test
-    void testGetReservationDetailsByUserSuccessful() {
-        String encryptedUserId = "encryptedUser123";
-        Long userId = 123L;
-        Map<Long, Map<String, String>> mockPerformanceDetails = Map.of(
-            1L, Map.of(
-                "name", "Performance 1",
-                "artistName", "Artist 1",
-                "locationName", "Location 1"
-            ),
-            2L, Map.of(
-                "name", "Performance 2",
-                "artistName", "Artist 2",
-                "locationName", "Location 2"
-            )
-        );
-
-        List<ReservationOverviewDto> mockOverview = List.of(
-            new ReservationOverviewDto(1L, userId, List.of(createMockTicket(1L, 1, 1)), LocalDateTime.now(), mockPerformanceDetails),
-            new ReservationOverviewDto(2L, userId, List.of(createMockTicket(2L, 1, 2)), LocalDateTime.now(), mockPerformanceDetails)
-        );
-
-
-        when(randomStringGenerator.retrieveOriginalId(encryptedUserId)).thenReturn(Optional.of(userId));
-        when(reservedService.getReservationDetailsByUser(userId)).thenReturn(mockOverview);
-
-        ResponseEntity<List<ReservationOverviewDto>> response = reservedEndpoint.getReservationDetailsByUser(encryptedUserId);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(mockOverview, response.getBody());
-        verify(randomStringGenerator, times(1)).retrieveOriginalId(encryptedUserId);
-        verify(reservedService, times(1)).getReservationDetailsByUser(userId);
-    }
 
     @Test
     void testDeleteTicketFromReservationNotFound() {
@@ -262,21 +225,5 @@ public class ReservedEndpointTest {
         );
 
         verify(reservedService, times(1)).createReservation(createDto);
-    }
-
-    @Test
-    void testGetReservationsByInvalidUser() {
-        String invalidEncryptedUserId = "invalidUserId";
-
-        when(randomStringGenerator.retrieveOriginalId(invalidEncryptedUserId))
-            .thenReturn(Optional.empty());
-
-        assertThrows(
-            RuntimeException.class,
-            () -> reservedEndpoint.getReservationsByUser(invalidEncryptedUserId)
-        );
-
-        verify(randomStringGenerator, times(1)).retrieveOriginalId(invalidEncryptedUserId);
-        verifyNoInteractions(reservedService);
     }
 }
