@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.ReservedEndpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservationOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.enums.PriceCategory;
@@ -14,20 +15,18 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.ReservedServiceImpl;
-import org.hibernate.Remove;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -195,5 +194,110 @@ public class ReservedEndpointTest {
 
         assertEquals(204, response.getStatusCodeValue());
         verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
+    }
+
+    /*@Test
+    void testGetReservationsByUserSuccessful() {
+        String encryptedUserId = "encryptedUser123";
+        Long userId = 123L;
+        List<ReservedDetailDto> mockReservations = List.of(
+            new ReservedDetailDto(userId, LocalDateTime.now(), List.of(createMockTicket(1L, 1, 1)), 1L),
+            new ReservedDetailDto(userId, LocalDateTime.now(), List.of(createMockTicket(2L, 1, 2)), 2L)
+        );
+
+        when(randomStringGenerator.retrieveOriginalId(encryptedUserId)).thenReturn(Optional.of(userId));
+        when(reservedService.getReservationsByUserId(userId)).thenReturn(mockReservations);
+
+        ResponseEntity<List<ReservedDetailDto>> response = reservedEndpoint.getReservationsByUser(encryptedUserId);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals(mockReservations, response.getBody());
+        verify(randomStringGenerator, times(1)).retrieveOriginalId(encryptedUserId);
+        verify(reservedService, times(1)).getReservationsByUserId(userId);
+    }*/
+
+    @Test
+    void testGetReservationDetailsByUserSuccessful() {
+        String encryptedUserId = "encryptedUser123";
+        Long userId = 123L;
+        Map<Long, Map<String, String>> mockPerformanceDetails = Map.of(
+            1L, Map.of(
+                "name", "Performance 1",
+                "artistName", "Artist 1",
+                "locationName", "Location 1"
+            ),
+            2L, Map.of(
+                "name", "Performance 2",
+                "artistName", "Artist 2",
+                "locationName", "Location 2"
+            )
+        );
+
+        List<ReservationOverviewDto> mockOverview = List.of(
+            new ReservationOverviewDto(1L, userId, List.of(createMockTicket(1L, 1, 1)), LocalDateTime.now(), mockPerformanceDetails),
+            new ReservationOverviewDto(2L, userId, List.of(createMockTicket(2L, 1, 2)), LocalDateTime.now(), mockPerformanceDetails)
+        );
+
+
+        when(randomStringGenerator.retrieveOriginalId(encryptedUserId)).thenReturn(Optional.of(userId));
+        when(reservedService.getReservationDetailsByUser(userId)).thenReturn(mockOverview);
+
+        ResponseEntity<List<ReservationOverviewDto>> response = reservedEndpoint.getReservationDetailsByUser(encryptedUserId);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals(mockOverview, response.getBody());
+        verify(randomStringGenerator, times(1)).retrieveOriginalId(encryptedUserId);
+        verify(reservedService, times(1)).getReservationDetailsByUser(userId);
+    }
+
+    @Test
+    void testDeleteTicketFromReservationNotFound() {
+        Long reservationId = 1L;
+        Long ticketId = 2L;
+
+        doThrow(new RuntimeException("Reservation or Ticket not found"))
+            .when(reservedService)
+            .deleteTicketFromReservation(reservationId, ticketId);
+
+        assertThrows(
+            RuntimeException.class,
+            () -> reservedEndpoint.deleteTicketFromReservation(reservationId, ticketId)
+        );
+
+        verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
+    }
+
+    @Test
+    void testCreateReservationWithInvalidInput() throws ValidationException {
+        ReservedCreateDto createDto = new ReservedCreateDto("invalidUser123", LocalDateTime.now(), List.of(1L, 2L));
+
+        doThrow(new ValidationException("Invalid user ID", List.of("User ID could not be resolved.")))
+            .when(reservedService)
+            .createReservation(any(ReservedCreateDto.class));
+
+        assertThrows(
+            ValidationException.class,
+            () -> reservedEndpoint.createReservation(createDto)
+        );
+
+        verify(reservedService, times(1)).createReservation(createDto);
+    }
+
+    @Test
+    void testGetReservationsByInvalidUser() {
+        String invalidEncryptedUserId = "invalidUserId";
+
+        when(randomStringGenerator.retrieveOriginalId(invalidEncryptedUserId))
+            .thenReturn(Optional.empty());
+
+        assertThrows(
+            RuntimeException.class,
+            () -> reservedEndpoint.getReservationsByUser(invalidEncryptedUserId)
+        );
+
+        verify(randomStringGenerator, times(1)).retrieveOriginalId(invalidEncryptedUserId);
+        verifyNoInteractions(reservedService);
     }
 }

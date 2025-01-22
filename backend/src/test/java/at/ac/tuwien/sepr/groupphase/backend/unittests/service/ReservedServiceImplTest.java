@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -175,4 +176,82 @@ public class ReservedServiceImplTest {
 
         verify(reservedRepository, times(1)).findByUserId(userId);
     }
+
+    @Test
+    void createReservation_ShouldThrowValidationException_WhenTicketsAreUnavailable() {
+        ReservedCreateDto reservedCreateDto = new ReservedCreateDto("ENC123", LocalDateTime.now(), List.of(1L, 2L));
+        Ticket ticket1 = new Ticket(1L, 1, 1, PriceCategory.STANDARD, TicketType.SEATED, SectorType.B, null, "RESERVED", Hall.A, 123L, LocalDateTime.now());
+        Ticket ticket2 = new Ticket(2L, 2, 2, PriceCategory.VIP, TicketType.STANDING, SectorType.A, null, "AVAILABLE", Hall.A, 124L, LocalDateTime.now());
+
+        when(ticketRepository.findByIdsWithLock(reservedCreateDto.getTicketIds())).thenReturn(List.of(ticket1, ticket2));
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> reservedService.createReservation(reservedCreateDto));
+
+        assertEquals("Some tickets are not available for reservation: . Failed validations: [null].", exception.getMessage(), "Exception message should match");
+        verify(ticketRepository, times(1)).findByIdsWithLock(reservedCreateDto.getTicketIds());
+        verify(ticketRepository, never()).saveAll(anyList());
+        verify(reservedRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
+    void deleteTicketFromReservation_ShouldDeleteReservation_WhenLastTicketRemoved() {
+        Long reservationId = 1L;
+        Long ticketId = 1L;
+        Reservation reservation = new Reservation(1L, List.of(1L), LocalDateTime.now().plusHours(1));
+
+        when(reservedRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        reservedService.deleteTicketFromReservation(reservationId, ticketId);
+
+        verify(reservedRepository, times(1)).delete(reservation);
+        verify(reservedRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
+    void deleteTicketFromReservation_ShouldThrowException_WhenTicketNotInReservation() {
+        Long reservationId = 1L;
+        Long ticketId = 3L;
+        Reservation reservation = new Reservation(1L, List.of(1L, 2L), LocalDateTime.now().plusHours(1));
+
+        when(reservedRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> reservedService.deleteTicketFromReservation(reservationId, ticketId));
+
+        assertEquals("Ticket not found in reservation with ID: " + ticketId, exception.getMessage(), "Exception message should match");
+        verify(reservedRepository, times(1)).findById(reservationId);
+        verify(reservedRepository, never()).save(any(Reservation.class));
+        verify(reservedRepository, never()).delete(any(Reservation.class));
+    }
+
+    @Test
+    void updateReservation_ShouldUpdateReservation_WhenTicketsAreModified() {
+        ReservedDetailDto reservedDetailDto = new ReservedDetailDto(1L, LocalDateTime.now(), List.of(new Ticket(2L, 1, 1, PriceCategory.VIP, TicketType.SEATED, SectorType.B, null, "RESERVED", Hall.A, 123L, LocalDateTime.now())), 1L);
+        Reservation existingReservation = new Reservation(1L, List.of(1L), LocalDateTime.now().plusHours(1));
+        Ticket existingTicket = new Ticket(1L, 1, 1, PriceCategory.STANDARD, TicketType.STANDING, SectorType.A, null, "RESERVED", Hall.A, 123L, LocalDateTime.now());
+
+        when(reservedRepository.findById(1L)).thenReturn(Optional.of(existingReservation));
+        when(ticketRepository.findById(existingTicket.getTicketId())).thenReturn(Optional.of(existingTicket));
+
+        reservedService.updateReservation(reservedDetailDto);
+
+        verify(reservedRepository, times(1)).save(existingReservation);
+        verify(ticketService, times(1)).updateTicketStatusList(List.of(1L), "AVAILABLE");
+    }
+
+    @Test
+    void updateReservation_ShouldDeleteReservation_WhenNoTicketsRemain() {
+        ReservedDetailDto reservedDetailDto = new ReservedDetailDto(1L, LocalDateTime.now(), List.of(), 1L);
+        Reservation existingReservation = new Reservation(1L, List.of(1L), LocalDateTime.now().plusHours(1));
+        Ticket existingTicket = new Ticket(1L, 1, 1, PriceCategory.STANDARD, TicketType.STANDING, SectorType.A, null, "RESERVED", Hall.A, 123L, LocalDateTime.now());
+
+        when(reservedRepository.findById(1L)).thenReturn(Optional.of(existingReservation));
+        when(ticketRepository.findById(existingTicket.getTicketId())).thenReturn(Optional.of(existingTicket));
+
+        reservedService.updateReservation(reservedDetailDto);
+
+        verify(reservedRepository, times(1)).deleteById(existingReservation.getReservationId());
+        verify(ticketService, times(1)).updateTicketStatusList(List.of(1L), "AVAILABLE");
+        verify(reservedRepository, never()).save(any(Reservation.class));
+    }
+
 }
