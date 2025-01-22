@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -26,12 +27,15 @@ import at.ac.tuwien.sepr.groupphase.backend.service.impl.ResetPasswordServiceImp
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.UserValidator;
 import io.jsonwebtoken.Claims;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 class ResetPasswordServiceImplTest {
@@ -94,6 +98,34 @@ class ResetPasswordServiceImplTest {
     }
 
     @Test
+    void sendEmailToResetPassword_AccountLocked() {
+        String email = "locked@example.com";
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(email);
+        user.setLocked(true);
+
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        assertThrows(BadCredentialsException.class,
+            () -> resetPasswordServiceImpl.sendEmailToResetPassword(email));
+    }
+
+    @Test
+    void sendEmailToResetPassword_MaxResetRequestsExceeded() {
+        String email = "user@example.com";
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(email);
+        user.setNumberOfRequestedResetTokens(5);
+        user.setLatestRequestedResetTokenTime(LocalDateTime.now().plusMinutes(10));
+
+        when(auth.getMaxResetTokenRequests()).thenReturn(5);
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        assertThrows(BadCredentialsException.class,
+            () -> resetPasswordServiceImpl.sendEmailToResetPassword(email));
+    }
+
+    @Test
     void verifyResetCode_Success() {
         String token = "ValidToken";
         String code = "12345678";
@@ -147,6 +179,28 @@ class ResetPasswordServiceImplTest {
     }
 
     @Test
+    void verifyResetCode_TokenExpired() {
+        String token = "ExpiredToken";
+        String code = "12345678";
+        String userEmail = "user@example.com";
+        PasswordResetToken resetPasswordToken = new PasswordResetToken(userEmail, code, token,
+            LocalDateTime.now().minusMinutes(1));
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn(userEmail);
+        when(jwtTokenizer.getClaims(token)).thenReturn(claims);
+        when(passwordResetRepository.findByEmail(userEmail)).thenReturn(
+            Optional.of(resetPasswordToken));
+
+        ResetPasswordTokenDto tokenDto = new ResetPasswordTokenDto();
+        tokenDto.setTokenFromStorage(token);
+        tokenDto.setCode(code);
+
+        assertThrows(IllegalArgumentException.class,
+            () -> resetPasswordServiceImpl.verifyResetCode(tokenDto));
+    }
+
+    @Test
     void resetPassword_Success() throws ValidationException {
         String email = "user@example.com";
         String token = "ValidToken";
@@ -193,5 +247,59 @@ class ResetPasswordServiceImplTest {
 
         assertThrows(NotFoundException.class,
             () -> resetPasswordServiceImpl.resetPassword(resetPasswordDto));
+    }
+
+    @Test
+    void resetPassword_UserNotFound() {
+        String token = "ValidToken";
+        ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
+        resetPasswordDto.setTokenToResetPassword(token);
+        resetPasswordDto.setNewPassword("NewPassword123");
+        resetPasswordDto.setNewConfirmedPassword("NewPassword123");
+
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn("user@example.com");
+        when(jwtTokenizer.getClaims(token)).thenReturn(claims);
+        when(passwordResetRepository.findByEmail(anyString())).thenReturn(Optional.of(
+            new PasswordResetToken("user@example.com", "12345678", token,
+                LocalDateTime.now().plusMinutes(15))));
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(BadCredentialsException.class,
+            () -> resetPasswordServiceImpl.resetPassword(resetPasswordDto));
+    }
+
+    @Test
+    void resetPassword_InvalidPasswordValidation() throws ValidationException {
+        String email = "user@example.com";
+        String token = "ValidToken";
+        String newPassword = "NewPassword123";
+        ResetPasswordDto resetPasswordDto = new ResetPasswordDto();
+        resetPasswordDto.setTokenToResetPassword(token);
+        resetPasswordDto.setNewPassword(newPassword);
+        resetPasswordDto.setNewConfirmedPassword("DifferentPassword123");
+
+        ApplicationUser user = new ApplicationUser();
+        user.setEmail(email);
+        PasswordResetToken resetPasswordToken = new PasswordResetToken(email, "12345678", token,
+            LocalDateTime.now().plusMinutes(15));
+
+        when(auth.getMaxResetCodeAttempts()).thenReturn(5);
+        Claims claims = mock(Claims.class);
+        when(claims.getSubject()).thenReturn(email);
+        when(jwtTokenizer.getClaims(token)).thenReturn(claims);
+        when(passwordResetRepository.findByEmail(email)).thenReturn(
+            Optional.of(resetPasswordToken));
+        when(userRepository.findUserByEmail(email)).thenReturn(Optional.of(user));
+
+        List<String> errors = new ArrayList<>();
+        errors.add("Passwords do not match");
+        doThrow(new ValidationException("", errors))
+            .when(userValidator).validateNewPasswords(newPassword, "DifferentPassword123");
+
+        assertThrows(ValidationException.class,
+            () -> resetPasswordServiceImpl.resetPassword(resetPasswordDto));
+
+        verify(passwordResetRepository, never()).delete(any(PasswordResetToken.class));
     }
 }
