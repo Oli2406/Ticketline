@@ -68,6 +68,30 @@ class AuthTokenEndpointTest {
     }
 
     @Test
+    void validateToken_EmptyToken() {
+        String token = "";
+
+        ResponseEntity<Boolean> response = authTokenEndpoint.validateToken(token);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertFalse(response.getBody());
+        verify(jwtTokenizer, never()).validateToken(anyString());
+    }
+
+    @Test
+    void validateToken_TokenWithoutBearerPrefix() {
+        String token = "invalidTokenFormat";
+
+        ResponseEntity<Boolean> response = authTokenEndpoint.validateToken(token);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertFalse(response.getBody());
+        verify(jwtTokenizer, never()).validateToken(anyString());
+    }
+
+    @Test
     void validateResetToken_Success() {
         String token = "Bearer validResetToken";
         Claims claims = mock(Claims.class);
@@ -132,5 +156,46 @@ class AuthTokenEndpointTest {
         assertEquals(200, response.getStatusCodeValue());
         assertFalse(response.getBody());
         verify(jwtTokenizer, times(1)).getClaims("invalidToken");
+    }
+
+    @Test
+    void validateResetToken_EmptyToken() {
+        String token = "";
+
+        ResponseEntity<Boolean> response = authTokenEndpoint.validateResetToken(token);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertFalse(response.getBody());
+        verify(jwtTokenizer, never()).getClaims(anyString());
+    }
+
+    @Test
+    void validateResetToken_TokenWithoutBearerPrefix() {
+        String token = "invalidTokenFormat";
+
+        ResponseEntity<Boolean> response = authTokenEndpoint.validateResetToken(token);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertFalse(response.getBody());
+        verify(jwtTokenizer, never()).getClaims(anyString());
+    }
+
+    @Test
+    void validateResetToken_NullPurposeInClaims() {
+        String token = "Bearer validResetToken";
+        Claims claims = mock(Claims.class);
+
+        when(claims.get("purpose")).thenReturn(null);
+        when(jwtTokenizer.getClaims("validResetToken")).thenReturn(claims);
+
+        ResponseEntity<Boolean> response = authTokenEndpoint.validateResetToken(token);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertFalse(response.getBody());
+        verify(jwtTokenizer, times(1)).getClaims("validResetToken");
+        verify(jwtTokenizer, never()).isTokenBlocked(anyString());
     }
 }
