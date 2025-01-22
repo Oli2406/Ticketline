@@ -118,21 +118,18 @@ public class ReservedEndpointTest {
 
     @Test
     void testCreateReservationSuccessful() throws ValidationException {
-        // Arrange
         String userId = "user123";
         LocalDateTime reservedDate = LocalDateTime.now();
         List<Long> ticketIds = List.of(1L, 2L, 3L);
 
         ReservedCreateDto createDto = new ReservedCreateDto(userId, reservedDate, ticketIds);
 
-        // Mock available tickets
         List<Ticket> availableTickets = List.of(
             createMockTicketWithStatus(1L, 1, 1, "AVAILABLE"),
             createMockTicketWithStatus(2L, 1, 2, "AVAILABLE"),
             createMockTicketWithStatus(3L, 1, 3, "AVAILABLE")
         );
 
-        // Mock reserved tickets
         List<Ticket> reservedTickets = List.of(
             createMockTicketWithStatus(1L, 1, 1, "RESERVED"),
             createMockTicketWithStatus(2L, 1, 2, "RESERVED"),
@@ -149,10 +146,8 @@ public class ReservedEndpointTest {
         when(ticketRepository.saveAll(anyList())).thenReturn(reservedTickets);
         when(reservedRepository.save(any(Reservation.class))).thenReturn(mockReservation);
 
-        // Act
         ResponseEntity<ReservedDetailDto> response = reservedEndpoint.createReservation(createDto);
 
-        // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertNull(response.getBody());
     }

@@ -110,6 +110,5 @@ public class ReservedEndpoint {
         LOG.info("Fetched {} detailed reservations for user with ID: {}", reservationDetails.size(), userId);
         return ResponseEntity.ok(reservationDetails);
     }
-
 }
 

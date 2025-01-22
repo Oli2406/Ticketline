@@ -174,39 +174,29 @@ public class PurchaseServiceImpl implements PurchaseService {
     public void updatePurchase(PurchaseDetailDto purchaseDetailDto) {
         Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
-        List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
-        List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
-        List<Ticket> tickets = purchaseDetailDto.getTickets();
 
-        for (Ticket ticket : tickets) {
-            ticketIds.add(ticket.getTicketId());
+        List<Long> newTicketIds = purchaseDetailDto.getTickets().stream()
+            .map(Ticket::getTicketId)
+            .collect(Collectors.toList());
+
+        List<Long> cancelledTickets = new ArrayList<>(existingPurchase.getTicketIds());
+        cancelledTickets.removeAll(newTicketIds);
+
+        if (!cancelledTickets.isEmpty()) {
+            ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
         }
 
-        List<Long> cancelledTickets = new ArrayList<>();
-
-        for (int i = 0; i < oldTickets.size(); i++) {
-            for (int j = i + 1; j < ticketIds.size(); j++) {
-                if (!ticketIds.contains(oldTickets.get(i))) {
-                    cancelledTickets.add(oldTickets.get(i));
-                    this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
-                }
-            }
+        if (newTicketIds.isEmpty()) {
+            purchaseRepository.deleteById(existingPurchase.getPurchaseId());
+            logger.info("Deleted purchase with ID: {}", existingPurchase.getPurchaseId());
+            return;
         }
 
-        existingPurchase.setTicketIds(ticketIds);
+        existingPurchase.setTicketIds(newTicketIds);
         existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
         purchaseRepository.save(existingPurchase);
-        logger.info("Updated purchase: {}", existingPurchase);
 
-        if (ticketIds.isEmpty()) {
-            cancelledTickets.add(oldTickets.getFirst());
-            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
-            purchaseRepository.deleteById(existingPurchase.getPurchaseId());
-        } else {
-            existingPurchase.setTicketIds(ticketIds);
-            existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
-            purchaseRepository.save(existingPurchase);
-        }
+        logger.info("Updated purchase: {}", existingPurchase);
     }
 
     @Override
