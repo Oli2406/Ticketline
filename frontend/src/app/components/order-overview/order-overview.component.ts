@@ -59,7 +59,8 @@ export class OrderOverviewComponent implements OnInit {
     date: new Date(),
     reservedUntil: ''
   };
-  cancelledTickets: TicketDto[];
+  cancelledTickets = [];
+  cancelledTicketsPrice = 0;
 
   invoiceTickets: TicketDto[];
   invoicePurchase: PurchaseListDto = {
@@ -325,6 +326,7 @@ export class OrderOverviewComponent implements OnInit {
       .then(() => {
         this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
           next: () => {
+            this.generateCancelPurchasePDF();
             this.toastr.success('Purchase cancelled successfully.', 'Success');
             this.loadUserPurchases(this.authService.getUserIdFromToken());
           },
@@ -417,7 +419,6 @@ export class OrderOverviewComponent implements OnInit {
     } else {
       this.toastr.error('No matching purchase found for the selected ticket.', 'Error');
     }
-
     this.showConfirmDeletionDialogPTicket = false;
   }
 
@@ -456,6 +457,7 @@ export class OrderOverviewComponent implements OnInit {
 
   showCancelMessagePurchase(ticket: TicketDto) {
     this.showConfirmDeletionDialogPTicket = true;
+    this.cancelledTickets[0] = ticket;
     this.cancelledTicket = ticket;
   }
 
@@ -530,5 +532,16 @@ export class OrderOverviewComponent implements OnInit {
 
   public generateCancelPurchasePDF(): void {
     this.receiptService.exportToPDF();
+  }
+
+  public getCancelTicketsPrice(tickets: TicketDto[]) {
+    this.cancelledTickets = tickets;
+    let totalPrice = 0;
+
+    this.cancelledTickets.forEach((ticket) => totalPrice += ticket.price);
+
+    this.cancelledTicketsPrice = totalPrice;
+    return totalPrice;
+
   }
 }

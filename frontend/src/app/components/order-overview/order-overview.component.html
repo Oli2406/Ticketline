@@ -18,9 +18,15 @@
             <li *ngFor="let ticket of group.reserved">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{getPerformanceNameOfReservation(ticket.performanceId)}}</span>
-                <span><strong>Artist:</strong> {{ getArtistNameOfReservation(ticket.performanceId) }}</span>
-                <span><strong>Location:</strong> {{ getPerformanceLocationOfReservation(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceNameOfReservation(ticket.performanceId)
+                  }}</span>
+                <span><strong>Artist:</strong> {{
+                    getArtistNameOfReservation(ticket.performanceId)
+                  }}</span>
+                <span><strong>Location:</strong> {{
+                    getPerformanceLocationOfReservation(ticket.performanceId)
+                  }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span
@@ -68,7 +74,9 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -117,7 +125,9 @@
             <li *ngFor="let ticket of group.purchased">
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
-                <span><strong>Performance Name:</strong> {{getPerformanceName(ticket.performanceId) }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
                 <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
                 <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
@@ -198,32 +208,37 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-          <td>{{getTicketPerformanceForInvoice(cancelledTicket.performanceId)}}</td>
-          <td>{{ cancelledTicket.ticketId }}</td>
-          <td>{{ cancelledTicket.rowNumber }}</td>
-          <td>{{ cancelledTicket.seatNumber }}</td>
-          <td>{{ cancelledTicket.sectorType }}</td>
-          <td>{{ cancelledTicket.ticketType }}</td>
+        <tr *ngFor="let cancelTicket of cancelledTickets">
+          <td>{{ getTicketPerformanceForInvoice(cancelTicket.performanceId) }}</td>
+          <td>{{ cancelTicket.ticketId }}</td>
+          <td>{{ cancelTicket.rowNumber }}</td>
+          <td>{{ cancelTicket.seatNumber }}</td>
+          <td>{{ cancelTicket.sectorType }}</td>
+          <td>{{ cancelTicket.ticketType }}</td>
           <td>{{ 1 }}</td>
-          <td>{{ cancelledTicket.price }} €</td>
-          <td>{{ ((cancelledTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }} €</td>
+          <td>{{ cancelTicket.price }} €</td>
+          <td>{{ ((cancelTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }} €</td>
         </tr>
         </tbody>
       </table>
+
+      <div class="page-break"></div>
+
       <table class="invoice-footer">
         <tr>
           <td><strong>Total Price excl. tax.:</strong></td>
-          <td><strong>{{ (cancelledTicket.price / 113) * 100 | number: '1.2-2' }} €</strong></td>
+          <td><strong>{{ getCancelTicketsPrice(cancelledTickets)| number: '1.2-2' }} €</strong></td>
         </tr>
         <tr>
           <td><strong>sales Tax (13%):</strong></td>
-          <td><strong>{{ ((cancelledTicket.price / 113) * 100) * 0.13 | number: '1.2-2' }}€</strong>
+          <td><strong>{{
+              ((getCancelTicketsPrice(cancelledTickets) / 113) * 100) * 0.13 | number: '1.2-2'
+            }}€</strong>
           </td>
         </tr>
         <tr>
           <td><strong>Total Price incl. tax:</strong></td>
-          <td><strong>{{ cancelledTicket.price| number: '1.2-2' }} €</strong></td>
+          <td><strong>{{ getCancelTicketsPrice(cancelledTickets)| number: '1.2-2' }} €</strong></td>
         </tr>
       </table>
 
@@ -305,6 +320,9 @@
             }
           </tbody>
         </table>
+
+        <div class="page-break"></div>
+
         <table class="invoice-footer">
           <td><strong>Total Price excl. tax.:</strong></td>
           <td><strong>{{ (this.invoicePurchase.totalPrice / 113) * 100 | number: '1.2-2' }}
