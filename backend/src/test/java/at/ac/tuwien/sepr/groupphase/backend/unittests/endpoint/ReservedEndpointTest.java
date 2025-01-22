@@ -195,28 +195,7 @@ public class ReservedEndpointTest {
         assertEquals(204, response.getStatusCodeValue());
         verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
     }
-
-    /*@Test
-    void testGetReservationsByUserSuccessful() {
-        String encryptedUserId = "encryptedUser123";
-        Long userId = 123L;
-        List<ReservedDetailDto> mockReservations = List.of(
-            new ReservedDetailDto(userId, LocalDateTime.now(), List.of(createMockTicket(1L, 1, 1)), 1L),
-            new ReservedDetailDto(userId, LocalDateTime.now(), List.of(createMockTicket(2L, 1, 2)), 2L)
-        );
-
-        when(randomStringGenerator.retrieveOriginalId(encryptedUserId)).thenReturn(Optional.of(userId));
-        when(reservedService.getReservationsByUserId(userId)).thenReturn(mockReservations);
-
-        ResponseEntity<List<ReservedDetailDto>> response = reservedEndpoint.getReservationsByUser(encryptedUserId);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals(mockReservations, response.getBody());
-        verify(randomStringGenerator, times(1)).retrieveOriginalId(encryptedUserId);
-        verify(reservedService, times(1)).getReservationsByUserId(userId);
-    }*/
-
+    
     @Test
     void testGetReservationDetailsByUserSuccessful() {
         String encryptedUserId = "encryptedUser123";
