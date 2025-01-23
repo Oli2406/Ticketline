@@ -23,6 +23,8 @@ export class TopEventsComponent implements AfterViewInit {
   categories: string[] = [];
   selectedCategory: string = 'All categories';
   selectedMonth: string = '';
+  maxMonth: string = '';
+  minMonth: string = '';
   isEmptyData: boolean = false;
   private chart: Chart | null = null;
 
@@ -33,8 +35,20 @@ export class TopEventsComponent implements AfterViewInit {
   ) {
   }
 
+  setMaxMinMonth() {
+    const today = new Date();
+    const thisMonth = (today.getMonth() + 1).toString().padStart(2, '0');
+    this.minMonth = `${today.getFullYear()}-${thisMonth}`;
+
+    const nextYear = new Date(today.setMonth(today.getMonth() + 12));
+    const year = nextYear.getFullYear();
+    const month = (nextYear.getMonth() + 1).toString().padStart(2, '0'); // Ensure 2-digit month format
+    this.maxMonth = `${year}-${month}`;
+  }
+
   ngOnInit(): void {
     this.loadCategories();
+    this.setMaxMinMonth();
   }
 
   ngAfterViewInit(): void {
@@ -88,8 +102,8 @@ export class TopEventsComponent implements AfterViewInit {
         labels: this.data.map((event) => event.eventTitle),
         datasets: [
           {
-            label: 'Sold Tickets in %',
-            data: this.data.map((event) => parseFloat((event.soldPercentage * 100).toFixed(2))),
+            label: 'Sold Tickets',
+            data: this.data.map((event) => (event.soldTickets)),
             backgroundColor: 'rgba(77, 71, 195, 0.2)',
             borderColor: 'rgba(77, 71, 195, 1)',
             borderWidth: 1,
@@ -98,10 +112,9 @@ export class TopEventsComponent implements AfterViewInit {
       },
       options: {
         responsive: true,
-        scales: {y: {beginAtZero: true, max: 100}},
         plugins: {
           legend: {display: true, position: 'top'},
-          tooltip: {callbacks: {label: (context) => `${context.raw}%`}},
+          tooltip: {callbacks: {label: (context) => `${context.raw}`}},
         },
         onClick: (event, elements) => {
           if (elements.length > 0) {

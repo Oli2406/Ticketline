@@ -82,7 +82,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         GROUP BY
             ep.EVENT_ID, e.TITLE
         ORDER BY
-            soldPercentage DESC
+            soldTickets DESC
         LIMIT 10
         """, nativeQuery = true)
     List<Object[]> findTop10EventsAsObjects(@Param("year") Integer year, @Param("month") Integer month, @Param("category") String category);
