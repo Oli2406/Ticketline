@@ -50,7 +50,7 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Food and Wine Festival Returns to [City]",
             "Indulge in delicious food and drinks at the [City] Food and Wine Festival.",
             "The [City] Food and Wine Festival is back for another year of culinary delights. From [Date] to [Date], sample delicious food from local vendors, enjoy wine tastings, and learn from expert chefs. Get your tickets now!",
-            LocalDate.of(2025, 4, 10),
+            LocalDate.of(2024, 4, 10),
             new ArrayList<>(List.of("food.png")));
 
         createNewsIfNotExists("New Year's Eve Gala at the [Hotel Name]",
@@ -62,43 +62,43 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Children's Theatre Presents [Play Name]",
             "Bring the whole family to enjoy [Play Name] at the [Theatre Name].",
             "The [Theatre Name] is proud to present [Play Name], a delightful children's play perfect for the whole family. Shows run from [Date] to [Date]. Get your tickets now!",
-            LocalDate.of(2025, 1, 15),
+            LocalDate.of(2024, 1, 15),
             null);
 
         createNewsIfNotExists("Outdoor Movie Night in the Park",
             "Enjoy a movie under the stars at [Park Name].",
             "Join us for a free outdoor movie night at [Park Name] on [Date]. We'll be showing [Movie Name] on a giant screen. Bring your blankets, chairs, and snacks for a fun night under the stars.",
-            LocalDate.of(2025, 6, 20),
+            LocalDate.of(2024, 6, 20),
             new ArrayList<>(List.of("outdoor_movie.jpg")));
 
         createNewsIfNotExists("Summer Concert Series at the [Venue Name]",
             "Enjoy live music all summer long at the [Venue Name].",
             "The [Venue Name] is hosting a summer concert series featuring a variety of musical genres. From [Date] to [Date], enjoy live music every weekend. Check out the lineup and get your tickets today!",
-            LocalDate.of(2025, 7, 1),
+            LocalDate.of(2024, 7, 1),
             null);
 
         createNewsIfNotExists("Comedy Night at the [Venue Name]",
             "Laugh the night away with some of the funniest comedians around!",
             "Join us for a night of side-splitting comedy at the [Venue Name] on [Date]. Featuring [Comedian 1], [Comedian 2], and [Comedian 3], this show is guaranteed to leave you in stitches. Book your tickets now!",
-            LocalDate.of(2025, 1, 10),
+            LocalDate.of(2024, 1, 10),
             new ArrayList<>(List.of("commedy.jpg")));
 
         createNewsIfNotExists("[City] Farmers Market Opens for the Season",
             "Fresh, local produce is back at the [City] Farmers Market.",
             "The [City] Farmers Market is officially open for the season! Every [Day of the week] from [Time] to [Time], find fresh produce, baked goods, and handcrafted items from local vendors.",
-            LocalDate.of(2025, 5, 1),
+            LocalDate.of(2024, 5, 1),
             null);
 
         createNewsIfNotExists("Annual [City] Marathon",
             "Run for a cause in the [City] Marathon!",
             "The annual [City] Marathon is back on [Date]. Whether you're a seasoned runner or a first-timer, this is a great opportunity to challenge yourself and support a good cause. Register now and start training!",
-            LocalDate.of(2025, 3, 15),
+            LocalDate.of(2024, 3, 15),
             new ArrayList<>(List.of("marathon.png")));
 
         createNewsIfNotExists("Photography Exhibition at the [Gallery Name]",
             "See stunning photography by local artists at the [Gallery Name].",
             "The [Gallery Name] is pleased to present a new photography exhibition featuring the work of talented local artists. The exhibition opens on [Date] and runs through [Date].",
-            LocalDate.of(2025, 4, 15),
+            LocalDate.of(2024, 4, 15),
             null);
 
         createNewsIfNotExists("Yoga in the Park",
@@ -110,13 +110,13 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Book Signing with [Author Name]",
             "Meet [Author Name] and get your book signed.",
             "[Author Name] will be signing copies of their new book, [Book Title], at [Bookstore Name] on [Date] at [Time]. Don't miss this chance to meet the author and hear about their work.",
-            LocalDate.of(2025, 3, 20),
+            LocalDate.of(2025, 1, 20),
             new ArrayList<>(List.of("signing.png")));
 
         createNewsIfNotExists("Volunteer Day at the [Organization Name]",
             "Give back to the community by volunteering with the [Organization Name].",
             "The [Organization Name] is hosting a volunteer day on [Date]. Join us to help with [Volunteer activity] and make a difference in our community.",
-            LocalDate.of(2025, 2, 15),
+            LocalDate.of(2025, 1, 15),
             null);
 
         createNewsIfNotExists("Workshop: Learn to [Skill]",
@@ -128,7 +128,7 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Community Garage Sale",
             "Find treasures and support your neighbors at the community garage sale.",
             "The annual community garage sale is happening on [Date] from [Time] to [Time]. Find great deals on clothes, furniture, toys, and more. All proceeds benefit the [Charity Name].",
-            LocalDate.of(2025, 6, 5),
+            LocalDate.of(2024, 6, 5),
             new ArrayList<>(List.of("garage.png")));
 
         createNewsIfNotExists("Open Mic Night at the [Venue Name]",
