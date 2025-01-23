@@ -39,7 +39,7 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Interactive Art Exhibit Opens at [Museum Name]",
             "Experience art in a whole new way.",
             "The [Museum Name] is excited to announce the opening of its new interactive art exhibit, [Exhibit Name], on [Date]. This immersive exhibit invites visitors to engage with art through technology and explore "
-                + "their creativity. Don't miss this unique experience!", LocalDate.of(2025, 2, 5), new ArrayList<>(List.of("art.png")));
+                + "their creativity. Don't miss this unique experience!", LocalDate.of(2025, 1, 5), new ArrayList<>(List.of("art.png")));
 
         createNewsIfNotExists("Local Band [Band Name] Live in Concert",
             "[Band Name] is playing a special show in their hometown!",
@@ -104,7 +104,7 @@ public class NewsDataGenerator {
         createNewsIfNotExists("Yoga in the Park",
             "Start your day with a free yoga class in the park.",
             "Join us for a free yoga class in [Park Name] every [Day of the week] morning at [Time]. All levels are welcome.",
-            LocalDate.of(2025, 5, 10),
+            LocalDate.of(2024, 5, 10),
             null);
 
         createNewsIfNotExists("Book Signing with [Author Name]",
