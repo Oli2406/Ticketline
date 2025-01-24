@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,7 +35,7 @@ public class PurchaseDataGenerator {
     private final Random random = new Random();
 
     public PurchaseDataGenerator(PurchaseRepository purchaseRepository,
-        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
+                                 TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
@@ -42,72 +43,72 @@ public class PurchaseDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 7;
+        int userCount = 100;
 
         if (purchaseRepository.count() > 0) {
             return;
         }
 
-        for (long userId = 1; userId <= userCount; userId++) {
-            createPurchasesForUser(userId);
-        }
-    }
-
-    private void createPurchasesForUser(Long userId) {
-        List<Ticket> purchasedTickets = ticketRepository.findAll().stream()
-            .filter(ticket -> ticket.getStatus().equals("SOLD"))
-            .collect(Collectors.toList());
-
+        // Pre-fetch sold tickets and merchandise
+        List<Ticket> soldTickets = ticketRepository.findSoldTickets();
         List<Merchandise> allMerchandise = merchandiseRepository.findAll();
 
-        if (purchasedTickets.size() < 2 || allMerchandise.isEmpty()) {
-            LOGGER.warn("Not enough purchased tickets or merchandise to create purchases.");
+        if (soldTickets.size() < 2 || allMerchandise.isEmpty()) {
+            LOGGER.warn("Not enough sold tickets or merchandise to create purchases.");
             return;
         }
 
-        for (int i = 0; i < 4; i++) { // 2 purchases per user
-            // Je 2 gekaufte und reservierte Tickets
-            LocalDate cutoffDate = LocalDate.of(2025, 6, 23);
-            boolean validSelection = false;
+        // Split tickets into two groups: before and after cutoff date
+        LocalDate cutoffDate = LocalDate.of(2025, 6, 23);
+        List<Ticket> ticketsBeforeCutoff = soldTickets.stream()
+            .filter(ticket -> ticket.getDate().isBefore(cutoffDate.atStartOfDay()))
+            .collect(Collectors.toList());
+        List<Ticket> ticketsAfterCutoff = soldTickets.stream()
+            .filter(ticket -> ticket.getDate().isAfter(cutoffDate.atStartOfDay()))
+            .collect(Collectors.toList());
 
-            List<Long> ticketIds = new ArrayList<>();
-            int attempts = 0;
-            while (!validSelection && attempts < 30) {
-                ticketIds.clear();
-                ticketIds.addAll(getRandomIds(purchasedTickets, 2));
+        // Create purchases for each user
+        for (long userId = 1; userId <= userCount; userId++) {
+            createPurchasesForUser(userId, ticketsBeforeCutoff, ticketsAfterCutoff, allMerchandise);
+        }
+    }
 
-                boolean allAfterCutoff = ticketIds.stream()
-                    .map(ticketRepository::findByTicketId)
-                    .allMatch(ticket -> ticket.getDate().isAfter(cutoffDate.atStartOfDay()));
+    private void createPurchasesForUser(Long userId, List<Ticket> ticketsBeforeCutoff,
+                                        List<Ticket> ticketsAfterCutoff, List<Merchandise> allMerchandise) {
+        for (int i = 0; i < 4; i++) { // 4 purchases per user
+            // Randomly select a group: before or after cutoff
+            List<Ticket> selectedGroup = random.nextBoolean() ? ticketsBeforeCutoff : ticketsAfterCutoff;
 
-                boolean allBeforeCutoff = ticketIds.stream()
-                    .map(ticketRepository::findByTicketId)
-                    .allMatch(ticket -> ticket.getDate().isBefore(cutoffDate.atStartOfDay()));
-
-                validSelection = allAfterCutoff || allBeforeCutoff;
-                attempts++;
+            if (selectedGroup.size() < 2) {
+                LOGGER.warn("Not enough tickets for user {}.", userId);
+                continue;
             }
 
-            if (!validSelection) {
-                LOGGER.info("Could not find valid tickets for user {} after 10 attempts.", userId);
-                return; // Überspringe diesen Benutzer
-            }
+            // Select 2 random tickets
+            List<Ticket> selectedTickets = getRandomSubset(selectedGroup, 2);
 
-            // 2 Merchandise-Artikel je Kauf
-            List<Long> merchandiseIds = getRandomIds(allMerchandise, 2);
+            // Select 2 random merchandise items
+            List<Merchandise> selectedMerchandise = getRandomSubset(allMerchandise, 2);
 
-            List<Long> merchandiseQuantities = new ArrayList<>();
-            merchandiseQuantities.add(ThreadLocalRandom.current().nextLong(1, 6));
-            merchandiseQuantities.add(ThreadLocalRandom.current().nextLong(1, 6));
+            // Random quantities for merchandise
+            List<Long> merchandiseQuantities = selectedMerchandise.stream()
+                .map(item -> ThreadLocalRandom.current().nextLong(1, 6))
+                .collect(Collectors.toList());
 
-            // Berechnung des Gesamtpreises
-            Long totalPrice = calculateTotalPrice(ticketIds, merchandiseIds);
+            // Calculate total price
+            long ticketTotal = selectedTickets.stream()
+                .mapToLong(ticket -> ticket.getPrice().longValue())
+                .sum();
+            long merchandiseTotal = selectedMerchandise.stream()
+                .mapToLong(item -> item.getPrice().longValue())
+                .sum();
+            long totalPrice = ticketTotal + merchandiseTotal;
 
-            // Erstellung des Kaufs
+            // Create purchase
             Purchase purchase = new Purchase(
                 userId,
-                ticketIds,
-                merchandiseIds,
+                selectedTickets.stream().map(Ticket::getTicketId).collect(Collectors.toList()),
+                selectedMerchandise.stream().map(Merchandise::getMerchandiseId).collect(Collectors.toList()),
                 totalPrice,
                 getRandomPastDate(),
                 merchandiseQuantities,
@@ -117,40 +118,20 @@ public class PurchaseDataGenerator {
             );
 
             purchaseRepository.save(purchase);
-            LOGGER.info("Created purchase for user {}: {}", userId, purchase);
         }
+        LOGGER.info("Purchases for user {} created", userId);
     }
 
-
-    private List<Long> getRandomIds(List<?> items, int count) {
-        return random.ints(0, items.size())
-            .distinct()
-            .limit(count)
-            .mapToObj(i -> {
-                if (items.get(0) instanceof Ticket) { // Prüfe das erste Element
-                    return ((Ticket) items.get(i)).getTicketId();
-                } else if (items.get(0) instanceof Merchandise) {
-                    return ((Merchandise) items.get(i)).getMerchandiseId();
-                }
-                throw new IllegalArgumentException("Unsupported item type in list.");
-            })
-            .collect(Collectors.toList());
-    }
-
-    private Long calculateTotalPrice(List<Long> ticketIds, List<Long> merchandiseIds) {
-        List<Ticket> tickets = ticketRepository.findAllById(ticketIds);
-        List<Merchandise> merchandise = merchandiseRepository.findAllById(merchandiseIds);
-
-        long ticketTotal = tickets.stream().mapToLong(ticket -> ticket.getPrice().longValue())
-            .sum();
-        long merchandiseTotal = merchandise.stream().mapToLong(item -> item.getPrice().longValue())
-            .sum();
-
-        return ticketTotal + merchandiseTotal;
+    private <T> List<T> getRandomSubset(List<T> items, int count) {
+        List<T> copy = new ArrayList<>(items);
+        Collections.shuffle(copy);
+        return copy.subList(0, Math.min(count, copy.size()));
     }
 
     private LocalDateTime getRandomPastDate() {
-        return LocalDateTime.now().minusDays(random.nextInt(365 * 3)).minusHours(random.nextInt(24))
-            .minusMinutes(random.nextInt(60));
+        return LocalDateTime.now()
+            .minusDays(ThreadLocalRandom.current().nextInt(365 * 3))
+            .minusHours(ThreadLocalRandom.current().nextInt(24))
+            .minusMinutes(ThreadLocalRandom.current().nextInt(60));
     }
 }

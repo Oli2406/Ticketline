@@ -26,8 +26,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * Check if a ticket exists for a specific seat and performance.
      *
      * @param performanceId the ID of the performance
-     * @param rowNumber the row number of the seat
-     * @param seatNumber the seat number
+     * @param rowNumber     the row number of the seat
+     * @param seatNumber    the seat number
      * @return true if the ticket exists, false otherwise
      */
     boolean existsByPerformanceIdAndRowNumberAndSeatNumber(Long performanceId, Integer rowNumber, Integer seatNumber);
@@ -78,4 +78,21 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
      * @return the number of tickets deleted
      */
     int deleteByPerformanceId(Long performanceId);
+
+
+    /**
+     * Retrieves all reserved tickets.
+     *
+     * @return a list of all reserved tickets
+     */
+    @Query("SELECT t FROM Ticket t WHERE t.status = 'RESERVED'")
+    List<Ticket> findReservedTickets();
+
+    /**
+     * Retrieves all sold tickets.
+     *
+     * @return a list of all sold tickets
+     */
+    @Query("SELECT t FROM Ticket t WHERE t.status = 'SOLD'")
+    List<Ticket> findSoldTickets();
 }
