@@ -62,8 +62,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             ep.EVENT_ID AS eventId,
             e.TITLE AS eventTitle,
             SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets,
-            COUNT(t.TICKET_ID) AS totalTickets,
-            (SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) * 1.0 / COUNT(t.TICKET_ID)) AS soldPercentage
         FROM
             EVENT_PERFORMANCE_IDS ep
         JOIN
@@ -71,9 +69,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         JOIN
             EVENT e ON ep.EVENT_ID = e.EVENT_ID
         WHERE
-            (:category IS NULL OR e.CATEGORY = :category) -- Include all categories if :category is NULL
+            (:category IS NULL OR e.CATEGORY = :category)
             AND (
-                (:year IS NULL OR :month IS NULL) -- Include all time if year or month is NULL
+                (:year IS NULL OR :month IS NULL)
                 OR
                 (YEAR(e.DATE_FROM) = :year AND MONTH(e.DATE_FROM) = :month)
                 OR

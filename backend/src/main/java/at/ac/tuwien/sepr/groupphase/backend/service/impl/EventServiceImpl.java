@@ -6,9 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.entity.TopEvents;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
@@ -28,12 +30,14 @@ public class EventServiceImpl implements EventService {
     private static final Logger LOGGER = LoggerFactory.getLogger(
         MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
+    private final TopEventsRepository topEventsRepository;
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
 
-    public EventServiceImpl(EventRepository eventRepository, EventValidator eventValidator,
+    public EventServiceImpl(EventRepository eventRepository, TopEventsRepository topEventsRepository, EventValidator eventValidator,
         EventMapper eventMapper) {
         this.eventRepository = eventRepository;
+        this.topEventsRepository = topEventsRepository;
         this.eventValidator = eventValidator;
         this.eventMapper = eventMapper;
     }
@@ -120,15 +124,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventSalesDto> getTop10Events(Integer year, Integer month, String category) {
         LOGGER.info("Getting top ten events with category {} in {} {}", category, month, year);
-        List<Object[]> results = eventRepository.findTop10EventsAsObjects(year, month, category);
+        List<TopEvents> topEvents = topEventsRepository.findByCategoryAndYearAndMonth(category, year, month);
 
-        return results.stream()
-            .map(e -> new EventSalesDto(
-                ((Number) e[0]).longValue(),
-                e[1].toString(),
-                ((Number) e[2]).longValue(),
-                ((Number) e[3]).longValue(),
-                ((Number) e[4]).doubleValue()
+        return topEvents.stream()
+            .map(event -> new EventSalesDto(
+                event.getEventId(),
+                event.getEventTitle(),
+                event.getSoldTickets()
             ))
             .collect(Collectors.toList());
     }

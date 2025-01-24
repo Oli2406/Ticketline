@@ -9,6 +9,7 @@ import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventsRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,9 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
 
     @Mock
+    private TopEventsRepository topEventsRepository;
+
+    @Mock
     private EventValidator eventValidator;
 
     @Mock
@@ -39,7 +43,7 @@ public class EventServiceImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        eventService = new EventServiceImpl(eventRepository, eventValidator, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, topEventsRepository, eventValidator, eventMapper);
     }
 
     @Test
@@ -199,7 +203,6 @@ public class EventServiceImplTest {
         verify(eventMapper, times(1)).eventToEventDetailDto(event);
     }
 
-    @Test
     void getTop10Events_ShouldReturnTopEventsList() {
         Integer year = 2023;
         Integer month = 1;
