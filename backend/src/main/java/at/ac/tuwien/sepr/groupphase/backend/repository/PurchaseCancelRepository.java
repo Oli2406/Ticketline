@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PurchaseCancelRepository extends JpaRepository<CancelPurchase, Long>{
+public interface PurchaseCancelRepository extends JpaRepository<CancelPurchase, Long> {
 
     /**
      * Find all purchases for a specific user.

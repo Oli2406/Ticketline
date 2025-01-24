@@ -184,7 +184,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
         List<Ticket> tickets = purchaseDetailDto.getTickets();
 
-        Optional<CancelPurchase> existingCancellation = purchaseCancelRepository.findById(purchaseDetailDto.getPurchaseId());
+        Optional<CancelPurchase> existingCancellation = purchaseCancelRepository.findById(
+            purchaseDetailDto.getPurchaseId());
 
         long cancelledTotalPrice = 0;
 
@@ -193,30 +194,31 @@ public class PurchaseServiceImpl implements PurchaseService {
             cancelledTotalPrice = cancelledTotalPrice + ticket.getPrice().longValue();
         }
 
-        List<Long> alreadyCancelledTickets = new ArrayList<>();
-
-        if (existingCancellation.isPresent()){
-            alreadyCancelledTickets = (existingCancellation.get().getTicketIds());
-        }
-
         List<Long> cancelledTickets = new ArrayList<>();
 
         for (int i = 0; i < oldTickets.size(); i++) {
             for (int j = i + 1; j < ticketIds.size(); j++) {
                 if (!ticketIds.contains(oldTickets.get(i))) {
                     cancelledTickets.add(oldTickets.get(i));
-                    alreadyCancelledTickets.add(oldTickets.get(i));
                     this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
                 }
             }
         }
+
+        List<Long> alreadyCancelledTickets = new ArrayList<>();
+
+        if (existingCancellation.isPresent()) {
+            alreadyCancelledTickets = (existingCancellation.get().getTicketIds());
+        }
+
+        alreadyCancelledTickets.addAll(cancelledTickets);
 
         existingPurchase.setTicketIds(ticketIds);
         existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
         purchaseRepository.save(existingPurchase);
         logger.info("Updated purchase: {}", existingPurchase);
 
-        CancelPurchase cancelPurchase = new CancelPurchase (
+        CancelPurchase cancelPurchase = new CancelPurchase(
             existingPurchase.getPurchaseId(),
             existingPurchase.getUserId(),
             alreadyCancelledTickets,
@@ -241,7 +243,9 @@ public class PurchaseServiceImpl implements PurchaseService {
             purchaseRepository.save(existingPurchase);
         }
 
-        //TODO saved the purchase, but ticket ids are empty ^^
+        //TODO saved the purchase,
+        // but ticket ids are empty  and total price is not saved correctly
+        // and the purchases are saved again and are not updated
         purchaseCancelRepository.save(cancelPurchase);
     }
 
