@@ -19,6 +19,7 @@ import {
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
 import {forEach} from "lodash";
+import {CancelpurchaseService} from "../../services/cancelpurchase.service";
 
 @Component({
   selector: 'app-order-overview',
@@ -104,7 +105,8 @@ export class OrderOverviewComponent implements OnInit {
     private artistService: ArtistService,
     private receiptService: ReceiptService,
     private ticketService: TicketService,
-    private cartService: CartService
+    private cartService: CartService,
+    private cancelPurchaseService: CancelpurchaseService
   ) {
   }
 
@@ -322,6 +324,10 @@ export class OrderOverviewComponent implements OnInit {
         }).toPromise()
       );
 
+      //TODO interject here to save the cancelled purchase??? AND WRITE HTML FOR THE CANCELLED VIEW
+      //TODO and check if you need additional variables, like the group for purchased and so on
+      //TODO and you need to fetch them with the other purchases
+      // --> TODO Maybe write a new service class
       Promise.all(updatePromises)
       .then(() => {
         this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
@@ -405,6 +411,7 @@ export class OrderOverviewComponent implements OnInit {
         tickets: matchingPurchase.tickets.filter((item) => item.ticketId !== ticket.ticketId)
       };
 
+      //TODO interject here to save the cancelled purchase???
       this.purchaseService.updatePurchase(updatedPurchase).subscribe({
         next: () => {
           this.generateCancelPurchasePDF();
