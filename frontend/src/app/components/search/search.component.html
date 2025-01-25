@@ -240,17 +240,15 @@
   <tr>
     <th>Name</th>
     <th>Category</th>
-    <th>Description</th>
     <th>Startdate</th>
     <th>Enddate</th>
     <th>Actions</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let event of events">
+  <tr *ngFor="let event of displayedEvents">
     <td>{{ event.title }}</td>
     <td>{{ event.category }}</td>
-    <td>{{ truncate(event.description, 164) }}</td>
     <td>{{ event.dateFrom }}</td>
     <td>{{ event.dateTo }}</td>
     <td>
@@ -274,7 +272,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let artist of artists">
+  <tr *ngFor="let artist of displayedArtists">
     <td>{{ artist.firstName }}</td>
     <td>{{ artist.lastName }}</td>
     <td>{{ artist.artistName }}</td>
@@ -297,7 +295,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let location of locations">
+  <tr *ngFor="let location of displayedLocations">
     <td>{{ location.name }}</td>
     <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
     <td>
@@ -339,24 +337,22 @@
     <tr>
       <th>Name</th>
       <th>Location</th>
-      <th>Time & Date</th>
+      <th>Date & Time</th>
       <th>Duration</th>
       <th>Price</th>
       <th>Artist</th>
-      <th>Ticket Number</th>
       <th>Hall</th>
       <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let performance of advancedSearchPerformances">
+    <tr *ngFor="let performance of displayedAdvancedSearchPerformances">
       <td>{{ performance.name }}</td>
       <td>{{ performance.location.name }}</td>
       <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
       <td>{{ performance.duration | duration }}</td>
       <td>{{ performance.price | currency: 'EUR' }}</td>
       <td>{{ performance.artist.artistName }}</td>
-      <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
       <td>
         <button
@@ -386,7 +382,7 @@
   <tr>
     <th>Name</th>
     <th>Location</th>
-    <th>Time & Date</th>
+    <th>Date & Time</th>
     <th>Duration</th>
     <th>Price</th>
     <th>Artist</th>
@@ -396,7 +392,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let performance of performances">
+  <tr *ngFor="let performance of displayedPerformances">
     <td>{{ performance.name }}</td>
     <td>{{ performance.location.name }}</td>
     <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
@@ -413,7 +409,36 @@
         <i class="bi bi-ticket-fill"></i> Tickets
       </button>
     </td>
-
   </tr>
   </tbody>
 </table>
+
+<!-- Pagination Controls -->
+<div class="pagination my-4 d-flex justify-content-center">
+  <button
+    class="btn btn-light me-2"
+    (click)="goToPage(currentPage - 1)"
+    [disabled]="currentPage === 1"
+  >
+    &larr;
+  </button>
+
+  <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+    <button
+      class="btn me-2"
+      (click)="goToPage(i + 1)"
+      [class.active]="currentPage === i + 1"
+      [ngClass]="{ 'btn-primary': currentPage === i + 1, 'btn-light': currentPage !== i + 1 }"
+    >
+      {{ i + 1 }}
+    </button>
+  </ng-container>
+
+  <button
+    class="btn btn-light"
+    (click)="goToPage(currentPage + 1)"
+    [disabled]="currentPage === totalPages"
+  >
+    &rarr;
+  </button>
+</div>

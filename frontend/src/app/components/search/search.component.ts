@@ -12,6 +12,7 @@ import {debounceTime, forkJoin, map, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import {TicketService} from "../../services/ticket.service";
+import {ToastrService} from "ngx-toastr";
 
 export enum SearchType {
   event,
@@ -51,11 +52,25 @@ declare var bootstrap: any;
   styleUrl: './search.component.scss'
 })
 export class SearchComponent implements AfterViewInit {
+  currentPage: number = 1;
+  itemsPerPage: number = 50;
+  totalPages: number = 0;
+
   events: EventListDto[] = [];
+  displayedEvents: EventListDto[] = [];
+
   artists: ArtistListDto[] = [];
+  displayedArtists: ArtistListDto[] = [];
+
   performances: PerformanceDetailDto[] = [];
+  displayedPerformances: PerformanceDetailDto[] = [];
+
   locations: LocationListDto[] = [];
+  displayedLocations: LocationListDto[] = [];
+
   advancedSearchPerformances: PerformanceDetailDto[] = [];
+  displayedAdvancedSearchPerformances: PerformanceDetailDto[] = [];
+
 
   searchQuery: string = '';
 
@@ -71,7 +86,8 @@ export class SearchComponent implements AfterViewInit {
     private artistService: ArtistService,
     private performanceService: PerformanceService,
     private locationService: LocationService,
-    private ticketService: TicketService
+    private ticketService: TicketService,
+    private notification: ToastrService
   ) {
   }
 
@@ -79,6 +95,7 @@ export class SearchComponent implements AfterViewInit {
     this.setupSearchListener();
     this.loadSearchType();
     this.updateData();
+    this.updateTotalPages();
   }
 
   ngAfterViewInit() {
@@ -87,6 +104,7 @@ export class SearchComponent implements AfterViewInit {
   }
 
   changeSearchType(type: SearchType) {
+
     if (type !== SearchType.advanced) {
       this.advancedSearchPerformances = [];
       this.searchQuery = '';
@@ -102,7 +120,7 @@ export class SearchComponent implements AfterViewInit {
 
   updateData() {
     const updateActions: { [key in SearchType]: () => void } = {
-      [SearchType.event]: this.updateEvents.bind(this),
+      [SearchType.event]: this.updateEvents.bind(this) ,
       [SearchType.artist]: this.updateArtists.bind(this),
       [SearchType.location]: this.updateLocations.bind(this),
       [SearchType.performance]: this.updatePerformances.bind(this),
@@ -116,37 +134,55 @@ export class SearchComponent implements AfterViewInit {
     };
 
     const updateAction = updateActions[this.curSearchType];
-    if (updateAction) updateAction();
-    this.updateTicketNumbers(); this.updateTicketNumbers();
+    if (updateAction) {
+      updateAction();
+    }
+    this.currentPage = 1;
+    this.updateTotalPages();
+    this.updateDisplayedItems();
   }
 
 
   updateEvents() {
     this.eventService.getAllByFilter(this.eventSearchParams).subscribe({
-      next: events => (this.events = events),
+      next: events => {
+        this.events = events;
+        this.updateDisplayedItems();
+        this.updateTotalPages();
+      },
       error: err => console.error('Error fetching events:', err)
     });
-
   }
 
   updateArtists() {
     this.artistService.getAllByFilter(this.artistSearchParams).subscribe({
-      next: artists => (this.artists = artists),
+      next: artists => {
+        this.artists = artists;
+        this.updateDisplayedItems();
+        this.updateTotalPages();
+      },
       error: err => console.error('Error fetching artists:', err)
     });
-
   }
 
   updateLocations() {
     this.locationService.getAllByFilter(this.locationSearchParams).subscribe({
-      next: locations => (this.locations = locations),
+      next: locations => {
+          this.locations = locations;
+          this.updateDisplayedItems();
+          this.updateTotalPages();
+        },
       error: err => console.error('Error fetching locations:', err)
     });
   }
 
   updatePerformances() {
     this.performanceService.getAllByFilter(this.performanceSearchParams).subscribe({
-      next: performances => (this.performances = performances),
+      next: performances => {
+        this.performances = performances;
+        this.updateDisplayedItems();
+        this.updateTotalPages();
+      },
       error: err => console.error('Error fetching artists:', err)
     });
   }
@@ -159,7 +195,6 @@ export class SearchComponent implements AfterViewInit {
             map((tickets) => {
               const availableTickets = tickets.filter(ticket => ticket.status === 'AVAILABLE').length;
               return this.performanceService.updateTicketNumber(performance.performanceId, availableTickets).subscribe();
-
             })
           )
         );
@@ -180,6 +215,8 @@ export class SearchComponent implements AfterViewInit {
     this.performanceService.advancedSearchPerformances(this.searchQuery).subscribe({
       next: (performances) => {
         this.advancedSearchPerformances = performances;
+        this.updateDisplayedItems();
+        this.updateTotalPages();
       },
       error: (err) => {
         console.error('Error performing advanced search:', err);
@@ -211,13 +248,58 @@ export class SearchComponent implements AfterViewInit {
     this.performanceSearchParams = {};
     this.searchQuery = '';
     this.searchChanged();
+    this.updateTotalPages();
+    this.currentPage = 1;
+    this.updateDisplayedItems();
   }
 
-  truncate(text: string, maxLength: number): string {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + '...';
-    } else {
-      return text;
+  updateTotalPages() {
+    switch (this.curSearchType) {
+      case SearchType.event:
+        this.totalPages = Math.ceil(this.events.length / this.itemsPerPage);
+        break;
+      case SearchType.artist:
+        this.totalPages = Math.ceil(this.artists.length / this.itemsPerPage);
+        break;
+      case SearchType.performance:
+        this.totalPages = Math.ceil(this.performances.length / this.itemsPerPage);
+        break;
+      case SearchType.location:
+        this.totalPages = Math.ceil(this.locations.length / this.itemsPerPage);
+        break;
+      case SearchType.advanced:
+        this.totalPages = Math.ceil(this.advancedSearchPerformances.length / this.itemsPerPage);
+        break;
+    }
+  }
+
+  updateDisplayedItems() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+
+    switch (this.curSearchType) {
+      case SearchType.event:
+        this.displayedEvents = this.events.slice(startIndex, endIndex);
+        break;
+      case SearchType.artist:
+        this.displayedArtists = this.artists.slice(startIndex, endIndex);
+        break;
+      case SearchType.performance:
+        this.displayedPerformances = this.performances.slice(startIndex, endIndex);
+        break;
+      case SearchType.location:
+        this.displayedLocations = this.locations.slice(startIndex, endIndex);
+        break;
+      case SearchType.advanced:
+        this.displayedAdvancedSearchPerformances = this.advancedSearchPerformances.slice(startIndex, endIndex);
+        break;
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updateDisplayedItems();
     }
   }
 
