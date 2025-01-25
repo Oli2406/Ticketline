@@ -151,6 +151,48 @@
     </div>
   </section>
 
+  <section *ngIf="alreadyCancelTickets.length > 0" class="section">
+    <h2>Cancelled Purchases</h2>
+    <div *ngFor="let group of alreadyCancelTickets" class="ticket-group">
+      <div class="ticket-header" (click)="group.showDetails = !group.showDetails">
+        <h3>{{ group.date | date: 'yyyy-MM-dd HH:mm' }}</h3>
+        <span class="toggle-arrow" [class.expanded]="group.showDetails">&#x25BC;</span>
+      </div>
+
+      <div *ngIf="group.showDetails">
+        <div class="ticket-section">
+          <h4>Purchased Tickets</h4>
+          <ul>
+            <li *ngFor="let ticket of group.cancel">
+              <div class="ticket-details">
+                <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
+                <span><strong>Performance Name:</strong> {{
+                    getPerformanceName(ticket.performanceId)
+                  }}</span>
+                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
+                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
+                <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Seat Number:</strong> {{ ticket.seatNumber }}</span>
+                <span
+                  *ngIf="ticket.ticketType !== 'STANDING'"><strong>Row Number:</strong> {{ ticket.rowNumber }}</span>
+                <span><strong>Price Category:</strong> {{ ticket.priceCategory }}</span>
+                <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
+              </div>
+            </li>
+            <div class="cancel-button">
+              <button class="btn btn-primary"
+                      (click)="fetchCancelPurchaseForInvoice(group.cancel)">
+                Download Invoice
+              </button>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Wenn keine Tickets vorhanden sind -->
   <ng-container
     *ngIf="reservedTickets.length === 0 && purchasedTickets.length === 0 && pastTickets.length === 0">
@@ -270,9 +312,11 @@
       <body>
       <div class="invoice-container-download">
         <div class="invoice-header">
-          <h1>Invoice</h1>
+          <h1 *ngIf="this.cancelInvDownload">Cancel Invoice</h1>
+          <h1 *ngIf="!this.cancelInvDownload">Invoice</h1>
           <div>
-            <p>Invoice Date: <strong>{{ invoicePurchase.purchaseDate | date: 'yyyy-MM-dd' }}</strong></p>
+            <p>Invoice Date:
+              <strong>{{ invoicePurchase.purchaseDate | date: 'yyyy-MM-dd' }}</strong></p>
             <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
           </div>
         </div>
@@ -340,7 +384,13 @@
         </table>
 
         <div class="invoice-bank">
-          <p>Thank you for your purchase at Ticket-Line!</p>
+          <p *ngIf="this.cancelInvDownload"> Your purchase has been successfully cancelled and the
+            tickets are available again.</p>
+          <p *ngIf="this.cancelInvDownload"> The above mentioned amount will be transferred back to
+            your
+            bank account within the next
+            7 business days.</p>
+          <p *ngIf="!this.cancelInvDownload">Thank you for your purchase at Ticket-Line!</p>
           <p> Tax Information: Tickets have a 13% sales tax.</p>
         </div>
       </div>
