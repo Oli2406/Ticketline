@@ -61,7 +61,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         SELECT
             ep.EVENT_ID AS eventId,
             e.TITLE AS eventTitle,
-            SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets,
+            SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets
         FROM
             EVENT_PERFORMANCE_IDS ep
         JOIN

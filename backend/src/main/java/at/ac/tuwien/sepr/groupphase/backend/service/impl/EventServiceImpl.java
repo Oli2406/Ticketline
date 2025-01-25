@@ -6,11 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
-import at.ac.tuwien.sepr.groupphase.backend.entity.TopEvents;
+import at.ac.tuwien.sepr.groupphase.backend.entity.TopEvent;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.EventService;
 
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
@@ -30,14 +30,14 @@ public class EventServiceImpl implements EventService {
     private static final Logger LOGGER = LoggerFactory.getLogger(
         MethodHandles.lookup().lookupClass());
     private final EventRepository eventRepository;
-    private final TopEventsRepository topEventsRepository;
+    private final TopEventRepository topEventRepository;
     private final EventValidator eventValidator;
     private final EventMapper eventMapper;
 
-    public EventServiceImpl(EventRepository eventRepository, TopEventsRepository topEventsRepository, EventValidator eventValidator,
-        EventMapper eventMapper) {
+    public EventServiceImpl(EventRepository eventRepository, TopEventRepository topEventRepository, EventValidator eventValidator,
+                            EventMapper eventMapper) {
         this.eventRepository = eventRepository;
-        this.topEventsRepository = topEventsRepository;
+        this.topEventRepository = topEventRepository;
         this.eventValidator = eventValidator;
         this.eventMapper = eventMapper;
     }
@@ -124,7 +124,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventSalesDto> getTop10Events(Integer year, Integer month, String category) {
         LOGGER.info("Getting top ten events with category {} in {} {}", category, month, year);
-        List<TopEvents> topEvents = topEventsRepository.findByCategoryAndYearAndMonth(category, year, month);
+        List<TopEvent> topEvents = topEventRepository.findByCategoryMonthYear(category, month, year);
 
         return topEvents.stream()
             .map(event -> new EventSalesDto(

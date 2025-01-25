@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import java.time.LocalDate;
 
 @Entity
-public class TopEvents {
+public class TopEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +28,27 @@ public class TopEvents {
     private String category;
 
     @Column(name = "year_filter")
-    private int year;
+    private Integer year;
 
     @Column(name = "month_filter")
-    private int month;
+    private Integer month;
 
     @Column(name = "update_date")
     private LocalDate updateDate;
+
+    public TopEvent() {
+    }
+
+    public TopEvent(Long id, Long eventId, String eventTitle, Long soldTickets, String category, Integer year, Integer month, LocalDate updateDate) {
+        this.id = id;
+        this.eventId = eventId;
+        this.eventTitle = eventTitle;
+        this.soldTickets = soldTickets;
+        this.category = category;
+        this.year = year;
+        this.month = month;
+        this.updateDate = updateDate;
+    }
 
     public Long getId() {
         return id;
@@ -76,19 +90,19 @@ public class TopEvents {
         this.category = category;
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 
-    public int getMonth() {
+    public Integer getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
+    public void setMonth(Integer month) {
         this.month = month;
     }
 

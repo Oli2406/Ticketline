@@ -40,7 +40,7 @@ export class TopEventsComponent implements AfterViewInit {
     const thisMonth = (today.getMonth() + 1).toString().padStart(2, '0');
     this.minMonth = `${today.getFullYear()}-${thisMonth}`;
 
-    const nextYear = new Date(today.setMonth(today.getMonth() + 12));
+    const nextYear = new Date(today.setMonth(today.getMonth() + 11));
     const year = nextYear.getFullYear();
     const month = (nextYear.getMonth() + 1).toString().padStart(2, '0'); // Ensure 2-digit month format
     this.maxMonth = `${year}-${month}`;
