@@ -6,10 +6,11 @@ import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSalesDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.EventSearchDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.mapper.EventMapper;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Event;
+import at.ac.tuwien.sepr.groupphase.backend.entity.TopEvent;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ConflictException;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.EventRepository;
-import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventsRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.TopEventRepository;
 import at.ac.tuwien.sepr.groupphase.backend.service.impl.EventServiceImpl;
 import at.ac.tuwien.sepr.groupphase.backend.service.validators.EventValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ public class EventServiceImplTest {
     private EventRepository eventRepository;
 
     @Mock
-    private TopEventsRepository topEventsRepository;
+    private TopEventRepository topEventRepository;
 
     @Mock
     private EventValidator eventValidator;
@@ -43,7 +44,7 @@ public class EventServiceImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        eventService = new EventServiceImpl(eventRepository, topEventsRepository, eventValidator, eventMapper);
+        eventService = new EventServiceImpl(eventRepository, topEventRepository, eventValidator, eventMapper);
     }
 
     @Test
@@ -203,14 +204,15 @@ public class EventServiceImplTest {
         verify(eventMapper, times(1)).eventToEventDetailDto(event);
     }
 
+    @Test
     void getTop10Events_ShouldReturnTopEventsList() {
         Integer year = 2023;
         Integer month = 1;
         String category = "Music";
 
-        Object[] event1 = {1L, "Event1", 100L, 200L, 300.50};
-        Object[] event2 = {2L, "Event2", 150L, 250L, 400.75};
-        when(eventRepository.findTop10EventsAsObjects(year, month, category)).thenReturn(List.of(event1, event2));
+        TopEvent event1 = new TopEvent(1L, 1L, "Event1", 100L, "category1", 2025, 1, LocalDate.of(year, month, 1));
+        TopEvent event2 = new TopEvent(2L, 2L, "Event2", 200L, "category2", 2025, 1, LocalDate.of(year, month, 1));
+        when(topEventRepository.findByCategoryMonthYear(category, month, year)).thenReturn(List.of(event1, event2));
 
         List<EventSalesDto> result = eventService.getTop10Events(year, month, category);
 
@@ -219,7 +221,7 @@ public class EventServiceImplTest {
         assertEquals(1L, result.getFirst().getEventId(), "First event ID should match");
         assertEquals("Event1", result.getFirst().getEventTitle(), "First event title should match");
 
-        verify(eventRepository, times(1)).findTop10EventsAsObjects(year, month, category);
+        verify(topEventRepository, times(1)).findByCategoryMonthYear(category, month, year);
     }
 
     @Test
