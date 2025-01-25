@@ -6,11 +6,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class PurchaseCancelDetailDto {
+
     private Long userId;
     private List<Ticket> tickets;
     private List<Merchandise> merchandises;
     private List<Long> merchandiseQuantities;
-    private Long totalPrice;
+    private Double totalPrice;
     private LocalDateTime purchaseDate;
     private Long purchaseId;
     private String street;
@@ -19,7 +20,7 @@ public class PurchaseCancelDetailDto {
 
 
     public PurchaseCancelDetailDto(Long purchaseId, Long userId, List<Ticket> tickets,
-        List<Merchandise> merchandises, Long totalPrice, LocalDateTime purchaseDate,
+        List<Merchandise> merchandises, Double totalPrice, LocalDateTime purchaseDate,
         List<Long> merchandiseQuantities, String street, String postalCode, String city) {
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -68,11 +69,11 @@ public class PurchaseCancelDetailDto {
         this.merchandises = merchandises;
     }
 
-    public Long getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Long totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 

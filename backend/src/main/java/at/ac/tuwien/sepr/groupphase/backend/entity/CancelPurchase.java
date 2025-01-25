@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class CancelPurchase {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long purchaseId;
 
     @Column(nullable = false)
@@ -30,7 +30,7 @@ public class CancelPurchase {
     private String merchandiseQuantities;
 
     @Column(nullable = false)
-    private Long totalPrice;
+    private Double totalPrice;
 
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
@@ -48,7 +48,7 @@ public class CancelPurchase {
     }
 
     public CancelPurchase(Long purchaseId, Long userId, List<Long> ticketIds,
-        List<Long> merchandiseIds, List<Long> merchandiseQuantities, Long totalPrice,
+        List<Long> merchandiseIds, List<Long> merchandiseQuantities, Double totalPrice,
         LocalDateTime purchaseDate, String street, String postalCode, String city) {
         this.purchaseId = purchaseId;
         this.userId = userId;
@@ -103,11 +103,11 @@ public class CancelPurchase {
     }
 
 
-    public Long getTotalPrice() {
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Long totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
@@ -160,4 +160,6 @@ public class CancelPurchase {
             .map(Long::valueOf)
             .collect(Collectors.toList());
     }
+
+
 }

@@ -182,7 +182,7 @@ public class PurchaseCancelServiceImpl implements PurchaseCancelService {
                 purchase.getUserId(),
                 tickets,
                 merchandises,
-                purchase.getTotalPrice(),
+                purchase.getTotalPrice().longValue(),
                 purchase.getPurchaseDate(),
                 purchase.getStreet(),
                 purchase.getPostalCode(),
