@@ -217,10 +217,6 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
         }
 
-        //TODO price to float and checking for why it doesn't fetch an already existing purchase
-        // See if there is a merge option somewhere
-        // there is also something wrong with the purchase ID --> reason why it can't fetch an existing one???
-        // look at the repo or maybe at the entity purchase to see if i st the ID correctly
         for (Long cancelTicket : alreadyCancelledTickets) {
             double price = this.ticketService.getTicketById(cancelTicket).getPrice().floatValue();
             cancelledTotalPrice += price;
@@ -254,9 +250,6 @@ public class PurchaseServiceImpl implements PurchaseService {
             existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
             purchaseRepository.save(existingPurchase);
         }
-
-        //TODO saved the purchase,
-        // and the purchases are saved again and are not updated + check if the total price updates now?
 
         logger.info("Saving cancelled purchase: {}", cancelPurchase);
         purchaseCancelRepository.save(cancelPurchase);
