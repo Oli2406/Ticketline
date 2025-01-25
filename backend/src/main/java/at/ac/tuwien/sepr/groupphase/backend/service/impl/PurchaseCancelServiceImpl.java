@@ -1,14 +1,12 @@
 package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCancelDetailDto;
-import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Artist;
 import at.ac.tuwien.sepr.groupphase.backend.entity.CancelPurchase;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Location;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Performance;
-import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.repository.ArtistRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.LocationRepository;
@@ -21,7 +19,6 @@ import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.PurchaseCancelService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

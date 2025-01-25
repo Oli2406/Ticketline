@@ -181,9 +181,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         logger.info("updating purchase: {}", purchaseDetailDto);
         Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
-        List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
-        List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
-        List<Ticket> tickets = purchaseDetailDto.getTickets();
 
         List<Long> alreadyCancelledTickets = new ArrayList<>();
 
@@ -194,7 +191,9 @@ public class PurchaseServiceImpl implements PurchaseService {
             alreadyCancelledTickets = (existingCancellation.getTicketIds());
         }
 
-        double cancelledTotalPrice = 0;
+        List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
+        List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
+        List<Ticket> tickets = purchaseDetailDto.getTickets();
 
         for (Ticket ticket : tickets) {
             ticketIds.add(ticket.getTicketId());
@@ -217,6 +216,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
         }
 
+        double cancelledTotalPrice = 0;
         for (Long cancelTicket : alreadyCancelledTickets) {
             double price = this.ticketService.getTicketById(cancelTicket).getPrice().floatValue();
             cancelledTotalPrice += price;
@@ -242,7 +242,6 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         if (ticketIds.isEmpty()) {
             cancelledTickets.add(oldTickets.getFirst());
-            //alreadyCancelledTickets.add(oldTickets.getFirst());
             this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
             purchaseRepository.deleteById(existingPurchase.getPurchaseId());
         } else {
