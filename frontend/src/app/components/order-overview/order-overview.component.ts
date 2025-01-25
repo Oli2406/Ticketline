@@ -411,7 +411,6 @@ export class OrderOverviewComponent implements OnInit {
         tickets: matchingPurchase.tickets.filter((item) => item.ticketId !== ticket.ticketId)
       };
 
-      //TODO interject here to save the cancelled purchase???
       this.purchaseService.updatePurchase(updatedPurchase).subscribe({
         next: () => {
           this.generateCancelPurchasePDF();

@@ -140,6 +140,11 @@
                 <span><strong>Price:</strong> {{ ticket.price | currency }}</span>
               </div>
             </li>
+            <div class="cancel-button">
+              <button class="btn btn-primary" (click)="fetchPurchaseForInvoice(group.purchased)">
+                Download Invoice
+              </button>
+            </div>
           </ul>
         </div>
       </div>
@@ -267,7 +272,7 @@
         <div class="invoice-header">
           <h1>Invoice</h1>
           <div>
-            <p>Invoice Date: <strong>{{ setInvoiceDate() | date: 'yyyy-MM-dd' }}</strong></p>
+            <p>Invoice Date: <strong>{{ invoicePurchase.purchaseDate | date: 'yyyy-MM-dd' }}</strong></p>
             <p>Invoice Number: <strong>{{ setInvoiceNumber() }}</strong></p>
           </div>
         </div>
