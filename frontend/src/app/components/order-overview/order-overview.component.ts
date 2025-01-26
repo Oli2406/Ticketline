@@ -293,13 +293,33 @@ export class OrderOverviewComponent implements OnInit {
     );
   }
 
+  getPerformanceNameCancel(performanceId: number): string {
+    const purchase = this.findCancelPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.name || 'Unknown Performance';
+  }
+
+  getArtistNameCancel(performanceId: number): string {
+    const purchase = this.findCancelPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.artistName || 'Unknown Artist';
+  }
+
+  getPerformanceLocationCancel(performanceId: number): string {
+    const purchase = this.findCancelPurchaseByPerformanceId(performanceId);
+    return purchase?.performanceDetails[performanceId]?.locationName || 'Unknown Location';
+  }
+
+  private findCancelPurchaseByPerformanceId(performanceId: number): PurchaseDetailDto | undefined {
+    return this.userCancelPurchases.find(cancelPurchase =>
+      Object.keys(cancelPurchase.performanceDetails).some(id => Number(id) === performanceId)
+    );
+  }
+
   getTicketPerformanceForInvoice(performanceId: number): string {
     for (const purchase of this.userPurchases) {
       if (purchase.performanceDetails && purchase.performanceDetails[performanceId]) {
         return purchase.performanceDetails[performanceId].name;
       }
     }
-
     return 'Unknown Performance';
   }
 
