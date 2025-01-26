@@ -18,7 +18,6 @@ import {
 } from "../confirm-dialog/confirm-dialog.component";
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
-import {forEach} from "lodash";
 import {CancelpurchaseService} from "../../services/cancelpurchase.service";
 
 @Component({
@@ -119,7 +118,6 @@ export class OrderOverviewComponent implements OnInit {
       this.loadUserPurchases(userId);
       this.loadUserReservations(userId);
       this.loadUserCancelPurchases(userId);
-      console.log(this.alreadyCancelTickets);
       this.fetchUser();
       this.loadInvoiceCounter();
     } else {
@@ -188,7 +186,6 @@ export class OrderOverviewComponent implements OnInit {
     const cancelMap: { [key: string]: TicketDto[] } = {};
 
     cancelPurchases.forEach((cancelPurchase) => {
-      console.log(cancelPurchase);
       const purchaseDate = new Date(cancelPurchase.purchaseDate);
 
       cancelPurchase.tickets.forEach((ticket) => {
@@ -197,6 +194,7 @@ export class OrderOverviewComponent implements OnInit {
 
         if (!cancelMap[key]) {
           cancelMap[key] = [];
+          cancelMap[key].push(ticket);
         } else {
           cancelMap[key].push(ticket);
         }
@@ -322,10 +320,6 @@ export class OrderOverviewComponent implements OnInit {
     }
   }
 
-  saveInvoiceCounter(): void {
-    localStorage.setItem('invoiceCounter', this.invoiceCounter.toString());
-  }
-
   setInvoiceNumber(): string {
     return new Date().getFullYear().toString() + '-00' + this.invoiceCounter;
   }
@@ -371,7 +365,6 @@ export class OrderOverviewComponent implements OnInit {
 
   }
 
-
   cancelCompletePurchase(tickets: TicketDto[]) {
     this.cancelledTickets = tickets;
 
@@ -397,6 +390,7 @@ export class OrderOverviewComponent implements OnInit {
             this.generateCancelPurchasePDF();
             this.toastr.success('Purchase cancelled successfully.', 'Success');
             this.loadUserPurchases(this.authService.getUserIdFromToken());
+            this.loadUserCancelPurchases(this.authService.getUserIdFromToken());
           },
           error: (err) => {
             console.error('Error updating purchase:', err.message);
@@ -417,7 +411,6 @@ export class OrderOverviewComponent implements OnInit {
 
   cancelCompleteReservation(tickets: TicketDto[]) {
     this.cancelledTickets = tickets;
-    console.log(this.cancelledTickets);
 
     const matchingReservation = this.userReservations.find((reservation) =>
       reservation.tickets.some((reservedTicket) => reservedTicket.ticketId === tickets[0].ticketId)
@@ -478,6 +471,7 @@ export class OrderOverviewComponent implements OnInit {
           this.generateCancelPurchasePDF();
           this.toastr.success('Purchase cancelled successfully.', 'Success');
           this.loadUserPurchases(this.authService.getUserIdFromToken());
+          this.loadUserCancelPurchases(this.authService.getUserIdFromToken())
         },
         error: (err) => {
           console.error('Error updating purchase:', err.message);

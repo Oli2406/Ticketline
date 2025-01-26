@@ -161,7 +161,7 @@
 
       <div *ngIf="group.showDetails">
         <div class="ticket-section">
-          <h4>Purchased Tickets</h4>
+          <h4>Cancelled Tickets</h4>
           <ul>
             <li *ngFor="let ticket of group.cancel">
               <div class="ticket-details">
@@ -499,7 +499,7 @@
     [mode]="ConfirmationDialogMode.confirm"
     [message]="cancelMessagePurchase"
     (confirm)="cancelCompletePurchase(cancelledTickets)"
-    (cancel)="showConfirmDeletionDialogPTicket = false">
+    (cancel)="showConfirmDeletionDialogAllP = false">
   </app-confirm-dialog>
 }
 
@@ -517,7 +517,7 @@
     [mode]="ConfirmationDialogMode.confirm"
     [message]="cancelMessageReservation"
     (confirm)="cancelCompleteReservation(cancelledTickets)"
-    (cancel)="showConfirmDeletionDialogPTicket = false">
+    (cancel)="showConfirmDeletionDialogAllRes = false">
   </app-confirm-dialog>
 }
 
