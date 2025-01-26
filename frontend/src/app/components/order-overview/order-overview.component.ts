@@ -18,6 +18,7 @@ import {
 } from "../confirm-dialog/confirm-dialog.component";
 import {TicketService} from "../../services/ticket.service";
 import {CartService} from "../../services/cart.service";
+import {CancelpurchaseService} from "../../services/cancelpurchase.service";
 
 @Component({
   selector: 'app-order-overview',
@@ -35,12 +36,14 @@ export class OrderOverviewComponent implements OnInit {
   }[] = [];
   purchasedTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
   pastTickets: { date: Date; purchased: TicketDto[]; showDetails: boolean }[] = [];
+  alreadyCancelTickets: { date: Date; cancel: TicketDto[]; showDetails: boolean }[] = [];
   performanceNames: { [performanceId: number]: PerformanceListDto } = {};
   performanceDate: Date;
   artistCache: { [artistId: number]: string } = {};
   performanceLocations: { [locationId: number]: string } = {};
   userPurchases: PurchaseDetailDto[] = [];
   userReservations: ReservationDetailDto[] = [];
+  userCancelPurchases: PurchaseDetailDto[] = [];
   cancelledPurchase: PurchaseListDto;
   cancelledReservation: ReservationListDto;
   cancelledTicket: TicketDto = {
@@ -58,7 +61,8 @@ export class OrderOverviewComponent implements OnInit {
     date: new Date(),
     reservedUntil: ''
   };
-  cancelledTickets: TicketDto[];
+  cancelledTickets = [];
+  cancelledTicketsPrice = 0;
 
   invoiceTickets: TicketDto[];
   invoicePurchase: PurchaseListDto = {
@@ -83,6 +87,7 @@ export class OrderOverviewComponent implements OnInit {
   userLastName: string;
   userEmail: string;
   invoiceCounter: number = 1;
+  cancelInvDownload = false;
 
   ConfirmationDialogMode = ConfirmationDialogMode;
   showConfirmDeletionDialogPTicket = false;
@@ -102,7 +107,8 @@ export class OrderOverviewComponent implements OnInit {
     private artistService: ArtistService,
     private receiptService: ReceiptService,
     private ticketService: TicketService,
-    private cartService: CartService
+    private cartService: CartService,
+    private cancelPurchaseService: CancelpurchaseService
   ) {
   }
 
@@ -111,6 +117,7 @@ export class OrderOverviewComponent implements OnInit {
     if (userId) {
       this.loadUserPurchases(userId);
       this.loadUserReservations(userId);
+      this.loadUserCancelPurchases(userId);
       this.fetchUser();
       this.loadInvoiceCounter();
     } else {
@@ -144,6 +151,15 @@ export class OrderOverviewComponent implements OnInit {
     });
   }
 
+  loadUserCancelPurchases(userId: string): void {
+    this.cancelPurchaseService.getPurchaseDetailsByUser(userId).subscribe({
+      next: (details: PurchaseDetailDto[]) => {
+        this.userCancelPurchases = details;
+        this.processCancelPurchase(details);
+      }
+    })
+  }
+
   getPerformanceNameOfReservation(performanceId: number): string {
     const reservation = this.findReservationByPerformanceId(performanceId);
     return reservation?.performanceDetails[performanceId]?.name || 'Unknown Performance';
@@ -163,6 +179,35 @@ export class OrderOverviewComponent implements OnInit {
     return this.userReservations.find(reservation =>
       Object.keys(reservation.performanceDetails).some(id => Number(id) === performanceId)
     );
+  }
+
+  private processCancelPurchase(cancelPurchases: PurchaseListDto[]) {
+    const today = new Date();
+    const cancelMap: { [key: string]: TicketDto[] } = {};
+
+    cancelPurchases.forEach((cancelPurchase) => {
+      const purchaseDate = new Date(cancelPurchase.purchaseDate);
+
+      cancelPurchase.tickets.forEach((ticket) => {
+        const eventDate = new Date(ticket.date);
+        const key = purchaseDate.toISOString();
+
+        if (!cancelMap[key]) {
+          cancelMap[key] = [];
+          cancelMap[key].push(ticket);
+        } else {
+          cancelMap[key].push(ticket);
+        }
+      })
+    })
+
+    this.alreadyCancelTickets = Object.entries(cancelMap)
+    .map(([date, tickets]) => ({
+      date: new Date(date),
+      cancel: tickets,
+      showDetails: false,
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
   }
 
   private processPurchases(purchases: PurchaseListDto[]): void {
@@ -275,10 +320,6 @@ export class OrderOverviewComponent implements OnInit {
     }
   }
 
-  saveInvoiceCounter(): void {
-    localStorage.setItem('invoiceCounter', this.invoiceCounter.toString());
-  }
-
   setInvoiceNumber(): string {
     return new Date().getFullYear().toString() + '-00' + this.invoiceCounter;
   }
@@ -286,6 +327,7 @@ export class OrderOverviewComponent implements OnInit {
 
   fetchPurchaseForInvoice(tickets: TicketDto[]) {
     this.invoiceTickets = tickets;
+    this.cancelInvDownload = false;
 
     const matchingPurchase = this.userPurchases.find((purchase) =>
       purchase.tickets.some((purchaseTicket) => purchaseTicket.ticketId === tickets[0].ticketId)
@@ -302,6 +344,27 @@ export class OrderOverviewComponent implements OnInit {
     }
   }
 
+  fetchCancelPurchaseForInvoice(tickets: TicketDto[]) {
+    this.invoiceTickets = tickets;
+    this.cancelInvDownload = true;
+
+
+    const matchingPurchase = this.userCancelPurchases.find((purchase) =>
+      purchase.tickets.some((purchaseTicket) => purchaseTicket.ticketId === tickets[0].ticketId)
+    );
+
+    if (matchingPurchase) {
+      this.invoicePurchase = matchingPurchase;
+      this.invoiceTickets = matchingPurchase.tickets;
+
+      this.toastr.info('Downloading Invoice.', 'Download');
+      this.generateDownloadPDF();
+    } else {
+      this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
+    }
+
+  }
+
   cancelCompletePurchase(tickets: TicketDto[]) {
     this.cancelledTickets = tickets;
 
@@ -310,20 +373,34 @@ export class OrderOverviewComponent implements OnInit {
     );
 
     if (matchingPurchase) {
-      this.cancelledPurchase = { ...matchingPurchase };
+      this.cancelledPurchase = {...matchingPurchase};
       this.cancelledPurchase.tickets = [];
 
-      this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
-        next: () => {
-          this.toastr.success('Purchase cancelled successfully.', 'Success');
-          this.loadUserPurchases(this.authService.getUserIdFromToken());
-          // Optional: PDF generieren
-          // this.generateCancelPurchasePDF();
-        },
-        error: (err) => {
-          console.error('Error updating purchase:', err.message);
-          this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
-        }
+      const updatePromises = tickets.map(ticket =>
+        this.ticketService.updateTicket(ticket.ticketId, {
+          ...ticket,
+          status: 'AVAILABLE',
+        }).toPromise()
+      );
+
+      Promise.all(updatePromises)
+      .then(() => {
+        this.purchaseService.updatePurchase(this.cancelledPurchase).subscribe({
+          next: () => {
+            this.generateCancelPurchasePDF();
+            this.toastr.success('Purchase cancelled successfully.', 'Success');
+            this.loadUserPurchases(this.authService.getUserIdFromToken());
+            this.loadUserCancelPurchases(this.authService.getUserIdFromToken());
+          },
+          error: (err) => {
+            console.error('Error updating purchase:', err.message);
+            this.toastr.error('Failed to cancel the purchase. Please try again.', 'Error');
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating tickets:', error.message);
+        this.toastr.error('Failed to update tickets. Please try again.', 'Error');
       });
     } else {
       this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
@@ -340,25 +417,37 @@ export class OrderOverviewComponent implements OnInit {
     );
 
     if (matchingReservation) {
-      this.cancelledReservation = { ...matchingReservation, tickets: [] };
+      this.cancelledReservation = {...matchingReservation, tickets: []};
 
-      this.reservationService.updateReservation(this.cancelledReservation).subscribe({
-        next: () => {
-          this.toastr.success('Reservation cancelled successfully.', 'Success');
-          this.loadUserReservations(this.authService.getUserIdFromToken());
-        },
-        error: (err) => {
-          console.error('Error updating reservation:', err.message);
-          this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
-        },
+      const updatePromises = tickets.map(ticket =>
+        this.ticketService.updateTicket(ticket.ticketId, {
+          ...ticket,
+          status: 'AVAILABLE',
+        }).toPromise()
+      );
+
+      Promise.all(updatePromises)
+      .then(() => {
+        this.reservationService.updateReservation(this.cancelledReservation).subscribe({
+          next: () => {
+            this.toastr.success('Reservation cancelled successfully.', 'Success');
+            this.loadUserReservations(this.authService.getUserIdFromToken());
+          },
+          error: (err) => {
+            console.error('Error updating reservation:', err.message);
+            this.toastr.error('Failed to cancel the reservation. Please try again.', 'Error');
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error updating tickets:', error.message);
+        this.toastr.error('Failed to update tickets. Please try again.', 'Error');
       });
     } else {
-      this.toastr.error('No matching reservation found for the provided tickets.', 'Error');
+      this.toastr.error('No matching purchase found for the provided tickets.', 'Error');
     }
-
     this.showConfirmDeletionDialogAllRes = false;
   }
-
 
   cancelPurchasedTicket(ticket: TicketDto) {
     this.cancelledTicket = ticket;
@@ -382,6 +471,7 @@ export class OrderOverviewComponent implements OnInit {
           this.generateCancelPurchasePDF();
           this.toastr.success('Purchase cancelled successfully.', 'Success');
           this.loadUserPurchases(this.authService.getUserIdFromToken());
+          this.loadUserCancelPurchases(this.authService.getUserIdFromToken())
         },
         error: (err) => {
           console.error('Error updating purchase:', err.message);
@@ -391,7 +481,6 @@ export class OrderOverviewComponent implements OnInit {
     } else {
       this.toastr.error('No matching purchase found for the selected ticket.', 'Error');
     }
-
     this.showConfirmDeletionDialogPTicket = false;
   }
 
@@ -430,6 +519,7 @@ export class OrderOverviewComponent implements OnInit {
 
   showCancelMessagePurchase(ticket: TicketDto) {
     this.showConfirmDeletionDialogPTicket = true;
+    this.cancelledTickets[0] = ticket;
     this.cancelledTicket = ticket;
   }
 
@@ -475,7 +565,6 @@ export class OrderOverviewComponent implements OnInit {
   }
 
 
-
   private removeTicketFromReservations(ticket: TicketDto): void {
     this.reservedTickets.forEach((group, groupIndex) => {
       const ticketIndex = group.reserved.findIndex((t) => t.ticketId === ticket.ticketId);
@@ -505,5 +594,16 @@ export class OrderOverviewComponent implements OnInit {
 
   public generateCancelPurchasePDF(): void {
     this.receiptService.exportToPDF();
+  }
+
+  public getCancelTicketsPrice(tickets: TicketDto[]) {
+    this.cancelledTickets = tickets;
+    let totalPrice = 0;
+
+    this.cancelledTickets.forEach((ticket) => totalPrice += ticket.price);
+
+    this.cancelledTicketsPrice = totalPrice;
+    return totalPrice;
+
   }
 }

@@ -177,6 +177,7 @@ body {
 }
 
 .invoice-container {
+  page-break-inside: auto;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
@@ -186,12 +187,17 @@ body {
 }
 
 .invoice-container-download {
+  page-break-inside: auto;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   max-width: 800px;
   margin: auto;
+}
+
+.page-break {
+  page-break-before: always;
 }
 
 .invoice-header {
