@@ -303,5 +303,15 @@ export class SearchComponent implements AfterViewInit {
     }
   }
 
+  paginationRange: number = 5;
+
+  get paginationButtons(): number[] {
+    const start = Math.max(1, this.currentPage - Math.floor(this.paginationRange / 2));
+    const end = Math.min(this.totalPages, start + this.paginationRange - 1);
+    const adjustedStart = Math.max(1, end - this.paginationRange + 1);
+
+    return Array.from({ length: end - adjustedStart + 1 }, (_, i) => adjustedStart + i);
+  }
+
   protected readonly SearchType = SearchType;
 }

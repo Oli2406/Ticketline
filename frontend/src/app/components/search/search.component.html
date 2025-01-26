@@ -1,31 +1,31 @@
 <div class="button-group mt-3 text-center">
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
     (click)="changeSearchType(SearchType.event)">
     event
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
     (click)="changeSearchType(SearchType.artist)">
     artist
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
     (click)="changeSearchType(SearchType.location)">
     location
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
     (click)="changeSearchType(SearchType.performance)">
     performance
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
     (click)="changeSearchType(SearchType.advanced)">
     advanced
   </button>
@@ -413,8 +413,8 @@
   </tbody>
 </table>
 
-<!-- Pagination Controls -->
 <div class="pagination my-4 d-flex justify-content-center">
+  <!-- Previous Button -->
   <button
     class="btn btn-light me-2"
     (click)="goToPage(currentPage - 1)"
@@ -423,17 +423,47 @@
     &larr;
   </button>
 
-  <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+  <!-- First Page Button -->
+  <button
+    *ngIf="paginationButtons[0] > 1"
+    class="btn me-2"
+    (click)="goToPage(1)"
+    [class.active]="currentPage === 1"
+    [ngClass]="{ 'btn-primary bg-purp': currentPage === 1, 'btn-light': currentPage !== 1 }"
+  >
+    1
+  </button>
+
+  <!-- Ellipsis for pages before the range -->
+  <span *ngIf="paginationButtons[0] > 2" class="me-2">...</span>
+
+  <!-- Dynamic Pagination Buttons -->
+  <ng-container *ngFor="let page of paginationButtons">
     <button
       class="btn me-2"
-      (click)="goToPage(i + 1)"
-      [class.active]="currentPage === i + 1"
-      [ngClass]="{ 'btn-primary': currentPage === i + 1, 'btn-light': currentPage !== i + 1 }"
+      (click)="goToPage(page)"
+      [class.active]="currentPage === page"
+      [ngClass]="{ 'btn-primary bg-purp': currentPage === page, 'btn-light': currentPage !== page }"
     >
-      {{ i + 1 }}
+      {{ page }}
     </button>
   </ng-container>
 
+  <!-- Ellipsis for pages after the range -->
+  <span *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages - 1" class="me-2">...</span>
+
+  <!-- Last Page Button -->
+  <button
+    *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages"
+    class="btn me-2"
+    (click)="goToPage(totalPages)"
+    [class.active]="currentPage === totalPages"
+    [ngClass]="{ 'btn-primary bg-purp': currentPage === totalPages, 'btn-light': currentPage !== totalPages }"
+  >
+    {{ totalPages }}
+  </button>
+
+  <!-- Next Button -->
   <button
     class="btn btn-light"
     (click)="goToPage(currentPage + 1)"
