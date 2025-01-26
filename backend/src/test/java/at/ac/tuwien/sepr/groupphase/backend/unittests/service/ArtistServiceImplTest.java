@@ -125,4 +125,97 @@ public class ArtistServiceImplTest {
         verify(artistRepository, times(1)).findAll();
         verify(artistMapper, never()).artistToArtistDetailDto(any(Artist.class));
     }
+
+    @Test
+    void getArtistById_ShouldReturnArtist_WhenValidId() {
+        Artist artist = new Artist("John", "Doe", "JohnDoe");
+        artist.setArtistId(1L);
+        when(artistRepository.findById(1L)).thenReturn(Optional.of(artist));
+        when(artistMapper.artistToArtistDetailDto(artist)).thenReturn(
+            new ArtistDetailDto(1L, "John", "Doe", "JohnDoe")
+        );
+
+        ArtistDetailDto result = artistService.getArtistById(1L);
+
+        assertNotNull(result, "Artist should not be null");
+        assertEquals("JohnDoe", result.getArtistName(), "Artist name should match");
+
+        verify(artistRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void deleteArtist_ShouldRemoveArtist_WhenValidId() {
+        Long artistId = 1L;
+        when(artistRepository.existsById(artistId)).thenReturn(true);
+        doNothing().when(artistRepository).deleteById(artistId);
+
+        artistService.deleteArtist(artistId);
+
+        verify(artistRepository, times(1)).deleteById(artistId);
+    }
+
+    @Test
+    void deleteArtist_ShouldThrowException_WhenArtistNotFound() {
+        Long artistId = 999L;
+        when(artistRepository.existsById(artistId)).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+            () -> artistService.deleteArtist(artistId),
+            "Should throw exception when trying to delete a non-existent artist");
+
+        assertEquals("Artist not found with ID: 999", exception.getMessage());
+        verify(artistRepository, never()).deleteById(artistId);
+    }
+
+    @Test
+    void searchArtistByFullNameReturnsMatchingArtists() {
+        Artist artist = new Artist("John", "Doe", "JohnDoe");
+        when(artistRepository.findAll()).thenReturn(List.of(artist));
+        when(artistMapper.artistToArtistDetailDto(artist)).thenReturn(
+            new ArtistDetailDto(1L, "John", "Doe", "JohnDoe")
+        );
+
+        ArtistSearchDto searchDto = new ArtistSearchDto("John", "Doe", null);
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return one matching artist");
+        assertEquals("JohnDoe", result.getFirst().getArtistName(), "Artist name should match");
+
+        verify(artistRepository, times(1)).findAll();
+    }
+
+    @Test
+    void searchArtistByLastNameReturnsMatchingArtists() {
+        Artist artist = new Artist("Jane", "Doe", "JaneDoe");
+        when(artistRepository.findAll()).thenReturn(List.of(artist));
+        when(artistMapper.artistToArtistDetailDto(artist)).thenReturn(
+            new ArtistDetailDto(2L, "Jane", "Doe", "JaneDoe")
+        );
+
+        ArtistSearchDto searchDto = new ArtistSearchDto(null, "Doe", null);
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return one matching artist");
+        assertEquals("JaneDoe", result.getFirst().getArtistName(), "Artist name should match");
+
+        verify(artistRepository, times(1)).findAll();
+    }
+
+    @Test
+    void searchArtistByArtistNameReturnsMatchingArtists() {
+        Artist artist = new Artist("John", "Smith", "JohnSmith");
+        when(artistRepository.findAll()).thenReturn(List.of(artist));
+        when(artistMapper.artistToArtistDetailDto(artist)).thenReturn(
+            new ArtistDetailDto(3L, "John", "Smith", "JohnSmith")
+        );
+
+        ArtistSearchDto searchDto = new ArtistSearchDto(null, null, "JohnSmith");
+        List<ArtistDetailDto> result = artistService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return one matching artist");
+        assertEquals("JohnSmith", result.getFirst().getArtistName(), "Artist name should match");
+
+        verify(artistRepository, times(1)).findAll();
+    }
+
 }

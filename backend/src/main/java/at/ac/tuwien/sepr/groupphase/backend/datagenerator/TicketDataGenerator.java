@@ -17,8 +17,12 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Component
 @Profile("generateData")
@@ -26,7 +30,8 @@ import java.util.Random;
 public class TicketDataGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TicketDataGenerator.class);
-
+    private static final String[] STATUSES = {"AVAILABLE", "RESERVED", "SOLD"};
+    private static final int BATCH_SIZE = 1000;
     private final TicketRepository ticketRepository;
     private final PerformanceRepository performanceRepository;
     private final Random random = new Random();
@@ -45,98 +50,137 @@ public class TicketDataGenerator {
             return;
         }
 
-        for (Performance performance : performances) {
-            createTicketsForPerformance(performance);
-        }
-        LOGGER.info("Generated all tickets");
+        // Parallelize ticket generation for performances
+        performances.parallelStream().forEach(this::createTicketsForPerformance);
+        LOGGER.info("Generated tickets for all performances");
     }
 
     private void createTicketsForPerformance(Performance performance) {
-        String hall = performance.getHall();
+        // Fetch existing tickets for the performance
+        Set<String> existingTicketKeys = fetchExistingTicketKeys(performance.getPerformanceId());
         List<Ticket> tickets = new ArrayList<>();
 
-        if ("A".equals(hall)) {
-            for (int row = 1; row <= 12; row++) {
-                for (int seat = 1; seat <= 20; seat++) {
-                    createTicketIfNotExists(performance, row, seat, PriceCategory.PREMIUM, TicketType.SEATED, SectorType.B, BigDecimal.valueOf(120), Hall.A, tickets);
-                }
-            }
+        if ("A".equals(performance.getHall())) {
+            // Generate seated tickets for Hall A
+            tickets.addAll(generateSeatedTickets(performance, 12, 20, PriceCategory.PREMIUM, SectorType.B, BigDecimal.valueOf(120), Hall.A, existingTicketKeys));
+            tickets.addAll(generateSeatedTickets(performance, 12, 20, PriceCategory.PREMIUM, SectorType.C, BigDecimal.valueOf(120), Hall.A, existingTicketKeys));
 
-            for (int row = 1; row <= 12; row++) {
-                for (int seat = 1; seat <= 20; seat++) {
-                    createTicketIfNotExists(performance, row, seat, PriceCategory.PREMIUM, TicketType.SEATED, SectorType.C, BigDecimal.valueOf(120), Hall.A, tickets);
-                }
-            }
+            // Generate standing tickets for Hall A
+            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(150), Hall.A));
+            tickets.addAll(generateStandingTickets(performance, 100, PriceCategory.STANDARD, SectorType.A, BigDecimal.valueOf(80), Hall.A));
+        } else if ("B".equals(performance.getHall())) {
+            // Generate seated tickets for Hall B
+            tickets.addAll(generateSeatedTickets(performance, 3, 14, PriceCategory.PREMIUM, SectorType.B, BigDecimal.valueOf(80), Hall.B, existingTicketKeys));
+            tickets.addAll(generateDynamicSeatedTickets(performance, 9, 14, PriceCategory.STANDARD, SectorType.C, BigDecimal.valueOf(60), Hall.B, existingTicketKeys));
 
-            for (int i = 1; i <= 80; i++) {
-                createTicketIfNotExists(performance, 0, 0, PriceCategory.VIP, TicketType.STANDING, SectorType.A, BigDecimal.valueOf(150), Hall.A, tickets);
-            }
-
-            for (int i = 1; i <= 100; i++) {
-                createTicketIfNotExists(performance, 0, 0, PriceCategory.STANDARD, TicketType.STANDING, SectorType.A, BigDecimal.valueOf(80), Hall.A, tickets);
-            }
-        } else if ("B".equals(hall)) {
-            for (int row = 1; row <= 3; row++) {
-                for (int seat = 1; seat <= 14; seat++) {
-                    createTicketIfNotExists(performance, row, seat, PriceCategory.PREMIUM, TicketType.SEATED, SectorType.B, BigDecimal.valueOf(80), Hall.B, tickets);
-                }
-            }
-
-            for (int row = 1; row <= 9; row++) {
-                int seatsInRow = 14 + row;
-                for (int seat = 1; seat <= seatsInRow; seat++) {
-                    createTicketIfNotExists(performance, row, seat, PriceCategory.STANDARD, TicketType.SEATED, SectorType.C, BigDecimal.valueOf(60), Hall.B, tickets);
-                }
-            }
-
-            for (int i = 1; i <= 80; i++) {
-                createTicketIfNotExists(performance, 0, 0, PriceCategory.PREMIUM, TicketType.STANDING, SectorType.A, BigDecimal.valueOf(70), Hall.B, tickets);
-            }
-
-            for (int i = 1; i <= 60; i++) {
-                createTicketIfNotExists(performance, 0, 0, PriceCategory.VIP, TicketType.STANDING, SectorType.A, BigDecimal.valueOf(100), Hall.B, tickets);
-            }
+            // Generate standing tickets for Hall B
+            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.PREMIUM, SectorType.A, BigDecimal.valueOf(70), Hall.B));
+            tickets.addAll(generateStandingTickets(performance, 60, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(100), Hall.B));
         }
 
-        ticketRepository.saveAll(tickets);
-        LOGGER.debug("Generated {} tickets for performance {} in hall {}", tickets.size(), performance.getName(), hall);
+        // Calculate total tickets for this performance
+        int totalTickets = tickets.size();
+
+        // Generate a custom status distribution for this performance
+        int[] statusDistribution = getStatusDistribution(totalTickets);
+
+        // Apply the status distribution to the tickets
+        applyStatusDistribution(tickets, statusDistribution);
+
+        saveTicketsInBatches(tickets);
+        LOGGER.debug("Generated {} tickets for performance '{}' in hall {}", tickets.size(), performance.getName(), performance.getHall());
     }
 
-    private void createTicketIfNotExists(Performance performance, int row, int seat, PriceCategory priceCategory,
-                                         TicketType ticketType, SectorType sectorType, BigDecimal price, Hall hall, List<Ticket> tickets) {
+    private Set<String> fetchExistingTicketKeys(Long performanceId) {
+        return ticketRepository.findByPerformanceId(performanceId).stream()
+            .map(ticket -> ticket.getRowNumber() + "-" + ticket.getSeatNumber())
+            .collect(Collectors.toSet());
+    }
 
-        // Check if a ticket with the same properties already exists
-        if (!ticketRepository.existsByPerformanceIdAndRowNumberAndSeatNumber(performance.getPerformanceId(), row, seat)) {
+    private List<Ticket> generateSeatedTickets(Performance performance, int rows, int seats, PriceCategory priceCategory, SectorType sectorType, BigDecimal price, Hall hall,
+                                               Set<String> existingTicketKeys) {
+        List<Ticket> tickets = new ArrayList<>();
+        for (int row = 1; row <= rows; row++) {
+            for (int seat = 1; seat <= seats; seat++) {
+                String ticketKey = row + "-" + seat;
+                if (!existingTicketKeys.contains(ticketKey)) {
+                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.SEATED, sectorType, price, hall));
+                }
+            }
+        }
+        return tickets;
+    }
 
-            tickets.add(new Ticket(
-                performance.getPerformanceId(),
-                row,
-                seat,
-                priceCategory,
-                ticketType,
-                sectorType,
-                price,
-                getRandomTicketStatus(),
-                hall,
-                1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
-                performance.getDate()
-            ));
+    private List<Ticket> generateDynamicSeatedTickets(Performance performance, int rows, int baseSeats, PriceCategory priceCategory, SectorType sectorType, BigDecimal price, Hall hall,
+                                                      Set<String> existingTicketKeys) {
+        List<Ticket> tickets = new ArrayList<>();
+        for (int row = 1; row <= rows; row++) {
+            int seatsInRow = baseSeats + row;
+            for (int seat = 1; seat <= seatsInRow; seat++) {
+                String ticketKey = row + "-" + seat;
+                if (!existingTicketKeys.contains(ticketKey)) {
+                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.SEATED, sectorType, price, hall));
+                }
+            }
+        }
+        return tickets;
+    }
+
+    private List<Ticket> generateStandingTickets(Performance performance, int count, PriceCategory priceCategory,
+                                                 SectorType sectorType, BigDecimal price, Hall hall) {
+        return IntStream.range(0, count)
+            .mapToObj(i -> createTicket(performance, 0, 0, priceCategory, TicketType.STANDING, sectorType, price, hall))
+            .collect(Collectors.toList());
+    }
+
+    private Ticket createTicket(Performance performance, int row, int seat, PriceCategory priceCategory, TicketType ticketType,
+                                SectorType sectorType, BigDecimal price, Hall hall) {
+        return new Ticket(
+            performance.getPerformanceId(),
+            row,
+            seat,
+            priceCategory,
+            ticketType,
+            sectorType,
+            price,
+            "AVAILABLE", // Status will be set later in applyStatusDistribution
+            hall,
+            1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
+            performance.getDate()
+        );
+    }
+
+    private void saveTicketsInBatches(List<Ticket> tickets) {
+        for (int i = 0; i < tickets.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, tickets.size());
+            ticketRepository.saveAll(tickets.subList(i, end));
         }
     }
 
-    private int getTicketCountByHall(String hall) {
-        switch (hall) {
-            case "A":
-                return 660; // Hall A capacity
-            case "B":
-                return 353; // Hall B capacity
-            default:
-                return 100; // Default capacity for unknown halls
-        }
+    private int[] getStatusDistribution(int totalTickets) {
+        Random statusRandom = new Random();
+        int[] distribution = new int[STATUSES.length];
+
+        int soldPercentage = statusRandom.nextInt(101);
+        distribution[2] = (int) (totalTickets * (soldPercentage / 100.0)); // SOLD
+        int remaining = totalTickets - distribution[2];
+        distribution[1] = statusRandom.nextInt(remaining + 1); // RESERVED
+        distribution[0] = remaining - distribution[1]; // AVAILABLE
+
+        return distribution;
     }
 
-    private String getRandomTicketStatus() {
-        String[] statuses = {"AVAILABLE", "RESERVED", "SOLD"};
-        return statuses[random.nextInt(statuses.length)];
+    private void applyStatusDistribution(List<Ticket> tickets, int[] distribution) {
+        Collections.shuffle(tickets, random);
+
+        int index = 0;
+        for (int i = 0; i < STATUSES.length; i++) {
+            for (int j = 0; j < distribution[i]; j++) {
+                if (index < tickets.size()) {
+                    tickets.get(index).setStatus(STATUSES[i]);
+                    index++;
+                }
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package at.ac.tuwien.sepr.groupphase.backend.unittests.endpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.ReservedEndpoint;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservationOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Reservation;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.enums.PriceCategory;
@@ -14,21 +15,17 @@ import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
 import at.ac.tuwien.sepr.groupphase.backend.service.ReservedService;
 import at.ac.tuwien.sepr.groupphase.backend.service.TicketService;
-import at.ac.tuwien.sepr.groupphase.backend.service.impl.ReservedServiceImpl;
-import org.hibernate.Remove;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -118,21 +115,18 @@ public class ReservedEndpointTest {
 
     @Test
     void testCreateReservationSuccessful() throws ValidationException {
-        // Arrange
         String userId = "user123";
         LocalDateTime reservedDate = LocalDateTime.now();
         List<Long> ticketIds = List.of(1L, 2L, 3L);
 
         ReservedCreateDto createDto = new ReservedCreateDto(userId, reservedDate, ticketIds);
 
-        // Mock available tickets
         List<Ticket> availableTickets = List.of(
             createMockTicketWithStatus(1L, 1, 1, "AVAILABLE"),
             createMockTicketWithStatus(2L, 1, 2, "AVAILABLE"),
             createMockTicketWithStatus(3L, 1, 3, "AVAILABLE")
         );
 
-        // Mock reserved tickets
         List<Ticket> reservedTickets = List.of(
             createMockTicketWithStatus(1L, 1, 1, "RESERVED"),
             createMockTicketWithStatus(2L, 1, 2, "RESERVED"),
@@ -149,10 +143,8 @@ public class ReservedEndpointTest {
         when(ticketRepository.saveAll(anyList())).thenReturn(reservedTickets);
         when(reservedRepository.save(any(Reservation.class))).thenReturn(mockReservation);
 
-        // Act
         ResponseEntity<ReservedDetailDto> response = reservedEndpoint.createReservation(createDto);
 
-        // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertNull(response.getBody());
     }
@@ -200,5 +192,38 @@ public class ReservedEndpointTest {
 
         assertEquals(204, response.getStatusCodeValue());
         verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
+    }
+
+    @Test
+    void testDeleteTicketFromReservationNotFound() {
+        Long reservationId = 1L;
+        Long ticketId = 2L;
+
+        doThrow(new RuntimeException("Reservation or Ticket not found"))
+            .when(reservedService)
+            .deleteTicketFromReservation(reservationId, ticketId);
+
+        assertThrows(
+            RuntimeException.class,
+            () -> reservedEndpoint.deleteTicketFromReservation(reservationId, ticketId)
+        );
+
+        verify(reservedService, times(1)).deleteTicketFromReservation(reservationId, ticketId);
+    }
+
+    @Test
+    void testCreateReservationWithInvalidInput() throws ValidationException {
+        ReservedCreateDto createDto = new ReservedCreateDto("invalidUser123", LocalDateTime.now(), List.of(1L, 2L));
+
+        doThrow(new ValidationException("Invalid user ID", List.of("User ID could not be resolved.")))
+            .when(reservedService)
+            .createReservation(any(ReservedCreateDto.class));
+
+        assertThrows(
+            ValidationException.class,
+            () -> reservedEndpoint.createReservation(createDto)
+        );
+
+        verify(reservedService, times(1)).createReservation(createDto);
     }
 }

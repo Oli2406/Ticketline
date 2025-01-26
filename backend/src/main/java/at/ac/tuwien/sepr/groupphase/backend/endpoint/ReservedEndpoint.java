@@ -1,5 +1,6 @@
 package at.ac.tuwien.sepr.groupphase.backend.endpoint;
 
+import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservationOverviewDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.ReservedDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
@@ -93,6 +94,21 @@ public class ReservedEndpoint {
         reservedService.deleteTicketFromReservation(reservationId, ticketId);
         LOG.info("Successfully deleted ticket {} from reservation {}", ticketId, reservationId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PermitAll
+    @GetMapping("/details/{encryptedUserId}")
+    public ResponseEntity<List<ReservationOverviewDto>> getReservationDetailsByUser(
+        @PathVariable String encryptedUserId) {
+        LOG.info("Fetching detailed reservations for user with encrypted ID: {}", encryptedUserId);
+
+        Long userId = randomStringGenerator.retrieveOriginalId(encryptedUserId)
+            .orElseThrow(() -> new RuntimeException("User not found for the given encrypted ID"));
+
+        List<ReservationOverviewDto> reservationDetails = reservedService.getReservationDetailsByUser(userId);
+
+        LOG.info("Fetched {} detailed reservations for user with ID: {}", reservationDetails.size(), userId);
+        return ResponseEntity.ok(reservationDetails);
     }
 }
 

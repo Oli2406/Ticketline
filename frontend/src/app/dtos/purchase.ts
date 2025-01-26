@@ -25,3 +25,22 @@ export interface PurchaseListDto {
   postalCode: string;
   city: string;
 }
+
+export interface PurchaseDetailDto {
+  purchaseId: number;
+  userId: number;
+  tickets: TicketDto[];
+  merchandises: Merchandise[];
+  totalPrice: number;
+  purchaseDate: Date;
+  street: string;
+  postalCode: string;
+  city: string;
+  performanceDetails: {
+    [performanceId: number]: {
+      name: string;
+      artistName: string;
+      locationName: string;
+    };
+  };
+}

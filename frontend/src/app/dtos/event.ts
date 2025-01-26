@@ -29,6 +29,4 @@ export interface EventSalesDto {
   eventId: number;
   eventTitle: string;
   soldTickets: number;
-  totalTickets: number;
-  soldPercentage: number;
 }

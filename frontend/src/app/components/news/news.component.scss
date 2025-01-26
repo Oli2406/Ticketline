@@ -56,28 +56,6 @@ h1 {
   font-size: 0.9rem;
 }
 
-.pagination button {
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.pagination button:hover {
-  background-color: #d6caff;
-}
-
-.pagination button:disabled {
-  background-color: #ececec;
-  cursor: not-allowed;
-}
-
-.pagination button.active {
-  background-color: #6a5acd;
-  color: white;
-  font-weight: bold;
-  border-color: #6a5acd;
+.bg-purp {
+  background-color: #4D47C3;
 }

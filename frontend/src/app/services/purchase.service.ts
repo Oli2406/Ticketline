@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Globals } from '../global/globals';
-import { Purchase, PurchaseListDto } from '../dtos/purchase';
+import {Purchase, PurchaseDetailDto, PurchaseListDto} from '../dtos/purchase';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +19,16 @@ export class PurchaseService {
   getPurchasesByUser(encryptedUserId: string): Observable<PurchaseListDto[]> {
     const url = `${this.apiUrl}/user/${encryptedUserId}`;
     return this.http.get<PurchaseListDto[]>(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Get all detailed purchases for a specific user by userId
+   */
+  getPurchaseDetailsByUser(encryptedUserId: string): Observable<PurchaseDetailDto[]> {
+    const url = `${this.apiUrl}/details/${encryptedUserId}`;
+    return this.http.get<PurchaseDetailDto[]>(url).pipe(
       catchError(this.handleError)
     );
   }
@@ -61,20 +71,7 @@ export class PurchaseService {
     let cleanedError = 'An unexpected error occurred.';
     if (error.error) {
       if (error.error.errors) {
-        try {
-          const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');
-          const errors = rawDetails.split(/(?=[A-Z])/);
-          const cleanedErrors = errors.map((err) =>
-            err.replace(/,\s*$/, '').trim()
-          );
-          cleanedError = cleanedErrors.join('\n');
-        } catch {
-          cleanedError = error.error.details;
-        }
-      } else if (typeof error.error === 'string') {
-        cleanedError = error.error;
-      } else if (error.error.message) {
-        cleanedError = error.error.message;
+        cleanedError = error.error.errors;
       }
     }
     return throwError(() => new Error(cleanedError));

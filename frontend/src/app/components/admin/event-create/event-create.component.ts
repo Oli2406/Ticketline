@@ -403,10 +403,8 @@ export class EventCreateComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error during event creation:', err);
-            // Lösche alle erstellten Performances im Backend
             if (this.eventData.performanceIds.length > 0) {
               const deletePromises = this.eventData.performanceIds.map((performanceId) => {
-                // Zuerst Tickets löschen, dann die Performance
                 return this.performanceService.deletePerformance(performanceId).toPromise();
               });
 

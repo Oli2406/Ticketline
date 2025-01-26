@@ -13,7 +13,7 @@
       <tr>
         <th>Name</th>
         <th>Location</th>
-        <th>Time & Date</th>
+        <th>Date & Time</th>
         <th>Price</th>
         <th>Artist</th>
         <th>Ticket Number</th>
@@ -36,7 +36,8 @@
           <button
             class="btn btn-secondary bg-purp"
             [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
-            [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+            [queryParams]="{ id: performance.performanceId, hall: performance.hall }"
+            [disabled]="isPastDate(performance.date)">
             <i class="bi bi-ticket-fill"></i> Tickets
           </button>
         </td>

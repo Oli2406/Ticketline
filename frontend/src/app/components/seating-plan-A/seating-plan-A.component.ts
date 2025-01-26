@@ -1,17 +1,17 @@
-import { Component } from '@angular/core';
-import { TicketDto, TicketType, SectorType, PriceCategory } from "../../dtos/ticket";
-import { ToastrService } from 'ngx-toastr';
-import { PerformanceService } from 'src/app/services/performance.service';
-import { PerformanceListDto } from 'src/app/dtos/performance';
-import { LocationService } from 'src/app/services/location.service';
-import { ArtistService } from 'src/app/services/artist.service';
-import { Artist } from "../../dtos/artist";
-import { Location } from "../../dtos/location";
-import { TicketService } from 'src/app/services/ticket.service';
+import {Component} from '@angular/core';
+import {PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
+import {ToastrService} from 'ngx-toastr';
+import {PerformanceService} from 'src/app/services/performance.service';
+import {PerformanceListDto} from 'src/app/dtos/performance';
+import {LocationService} from 'src/app/services/location.service';
+import {ArtistService} from 'src/app/services/artist.service';
+import {Artist} from "../../dtos/artist";
+import {Location} from "../../dtos/location";
+import {TicketService} from 'src/app/services/ticket.service';
 import {catchError, forkJoin, map, Observable, throwError} from "rxjs";
-import { CartService } from "../../services/cart.service";
-import { AuthService } from "../../services/auth.service";
-import { ActivatedRoute } from '@angular/router';
+import {CartService} from "../../services/cart.service";
+import {AuthService} from "../../services/auth.service";
+import {ActivatedRoute} from '@angular/router';
 import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Reservation} from "../../dtos/reservation";
@@ -32,7 +32,7 @@ export class SeatingPlanAComponent {
 
   // Selected Tickets and Info
   selectedTickets: TicketDto[] = [];
-  selectedStanding: { vip: number; standard: number } = { vip: 0, standard: 0 };
+  selectedStanding: { vip: number; standard: number } = {vip: 0, standard: 0};
 
   // Enums for easier reference
   priceCategory = PriceCategory;
@@ -69,7 +69,8 @@ export class SeatingPlanAComponent {
     private authService: AuthService,
     private reservedService: ReservationService,
     private purchaseService: PurchaseService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -141,12 +142,12 @@ export class SeatingPlanAComponent {
         this.seatedBackC = tickets
           .filter(ticket => ticket.sectorType === SectorType.C)
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         this.seatedBackB = tickets
           .filter(ticket => ticket.sectorType === SectorType.B)
           .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-          .map(ticket => ({ ...ticket, price: this.performanceDetails.price + 40 }));
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
@@ -233,8 +234,10 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    if (this.cartedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+    if (index > -1) {
+      this.selectedTickets.splice(index, 1);
+      this.updateTotalPrice();
       return;
     }
 
@@ -253,19 +256,26 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
-    if (index > -1) {
-      this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(ticket);
-    }
+    this.selectedTickets.push(ticket);
 
     this.updateTotalPrice();
   }
 
+
   toggleStandingSector(priceCategory: PriceCategory): void {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
+
+    if (priceCategory === this.priceCategory.VIP && this.selectedStanding.vip > 0) {
+      this.selectedStanding.vip = 0;
+      this.updateTotalPrice();
+      return;
+    }
+
+    if (priceCategory === this.priceCategory.STANDARD && this.selectedStanding.standard > 0) {
+      this.selectedStanding.standard = 0;
+      this.updateTotalPrice();
+      return;
+    }
 
     if (totalUserTickets >= 8) {
       const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
@@ -281,27 +291,18 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
     if (priceCategory === this.priceCategory.VIP) {
-      if (this.selectedStanding.vip > 0) {
-        this.selectedStanding.vip = 0;
-      } else {
-        if (this.vipStandingTickets <= 0) {
-          this.toastr.warning('No VIP Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.vip = 1;
+      if (this.vipStandingTickets <= 0) {
+        this.toastr.warning('No VIP Standing tickets available!', 'Warning');
+        return;
       }
+      this.selectedStanding.vip = 1;
     } else if (priceCategory === this.priceCategory.STANDARD) {
-      if (this.selectedStanding.standard > 0) {
-        this.selectedStanding.standard = 0;
-      } else {
-        if (this.standingTickets <= 0) {
-          this.toastr.warning('No Regular Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.standard = 1;
+      if (this.standingTickets <= 0) {
+        this.toastr.warning('No Regular Standing tickets available!', 'Warning');
+        return;
       }
+      this.selectedStanding.standard = 1;
     }
 
     this.updateTotalPrice();
@@ -333,7 +334,7 @@ export class SeatingPlanAComponent {
 
   public resetSelections(): void {
     this.selectedTickets = [];
-    this.selectedStanding = { vip: 0, standard: 0 };
+    this.selectedStanding = {vip: 0, standard: 0};
     this.totalTickets = 0;
     this.totalPrice = 0;
   }
@@ -480,7 +481,7 @@ export class SeatingPlanAComponent {
         });
 
         dialogRef.afterClosed().subscribe(() => {
-          const updateRequests = this.selectedTickets.map(ticket => {
+          const seatedUpdateRequests = this.selectedTickets.map(ticket => {
             ticket.status = 'RESERVED';
             return this.ticketService.updateTicket(ticket.ticketId, {
               ...ticket,
@@ -488,19 +489,55 @@ export class SeatingPlanAComponent {
             });
           });
 
-          forkJoin(updateRequests).subscribe({
-            next: updatedTickets => {
-              updatedTickets.forEach(ticket => {
-                this.cartService.addToCart(ticket);
-                this.cartedSeats.push(ticket.ticketId);
+          const vipCount = this.selectedStanding.vip;
+          const standardCount = this.selectedStanding.standard;
+
+          let vipRequest$ = vipCount > 0
+            ? this.getAvailableStandingTickets(PriceCategory.VIP, vipCount)
+            : new Observable<TicketDto[]>(subscriber => {
+              subscriber.next([]);
+              subscriber.complete();
+            });
+
+          let standardRequest$ = standardCount > 0
+            ? this.getAvailableStandingTickets(PriceCategory.STANDARD, standardCount)
+            : new Observable<TicketDto[]>(subscriber => {
+              subscriber.next([]);
+              subscriber.complete();
+            });
+
+          forkJoin([vipRequest$, standardRequest$]).subscribe({
+            next: ([vipTickets, standardTickets]) => {
+              const standingTickets = [...vipTickets, ...standardTickets];
+              const standingUpdateRequests = standingTickets.map(ticket => {
+                ticket.status = 'RESERVED';
+                return this.ticketService.updateTicket(ticket.ticketId, {
+                  ...ticket,
+                  status: 'RESERVED',
+                });
               });
 
-              this.resetSelections();
-              this.toastr.success("Tickets successfully added to cart!", "Success");
+              // Combine all requests
+              const allUpdateRequests = [...seatedUpdateRequests, ...standingUpdateRequests];
+              forkJoin(allUpdateRequests).subscribe({
+                next: updatedTickets => {
+                  updatedTickets.forEach(ticket => {
+                    this.cartService.addToCart(ticket);
+                    this.cartedSeats.push(ticket.ticketId);
+                  });
+
+                  this.resetSelections();
+                  this.toastr.success("Tickets successfully added to cart!", "Success");
+                },
+                error: err => {
+                  console.error('Error reserving tickets while adding to cart:', err);
+                  this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+                }
+              });
             },
             error: err => {
-              console.error('Error reserving tickets while adding to cart:', err);
-              this.toastr.error('Failed to reserve tickets. Please try again.', 'Error');
+              console.error('Error fetching standing tickets:', err);
+              this.toastr.error('Failed to fetch standing tickets. Please try again.', 'Error');
             }
           });
         });
@@ -511,4 +548,5 @@ export class SeatingPlanAComponent {
       }
     });
   }
+
 }
