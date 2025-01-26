@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {TicketDto, TicketType, SectorType, PriceCategory} from "../../dtos/ticket";
+import {PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
 import {ToastrService} from 'ngx-toastr';
 import {PerformanceService} from 'src/app/services/performance.service';
 import {PerformanceListDto} from 'src/app/dtos/performance';
@@ -12,9 +12,7 @@ import {catchError, forkJoin, map, Observable, throwError} from "rxjs";
 import {CartService} from "../../services/cart.service";
 import {AuthService} from "../../services/auth.service";
 import {ActivatedRoute} from '@angular/router';
-import {
-  TicketExpirationDialogComponent
-} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
+import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Reservation} from "../../dtos/reservation";
 import {ReservationService} from "../../services/reservation.service";
@@ -142,14 +140,14 @@ export class SeatingPlanAComponent {
       map((tickets: TicketDto[]) => {
 
         this.seatedBackC = tickets
-        .filter(ticket => ticket.sectorType === SectorType.C)
-        .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-        .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
+          .filter(ticket => ticket.sectorType === SectorType.C)
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         this.seatedBackB = tickets
-        .filter(ticket => ticket.sectorType === SectorType.B)
-        .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-        .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
+          .filter(ticket => ticket.sectorType === SectorType.B)
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
@@ -236,8 +234,10 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    if (this.cartedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+    if (index > -1) {
+      this.selectedTickets.splice(index, 1);
+      this.updateTotalPrice();
       return;
     }
 
@@ -256,19 +256,26 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
-    if (index > -1) {
-      this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(ticket);
-    }
+    this.selectedTickets.push(ticket);
 
     this.updateTotalPrice();
   }
 
+
   toggleStandingSector(priceCategory: PriceCategory): void {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
+
+    if (priceCategory === this.priceCategory.VIP && this.selectedStanding.vip > 0) {
+      this.selectedStanding.vip = 0;
+      this.updateTotalPrice();
+      return;
+    }
+
+    if (priceCategory === this.priceCategory.STANDARD && this.selectedStanding.standard > 0) {
+      this.selectedStanding.standard = 0;
+      this.updateTotalPrice();
+      return;
+    }
 
     if (totalUserTickets >= 8) {
       const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
@@ -284,27 +291,18 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
     if (priceCategory === this.priceCategory.VIP) {
-      if (this.selectedStanding.vip > 0) {
-        this.selectedStanding.vip = 0;
-      } else {
-        if (this.vipStandingTickets <= 0) {
-          this.toastr.warning('No VIP Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.vip = 1;
+      if (this.vipStandingTickets <= 0) {
+        this.toastr.warning('No VIP Standing tickets available!', 'Warning');
+        return;
       }
+      this.selectedStanding.vip = 1;
     } else if (priceCategory === this.priceCategory.STANDARD) {
-      if (this.selectedStanding.standard > 0) {
-        this.selectedStanding.standard = 0;
-      } else {
-        if (this.standingTickets <= 0) {
-          this.toastr.warning('No Regular Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.standard = 1;
+      if (this.standingTickets <= 0) {
+        this.toastr.warning('No Regular Standing tickets available!', 'Warning');
+        return;
       }
+      this.selectedStanding.standard = 1;
     }
 
     this.updateTotalPrice();
