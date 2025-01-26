@@ -3,12 +3,14 @@ package at.ac.tuwien.sepr.groupphase.backend.service.impl;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseCreateDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseDetailDto;
 import at.ac.tuwien.sepr.groupphase.backend.endpoint.dto.PurchaseOverviewDto;
+import at.ac.tuwien.sepr.groupphase.backend.entity.CancelPurchase;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Merchandise;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Purchase;
 import at.ac.tuwien.sepr.groupphase.backend.entity.Ticket;
 import at.ac.tuwien.sepr.groupphase.backend.exception.ValidationException;
 import at.ac.tuwien.sepr.groupphase.backend.repository.MerchandiseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PerformanceRepository;
+import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseCancelRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.PurchaseRepository;
 import at.ac.tuwien.sepr.groupphase.backend.repository.TicketRepository;
 import at.ac.tuwien.sepr.groupphase.backend.security.RandomStringGenerator;
@@ -46,10 +48,13 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final PerformanceRepository performanceRepository;
     private final ArtistRepository artistRepository;
     private final LocationRepository locationRepository;
+    private final PurchaseCancelRepository purchaseCancelRepository;
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
-                               TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
-                               RandomStringGenerator generator, TicketService ticketService, PerformanceRepository performanceRepository, ArtistRepository artistRepository, LocationRepository locationRepository) {
+        TicketRepository ticketRepository, MerchandiseRepository merchandiseRepository,
+        RandomStringGenerator generator, TicketService ticketService,
+        PerformanceRepository performanceRepository, ArtistRepository artistRepository,
+        LocationRepository locationRepository, PurchaseCancelRepository purchaseCancelRepository) {
         this.purchaseRepository = purchaseRepository;
         this.ticketRepository = ticketRepository;
         this.merchandiseRepository = merchandiseRepository;
@@ -58,6 +63,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.performanceRepository = performanceRepository;
         this.artistRepository = artistRepository;
         this.locationRepository = locationRepository;
+        this.purchaseCancelRepository = purchaseCancelRepository;
     }
 
     @Override
@@ -172,32 +178,79 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     public void updatePurchase(PurchaseDetailDto purchaseDetailDto) {
+        logger.info("updating purchase: {}", purchaseDetailDto);
         Purchase existingPurchase = purchaseRepository.findById(purchaseDetailDto.getPurchaseId())
             .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
 
-        List<Long> newTicketIds = purchaseDetailDto.getTickets().stream()
-            .map(Ticket::getTicketId)
-            .collect(Collectors.toList());
+        List<Long> alreadyCancelledTickets = new ArrayList<>();
 
-        List<Long> cancelledTickets = new ArrayList<>(existingPurchase.getTicketIds());
-        cancelledTickets.removeAll(newTicketIds);
-
-        if (!cancelledTickets.isEmpty()) {
-            ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+        if (purchaseCancelRepository.existsByPurchaseId(purchaseDetailDto.getPurchaseId())) {
+            CancelPurchase existingCancellation = purchaseCancelRepository.findById(
+                    purchaseDetailDto.getPurchaseId())
+                .orElseThrow(() -> new IllegalArgumentException("Purchase not found"));
+            alreadyCancelledTickets = (existingCancellation.getTicketIds());
         }
 
-        if (newTicketIds.isEmpty()) {
+        List<Long> ticketIds = new java.util.ArrayList<>(List.of()); // the tickets after cancel
+        List<Long> oldTickets = existingPurchase.getTicketIds(); //the tickets before cancel
+        List<Ticket> tickets = purchaseDetailDto.getTickets();
+
+        for (Ticket ticket : tickets) {
+            ticketIds.add(ticket.getTicketId());
+        }
+
+        if (ticketIds.isEmpty()) {
+            alreadyCancelledTickets.addAll(alreadyCancelledTickets.size() - 1,
+                existingPurchase.getTicketIds());
+        }
+
+        List<Long> cancelledTickets = new ArrayList<>();
+
+        for (int i = 0; i < oldTickets.size(); i++) {
+            for (int j = i + 1; j < ticketIds.size(); j++) {
+                if (!ticketIds.contains(oldTickets.get(i))) {
+                    cancelledTickets.add(oldTickets.get(i));
+                    alreadyCancelledTickets.add(oldTickets.get(i));
+                    this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
+                    break;
+                }
+            }
+        }
+
+        double cancelledTotalPrice = 0;
+        for (Long cancelTicket : alreadyCancelledTickets) {
+            double price = this.ticketService.getTicketById(cancelTicket).getPrice().floatValue();
+            cancelledTotalPrice += price;
+        }
+
+        CancelPurchase cancelPurchase = new CancelPurchase(
+            purchaseDetailDto.getPurchaseId(),
+            existingPurchase.getUserId(),
+            alreadyCancelledTickets,
+            existingPurchase.getMerchandiseIds(),
+            existingPurchase.getMerchandiseQuantities(),
+            cancelledTotalPrice,
+            existingPurchase.getPurchaseDate(),
+            existingPurchase.getStreet(),
+            existingPurchase.getPostalCode(),
+            existingPurchase.getCity()
+        );
+
+        if (ticketIds.isEmpty()) {
+            cancelledTickets.add(oldTickets.getFirst());
+            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
             purchaseRepository.deleteById(existingPurchase.getPurchaseId());
-            logger.info("Deleted purchase with ID: {}", existingPurchase.getPurchaseId());
-            return;
+        } else {
+            logger.info("Updated purchase: {}", existingPurchase);
+            existingPurchase.setTicketIds(ticketIds);
+            existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
+            purchaseRepository.save(existingPurchase);
         }
 
-        existingPurchase.setTicketIds(newTicketIds);
-        existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
-        purchaseRepository.save(existingPurchase);
-
-        logger.info("Updated purchase: {}", existingPurchase);
+        logger.info("Saving cancelled purchase: {}", cancelPurchase);
+        purchaseCancelRepository.save(cancelPurchase);
     }
+
 
     @Override
     public List<PurchaseOverviewDto> getPurchaseDetailsByUser(Long userId) {
@@ -205,7 +258,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         return purchases.stream().map(purchase -> {
             List<Ticket> tickets = ticketRepository.findAllById(purchase.getTicketIds());
-            List<Merchandise> merchandises = merchandiseRepository.findAllById(purchase.getMerchandiseIds());
+            List<Merchandise> merchandises = merchandiseRepository.findAllById(
+                purchase.getMerchandiseIds());
 
             Map<Long, Map<String, String>> performanceDetails = new HashMap<>();
             for (Ticket ticket : tickets) {

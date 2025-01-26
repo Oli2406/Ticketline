@@ -19,7 +19,6 @@ import cardValidator from 'card-validator';
 
 @Component({
   selector: 'app-cart',
-  templateUrl: './cart.component.html',
   standalone: true,
   imports: [
     FormsModule,
@@ -27,6 +26,7 @@ import cardValidator from 'card-validator';
     CommonModule,
     NgOptimizedImage
   ],
+  templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
@@ -94,7 +94,7 @@ export class CartComponent implements OnInit {
     for (let i = 0; i < this.cartItems.length; i++) {
       if (this.isMerchandise(this.cartItems[i].item)) {
         const mTax = ((this.cartItems[i].item.price / 120) * 100) * 0.2;
-        this.merchandiseTaxAmount = this.merchandiseTaxAmount + (mTax*this.cartItems[i].quantity);
+        this.merchandiseTaxAmount = this.merchandiseTaxAmount + (mTax * this.cartItems[i].quantity);
       } else if (this.isTicket(this.cartItems[i].item)) {
         const tTax = ((this.cartItems[i].item.price / 113) * 100) * 0.13;
         this.ticketTaxAmount = this.ticketTaxAmount + tTax;
@@ -211,7 +211,7 @@ export class CartComponent implements OnInit {
     if (this.isTicket(item)) {
       const ticket = item as TicketDto;
       ticket.status = 'AVAILABLE';
-      this.ticketService.updateTicket(ticket.ticketId ,ticket).subscribe({
+      this.ticketService.updateTicket(ticket.ticketId, ticket).subscribe({
         next: () => {
           this.toastr.success('Ticket successfully removed and marked as available.', 'Success');
         },
@@ -252,7 +252,7 @@ export class CartComponent implements OnInit {
       return false;
     }
     return true;
-}
+  }
 
   formatBankAccountNumber(event: Event): void {
     const input = event.target as HTMLInputElement;
