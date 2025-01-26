@@ -61,9 +61,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         SELECT
             ep.EVENT_ID AS eventId,
             e.TITLE AS eventTitle,
-            SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets,
-            COUNT(t.TICKET_ID) AS totalTickets,
-            (SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) * 1.0 / COUNT(t.TICKET_ID)) AS soldPercentage
+            SUM(CASE WHEN t.STATUS = 'SOLD' THEN 1 ELSE 0 END) AS soldTickets
         FROM
             EVENT_PERFORMANCE_IDS ep
         JOIN
@@ -71,9 +69,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         JOIN
             EVENT e ON ep.EVENT_ID = e.EVENT_ID
         WHERE
-            (:category IS NULL OR e.CATEGORY = :category) -- Include all categories if :category is NULL
+            (:category IS NULL OR e.CATEGORY = :category)
             AND (
-                (:year IS NULL OR :month IS NULL) -- Include all time if year or month is NULL
+                (:year IS NULL OR :month IS NULL)
                 OR
                 (YEAR(e.DATE_FROM) = :year AND MONTH(e.DATE_FROM) = :month)
                 OR
@@ -82,7 +80,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         GROUP BY
             ep.EVENT_ID, e.TITLE
         ORDER BY
-            soldPercentage DESC
+            soldTickets DESC
         LIMIT 10
         """, nativeQuery = true)
     List<Object[]> findTop10EventsAsObjects(@Param("year") Integer year, @Param("month") Integer month, @Param("category") String category);

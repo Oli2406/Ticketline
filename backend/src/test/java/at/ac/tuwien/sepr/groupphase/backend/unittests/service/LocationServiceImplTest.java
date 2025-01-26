@@ -126,4 +126,75 @@ public class LocationServiceImplTest {
         verify(locationRepository, times(1)).findAll();
         verify(locationMapper, never()).locationToLocationDetailDto(any(Location.class));
     }
+
+    @Test
+    void getLocationById_ShouldReturnLocation_WhenValidId() {
+        Location location = new Location("LocationName", "Street", "City", "12345", "Country");
+        location.setLocationId(1L);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(location));
+        when(locationMapper.locationToLocationDetailDto(location)).thenReturn(
+            new LocationDetailDto(1L, "LocationName", "Street", "City", "12345", "Country")
+        );
+
+        LocationDetailDto result = locationService.getLocationById(1L);
+
+        assertNotNull(result, "Location should not be null");
+        assertEquals("LocationName", result.getName(), "Location name should match");
+
+        verify(locationRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void deleteLocation_ShouldRemoveLocation_WhenValidId() {
+        Long locationId = 1L;
+        doNothing().when(locationRepository).deleteById(locationId);
+
+        locationService.deleteLocation(locationId);
+
+        verify(locationRepository, times(1)).deleteById(locationId);
+    }
+
+    @Test
+    void deleteLocation_ShouldNotThrowError_WhenIdDoesNotExist() {
+        Long nonExistentId = 999L;
+        doNothing().when(locationRepository).deleteById(nonExistentId);
+
+        locationService.deleteLocation(nonExistentId);
+
+        verify(locationRepository, times(1)).deleteById(nonExistentId);
+    }
+
+    @Test
+    void searchLocationByStreetReturnsMatchingLocation() {
+        Location location = new Location("Name", "Matching Street", "City", "12345", "Country");
+        when(locationRepository.findAll()).thenReturn(List.of(location));
+        when(locationMapper.locationToLocationDetailDto(location)).thenReturn(
+            new LocationDetailDto(1L, "Name", "Matching Street", "City", "12345", "Country")
+        );
+
+        LocationSearchDto searchDto = new LocationSearchDto(null, "Matching Street", null, null, null);
+        List<LocationDetailDto> result = locationService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return one matching location");
+        assertEquals("Matching Street", result.getFirst().getStreet(), "Street should match");
+
+        verify(locationRepository, times(1)).findAll();
+    }
+
+    @Test
+    void searchLocationByCityReturnsMatchingLocation() {
+        Location location = new Location("Name", "Street", "Matching City", "12345", "Country");
+        when(locationRepository.findAll()).thenReturn(List.of(location));
+        when(locationMapper.locationToLocationDetailDto(location)).thenReturn(
+            new LocationDetailDto(1L, "Name", "Street", "Matching City", "12345", "Country")
+        );
+
+        LocationSearchDto searchDto = new LocationSearchDto(null, null, "Matching City", null, null);
+        List<LocationDetailDto> result = locationService.search(searchDto).toList();
+
+        assertEquals(1, result.size(), "Should return one matching location");
+        assertEquals("Matching City", result.getFirst().getCity(), "City should match");
+
+        verify(locationRepository, times(1)).findAll();
+    }
 }

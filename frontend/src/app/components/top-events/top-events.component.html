@@ -7,6 +7,8 @@
         id="month"
         class="form-control"
         [(ngModel)]="selectedMonth"
+        [max]="maxMonth"
+        [min]="minMonth"
         (change)="onFilterChange()"
       />
     </div>

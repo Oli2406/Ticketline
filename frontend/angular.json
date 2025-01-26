@@ -33,7 +33,8 @@
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.slim.min.js",
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.js",
+              "./node_modules/html2pdf.js/dist/html2pdf.bundle.min.js"
             ],
             "extractLicenses": false,
             "sourceMap": true,
