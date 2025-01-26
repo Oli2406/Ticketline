@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {TicketDto, TicketType, SectorType, PriceCategory} from "../../dtos/ticket";
+import {PriceCategory, SectorType, TicketDto, TicketType} from "../../dtos/ticket";
 import {ToastrService} from 'ngx-toastr';
 import {PerformanceService} from 'src/app/services/performance.service';
 import {PerformanceListDto} from 'src/app/dtos/performance';
@@ -12,9 +12,7 @@ import {catchError, forkJoin, map, Observable, throwError} from "rxjs";
 import {CartService} from "../../services/cart.service";
 import {AuthService} from "../../services/auth.service";
 import {ActivatedRoute} from '@angular/router';
-import {
-  TicketExpirationDialogComponent
-} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
+import {TicketExpirationDialogComponent} from "../ticket-expiration-dialog/ticket-expiration-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {Reservation} from "../../dtos/reservation";
 import {ReservationService} from "../../services/reservation.service";
@@ -142,14 +140,14 @@ export class SeatingPlanAComponent {
       map((tickets: TicketDto[]) => {
 
         this.seatedBackC = tickets
-        .filter(ticket => ticket.sectorType === SectorType.C)
-        .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-        .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
+          .filter(ticket => ticket.sectorType === SectorType.C)
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         this.seatedBackB = tickets
-        .filter(ticket => ticket.sectorType === SectorType.B)
-        .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
-        .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
+          .filter(ticket => ticket.sectorType === SectorType.B)
+          .sort((a, b) => a.rowNumber - b.rowNumber || a.seatNumber - b.seatNumber)
+          .map(ticket => ({...ticket, price: this.performanceDetails.price + 40}));
 
         const standingTickets = tickets.filter(
           ticket => ticket.sectorType === SectorType.A && ticket.ticketType === TicketType.STANDING
@@ -299,9 +297,7 @@ export class SeatingPlanAComponent {
         return;
       }
       this.selectedStanding.vip = 1;
-    }
-
-    else if (priceCategory === this.priceCategory.STANDARD) {
+    } else if (priceCategory === this.priceCategory.STANDARD) {
       if (this.standingTickets <= 0) {
         this.toastr.warning('No Regular Standing tickets available!', 'Warning');
         return;
