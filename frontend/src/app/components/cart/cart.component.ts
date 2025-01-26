@@ -407,9 +407,8 @@ export class CartComponent implements OnInit {
         await this.router.navigate(['merchandise']);
       },
       error: (error: HttpErrorResponse) => {
-        console.error('Purchase Error:', error);
-        if (error.error) {
-          this.toastr.error(`Error: ${error.error.message || error.message}`);
+        if (error) {
+          this.toastr.error(`${error}`);
         } else {
           this.toastr.error('An unexpected error occurred. Please try again.');
         }

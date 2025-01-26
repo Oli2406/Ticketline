@@ -66,16 +66,16 @@ public class TicketDataGenerator {
             tickets.addAll(generateSeatedTickets(performance, 12, 20, PriceCategory.PREMIUM, SectorType.C, BigDecimal.valueOf(120), Hall.A, existingTicketKeys));
 
             // Generate standing tickets for Hall A
-            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(150), Hall.A, existingTicketKeys));
-            tickets.addAll(generateStandingTickets(performance, 100, PriceCategory.STANDARD, SectorType.A, BigDecimal.valueOf(80), Hall.A, existingTicketKeys));
+            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(150), Hall.A));
+            tickets.addAll(generateStandingTickets(performance, 100, PriceCategory.STANDARD, SectorType.A, BigDecimal.valueOf(80), Hall.A));
         } else if ("B".equals(performance.getHall())) {
             // Generate seated tickets for Hall B
             tickets.addAll(generateSeatedTickets(performance, 3, 14, PriceCategory.PREMIUM, SectorType.B, BigDecimal.valueOf(80), Hall.B, existingTicketKeys));
             tickets.addAll(generateDynamicSeatedTickets(performance, 9, 14, PriceCategory.STANDARD, SectorType.C, BigDecimal.valueOf(60), Hall.B, existingTicketKeys));
 
             // Generate standing tickets for Hall B
-            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.PREMIUM, SectorType.A, BigDecimal.valueOf(70), Hall.B, existingTicketKeys));
-            tickets.addAll(generateStandingTickets(performance, 60, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(100), Hall.B, existingTicketKeys));
+            tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.PREMIUM, SectorType.A, BigDecimal.valueOf(70), Hall.B));
+            tickets.addAll(generateStandingTickets(performance, 60, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(100), Hall.B));
         }
 
         // Calculate total tickets for this performance
@@ -104,7 +104,7 @@ public class TicketDataGenerator {
             for (int seat = 1; seat <= seats; seat++) {
                 String ticketKey = row + "-" + seat;
                 if (!existingTicketKeys.contains(ticketKey)) {
-                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.STANDING, sectorType, price, hall));
+                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.SEATED, sectorType, price, hall));
                 }
             }
         }
@@ -119,7 +119,7 @@ public class TicketDataGenerator {
             for (int seat = 1; seat <= seatsInRow; seat++) {
                 String ticketKey = row + "-" + seat;
                 if (!existingTicketKeys.contains(ticketKey)) {
-                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.STANDING, sectorType, price, hall));
+                    tickets.add(createTicket(performance, row, seat, priceCategory, TicketType.SEATED, sectorType, price, hall));
                 }
             }
         }
@@ -127,8 +127,7 @@ public class TicketDataGenerator {
     }
 
     private List<Ticket> generateStandingTickets(Performance performance, int count, PriceCategory priceCategory,
-                                                 SectorType sectorType, BigDecimal price, Hall hall,
-                                                 Set<String> existingTicketKeys) {
+                                                 SectorType sectorType, BigDecimal price, Hall hall) {
         return IntStream.range(0, count)
             .mapToObj(i -> createTicket(performance, 0, 0, priceCategory, TicketType.STANDING, sectorType, price, hall))
             .collect(Collectors.toList());

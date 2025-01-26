@@ -10,6 +10,7 @@ export class ErrorFormatterService {
 
 
   public handleError(error: HttpErrorResponse): Observable<never> {
+    console.log(error)
     let cleanedError = 'An unexpected error occurred.';
     if (error.error) {
       if (error.error.errors) {

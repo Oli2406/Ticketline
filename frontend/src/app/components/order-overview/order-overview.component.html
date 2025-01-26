@@ -244,7 +244,6 @@
         <thead>
         <tr>
           <th>Performance</th>
-          <th>Ticket ID</th>
           <th>Row Number</th>
           <th>Seat Number</th>
           <th>Sector</th>
@@ -257,7 +256,6 @@
         <tbody>
         <tr *ngFor="let cancelTicket of cancelledTickets">
           <td>{{ getTicketPerformanceForInvoice(cancelTicket.performanceId) }}</td>
-          <td>{{ cancelTicket.ticketId }}</td>
           <td>{{ cancelTicket.rowNumber }}</td>
           <td>{{ cancelTicket.seatNumber }}</td>
           <td>{{ cancelTicket.sectorType }}</td>
@@ -441,7 +439,6 @@
     <table class="invoice-items">
       <thead>
       <tr>
-        <th>Ticket ID</th>
         <th>Row Number</th>
         <th>Seat Number</th>
         <th>Sector</th>
@@ -454,7 +451,6 @@
       <tbody>
         @for (ticket of invoiceTickets; track ticket) {
           <tr>
-            <td>{{ ticket.ticketId }}</td>
             <td>{{ ticket.rowNumber }}</td>
             <td>{{ ticket.seatNumber }}</td>
             <td>{{ ticket.sectorType }}</td>

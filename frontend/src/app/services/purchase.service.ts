@@ -71,20 +71,7 @@ export class PurchaseService {
     let cleanedError = 'An unexpected error occurred.';
     if (error.error) {
       if (error.error.errors) {
-        try {
-          const rawDetails = error.error.errors.replace(/^\[|\]$/g, '');
-          const errors = rawDetails.split(/(?=[A-Z])/);
-          const cleanedErrors = errors.map((err) =>
-            err.replace(/,\s*$/, '').trim()
-          );
-          cleanedError = cleanedErrors.join('\n');
-        } catch {
-          cleanedError = error.error.details;
-        }
-      } else if (typeof error.error === 'string') {
-        cleanedError = error.error;
-      } else if (error.error.message) {
-        cleanedError = error.error.message;
+        cleanedError = error.error.errors;
       }
     }
     return throwError(() => new Error(cleanedError));
