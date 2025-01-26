@@ -200,7 +200,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
 
         if (ticketIds.isEmpty()) {
-            alreadyCancelledTickets.addAll(alreadyCancelledTickets.size()-1,existingPurchase.getTicketIds());
+            alreadyCancelledTickets.addAll(alreadyCancelledTickets.size() - 1,
+                existingPurchase.getTicketIds());
         }
 
         List<Long> cancelledTickets = new ArrayList<>();
