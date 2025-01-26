@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -57,7 +58,6 @@ public class TicketDataGenerator {
     private void createTicketsForPerformance(Performance performance) {
         // Fetch existing tickets for the performance
         Set<String> existingTicketKeys = fetchExistingTicketKeys(performance.getPerformanceId());
-
         List<Ticket> tickets = new ArrayList<>();
 
         if ("A".equals(performance.getHall())) {
@@ -77,6 +77,15 @@ public class TicketDataGenerator {
             tickets.addAll(generateStandingTickets(performance, 80, PriceCategory.PREMIUM, SectorType.A, BigDecimal.valueOf(70), Hall.B, existingTicketKeys));
             tickets.addAll(generateStandingTickets(performance, 60, PriceCategory.VIP, SectorType.A, BigDecimal.valueOf(100), Hall.B, existingTicketKeys));
         }
+
+        // Calculate total tickets for this performance
+        int totalTickets = tickets.size();
+
+        // Generate a custom status distribution for this performance
+        int[] statusDistribution = getStatusDistribution(totalTickets);
+
+        // Apply the status distribution to the tickets
+        applyStatusDistribution(tickets, statusDistribution);
 
         saveTicketsInBatches(tickets);
         LOGGER.debug("Generated {} tickets for performance '{}' in hall {}", tickets.size(), performance.getName(), performance.getHall());
@@ -135,7 +144,7 @@ public class TicketDataGenerator {
             ticketType,
             sectorType,
             price,
-            STATUSES[random.nextInt(STATUSES.length)],
+            "AVAILABLE", // Status will be set later in applyStatusDistribution
             hall,
             1 + (long) (random.nextDouble() * (99000 - 1 + 1)),
             performance.getDate()
@@ -146,6 +155,33 @@ public class TicketDataGenerator {
         for (int i = 0; i < tickets.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, tickets.size());
             ticketRepository.saveAll(tickets.subList(i, end));
+        }
+    }
+
+    private int[] getStatusDistribution(int totalTickets) {
+        Random statusRandom = new Random();
+        int[] distribution = new int[STATUSES.length];
+
+        int soldPercentage = statusRandom.nextInt(101);
+        distribution[2] = (int) (totalTickets * (soldPercentage / 100.0)); // SOLD
+        int remaining = totalTickets - distribution[2];
+        distribution[1] = statusRandom.nextInt(remaining + 1); // RESERVED
+        distribution[0] = remaining - distribution[1]; // AVAILABLE
+
+        return distribution;
+    }
+
+    private void applyStatusDistribution(List<Ticket> tickets, int[] distribution) {
+        Collections.shuffle(tickets, random);
+
+        int index = 0;
+        for (int i = 0; i < STATUSES.length; i++) {
+            for (int j = 0; j < distribution[i]; j++) {
+                if (index < tickets.size()) {
+                    tickets.get(index).setStatus(STATUSES[i]);
+                    index++;
+                }
+            }
         }
     }
 }
