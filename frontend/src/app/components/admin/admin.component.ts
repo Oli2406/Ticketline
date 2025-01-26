@@ -18,6 +18,10 @@ export class AdminComponent implements OnInit {
   errorMessage = '';
 
   users: any[] = [];
+  displayedUsers: any[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 50;
+  totalPages: number = 0;
   currentUserEmail = '';
 
   ConfirmationDialogMode = ConfirmationDialogMode;
@@ -42,6 +46,8 @@ export class AdminComponent implements OnInit {
     this.adminService.getUsers().subscribe({
       next: (data) => {
         this.users = data;
+        this.updateTotalPages();
+        this.updateDisplayedUsers();
       },
       error: (err) => {
         this.error = true;
@@ -146,5 +152,33 @@ export class AdminComponent implements OnInit {
   showDeleteMessage(email: string) {
     this.showConfirmDeletionDialog = true;
     this.selectedUserEmail = email;
+  }
+
+  updateTotalPages() {
+    this.totalPages = Math.ceil(this.users.length / this.itemsPerPage);
+  }
+
+  updateDisplayedUsers() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+
+    this.displayedUsers = this.users.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updateDisplayedUsers();
+    }
+  }
+
+  paginationRange: number = 5;
+
+  get paginationButtons(): number[] {
+    const start = Math.max(1, this.currentPage - Math.floor(this.paginationRange / 2));
+    const end = Math.min(this.totalPages, start + this.paginationRange - 1);
+    const adjustedStart = Math.max(1, end - this.paginationRange + 1);
+
+    return Array.from({ length: end - adjustedStart + 1 }, (_, i) => adjustedStart + i);
   }
 }
