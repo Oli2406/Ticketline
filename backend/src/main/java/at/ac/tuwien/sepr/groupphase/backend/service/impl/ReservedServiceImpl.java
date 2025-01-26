@@ -143,39 +143,32 @@ public class ReservedServiceImpl implements ReservedService {
 
     @Override
     public void updateReservation(ReservedDetailDto reservedDetailDto) {
-        Reservation existingReservation = reservedRepository.findById(
-                reservedDetailDto.getReservedId())
+        Reservation existingReservation = reservedRepository.findById(reservedDetailDto.getReservedId())
             .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
-        List<Long> oldTickets = existingReservation.getTicketIds(); //the tickets before something was cancelled
-        List<Long> ticketIds = new java.util.ArrayList<>(List.of());
-        List<Ticket> tickets = reservedDetailDto.getTickets();
 
-        for (Ticket ticket : tickets) {
-            ticketIds.add(ticket.getTicketId());
+        List<Long> oldTickets = existingReservation.getTicketIds();
+
+        List<Long> ticketIds = reservedDetailDto.getTickets()
+            .stream()
+            .map(Ticket::getTicketId)
+            .collect(Collectors.toList());
+
+        List<Long> cancelledTickets = oldTickets.stream()
+            .filter(oldTicket -> !ticketIds.contains(oldTicket))
+            .collect(Collectors.toList());
+
+        if (!cancelledTickets.isEmpty()) {
+            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
         }
 
-        List<Long> cancelledTickets = new ArrayList<>();
-
-        for (Long oldTicket : oldTickets) {
-            for (int j = 0; j < ticketIds.size(); j++) {
-                if (!ticketIds.contains(oldTicket)) {
-                    cancelledTickets.add(oldTicket);
-                    this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
-                }
-            }
+        if (ticketIds.isEmpty()) {
+            reservedRepository.deleteById(existingReservation.getReservationId());
+            logger.info("Deleted reservation with ID: {}", existingReservation.getReservationId());
+            return;
         }
 
         existingReservation.setTicketIds(ticketIds);
         reservedRepository.save(existingReservation);
-
-        if (ticketIds.isEmpty()) {
-            cancelledTickets.add(oldTickets.getFirst());
-            this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
-            reservedRepository.deleteById(existingReservation.getReservationId());
-        } else {
-            existingReservation.setTicketIds(ticketIds);
-            reservedRepository.save(existingReservation);
-        }
 
         logger.info("Updated reservation: {}", existingReservation);
     }

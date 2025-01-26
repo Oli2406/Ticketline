@@ -223,11 +223,6 @@ public class PurchaseServiceImpl implements PurchaseService {
             cancelledTotalPrice += price;
         }
 
-        existingPurchase.setTicketIds(ticketIds);
-        existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
-        purchaseRepository.save(existingPurchase);
-        logger.info("Updated purchase: {}", existingPurchase);
-
         CancelPurchase cancelPurchase = new CancelPurchase(
             purchaseDetailDto.getPurchaseId(),
             existingPurchase.getUserId(),
@@ -246,6 +241,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             this.ticketService.updateTicketStatusList(cancelledTickets, "AVAILABLE");
             purchaseRepository.deleteById(existingPurchase.getPurchaseId());
         } else {
+            logger.info("Updated purchase: {}", existingPurchase);
             existingPurchase.setTicketIds(ticketIds);
             existingPurchase.setTotalPrice(purchaseDetailDto.getTotalPrice());
             purchaseRepository.save(existingPurchase);
@@ -254,6 +250,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         logger.info("Saving cancelled purchase: {}", cancelPurchase);
         purchaseCancelRepository.save(cancelPurchase);
     }
+
 
     @Override
     public List<PurchaseOverviewDto> getPurchaseDetailsByUser(Long userId) {

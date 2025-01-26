@@ -162,23 +162,19 @@ public class TicketServiceImpl implements TicketService {
         throws ValidationException, ConflictException {
         LOGGER.info("Updating ticket with ID: {}", ticketId);
 
-        // Validate the incoming ticket data
         ticketValidator.validateTicket(ticketCreateDto);
 
-        // Lock the ticket row to prevent concurrent updates
         Ticket existingTicket = ticketRepository.findByIdWithLock(ticketId)
             .orElseThrow(() -> {
                 LOGGER.error("Ticket not found with ID: {}", ticketId);
                 return new IllegalArgumentException("Ticket not found with ID: " + ticketId);
             });
 
-        // Check if the ticket is available if the status is being updated to RESERVED
         if (Objects.equals(ticketCreateDto.getStatus(), "RESERVED") && !existingTicket.getStatus().equals("AVAILABLE")) {
             LOGGER.error("Ticket with ID {} is not available for reservation.", ticketId);
             throw new ConflictException("Ticket is not available for reservation.", new ArrayList<>());
         }
 
-        // Update the ticket details
         existingTicket.setRowNumber(ticketCreateDto.getRowNumber());
         existingTicket.setSeatNumber(ticketCreateDto.getSeatNumber());
         existingTicket.setPriceCategory(ticketCreateDto.getPriceCategory());
@@ -191,11 +187,9 @@ public class TicketServiceImpl implements TicketService {
         existingTicket.setHall(ticketCreateDto.getHall());
         existingTicket.setDate(ticketCreateDto.getDate());
 
-        // Save the updated ticket
         Ticket savedTicket = ticketRepository.save(existingTicket);
         LOGGER.debug("Updated ticket saved to database: {}", savedTicket);
 
-        // Map the saved ticket to a DTO
         return new TicketDetailDto(
             savedTicket.getTicketId(),
             savedTicket.getPerformanceId(),

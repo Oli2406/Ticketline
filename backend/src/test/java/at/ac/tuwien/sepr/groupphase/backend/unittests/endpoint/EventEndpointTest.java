@@ -32,8 +32,8 @@ class EventEndpointTest {
     private final EventDetailDto event2 = new EventDetailDto(2L, "Event2", "Descr2", "Category2", LocalDate.now(), LocalDate.now().plusDays(1));
     private final List<EventDetailDto> mockEvents = List.of(event1, event2);
     private final List<EventSalesDto> mockEventSalesDtos = List.of(
-        new EventSalesDto(1L, "Event1", 100L, 600L, 100.0/600.0),
-        new EventSalesDto(2L, "Event2", 200L, 600L, 200.0/600.0)
+        new EventSalesDto(1L, "Event1", 100L),
+        new EventSalesDto(2L, "Event2", 200L)
     );
     @Mock
     private EventService eventService;
