@@ -167,10 +167,14 @@
               <div class="ticket-details">
                 <span><strong>Reservation Number:</strong> {{ ticket.reservationNumber }}</span>
                 <span><strong>Performance Name:</strong> {{
-                    getPerformanceName(ticket.performanceId)
+                    getPerformanceNameCancel(ticket.performanceId)
                   }}</span>
-                <span><strong>Artist:</strong> {{ getArtistName(ticket.performanceId) }}</span>
-                <span><strong>Location:</strong> {{ getPerformanceLocation(ticket.performanceId) }}</span>
+                <span><strong>Artist:</strong> {{
+                    getArtistNameCancel(ticket.performanceId)
+                  }}</span>
+                <span><strong>Location:</strong> {{
+                    getPerformanceLocationCancel(ticket.performanceId)
+                  }}</span>
                 <span><strong>Date and Time:</strong> {{ ticket.date | date: 'yyyy-MM-dd HH:mm' }}</span>
                 <span><strong>Ticket Type:</strong> {{ ticket.ticketType }}</span>
                 <span
@@ -355,7 +359,14 @@
           <tbody>
             @for (invTicket of invoiceTickets; track invTicket) {
               <tr>
-                <td>{{ getTicketPerformanceForInvoice(invTicket.performanceId) }}</td>
+                <td *ngIf="this.cancelInvDownload"> {{
+                    getPerformanceNameCancel(invTicket.performanceId)
+                  }}
+                </td>
+                <td *ngIf="!this.cancelInvDownload">{{
+                    getTicketPerformanceForInvoice(invTicket.performanceId)
+                  }}
+                </td>
                 <td>{{ invTicket.rowNumber }}</td>
                 <td>{{ invTicket.seatNumber }}</td>
                 <td>{{ invTicket.sectorType }}</td>
