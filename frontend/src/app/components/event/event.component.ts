@@ -58,4 +58,9 @@ export class EventComponent {
       }
     });
   }
+  isPastDate(date: string | Date): boolean {
+    const performanceDate = new Date(date);
+    const currentDate = new Date();
+    return performanceDate < currentDate;
+  }
 }

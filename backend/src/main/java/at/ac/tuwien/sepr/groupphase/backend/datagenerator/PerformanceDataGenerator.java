@@ -715,9 +715,9 @@ public class PerformanceDataGenerator {
     }
 
     private LocalDateTime generateRandomFutureDate() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now().minusDays(365);
 
-        int daysToAdd = random.nextInt(365 * 2);
+        int daysToAdd = random.nextInt(365 * 3);
         int hoursToAdd = random.nextInt(24);
         int minutesToAdd = random.nextInt(60);
 

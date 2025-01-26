@@ -49,7 +49,7 @@ public class UserDataGenerator {
         createUserIfNotExists("Isabella", "Supervisor", "isabella.supervisor@email.com", "password",
             true, 40000);
 
-        IntStream.range(1, 1500).forEach(i -> {
+        IntStream.range(1, 988).forEach(i -> {
             String firstName = getRandomFirstName();
             String lastName = getRandomLastName();
             String email = String.format("%s.%s%d@email.com", firstName.toLowerCase(),

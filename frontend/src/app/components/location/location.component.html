@@ -19,7 +19,7 @@
         <tr>
           <th>Name</th>
           <th>Location</th>
-          <th>Time & Date</th>
+          <th>Date & Time</th>
           <th>Price</th>
           <th>Artist</th>
           <th>Ticket Number</th>
@@ -39,7 +39,7 @@
           <td>{{ performance.ticketNumber }}</td>
           <td>{{ performance.hall }}</td>
           <td>
-            <button class="btn btn-primary btn-sm bg-purp">
+            <button class="btn btn-primary btn-sm bg-purp" [disabled]="isPastDate(performance.date)">
               <i class="bi bi-ticket-fill"></i> Tickets
             </button>
           </td>

@@ -43,7 +43,7 @@ public class PurchaseDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 100;
+        int userCount = 12;
 
         if (purchaseRepository.count() > 0) {
             return;
@@ -71,11 +71,13 @@ public class PurchaseDataGenerator {
         for (long userId = 1; userId <= userCount; userId++) {
             createPurchasesForUser(userId, ticketsBeforeCutoff, ticketsAfterCutoff, allMerchandise);
         }
+        LOGGER.info("All purchases were created!");
+
     }
 
     private void createPurchasesForUser(Long userId, List<Ticket> ticketsBeforeCutoff,
                                         List<Ticket> ticketsAfterCutoff, List<Merchandise> allMerchandise) {
-        for (int i = 0; i < 4; i++) { // 4 purchases per user
+        for (int i = 0; i < 10; i++) { // 4 purchases per user
             // Randomly select a group: before or after cutoff
             List<Ticket> selectedGroup = random.nextBoolean() ? ticketsBeforeCutoff : ticketsAfterCutoff;
 
@@ -119,7 +121,7 @@ public class PurchaseDataGenerator {
 
             purchaseRepository.save(purchase);
         }
-        LOGGER.info("Purchases for user {} created", userId);
+        LOGGER.debug("Purchases for user {} created", userId);
     }
 
     private <T> List<T> getRandomSubset(List<T> items, int count) {

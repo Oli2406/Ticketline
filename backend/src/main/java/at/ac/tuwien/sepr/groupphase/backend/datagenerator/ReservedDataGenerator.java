@@ -38,7 +38,7 @@ public class ReservedDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 100;
+        int userCount = 12;
 
         if (reservedRepository.count() > 0) {
             return;
@@ -65,6 +65,8 @@ public class ReservedDataGenerator {
         for (long userId = 1; userId <= userCount; userId++) {
             createReservationsForUser(userId, ticketsBeforeCutoff, ticketsAfterCutoff);
         }
+        LOGGER.info("All reservations were created!");
+
     }
 
     private void createReservationsForUser(Long userId, List<Ticket> ticketsBeforeCutoff, List<Ticket> ticketsAfterCutoff) {
@@ -73,7 +75,7 @@ public class ReservedDataGenerator {
             return;
         }
 
-        for (int i = 0; i < 4; i++) { // 4 reservations per user
+        for (int i = 0; i < 10; i++) { // 4 reservations per user
             // Randomly select a group: before or after cutoff
             List<Ticket> selectedGroup = random.nextBoolean() ? ticketsBeforeCutoff : ticketsAfterCutoff;
 
@@ -94,7 +96,7 @@ public class ReservedDataGenerator {
 
             reservedRepository.save(reservation);
         }
-        LOGGER.info("Reservations for user {} created", userId);
+        LOGGER.debug("Reservations for user {} created", userId);
     }
 
     private List<Ticket> getRandomSubset(List<Ticket> tickets, int count) {

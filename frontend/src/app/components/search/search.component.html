@@ -211,7 +211,7 @@
       </div>
 
       <div class="col-md-3 mb-3">
-        <label class="form-label" for="performanceHall">Artist/Band Name</label>
+        <label class="form-label" for="performanceHall">Hall Name</label>
         <input
           class="form-control"
           id="performanceHall"
@@ -358,7 +358,8 @@
         <button
           class="btn btn-secondary bg-purp"
           [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
-          [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+          [queryParams]="{ id: performance.performanceId, hall: performance.hall }"
+          [disabled]="isPastDate(performance.date)">
           <i class="bi bi-ticket-fill"></i> Tickets
         </button>
       </td>
@@ -405,7 +406,8 @@
       <button
         class="btn btn-secondary bg-purp"
         [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
-        [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+        [queryParams]="{ id: performance.performanceId, hall: performance.hall }"
+        [disabled]="isPastDate(performance.date)">
         <i class="bi bi-ticket-fill"></i> Tickets
       </button>
     </td>

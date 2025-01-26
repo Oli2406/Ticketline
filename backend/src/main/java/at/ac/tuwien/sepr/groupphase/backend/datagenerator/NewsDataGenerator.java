@@ -37,7 +37,8 @@ public class NewsDataGenerator {
 
         createNewsIfNotExists("Interactive Art Exhibit Opens at Modern Art Museum",
             "Experience art in a whole new way.",
-            "The Modern Art Museum is excited to announce the opening of its new interactive art exhibit, Visionary Realities, on January 5, 2025. This immersive exhibit invites visitors to engage with art through technology and explore their creativity. Don't miss this unique experience!",
+            "The Modern Art Museum is excited to announce the opening of its new interactive art exhibit, Visionary Realities, on January 5, 2025. This immersive exhibit invites visitors to engage with art through technology "
+            + "and explore their creativity. Don't miss this unique experience!",
             LocalDate.of(2025, 1, 5),
             new ArrayList<>(List.of("2.png")));
 
@@ -49,7 +50,8 @@ public class NewsDataGenerator {
 
         createNewsIfNotExists("Food and Wine Festival Returns to San Francisco",
             "Indulge in delicious food and drinks at the San Francisco Food and Wine Festival.",
-            "The San Francisco Food and Wine Festival is back for another year of culinary delights. From April 10 to April 14, 2024, sample delicious food from local vendors, enjoy wine tastings, and learn from expert chefs. Get your tickets now!",
+            "The San Francisco Food and Wine Festival is back for another year of culinary delights. From April 10 to April 14, 2024, sample delicious food from local vendors, enjoy wine tastings, and learn from expert chefs. "
+            + "Get your tickets now!",
             LocalDate.of(2024, 4, 10),
             new ArrayList<>(List.of("3.png")));
 

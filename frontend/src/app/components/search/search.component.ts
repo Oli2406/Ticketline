@@ -8,7 +8,7 @@ import {LocationService} from "../../services/location.service";
 import {PerformanceService} from "../../services/performance.service";
 import {LocationListDto, LocationSearch} from "../../dtos/location";
 import {PerformanceSearch, PerformanceDetailDto} from "../../dtos/performance";
-import {debounceTime, forkJoin, map, Subject} from "rxjs";
+import {debounceTime, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import {TicketService} from "../../services/ticket.service";
@@ -187,26 +187,6 @@ export class SearchComponent implements AfterViewInit {
     });
   }
 
-  updateTicketNumbers() {
-    this.performanceService.get().subscribe({
-      next: (performances) => {
-        const updateRequests = performances.map((performance) =>
-          this.ticketService.getTicketsByPerformanceId(performance.performanceId).pipe(
-            map((tickets) => {
-              const availableTickets = tickets.filter(ticket => ticket.status === 'AVAILABLE').length;
-              return this.performanceService.updateTicketNumber(performance.performanceId, availableTickets).subscribe();
-            })
-          )
-        );
-        forkJoin(updateRequests).subscribe({
-          error: (err) => console.error('Error updating ticket numbers:', err),
-        });
-      },
-      error: (err) => console.error('Error fetching performances for ticket update:', err),
-    });
-  }
-
-
   performAdvancedSearch() {
     if (!this.searchQuery || this.searchQuery.trim() === '') {
       this.advancedSearchPerformances = [];
@@ -311,6 +291,12 @@ export class SearchComponent implements AfterViewInit {
     const adjustedStart = Math.max(1, end - this.paginationRange + 1);
 
     return Array.from({ length: end - adjustedStart + 1 }, (_, i) => adjustedStart + i);
+  }
+
+  isPastDate(date: string | Date): boolean {
+    const performanceDate = new Date(date);
+    const currentDate = new Date();
+    return performanceDate < currentDate;
   }
 
   protected readonly SearchType = SearchType;
