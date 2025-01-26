@@ -236,8 +236,10 @@ export class SeatingPlanAComponent {
       return;
     }
 
-    if (this.cartedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+    if (index > -1) {
+      this.selectedTickets.splice(index, 1);
+      this.updateTotalPrice();
       return;
     }
 
@@ -256,19 +258,26 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
-    if (index > -1) {
-      this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(ticket);
-    }
+    this.selectedTickets.push(ticket);
 
     this.updateTotalPrice();
   }
 
+
   toggleStandingSector(priceCategory: PriceCategory): void {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
+
+    if (priceCategory === this.priceCategory.VIP && this.selectedStanding.vip > 0) {
+      this.selectedStanding.vip = 0;
+      this.updateTotalPrice();
+      return;
+    }
+
+    if (priceCategory === this.priceCategory.STANDARD && this.selectedStanding.standard > 0) {
+      this.selectedStanding.standard = 0;
+      this.updateTotalPrice();
+      return;
+    }
 
     if (totalUserTickets >= 8) {
       const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
@@ -284,27 +293,20 @@ export class SeatingPlanAComponent {
       return;
     }
 
-
     if (priceCategory === this.priceCategory.VIP) {
-      if (this.selectedStanding.vip > 0) {
-        this.selectedStanding.vip = 0;
-      } else {
-        if (this.vipStandingTickets <= 0) {
-          this.toastr.warning('No VIP Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.vip = 1;
+      if (this.vipStandingTickets <= 0) {
+        this.toastr.warning('No VIP Standing tickets available!', 'Warning');
+        return;
       }
-    } else if (priceCategory === this.priceCategory.STANDARD) {
-      if (this.selectedStanding.standard > 0) {
-        this.selectedStanding.standard = 0;
-      } else {
-        if (this.standingTickets <= 0) {
-          this.toastr.warning('No Regular Standing tickets available!', 'Warning');
-          return;
-        }
-        this.selectedStanding.standard = 1;
+      this.selectedStanding.vip = 1;
+    }
+
+    else if (priceCategory === this.priceCategory.STANDARD) {
+      if (this.standingTickets <= 0) {
+        this.toastr.warning('No Regular Standing tickets available!', 'Warning');
+        return;
       }
+      this.selectedStanding.standard = 1;
     }
 
     this.updateTotalPrice();

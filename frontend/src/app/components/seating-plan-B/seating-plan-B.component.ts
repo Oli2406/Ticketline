@@ -263,8 +263,10 @@ export class SeatingPlanBComponent {
       return;
     }
 
-    if (this.cartedSeats.includes(ticket.ticketId)) {
-      this.toastr.info('You have already added this ticket to your cart.', 'Info');
+    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
+    if (index > -1) {
+      this.selectedTickets.splice(index, 1);
+      this.updateTotalPrice();
       return;
     }
 
@@ -283,19 +285,24 @@ export class SeatingPlanBComponent {
       return;
     }
 
-
-    const index = this.selectedTickets.findIndex((t) => t.ticketId === ticket.ticketId);
-    if (index > -1) {
-      this.selectedTickets.splice(index, 1);
-    } else {
-      this.selectedTickets.push(ticket);
-    }
-
+    this.selectedTickets.push(ticket);
     this.updateTotalPrice();
   }
 
   toggleStandingSector(priceCategory: PriceCategory): void {
     const totalUserTickets = this.getTotalUserTicketsForPerformance();
+
+    if (priceCategory === PriceCategory.VIP && this.selectedStanding.vip > 0) {
+      this.selectedStanding.vip = 0;
+      this.updateTotalPrice();
+      return;
+    }
+
+    if (priceCategory === PriceCategory.PREMIUM && this.selectedStanding.premium > 0) {
+      this.selectedStanding.premium = 0;
+      this.updateTotalPrice();
+      return;
+    }
 
     if (totalUserTickets >= 8) {
       const reservedCount = this.userTicketsPerPerformance[this.performanceID] || 0;
@@ -311,11 +318,18 @@ export class SeatingPlanBComponent {
       return;
     }
 
-
     if (priceCategory === PriceCategory.VIP) {
-      this.selectedStanding.vip = this.selectedStanding.vip > 0 ? 0 : 1;
+      if (this.vipStandingTickets <= 0) {
+        this.toastr.warning('No VIP Standing tickets available!', 'Warning');
+        return;
+      }
+      this.selectedStanding.vip = 1;
     } else {
-      this.selectedStanding.premium = this.selectedStanding.premium > 0 ? 0 : 1;
+      if (this.standingTickets <= 0) {
+        this.toastr.warning('No Regular Standing tickets available!', 'Warning');
+        return;
+      }
+      this.selectedStanding.premium = 1;
     }
 
     this.updateTotalPrice();
