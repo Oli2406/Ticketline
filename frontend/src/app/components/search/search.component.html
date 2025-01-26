@@ -1,31 +1,31 @@
 <div class="button-group mt-3 text-center">
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.event, 'btn-secondary': curSearchType !== SearchType.event}"
     (click)="changeSearchType(SearchType.event)">
     event
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.artist, 'btn-secondary': curSearchType !== SearchType.artist}"
     (click)="changeSearchType(SearchType.artist)">
     artist
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.location, 'btn-secondary': curSearchType !== SearchType.location}"
     (click)="changeSearchType(SearchType.location)">
     location
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.performance, 'btn-secondary': curSearchType !== SearchType.performance}"
     (click)="changeSearchType(SearchType.performance)">
     performance
   </button>
   <button
     class="btn me-3"
-    [ngClass]="{'btn-primary': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
+    [ngClass]="{'btn-primary btn-search': curSearchType === SearchType.advanced, 'btn-secondary': curSearchType !== SearchType.advanced}"
     (click)="changeSearchType(SearchType.advanced)">
     advanced
   </button>
@@ -211,7 +211,7 @@
       </div>
 
       <div class="col-md-3 mb-3">
-        <label class="form-label" for="performanceHall">Artist/Band Name</label>
+        <label class="form-label" for="performanceHall">Hall Name</label>
         <input
           class="form-control"
           id="performanceHall"
@@ -240,17 +240,15 @@
   <tr>
     <th>Name</th>
     <th>Category</th>
-    <th>Description</th>
     <th>Startdate</th>
     <th>Enddate</th>
     <th>Actions</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let event of events">
+  <tr *ngFor="let event of displayedEvents">
     <td>{{ event.title }}</td>
     <td>{{ event.category }}</td>
-    <td>{{ truncate(event.description, 164) }}</td>
     <td>{{ event.dateFrom }}</td>
     <td>{{ event.dateTo }}</td>
     <td>
@@ -274,7 +272,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let artist of artists">
+  <tr *ngFor="let artist of displayedArtists">
     <td>{{ artist.firstName }}</td>
     <td>{{ artist.lastName }}</td>
     <td>{{ artist.artistName }}</td>
@@ -297,7 +295,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let location of locations">
+  <tr *ngFor="let location of displayedLocations">
     <td>{{ location.name }}</td>
     <td>{{ location.street }}, {{ location.postalCode }} {{ location.city }}, {{ location.country }}</td>
     <td>
@@ -339,30 +337,29 @@
     <tr>
       <th>Name</th>
       <th>Location</th>
-      <th>Time & Date</th>
+      <th>Date & Time</th>
       <th>Duration</th>
       <th>Price</th>
       <th>Artist</th>
-      <th>Ticket Number</th>
       <th>Hall</th>
       <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let performance of advancedSearchPerformances">
+    <tr *ngFor="let performance of displayedAdvancedSearchPerformances">
       <td>{{ performance.name }}</td>
       <td>{{ performance.location.name }}</td>
       <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
       <td>{{ performance.duration | duration }}</td>
       <td>{{ performance.price | currency: 'EUR' }}</td>
       <td>{{ performance.artist.artistName }}</td>
-      <td>{{ performance.ticketNumber }}</td>
       <td>{{ performance.hall }}</td>
       <td>
         <button
           class="btn btn-secondary bg-purp"
           [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
-          [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+          [queryParams]="{ id: performance.performanceId, hall: performance.hall }"
+          [disabled]="isPastDate(performance.date)">
           <i class="bi bi-ticket-fill"></i> Tickets
         </button>
       </td>
@@ -386,7 +383,7 @@
   <tr>
     <th>Name</th>
     <th>Location</th>
-    <th>Time & Date</th>
+    <th>Date & Time</th>
     <th>Duration</th>
     <th>Price</th>
     <th>Artist</th>
@@ -396,7 +393,7 @@
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let performance of performances">
+  <tr *ngFor="let performance of displayedPerformances">
     <td>{{ performance.name }}</td>
     <td>{{ performance.location.name }}</td>
     <td>{{ performance.date | date: 'yyyy-MM-dd HH:mm' }}</td>
@@ -409,11 +406,71 @@
       <button
         class="btn btn-secondary bg-purp"
         [routerLink]="performance.hall === 'A' ? '/seatingPlanA' : '/seatingPlanB'"
-        [queryParams]="{ id: performance.performanceId, hall: performance.hall }">
+        [queryParams]="{ id: performance.performanceId, hall: performance.hall }"
+        [disabled]="isPastDate(performance.date)">
         <i class="bi bi-ticket-fill"></i> Tickets
       </button>
     </td>
-
   </tr>
   </tbody>
 </table>
+
+<div class="pagination my-4 d-flex justify-content-center">
+  <!-- Previous Button -->
+  <button
+    class="btn btn-light me-2"
+    (click)="goToPage(currentPage - 1)"
+    [disabled]="currentPage === 1"
+  >
+    &larr;
+  </button>
+
+  <!-- First Page Button -->
+  <button
+    *ngIf="paginationButtons[0] > 1"
+    class="btn me-2"
+    (click)="goToPage(1)"
+    [class.active]="currentPage === 1"
+    [ngClass]="{ 'btn-primary bg-purp': currentPage === 1, 'btn-light': currentPage !== 1 }"
+  >
+    1
+  </button>
+
+  <!-- Ellipsis for pages before the range -->
+  <span *ngIf="paginationButtons[0] > 2" class="me-2">...</span>
+
+  <!-- Dynamic Pagination Buttons -->
+  <ng-container *ngFor="let page of paginationButtons">
+    <button
+      class="btn me-2"
+      (click)="goToPage(page)"
+      [class.active]="currentPage === page"
+      [ngClass]="{ 'btn-primary bg-purp': currentPage === page, 'btn-light': currentPage !== page }"
+    >
+      {{ page }}
+    </button>
+  </ng-container>
+
+  <!-- Ellipsis for pages after the range -->
+  <span *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages - 1" class="me-2">...</span>
+
+  <!-- Last Page Button -->
+  <button
+    *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages"
+    class="btn me-2"
+    (click)="goToPage(totalPages)"
+    [class.active]="currentPage === totalPages"
+    [ngClass]="{ 'btn-primary bg-purp': currentPage === totalPages, 'btn-light': currentPage !== totalPages }"
+  >
+    {{ totalPages }}
+  </button>
+
+  <!-- Next Button -->
+  <button
+    class="btn btn-light"
+    (click)="goToPage(currentPage + 1)"
+    [disabled]="currentPage === totalPages"
+  >
+    &rarr;
+  </button>
+</div>

@@ -66,7 +66,27 @@ public class EventDataGenerator {
             "The Spectacular %s Event",
             "Experience the Best of %s",
             "A Celebration of %s",
-            "The Grand %s Affair"
+            "The Grand %s Affair",
+            "Unleashing the Magic of %s",
+            "The %s Experience",
+            "Dive Deep into %s",
+            "A %s Odyssey",
+            "The Pinnacle of %s",
+            "Feast of %s Wonders",
+            "The Legendary %s Gathering",
+            "Journey Through %s",
+            "The Artistry of %s",
+            "%s: A Cultural Delight",
+            "The %s Revolution",
+            "Masters of %s",
+            "Celebrate %s in Style",
+            "The %s Extravaganza Continues",
+            "Vibrant %s Adventures",
+            "The Essence of %s",
+            "A World-Class %s Experience",
+            "The %s Gala",
+            "Unforgettable %s Nights",
+            "The %s Spectacle"
         };
 
         String[] eventDescriptionFormats = {
@@ -106,8 +126,10 @@ public class EventDataGenerator {
             String titleFormat = eventTitleFormats[random.nextInt(eventTitleFormats.length)];
             String descriptionFormat = eventDescriptionFormats[random.nextInt(eventDescriptionFormats.length)];
 
+            String category = getRandomCategory();
+
             // Generate title and description with the selected formats
-            String title = String.format(titleFormat, getRandomCategory()); // Use category in title
+            String title = String.format(titleFormat, category); // Use category in title
             String description = String.format(
                 descriptionFormat,
                 performance1,
@@ -126,7 +148,7 @@ public class EventDataGenerator {
                 description,
                 dateFrom,
                 dateTo,
-                getRandomCategory(),
+                category,
                 performanceIds
             );
 
@@ -147,31 +169,13 @@ public class EventDataGenerator {
             "Dance",
             "Comedy",
             "Film",
-            "Art Exhibition",
-            "Opera",
-            "Literature",
-            "Photography",
             "Circus",
-            "Magic Show",
-            "Stand-up Comedy",
             "Jazz",
             "Rock",
             "Classical",
             "Pop",
             "Folk",
             "Hip-hop",
-            "Workshops",
-            "Cultural Festival",
-            "Food Festival",
-            "Technology Expo",
-            "Gaming",
-            "Sports",
-            "Meditation and Yoga",
-            "Adventure",
-            "Charity Event",
-            "Historical Reenactment",
-            "Science Fair",
-            "Nature Walk"
         };
         return categories[random.nextInt(categories.length)];
     }

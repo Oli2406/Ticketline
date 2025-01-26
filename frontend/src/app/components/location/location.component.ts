@@ -62,4 +62,9 @@ export class LocationComponent {
   goBack(): void {
     this.appLocation.back();
   }
+  isPastDate(date: string | Date): boolean {
+    const performanceDate = new Date(date);
+    const currentDate = new Date();
+    return performanceDate < currentDate;
+  }
 }

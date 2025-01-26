@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,93 +38,77 @@ public class ReservedDataGenerator {
 
     @PostConstruct
     public void loadInitialData() {
-        int userCount = 7;
+        int userCount = 12;
 
         if (reservedRepository.count() > 0) {
             return;
         }
 
-        for (long userId = 1; userId <= userCount; userId++) {
-            createReservationsForUser(userId);
-        }
-    }
-
-    private void createReservationsForUser(Long userId) {
-        List<Ticket> reservedTickets = ticketRepository.findAll().stream()
-            .filter(ticket -> ticket.getStatus().equals("RESERVED"))
-            .collect(Collectors.toList());
+        // Pre-fetch reserved tickets from the database
+        List<Ticket> reservedTickets = ticketRepository.findReservedTickets();
 
         if (reservedTickets.size() < 2) {
-            LOGGER.warn("Not enough reserved tickets to create reservation.");
+            LOGGER.warn("Not enough reserved tickets to create reservations.");
             return;
         }
 
-        for (int i = 0; i < 4; i++) { // 2 purchases per user
-            // Je 2 gekaufte und reservierte Tickets
-            LocalDate cutoffDate = LocalDate.of(2025, 6, 23);
-            boolean validSelection = false;
+        // Split tickets into two groups: before and after cutoff date
+        LocalDate cutoffDate = LocalDate.of(2025, 6, 23);
+        List<Ticket> ticketsBeforeCutoff = reservedTickets.stream()
+            .filter(ticket -> ticket.getDate().isBefore(cutoffDate.atStartOfDay()))
+            .collect(Collectors.toList());
+        List<Ticket> ticketsAfterCutoff = reservedTickets.stream()
+            .filter(ticket -> ticket.getDate().isAfter(cutoffDate.atStartOfDay()))
+            .collect(Collectors.toList());
 
-            List<Long> ticketIds = new ArrayList<>();
-            int attempts = 0;
-            while (!validSelection && attempts < 30) {
-                ticketIds.clear();
-                ticketIds.addAll(getRandomIds(reservedTickets, 2));
+        // Create reservations for each user
+        for (long userId = 1; userId <= userCount; userId++) {
+            createReservationsForUser(userId, ticketsBeforeCutoff, ticketsAfterCutoff);
+        }
+        LOGGER.info("All reservations were created!");
 
-                boolean allAfterCutoff = ticketIds.stream()
-                    .map(ticketRepository::findByTicketId)
-                    .allMatch(ticket -> ticket.getDate().isAfter(cutoffDate.atStartOfDay()));
+    }
 
-                boolean allBeforeCutoff = ticketIds.stream()
-                    .map(ticketRepository::findByTicketId)
-                    .allMatch(ticket -> ticket.getDate().isBefore(cutoffDate.atStartOfDay()));
+    private void createReservationsForUser(Long userId, List<Ticket> ticketsBeforeCutoff, List<Ticket> ticketsAfterCutoff) {
+        if (ticketsBeforeCutoff.size() < 2 && ticketsAfterCutoff.size() < 2) {
+            LOGGER.warn("Not enough valid tickets for user {}.", userId);
+            return;
+        }
 
-                validSelection = allAfterCutoff || allBeforeCutoff;
-                attempts++;
+        for (int i = 0; i < 10; i++) { // 4 reservations per user
+            // Randomly select a group: before or after cutoff
+            List<Ticket> selectedGroup = random.nextBoolean() ? ticketsBeforeCutoff : ticketsAfterCutoff;
+
+            if (selectedGroup.size() < 2) {
+                continue;
             }
 
-            if (!validSelection) {
-                LOGGER.info("Could not find valid tickets for user {} after 10 attempts.", userId);
-                return; // Überspringe diesen Benutzer
-            }
+            // Select 2 random tickets
+            List<Ticket> selectedTickets = getRandomSubset(selectedGroup, 2);
 
-            // Berechnung des Gesamtpreises
-            Long totalPrice = calculateTotalPrice(ticketIds);
 
-            // Erstellung des Kaufs
-            Reservation reserved = new Reservation(
+            // Create reservation
+            Reservation reservation = new Reservation(
                 userId,
-                ticketIds,
+                selectedTickets.stream().map(Ticket::getTicketId).collect(Collectors.toList()),
                 getRandomPastDate()
             );
 
-            reservedRepository.save(reserved);
-            LOGGER.info("Created reservation for user {}: {}", userId, reserved);
+            reservedRepository.save(reservation);
         }
+        LOGGER.debug("Reservations for user {} created", userId);
     }
 
-
-    private List<Long> getRandomIds(List<?> items, int count) {
-        return random.ints(0, items.size())
-            .distinct()
-            .limit(count)
-            .mapToObj(i -> {
-                if (items.get(0) instanceof Ticket) { // Prüfe das erste Element
-                    return ((Ticket) items.get(i)).getTicketId();
-                }
-                throw new IllegalArgumentException("Unsupported item type in list.");
-            })
-            .collect(Collectors.toList());
-    }
-
-    private Long calculateTotalPrice(List<Long> ticketIds) {
-        List<Ticket> tickets = ticketRepository.findAllById(ticketIds);
-
-        long ticketTotal = tickets.stream().mapToLong(ticket -> ticket.getPrice().longValue()).sum();
-
-        return ticketTotal;
+    private List<Ticket> getRandomSubset(List<Ticket> tickets, int count) {
+        List<Ticket> copy = new ArrayList<>(tickets);
+        Collections.shuffle(copy);
+        return copy.subList(0, Math.min(count, copy.size()));
     }
 
     private LocalDateTime getRandomPastDate() {
-        return LocalDateTime.now().minusDays(random.nextInt(365 * 3)).minusHours(random.nextInt(24)).minusMinutes(random.nextInt(60));
+        return LocalDateTime.now()
+            .minusDays(ThreadLocalRandom.current().nextInt(365 * 3))
+            .minusHours(ThreadLocalRandom.current().nextInt(24))
+            .minusMinutes(ThreadLocalRandom.current().nextInt(60));
     }
 }

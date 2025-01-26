@@ -57,7 +57,8 @@ public class ApplicationUser {
     @Column(nullable = false)
     private LocalDateTime latestRequestedResetTokenTime;
 
-    private Integer version;
+    @Column(nullable = false)
+    private Integer version = 0;
 
     public ApplicationUser() {
         this.latestRequestedResetTokenTime = LocalDateTime.MIN;

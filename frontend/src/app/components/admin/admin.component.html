@@ -16,11 +16,19 @@
 
   <!-- Action Buttons -->
   <div class="row justify-content-center my-3">
-    <div class="col-md-6 d-flex justify-content-between">
-      <button class="btn btn-primary me-3" (click)="navigateToCreateNews()"><i class="bi bi-plus-lg"></i> Create News</button>
-      <button class="btn btn-primary me-3" (click)="navigateToCreateEvent()"><i class="bi bi-plus-lg"></i> Create Event</button>
-      <button class="btn btn-primary me-3" (click)="navigateToCreateUser()"><i class="bi bi-person-plus"></i> Create User</button>
-      <button class="btn btn-primary" (click)="navigateToCreateMerchandise()"><i class="bi bi-plus-lg"></i> Create Merch</button>
+    <div class="col-md-6 d-flex justify-content-evenly">
+      <button class="btn btn-primary btn-create" (click)="navigateToCreateNews()">
+        <i class="bi bi-plus-lg"></i> Create News
+      </button>
+      <button class="btn btn-primary btn-create" (click)="navigateToCreateEvent()">
+        <i class="bi bi-plus-lg"></i> Create Event
+      </button>
+      <button class="btn btn-primary btn-create" (click)="navigateToCreateUser()">
+        <i class="bi bi-person-plus"></i> Create User
+      </button>
+      <button class="btn btn-primary btn-create" (click)="navigateToCreateMerchandise()">
+        <i class="bi bi-plus-lg"></i> Create Merch
+      </button>
     </div>
   </div>
 
@@ -39,7 +47,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let user of users" [ngClass]="{'table-danger': user.locked, 'table-warning': user.admin}">
+        <tr *ngFor="let user of displayedUsers" [ngClass]="{'table-danger': user.locked, 'table-warning': user.admin}">
           <td>{{ user.firstName }}</td>
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
@@ -73,6 +81,66 @@
         </tr>
         </tbody>
       </table>
+    </div>
+    <!-- pagination -->
+    <div class="pagination my-4 d-flex justify-content-center">
+      <!-- Previous Button -->
+      <button
+        class="btn btn-light me-2"
+        (click)="goToPage(currentPage - 1)"
+        [disabled]="currentPage === 1"
+      >
+        &larr;
+      </button>
+
+      <!-- First Page Button -->
+      <button
+        *ngIf="paginationButtons[0] > 1"
+        class="btn me-2"
+        (click)="goToPage(1)"
+        [class.active]="currentPage === 1"
+        [ngClass]="{ 'btn-primary': currentPage === 1, 'btn-light': currentPage !== 1 }"
+      >
+        1
+      </button>
+
+      <!-- Ellipsis for pages before the range -->
+      <span *ngIf="paginationButtons[0] > 2" class="me-2">...</span>
+
+      <!-- Dynamic Pagination Buttons -->
+      <ng-container *ngFor="let page of paginationButtons">
+        <button
+          class="btn me-2"
+          (click)="goToPage(page)"
+          [class.active]="currentPage === page"
+          [ngClass]="{ 'btn-primary bg-purp': currentPage === page, 'btn-light': currentPage !== page }"
+        >
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <!-- Ellipsis for pages after the range -->
+      <span *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages - 1" class="me-2">...</span>
+
+      <!-- Last Page Button -->
+      <button
+        *ngIf="paginationButtons[paginationButtons.length - 1] < totalPages"
+        class="btn me-2"
+        (click)="goToPage(totalPages)"
+        [class.active]="currentPage === totalPages"
+        [ngClass]="{ 'btn-primary': currentPage === totalPages, 'btn-light': currentPage !== totalPages }"
+      >
+        {{ totalPages }}
+      </button>
+
+      <!-- Next Button -->
+      <button
+        class="btn btn-light"
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+      >
+        &rarr;
+      </button>
     </div>
   </div>
   <!-- Render child components -->
