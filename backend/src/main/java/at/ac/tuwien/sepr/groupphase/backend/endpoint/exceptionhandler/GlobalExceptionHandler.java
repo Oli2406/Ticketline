@@ -73,7 +73,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleInsufficientStock(InsufficientStockException ex) {
         LOGGER.warn(ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(Map.of("status", "INSUFFICIENT_STOCK_ERROR", "errorMessage", ex.getMessage()));
+            .body(Map.of("status", "INSUFFICIENT_STOCK_ERROR", "errors", ex.getMessage()));
     }
 
     /**
