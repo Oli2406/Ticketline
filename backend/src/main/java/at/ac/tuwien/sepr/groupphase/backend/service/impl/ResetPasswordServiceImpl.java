@@ -93,6 +93,7 @@ public class ResetPasswordServiceImpl implements ResetPasswordService {
             tokenDto.getNewConfirmedPassword());
 
         user.setPassword(passwordEncoder.encode(tokenDto.getNewPassword()));
+        user.setIsLoggedIn(false);
         userRepository.save(user);
 
         passwordResetRepository.delete(resetToken);

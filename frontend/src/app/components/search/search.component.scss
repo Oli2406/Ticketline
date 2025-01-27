@@ -14,9 +14,27 @@
 
 .bg-purp {
   background-color: #4D47C3;
+  border:none;
 }
 
 td {
   text-align: center;
   vertical-align: middle;
+}
+input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #F0EFFF;
+  color: #333;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+
+
+  &:focus {
+    border-color: #7d5efc;
+    box-shadow: 0px 4px 10px rgba(125, 94, 252, 0.3);
+  }
 }

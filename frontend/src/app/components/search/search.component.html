@@ -37,9 +37,9 @@
     <!-- hidden submit button -->
     <input hidden="hidden" type="submit"/>
 
-    <div class="row">
+    <div class="row justify-content-center align-content-center">
       <!-- Event title -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="eventTitle">Title</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.title" class="form-control"
                id="eventTitle"
@@ -47,7 +47,7 @@
       </div>
 
       <!-- Event category -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="eventCategory">Category</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.category" class="form-control"
                id="eventCategory"
@@ -55,19 +55,19 @@
       </div>
 
       <!-- Event date (Earliest) -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="eventDateEarliest">Takes place after</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateEarliest" class="form-control"
                id="eventDateEarliest" name="eventDateEarliest" type="date"/>
       </div>
 
       <!-- Event date (Latest) -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="eventDateLatest">Takes place before</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="eventSearchParams.dateLatest" class="form-control"
                id="eventDateLatest" name="eventDateLatest" type="date"/>
       </div>
-      <div class="col-md-3 mb-3 d-flex align-items-end">
+      <div class="col-md-2 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
         </button>
@@ -82,9 +82,9 @@
     <!-- hidden submit button -->
     <input hidden="hidden" type="submit"/>
 
-    <div class="row">
+    <div class="row justify-content-center align-content-center">
       <!-- Location name -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="locationName">Name</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.name" class="form-control"
                id="locationName"
@@ -92,7 +92,7 @@
       </div>
 
       <!-- Location street -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="locationStreet">Street</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.street" class="form-control"
                id="locationStreet"
@@ -100,7 +100,7 @@
       </div>
 
       <!-- Location city -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="locationCity">City</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.city" class="form-control"
                id="locationCity"
@@ -108,7 +108,7 @@
       </div>
 
       <!-- Location country -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="locationCountry">Country</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.country" class="form-control"
                id="locationCountry"
@@ -116,14 +116,14 @@
       </div>
 
       <!-- Location postal code -->
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="locationPostalCode">Postal Code</label>
         <input (ngModelChange)="searchChanged()" [(ngModel)]="locationSearchParams.postalCode" class="form-control"
                id="locationPostalCode"
                name="locationPostalCode" placeholder="Enter postal code" type="number"/>
       </div>
 
-      <div class="col-md-3 mb-3 d-flex align-items-end">
+      <div class="col-md-2 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
         </button>
@@ -136,8 +136,8 @@
 <!-- Artist Search Form -->
 <div *ngIf="curSearchType === SearchType.artist" class="mt-3">
   <form (ngSubmit)="updateData()">
-    <div class="row justify-content-center">
-      <div class="col-md-3 mb-3">
+    <div class="row justify-content-center align-content-center">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="firstName">First Name</label>
         <input
           class="form-control"
@@ -149,7 +149,7 @@
           type="text"/>
       </div>
 
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="lastName">Last Name</label>
         <input
           class="form-control"
@@ -161,7 +161,7 @@
           type="text"/>
       </div>
 
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="artistBandName">Artist/Band Name</label>
         <input
           class="form-control"
@@ -173,7 +173,7 @@
           type="text"/>
       </div>
 
-      <div class="col-md-3 mb-3 d-flex align-items-end">
+      <div class="col-md-2 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
         </button>
@@ -186,8 +186,7 @@
 <div *ngIf="curSearchType === SearchType.performance" class="mt-3">
   <form (ngSubmit)="updateData()">
     <div class="row justify-content-center">
-      <div class="col-md-3 mb-3">
-
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="performanceDate">Date and Time</label>
         <input
           class="form-control"
@@ -198,7 +197,7 @@
           type="datetime-local"/>
       </div>
 
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="performancePrice">Price</label>
         <input
           class="form-control"
@@ -210,7 +209,7 @@
           type="number"/>
       </div>
 
-      <div class="col-md-3 mb-3">
+      <div class="col-md-2 mb-3">
         <label class="form-label" for="performanceHall">Hall Name</label>
         <input
           class="form-control"
@@ -222,7 +221,7 @@
           type="text"/>
       </div>
 
-      <div class="col-md-3 mb-3 d-flex align-items-end">
+      <div class="col-md-2 mb-3 d-flex align-items-end">
         <button type="button" (click)="clearSearch()" class="btn btn-secondary me-2">
           <i class="bi bi-x-circle"></i> Clear
         </button>
@@ -314,7 +313,7 @@
       placeholder="Enter advanced search query..."
       [(ngModel)]="searchQuery"
       (ngModelChange)="performAdvancedSearch()"/>
-    <button class="btn btn-primary" (click)="performAdvancedSearch()">Search</button>
+    <button class="btn btn-primary btn-search" (click)="performAdvancedSearch()">Search</button>
     <button type="button" (click)="clearSearch()" class="btn btn-secondary">
       <i class="bi bi-x-circle"></i> Clear
     </button>

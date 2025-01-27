@@ -16,6 +16,10 @@ import {Purchase} from "../../dtos/purchase";
 import {PurchaseService} from "../../services/purchase.service";
 import {TicketService} from "../../services/ticket.service";
 import cardValidator from 'card-validator';
+import {
+  ConfirmationDialogMode,
+  ConfirmDialogComponent
+} from "../confirm-dialog/confirm-dialog.component";
 
 @Component({
   selector: 'app-cart',
@@ -24,7 +28,8 @@ import cardValidator from 'card-validator';
     FormsModule,
     DecimalPipe,
     CommonModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    ConfirmDialogComponent
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss']
@@ -62,6 +67,13 @@ export class CartComponent implements OnInit {
   performanceDetails: PerformanceListDto = null;
   performanceCache: { [id: number]: string } = {};
   isLoading: boolean = false;
+
+  showConfirmBuyDialog = false;
+  message = 'Only merchandise will be purchased with points. Tickets remain in the cart. Do you want to proceed?';
+
+  tickets: number[];
+  merchandise: number[];
+  merchandiseQuantities: number[];
 
   get showPaymentDetails(): boolean {
     return this.selectedPaymentOption !== 'points';
@@ -309,7 +321,7 @@ export class CartComponent implements OnInit {
     return 'performanceId' in item;
   }
 
-  async buy(): Promise<void> {
+  async validateAndBuy(): Promise<void> {
     this.countTicketMerchandiseInCart();
     this.calculateTaxAmounts();
 
@@ -359,10 +371,12 @@ export class CartComponent implements OnInit {
 
     if (this.selectedPaymentOption === 'points') {
       if (tickets.length > 0) {
-        this.toastr.info(
-          'Only merchandise will be purchased with points. Tickets remain in the cart.',
-          'Notice'
-        );
+        this.showConfirmBuyDialog = true;
+        this.tickets = tickets;
+        this.merchandise = merchandise;
+        this.merchandiseQuantities = merchandiseQuantities;
+
+        return;
       }
 
       if (merchandise.length === 0) {
@@ -370,7 +384,10 @@ export class CartComponent implements OnInit {
         return;
       }
     }
+    this.finalBuy(tickets, merchandise, merchandiseQuantities);
+  }
 
+  protected finalBuy(tickets: number[], merchandise: number[], merchandiseQuantities: number[]) {
     const totalPrice = this.getTotalPrice();
     const today = new Date();
     const purchasePayload: Purchase = {
@@ -416,7 +433,6 @@ export class CartComponent implements OnInit {
     });
   }
 
-
   updatePaymentOption(option: string): void {
     const hasTickets = this.cartItems.some(cartItem => 'performanceId' in cartItem.item);
     if (option === 'points' && hasTickets) {
@@ -445,4 +461,6 @@ export class CartComponent implements OnInit {
 
     this.cartItems = validCartItems;
   }
+
+  protected readonly ConfirmationDialogMode = ConfirmationDialogMode;
 }

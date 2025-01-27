@@ -133,7 +133,7 @@
       </div>
 
       <div class="payment-buttons">
-        <button class="btn btn-primary" (click)="buy()">Buy</button>
+        <button class="btn btn-primary" (click)="validateAndBuy()">Buy</button>
       </div>
       <div class="payment-buttons" [hidden]="true">
         <button class="btn-download" (click)="generatePDF()"> Download/Print Receipt</button>
@@ -362,3 +362,12 @@
   </body>
   </html>
 </div>
+
+@if (showConfirmBuyDialog) {
+  <app-confirm-dialog
+    [mode]="ConfirmationDialogMode.confirm"
+    [message]="message"
+    (confirm)="finalBuy(tickets,merchandise,merchandiseQuantities)"
+    (cancel)="showConfirmBuyDialog = false">
+  </app-confirm-dialog>
+}
