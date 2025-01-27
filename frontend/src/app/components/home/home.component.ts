@@ -23,12 +23,13 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.saveResetTokenAndRedirect();
+    const reset = this.saveResetTokenAndRedirect();
 
     if (this.isLoggedIn()) {
       this.initNews()
     } else {
-      this.router.navigate(['/login']);
+      if(!reset)
+        this.router.navigate(['/login']);
     }
   }
 
@@ -37,14 +38,18 @@ export class HomeComponent implements OnInit {
   currentIndex = 0;
   displayedNews: NewsDetailDto[] = [];
 
-  saveResetTokenAndRedirect(){
+  saveResetTokenAndRedirect() : boolean {
+    var success = false;
     this.route.queryParams.subscribe((params) => {
       if (params['reset-password'] === 'true' && params['token']) {
         const token = params['token'];
         this.authService.storeResetToken(token);
         this.router.navigate(['/reset-password']);
+        success =  true;
       }
-    });
+    }, error => {success = false});
+
+    return success;
   }
 
   updateDisplayedNews() {
@@ -71,24 +76,24 @@ export class HomeComponent implements OnInit {
 
   initNews() {
     this.newsService.getUnreadNews(this.authService.getUserEmailFromToken())
-      .subscribe({
-        next: news => {
-          this.news = news;
+    .subscribe({
+      next: news => {
+        this.news = news;
 
-          for (const n of this.news) {
-            if (n.images && n.images[0]) {
-              n.images[0] = this.globals.backendRessourceUri + "/newsImages/" + n.images[0];
-            } else {
-              n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
-            }
+        for (const n of this.news) {
+          if (n.images && n.images[0]) {
+            n.images[0] = this.globals.backendRessourceUri + "/newsImages/" + n.images[0];
+          } else {
+            n.images.push(this.globals.backendRessourceUri + "/newsImages/none.png");
           }
-          this.updateDisplayedNews();
-        },
-        error: error => {
-          console.error('Error fetching news', error);
-          this.notification.error('Could not fetch news');
         }
-      });
+        this.updateDisplayedNews();
+      },
+      error: error => {
+        console.error('Error fetching news', error);
+        this.notification.error('Could not fetch news');
+      }
+    });
   }
 
   isLoggedIn(): boolean {
