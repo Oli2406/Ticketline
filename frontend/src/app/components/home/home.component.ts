@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
     if (this.isLoggedIn()) {
       this.initNews()
     } else {
-      if(!reset)
+      if (!reset)
         this.router.navigate(['/login']);
     }
   }
@@ -38,16 +38,18 @@ export class HomeComponent implements OnInit {
   currentIndex = 0;
   displayedNews: NewsDetailDto[] = [];
 
-  saveResetTokenAndRedirect() : boolean {
+  saveResetTokenAndRedirect(): boolean {
     var success = false;
     this.route.queryParams.subscribe((params) => {
       if (params['reset-password'] === 'true' && params['token']) {
         const token = params['token'];
         this.authService.storeResetToken(token);
         this.router.navigate(['/reset-password']);
-        success =  true;
+        success = true;
       }
-    }, error => {success = false});
+    }, error => {
+      success = false
+    });
 
     return success;
   }
