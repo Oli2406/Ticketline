@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-    private final String senderEmail = "ticketline.inso8@gmail.com";
+    private final String senderEmail = "ticketline944@gmail.com";
 
     public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -22,11 +22,10 @@ public class EmailServiceImpl implements EmailService {
         String subject = "Password Reset Request";
         String message = String.format(
             "Hello,\n\nYou requested a password reset. Here is your reset code: %s\n\n"
-                + "Alternatively, click the link below to reset your password:\n%s\n\n"
                 + "If you did not request this, please ignore this email.\n\n"
                 + "The Code expires in 25 Minutes! The reset will not work when the token expired. \n\n"
                 + "Regards,\nYour Ticketline-Team",
-            resetCode, resetLink);
+            resetCode);
 
         sendEmail(email, subject, message);
     }
