@@ -1,4 +1,3 @@
-# SE PR Group Phase
 
 ## First Steps
 
