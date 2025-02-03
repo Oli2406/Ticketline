@@ -1,4 +1,3 @@
-# Backend Template for SE PR Group Phase
 
 ## How to run it
 
